@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from .models import CompanyProfile
 from django.utils.deprecation import MiddlewareMixin
-from django.shortcuts import redirect
+
+from .models import CompanyProfile
 
 
 class TenantMiddleware(MiddlewareMixin):
@@ -11,56 +11,86 @@ class TenantMiddleware(MiddlewareMixin):
         "/logout/",
         "/static/",
         "/media/",
+        "/admin/",       # ✅ allow Django admin without tenant forcing
+        "/superadmin/",  # ✅ allow superadmin without tenant forcing
     )
+
+    def _host_no_port(self, request):
+        return (request.get_host() or "").split(":")[0].lower()
+
+    def _get_base_domain(self):
+        """
+        Returns base domain like: 'roznamcha.app' or 'lvh.me'
+        """
+        base = getattr(settings, "SAAS_BASE_DOMAIN", "") or ""
+        return base.lstrip(".").lower()
+
+    def _is_public_host(self, host, base):
+        """
+        Treat BOTH base domain and www.base as PUBLIC.
+        Example: roznamcha.app and www.roznamcha.app
+        """
+        if host == base:
+            return True
+        if host == f"www.{base}":
+            return True
+        return False
+
+    def _is_tenant_host(self, host, base):
+        """
+        Tenant hosts are: <something>.base (but NOT www.base)
+        """
+        if not host.endswith(f".{base}"):
+            return False
+        if host == f"www.{base}":
+            return False
+        return True
 
     def process_request(self, request):
         path = request.path or "/"
 
-        # ✅ SUPERADMIN routes must run ONLY on PUBLIC domain (not on tenant subdomains)
-        if request.path.startswith("/superadmin/"):
-            host = request.get_host().split(":")[0]  # remove port
-            public_base = (getattr(settings, "SAAS_BASE_DOMAIN", "") or "").lstrip(".")
-
-            # Local dev special: if SAAS_BASE_DOMAIN is lvh.me, public domain is lvh.me
-            # If request is coming from alpha.lvh.me, redirect to lvh.me
-            if public_base and host != public_base and host.endswith("." + public_base):
-                scheme = "https" if request.is_secure() else "http"
-                port = ""
-                # keep port in local dev (e.g. :8000)
-                if ":" in request.get_host():
-                    port = ":" + request.get_host().split(":")[1]
-
-                return redirect(f"{scheme}://{public_base}{port}{request.get_full_path()}")
-
-            # ✅ mark as public request (no tenant resolution)
+        # ✅ Always allow safe paths without forcing tenant resolution
+        if any(path.startswith(p) for p in self.SAFE_PATH_PREFIXES):
+            request.tenant = None
             request.owner = None
             request.company = None
-            return self.get_response(request)
+            return None
 
-        if any(path.startswith(p) for p in self.SAFE_PATH_PREFIXES):
-            return
+        host = self._host_no_port(request)
+        base = self._get_base_domain()
+
+        # If base domain isn't configured, don't guess
+        if not base:
+            request.tenant = None
+            request.owner = None
+            request.company = None
+            return None
+
+        # ✅ Public host: no tenant resolution
+        if self._is_public_host(host, base):
+            request.tenant = None
+            request.owner = None
+            request.company = None
+            return None
+
+        # ✅ Tenant host: requires authenticated user with OWNER/STAFF
+        if not self._is_tenant_host(host, base):
+            # Unknown host (safety)
+            raise PermissionDenied("Invalid host.")
 
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated:
+            # Must login first
             request.tenant = None
             request.owner = None
-            return
+            return None
 
-        # Django superuser (Super Admin) must always live on PUBLIC domain (no tenant subdomain)
+        # Superuser should NOT be tenant-bound
         if getattr(user, "is_superuser", False):
-            public_base = (getattr(settings, "PUBLIC_BASE_DOMAIN", "") or "").replace("https://", "").replace("http://", "")
-            public_host = public_base.split(":")[0]  # lvh.me or roznamcha.app
-
-            host = (request.get_host() or "").split(":")[0]
-            scheme = "https" if request.is_secure() else "http"
-
-            # If superadmin accidentally opens a tenant subdomain, bounce to public domain
-            if host.endswith("." + public_host):
-                return redirect(f"{scheme}://{public_base}{request.get_full_path()}")
-
             request.tenant = None
             request.owner = user
-            return
+            return None
+
         profile = getattr(user, "profile", None)
         if not profile:
             raise PermissionDenied("User profile missing")
@@ -77,7 +107,7 @@ class TenantMiddleware(MiddlewareMixin):
             # profile-based superadmin bypass if you use it
             request.tenant = None
             request.owner = user
-            return
+            return None
         else:
             raise PermissionDenied("Invalid role")
 
@@ -85,11 +115,7 @@ class TenantMiddleware(MiddlewareMixin):
         if not company:
             raise PermissionDenied("Company not found")
 
-        # HARD MATCH if subdomain resolved tenant
-        current = getattr(request, "tenant", None)
-        if current is not None and getattr(current, "id", None) != company.id:
-            raise PermissionDenied("Tenant mismatch (wrong subdomain).")
-
         request.owner = owner
         request.tenant = company
-        SubdomainTenantMiddleware = TenantMiddleware
+        request.company = company
+        return None
