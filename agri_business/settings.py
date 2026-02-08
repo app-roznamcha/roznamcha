@@ -1,5 +1,4 @@
 import os
-import os
 from pathlib import Path
 
 """
@@ -25,7 +24,6 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     ".localhost",
     ".lvh.me",
-
     "roznamcha.app",
     "www.roznamcha.app",
     ".roznamcha.app",
@@ -132,29 +130,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 if DEBUG:
     SAAS_BASE_DOMAIN = "lvh.me"
     PUBLIC_BASE_DOMAIN = "lvh.me:8000"
-
-    # Share session + CSRF across all local subdomains (*.lvh.me)
     SESSION_COOKIE_DOMAIN = ".lvh.me"
     CSRF_COOKIE_DOMAIN = ".lvh.me"
-
     CSRF_TRUSTED_ORIGINS = [
-        "https://roznamcha.app",
-        "https://www.roznamcha.app",
-        "https://*.roznamcha.app",
-        "https://roznamcha-web.onrender.com",
-
+        "http://lvh.me:8000",
+        "http://alpha.lvh.me:8000",
+        "http://beta.lvh.me:8000",
     ]
 else:
     SAAS_BASE_DOMAIN = "roznamcha.app"
-    PUBLIC_BASE_DOMAIN = "roznamcha.app"
-
-    # Share session + CSRF across all prod subdomains (*.roznamcha.app)
+    PUBLIC_BASE_DOMAIN = "www.roznamcha.app"
     SESSION_COOKIE_DOMAIN = ".roznamcha.app"
     CSRF_COOKIE_DOMAIN = ".roznamcha.app"
-
     CSRF_TRUSTED_ORIGINS = [
         "https://roznamcha.app",
         "https://www.roznamcha.app",
+        "https://roznamcha-web.onrender.com",
     ]
 
 if not DEBUG:
