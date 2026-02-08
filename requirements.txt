@@ -6,3 +6,4 @@ packaging==26.0
 pillow==12.1.0
 sqlparse==0.5.5
 whitenoise==6.11.0
+psycopg[binary]==3.2.6
