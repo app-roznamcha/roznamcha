@@ -136,6 +136,8 @@ if DEBUG:
         "http://lvh.me:8000",
         "http://alpha.lvh.me:8000",
         "http://beta.lvh.me:8000",
+        "https://roznamcha.app",
+        "https://www.roznamcha.app",
     ]
 else:
     SAAS_BASE_DOMAIN = "roznamcha.app"
