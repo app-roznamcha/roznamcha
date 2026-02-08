@@ -1,5 +1,6 @@
 import os
-from django.core.exceptions import ImproperlyConfigured
+import os
+from pathlib import Path
 
 """
 Django settings for agri_business project.
@@ -22,15 +23,14 @@ DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    ".localhost",        # enables abc.localhost
+    ".localhost",
     ".lvh.me",
 
-    # production domains
+    "roznamcha.app",
     "www.roznamcha.app",
     ".roznamcha.app",
     ".onrender.com",
 ]
-
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -138,9 +138,11 @@ if DEBUG:
     CSRF_COOKIE_DOMAIN = ".lvh.me"
 
     CSRF_TRUSTED_ORIGINS = [
-        "http://lvh.me:8000",
-        "http://alpha.lvh.me:8000",
-        "http://beta.lvh.me:8000",
+        "https://roznamcha.app",
+        "https://www.roznamcha.app",
+        "https://*.roznamcha.app",
+        "https://roznamcha-web.onrender.com",
+
     ]
 else:
     SAAS_BASE_DOMAIN = "roznamcha.app"
@@ -160,7 +162,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    
+
 # Auth redirects
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
