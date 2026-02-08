@@ -1,11 +1,13 @@
 services:
   - type: web
-    name: roznamcha
-    env: python
+    name: roznamcha-web
+    runtime: python
+    region: singapore
+    plan: starter
     buildCommand: "./build.sh"
     startCommand: "gunicorn agri_business.wsgi:application"
     envVars:
       - key: DEBUG
         value: "False"
-      - key: SECRET_KEY
-        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.11.12"
