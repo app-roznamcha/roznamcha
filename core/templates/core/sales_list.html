@@ -1,0 +1,236 @@
+{% extends "core/base.html" %}
+{% block title %}Sales Invoices{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
+
+  <style>
+    .action-pill {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:5px 14px;
+      border-radius:999px;
+      font-size:13px;
+      border:1px solid #111827;
+      background:#ffffff;
+      color:#111827;
+      text-decoration:none;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .action-pill:hover { background:#f3f4f6; }
+
+    .tbl{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed; /* respects colgroup widths */
+      min-width:1040px;  /* supplier removed, so less needed */
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:15px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      background:#f9fafb;
+      font-weight:600;
+      text-align:left;
+    }
+    .right{ text-align:right; }
+    .center{ text-align:center; }
+    .nowrap{ white-space:nowrap; }
+    .truncate{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+  </style>
+
+  {# ---------- Top Bar (Title + Buttons) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Sales Invoices</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        View, filter, and post sales invoices to customers.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'sales_new' %}"
+         class="btn btn-primary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        ➕ New Sale
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filters Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">Filters</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Narrow down sales invoices by date range, customer, and posting status.
+    </p>
+
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
+        <input type="date" name="from" value="{{ from_date|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
+        <input type="date" name="to" value="{{ to_date|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:220px;flex:1;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">Customer</label>
+        <select name="customer"
+                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">All customers</option>
+          {% for c in customers %}
+            <option value="{{ c.id }}"
+                    {% if c.id|stringformat:"s" == customer_id %}selected{% endif %}>
+              {{ c.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="min-width:160px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">Posted?</label>
+        <select name="posted"
+                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="all" {% if posted_filter == "all" %}selected{% endif %}>All</option>
+          <option value="yes" {% if posted_filter == "yes" %}selected{% endif %}>Yes</option>
+          <option value="no" {% if posted_filter == "no" %}selected{% endif %}>No</option>
+        </select>
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+        <a href="{% url 'sales_list' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;margin-left:4px;">
+          Reset
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+  {# ---------- Sales Invoices Table Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="padding:14px 20px 8px;border-bottom:1px solid #e5e7eb;">
+      <div style="font-size:18px;font-weight:600;">Sales Invoices</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl">
+        <colgroup>
+          <col style="width:5%;">   {# # #}
+          <col style="width:10%;">  {# Date #}
+          <col style="width:8%;">  {# Invoice # #}
+          <col style="width:13%;">  {# Customer #}
+          <col style="width:14%;">  {# Products #}
+          <col style="width:8%;">   {# Amount #}
+          <col style="width:7%;">   {# Posted #}
+          <col style="width:20%;">  {# Action #}
+        </colgroup>
+    
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Date</th>
+            <th class="nowrap">Invoice #</th>
+            <th>Customer</th>
+            <th>Products</th>
+            <th class="right nowrap">Amount</th>
+            <th class="center nowrap">Posted?</th>
+            <th class="center nowrap">Action</th>
+          </tr>
+        </thead>
+    
+        <tbody>
+        {% if invoices %}
+          {% for inv in invoices %}
+            <tr>
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
+              <td class="nowrap">{{ inv.invoice_number }}</td>
+    
+              <td class="truncate" title="{{ inv.customer.name }}">
+                {{ inv.customer.name }}
+              </td>
+    
+              <td class="truncate"
+                  title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
+                {% with first_item=inv.items.first %}
+                  {% if first_item %}
+                    {{ first_item.product.name }}
+                    {% if inv.items.count > 1 %}
+                      + {{ inv.items.count|add:"-1" }} more
+                    {% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                {% endwith %}
+              </td>
+    
+              <td class="right nowrap">{{ inv.calculate_total|floatformat:2 }}</td>
+    
+              <td class="center nowrap">
+                {% if inv.posted %}
+                  <span class="badge badge-success">Yes</span>
+                {% else %}
+                  <span class="badge badge-warning">No</span>
+                {% endif %}
+              </td>
+    
+              <td class="center nowrap">
+                {% if not inv.posted %}
+                  <a href="{% url 'sales_edit' inv.id %}" class="action-pill" style="margin-right:6px;">Edit</a>
+    
+                  <form action="{% url 'sales_delete' inv.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="action-pill" style="margin-right:6px;"
+                            onclick="return confirm('Delete this invoice?');">
+                      Delete
+                    </button>
+                  </form>
+    
+                  <a href="{% url 'sales_post' inv.id %}" class="action-pill">Post</a>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align:center;padding:12px;font-size:15px;color:#6b7280;">
+              No sales invoices found.
+            </td>
+          </tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

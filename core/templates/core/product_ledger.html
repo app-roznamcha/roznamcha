@@ -1,0 +1,145 @@
+{% extends "core/base.html" %}
+{% block title %}Product Ledger{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Product Ledger</h1>
+      <p style="margin:0 0 12px;font-size:15px;color:#475569;">
+        View detailed stock movements and running balance for any product.
+      </p>
+      {% if selected_product %}
+        <p style="margin:0 0 4px;font-size:14px;color:#4b5563;">
+          <strong>Product:</strong> {{ selected_product.code }} – {{ selected_product.name }}
+        </p>
+        <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">
+          <strong>Opening Qty:</strong> {{ opening_qty }} &nbsp;&nbsp;
+          <strong>Closing Qty:</strong> {{ closing_qty }}
+        </p>
+        {% if date_from or date_to %}
+          <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">
+            Period:
+            {% if date_from %}From {{ date_from|date:"d M Y" }}{% endif %}
+            {% if date_from and date_to %} to {% endif %}
+            {% if date_to %}{{ date_to|date:"d M Y" }}{% endif %}
+          </p>
+        {% endif %}
+      {% endif %}
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'product_list' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        📦 Product List
+      </a>
+    </div>
+  </div>
+
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:14px 16px 16px;margin-bottom:20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <form method="get"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+        <span style="color:#4b5563;">Product</span>
+        <select name="product"
+                style="min-width:260px;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;">
+          <option value="">-- Select Product --</option>
+          {% for p in products %}
+            <option value="{{ p.id }}"
+                    {% if selected_product and selected_product.id == p.id %}selected{% endif %}>
+              {{ p.code }} - {{ p.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+        <span style="color:#4b5563;">From</span>
+        <input type="date" name="from"
+               value="{{ date_from|date:'Y-m-d' }}"
+               style="padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;min-width:150px;">
+      </label>
+
+      <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+        <span style="color:#4b5563;">To</span>
+        <input type="date" name="to"
+               value="{{ date_to|date:'Y-m-d' }}"
+               style="padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;min-width:150px;">
+      </label>
+
+      <button type="submit"
+              style="height:38px;padding:0 18px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;">
+        Show Ledger
+      </button>
+    </form>
+  </div>
+
+  {% if selected_product %}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+      <div style="width:100%;overflow-x:auto;">
+        <table style="border-collapse:collapse;width:100%;min-width:900px;font-size:14px;">
+          <thead>
+            <tr>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Date</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Source</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Ref</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Counterparty</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">In Qty</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Out Qty</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Unit Price</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Value</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Balance Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if rows %}
+              {% for r in rows %}
+                <tr>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                    {{ r.date|date:"Y-m-d" }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                    {{ r.source }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                    {{ r.ref }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                    {{ r.counterparty }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                    {{ r.in_qty }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                    {{ r.out_qty }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                    {{ r.unit_price }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                    {{ r.value }}
+                  </td>
+                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                    {{ r.balance_qty }}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="9" style="padding:10px 9px;text-align:center;color:#6b7280;">
+                  No movements found for this product in the selected period.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

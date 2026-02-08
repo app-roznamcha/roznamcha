@@ -1,0 +1,89 @@
+{% extends "core/base.html" %}
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Products</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        Listing of all products with units, prices, and current stock status.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'product_create' %}"
+         class="btn btn-primary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        ➕ New Product
+      </a>
+    </div>
+  </div>
+
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:900px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Code</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Name</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Unit</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Purchase Price</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Sale Price</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Stock</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Active?</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if products %}
+          {% for p in products %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ forloop.counter }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ p.code }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ p.name }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ p.get_unit_display }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:right;">
+                {{ p.purchase_price_per_unit }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:right;">
+                {{ p.sale_price_per_unit }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:right;">
+                {{ p.current_stock }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:center;">
+                {% if p.is_active %}
+                  <span style="color:#166534;font-weight:600;">Yes</span>
+                {% else %}
+                  <span style="color:#b91c1c;font-weight:600;">No</span>
+                {% endif %}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:center;">
+                <a href="{% url 'product_edit' p.id %}"
+                   style="color:#0d6efd;text-decoration:none;font-weight:500;">
+                  Edit
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="9" style="text-align:center;padding:12px;font-size:15px;color:#6b7280;">
+              No products yet.
+            </td>
+          </tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

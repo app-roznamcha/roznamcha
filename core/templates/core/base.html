@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Roznamcha — Smart Khata & Hisab System
+      </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Global base styles -->
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+
+        /* Top header bar */
+        .app-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .app-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+            min-width: 0;
+        }
+
+        .brand-logo {
+    height: 64px;          /* bigger */
+    width: auto;           /* keep aspect ratio */
+    object-fit: contain;
+    border-radius: 12px;
+    border: 0;
+    background: transparent;
+}
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 16px;
+            color: #111827;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 520px;
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 520px;
+        }
+
+        /* Simple container for regular pages.
+           Dashboard adds its own .dashboard-page so this won’t hurt. */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        /* Generic primary button */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #2563eb;
+            border: 1px solid #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        /* Secondary button */
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { background: #f3f4f6; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Logout button (same styling as your dashboard logout) */
+        .btn-header-logout {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-header-logout:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+    
+        /* Allow certain pages to go full width */
+        .app-container.is-fluid {
+        max-width: 100%;
+        padding-left: 32px;
+        padding-right: 32px;
+        }
+
+        /* Optional: a bit tighter on small screens */
+        @media (max-width: 640px) {
+        .app-container.is-fluid {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+        }
+
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- ✅ Global Header with Company Branding -->
+    <header class="app-header">
+        <div class="app-header-inner">
+
+            <div class="brand">
+                <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'landing' %}{% endif %}"
+                    title="Roznamcha"
+                    style="display:inline-flex;align-items:center;">
+                    <img
+                      src="{% static 'core/branding/roznamcha.png' %}"
+                      alt="Roznamcha"
+                      class="brand-logo"
+                    />
+                  </a>
+            </div>
+
+            <div class="header-actions">
+                {% if user.is_authenticated %}
+              
+                  <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-header-logout" title="Logout">⏻ Logout</button>
+                  </form>
+              
+                {% else %}
+                  <a href="{% url 'login' %}" class="btn-primary">Login</a>
+                {% endif %}
+              </div>
+            
+        </div>
+    </header>
+
+    <div class="app-container {% block container_class %}{% endblock %}">
+        {% if request.user.is_authenticated %}
+  {% with owner=request.owner|default:None %}
+    {% if owner and owner.profile %}
+      {% if owner.profile.subscription_status == "TRIAL" %}
+        <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;">
+          You are on <b>Trial</b>. Please activate subscription before trial ends.
+          <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#92400e;">View</a>
+        </div>
+      {% elif owner.profile.subscription_status == "EXPIRED" %}
+        <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;">
+          Your subscription is <b>expired</b>. Some actions are blocked.
+          <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#9f1239;">Renew</a>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endwith %}
+{% endif %}
+
+{% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

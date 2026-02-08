@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}Company{% endblock %}
+{% block content %}
+
+<div class="container" style="max-width: 900px; margin: 30px auto;">
+  <h2>Company Profile</h2>
+
+  <form method="post" enctype="multipart/form-data" style="padding:12px;border:1px solid #ddd;border-radius:10px;">
+    {% csrf_token %}
+
+    <label>Company Name</label><br/>
+    <input name="name" value="{{ company.name|default:'' }}" style="width:100%;padding:8px;"><br/><br/>
+
+    <label>Phone</label><br/>
+    <input name="phone" value="{{ company.phone|default:'' }}" style="width:100%;padding:8px;"><br/><br/>
+
+    <label>Email</label><br/>
+    <input name="email" value="{{ company.email|default:'' }}" style="width:100%;padding:8px;"><br/><br/>
+
+    <label>Address</label><br/>
+    <textarea name="address" style="width:100%;padding:8px;">{{ company.address|default:'' }}</textarea><br/><br/>
+
+    <label>Logo</label><br/>
+    <input type="file" name="logo"><br/><br/>
+
+    <button type="submit" style="padding:10px 16px;">Save</button>
+    <a href="{% url 'owner_profile_page' %}" style="margin-left:10px;">Back</a>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Roznamcha — Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#f3f4f6; color:#111827; }
+    .app-header { background:#fff; border-bottom:1px solid #e5e7eb; }
+    .app-header-inner { max-width:1200px; margin:0 auto; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand { display:flex; align-items:center; gap:26px; min-width:0; }
+    .brand-logo { height:64px; width:auto; object-fit:contain; border-radius:12px; border:0; background:transparent; }
+    .btn-primary { display:inline-flex; align-items:center; justify-content:center; padding:8px 16px; border-radius:999px; background:#2563eb; border:1px solid #2563eb; color:#fff; font-size:14px; font-weight:600; text-decoration:none; cursor:pointer; }
+    .btn-primary:hover { background:#1d4ed8; border-color:#1d4ed8; }
+    .app-container { max-width:1200px; margin:0 auto; padding:24px 16px 40px; }
+    .card { max-width:420px; margin:30px auto; background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
+    .title { font-size:20px; font-weight:800; margin:0 0 10px; }
+    label { display:block; font-size:13px; font-weight:700; margin:10px 0 6px; color:#374151; }
+    input { width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; }
+    .hint { font-size:12px; color:#6b7280; margin-top:8px; }
+    .error { background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; padding:10px 12px; border-radius:12px; margin:10px 0; font-size:14px; }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="brand">
+      <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha" class="brand-logo" />
+    </div>
+  </div>
+</header>
+
+<div class="app-container">
+  <div class="card">
+    <div class="title">Login</div>
+
+    {% if form.errors %}
+      <div class="error">Invalid username or password.</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      <label for="id_username">Username</label>
+      <input type="text" name="username" autofocus required id="id_username">
+
+      <label for="id_password">Password</label>
+      <input type="password" name="password" required id="id_password">
+
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <div style="margin-top:14px;">
+        <button class="btn-primary" type="submit" style="width:100%;">Login</button>
+      </div>
+
+      <div class="hint">
+        Tip: If you logged in on the wrong subdomain, Roznamcha will automatically send you to your correct company subdomain after login.
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

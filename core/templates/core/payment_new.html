@@ -1,0 +1,138 @@
+{% extends "core/base.html" %}
+
+{% block title %}New Payment{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:50px auto 80px;padding:0 32px;font-size:17px;line-height:1.45;">
+
+  {# ---------- Top Bar (Title + Dashboard + Back) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 6px;font-size:34px;font-weight:700;">New Payment / Receipt</h1>
+      <p style="margin:0 0 20px;font-size:16px;color:#475569;">
+        Record money received from customers or paid to suppliers using a cash or bank account.
+      </p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'payment_list' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+        ← Back to Payments
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Error Message (if any) ---------- #}
+  {% if error %}
+    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
+                font-size:15px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  {# ---------- Card with Form ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:22px 24px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Date</label>
+          <input type="date"
+                 name="date"
+                 value="{{ today }}"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Direction</label>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;">
+            <label>
+              <input type="radio" name="direction" value="IN" checked>
+              Receipt (money coming IN)
+            </label>
+            <label>
+              <input type="radio" name="direction" value="OUT">
+              Payment (money going OUT)
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">
+            Party (Customer / Supplier)
+          </label>
+          <select name="party" required
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+            <option value="">-- Select Party --</option>
+            {% for p in parties %}
+              <option value="{{ p.id }}">{{ p.name }} ({{ p.get_party_type_display }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">
+            Cash / Bank Account
+          </label>
+          <select name="account" required
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+            <option value="">-- Select Account --</option>
+            {% for acc in accounts %}
+              <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
+            {% endfor %}
+          </select>
+          <p style="margin:6px 0 0;font-size:14px;color:#6b7280;">
+            Only accounts marked as Cash/Bank and allowed for payments are shown.
+          </p>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">
+            Amount (Rs)
+          </label>
+          <input type="number"
+                 name="amount"
+                 step="0.01"
+                 min="0"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">
+            Description (optional)
+          </label>
+          <input type="text"
+                 name="description"
+                 maxlength="255"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+      </div>
+
+      <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          💾 Save &amp; Post
+        </button>
+        <a href="{% url 'payment_list' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

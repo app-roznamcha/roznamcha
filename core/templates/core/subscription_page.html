@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="container" style="max-width: 900px; margin-top: 30px;">
+  <h2>Subscription</h2>
+
+  <div style="margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px;">
+    <p><strong>Status:</strong> {{ status|default:"-" }}</p>
+    <p><strong>Trial Started:</strong> {{ trial_started_at|date:"Y-m-d H:i" }}</p>
+
+    {% if expires_at %}
+      <p><strong>Expires At:</strong> {{ expires_at|date:"Y-m-d H:i" }}</p>
+      <p><strong>Days Left:</strong> {{ days_left }}</p>
+    {% else %}
+      <p><strong>Expires At:</strong> (not set)</p>
+    {% endif %}
+  </div>
+
+  <div style="padding: 12px; border: 1px solid #ddd; border-radius: 10px;">
+    <h4>Renew / Activate Subscription</h4>
+    <p style="color: #666;">
+      (Phase 4) Payment gateway will be connected here. For now, this form is a placeholder.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <label style="display:block; margin-top:10px;">Select Plan</label>
+      <select name="plan" required style="width: 250px; padding: 8px;">
+        <option value="">-- Select --</option>
+        <option value="MONTHLY">Monthly</option>
+        <option value="YEARLY">Yearly</option>
+      </select>
+
+      <div style="margin-top: 15px;">
+        <button type="submit" style="padding: 10px 16px;">
+          Submit Renewal Request
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+  </div>
+</div>
+
+{% endblock %}

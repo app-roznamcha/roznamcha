@@ -1,0 +1,169 @@
+{% extends "core/base.html" %}
+
+{% block title %}Account Ledger{% endblock %}
+{% block container_class %}is-fluid{% endblock %}
+
+{% block content %}
+<div class="page" style="width:100%;margin:40px 0 60px;padding:0 32px;">
+
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div class="top-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Account Ledger</h1>
+      <p class="subtitle" style="margin:0 0 20px;font-size:15px;color:#475569;">
+        View detailed debit/credit movements and running balance for a single account.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filter Card ---------- #}
+  <div class="card"
+       style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:20px;">
+    <div class="card-title" style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Filters
+    </div>
+    <div class="card-subtitle" style="font-size:15px;color:#475569;margin-bottom:14px;">
+      Choose an account and optional date range, then click <strong>Apply</strong>.
+    </div>
+
+    <form method="get"
+          class="filter-form"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:280px;flex:1;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">Account</label>
+        <select name="account"
+                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">-- Select account --</option>
+          {% for acc in accounts %}
+            <option value="{{ acc.id }}"
+                    {% if selected_account and acc.id == selected_account.id %}selected{% endif %}>
+              {{ acc.code }} - {{ acc.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="min-width:200px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
+        <input type="date"
+               name="from"
+               value="{{ date_from|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:200px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
+        <input type="date"
+               name="to"
+               value="{{ date_to|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+
+        <a href="{% url 'account_ledger' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+          Reset
+        </a>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Ledger Result Card ---------- #}
+  {% if selected_account %}
+    <div class="card"
+         style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+        <div class="card-title" style="font-size:18px;font-weight:600;margin:0;">
+          {{ selected_account.code }} – {{ selected_account.name }}
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;color:#475569;">
+          <span style="background:#f8fafc;border:1px solid #e5e7eb;padding:6px 10px;border-radius:999px;">
+            Opening: <strong style="font-weight:700;color:#0f172a;">{{ opening_balance|floatformat:2 }}</strong>
+          </span>
+          <span style="background:#f8fafc;border:1px solid #e5e7eb;padding:6px 10px;border-radius:999px;">
+            Closing: <strong style="font-weight:700;color:#0f172a;">{{ closing_balance|floatformat:2 }}</strong>
+          </span>
+        </div>
+      </div>
+
+      <div class="table-wrapper" style="width:100%;overflow-x:auto;">
+        <table style="border-collapse:collapse;width:100%;min-width:1200px;">
+          <thead>
+            <tr>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Date</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Type</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Counter Account</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;white-space:nowrap;">Debit (↑)</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;white-space:nowrap;">Credit (↓)</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;white-space:nowrap;">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if rows %}
+              {% for r in rows %}
+                <tr>
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;white-space:nowrap;">
+                    {{ r.date|date:"M j, Y" }}
+                  </td>
+
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;white-space:nowrap;color:#334155;">
+                    {{ r.type|default:"Journal" }}
+                  </td>
+
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;white-space:nowrap;color:#334155;">
+                    {{ r.counter|default:"—" }}
+                  </td>
+
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;">
+                    {{ r.description }}
+                  </td>
+
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;text-align:right;white-space:nowrap;color:#166534;">
+                    {% if r.debit and r.debit != 0 %}↑ {{ r.debit|floatformat:2 }}{% else %}—{% endif %}
+                  </td>
+
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;text-align:right;white-space:nowrap;color:#dc2626;">
+                    {% if r.credit and r.credit != 0 %}↓ {{ r.credit|floatformat:2 }}{% else %}—{% endif %}
+                  </td>
+
+                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;text-align:right;white-space:nowrap;">
+                    {{ r.balance|floatformat:2 }}
+                    {% if r.balance_label %}
+                      <span style="color:#64748b;font-size:12px;margin-left:6px;">{{ r.balance_label }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7"
+                    style="border-bottom:1px solid #e5e7eb;padding:12px 10px;font-size:14px;text-align:center;color:#6b7280;">
+                  No transactions for this period.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

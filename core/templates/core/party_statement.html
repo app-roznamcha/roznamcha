@@ -1,0 +1,160 @@
+{% extends "core/base.html" %}
+
+{% block title %}Party Statement – {{ party.name }}{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# -------- Top Bar -------- #}
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        📒 Party Statement – {{ party.name }}
+      </h1>
+      <p style="margin:0;font-size:15px;color:#475569;">
+        {{ party.get_party_type_display }}
+      </p>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
+        ← Dashboard
+      </a>
+
+      {% if party.party_type == "CUSTOMER" %}
+        <a href="{% url 'customer_list' %}"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:190px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
+          ← Back to Customers
+        </a>
+      {% else %}
+        <a href="{% url 'supplier_list' %}"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:190px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
+          ← Back to Suppliers
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {# -------- Filters Card -------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:16px 18px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:18px;">
+    <div style="font-size:17px;font-weight:600;margin-bottom:6px;">Filters</div>
+    <p style="font-size:14px;color:#475569;margin:0 0 12px;">
+      Select a date range and click <strong>Apply</strong>.
+    </p>
+
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
+        <input type="date" name="from"
+               value="{% if date_from %}{{ date_from|date:'Y-m-d' }}{% endif %}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
+        <input type="date" name="to"
+               value="{% if date_to %}{{ date_to|date:'Y-m-d' }}{% endif %}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <button type="submit"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+
+        <a href="{% url 'party_statement' party.id %}"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+          Reset
+        </a>
+      </div>
+    </form>
+  </div>
+
+  {# -------- Balances Card -------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:16px 18px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:18px;">
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;">
+      <div style="font-size:15px;">
+        <span style="color:#6b7280;">Opening balance:</span>
+        <strong style="margin-left:6px;">
+          {% if opening_balance and opening_balance != 0 %}
+            {% if opening_is_debit %}Dr{% else %}Cr{% endif %}
+            {{ opening_balance|floatformat:2 }}
+          {% else %}
+            0.00
+          {% endif %}
+        </strong>
+      </div>
+
+      <div style="font-size:15px;">
+        <span style="color:#6b7280;">Closing balance:</span>
+        <strong style="margin-left:6px;">
+          {# If your helper already returns signed/side-aware closing, keep number only #}
+          {{ closing_balance|floatformat:2 }}
+        </strong>
+      </div>
+    </div>
+  </div>
+
+  {# -------- Statement Table Card -------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:16px 18px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:17px;font-weight:600;">Ledger</div>
+      <div style="font-size:13px;color:#6b7280;">
+        Showing {% if date_from %}<strong>{{ date_from|date:"M j, Y" }}</strong>{% else %}<strong>all time</strong>{% endif %}
+        {% if date_to %} → <strong>{{ date_to|date:"M j, Y" }}</strong>{% endif %}
+      </div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:900px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:140px;">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:140px;">Debit</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:140px;">Credit</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:160px;">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if rows %}
+            {% for r in rows %}
+              <tr>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+                  {{ r.date|date:"M j, Y" }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#111827;">
+                  {{ r.description }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;color:#374151;">
+                  {% if r.debit %}{{ r.debit|floatformat:2 }}{% else %}—{% endif %}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;color:#374151;">
+                  {% if r.credit %}{{ r.credit|floatformat:2 }}{% else %}—{% endif %}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;color:#111827;font-weight:600;">
+                  {{ r.balance|floatformat:2 }}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" style="padding:12px 9px;font-size:14px;text-align:center;color:#6b7280;">
+                No transactions for this period.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

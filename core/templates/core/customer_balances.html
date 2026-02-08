@@ -1,0 +1,235 @@
+{% extends "core/base.html" %}
+
+{% block title %}Customer Balances{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Customer Balances</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        See opening balances, total sales, receipts, and net position (Dr/Cr) for each customer.
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filter Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      As-of date
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Choose a cut-off date to calculate balances up to that day, then click <strong>Apply</strong>.
+    </p>
+
+    <form method="get"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:220px;">
+        <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">
+          As of date
+        </label>
+        <input type="date"
+               id="date"
+               name="date"
+               value="{{ as_of|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Customer Balances Chart Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
+      <div style="font-size:18px;font-weight:600;">
+        Top customer balances
+      </div>
+      <div style="font-size:13px;color:#6b7280;">
+        Visual view of net receivable / payable (absolute amount).
+      </div>
+    </div>
+
+    <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">
+      Hover over a bar to see the exact balance. Labels include Dr/Cr.
+    </p>
+
+    <div style="width:100%;max-width:900px;">
+      <canvas id="customerBalanceChart" height="200"></canvas>
+    </div>
+  </div>
+
+  {# ---------- Customer Balances Table Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Customer balances summary
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:760px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">Customer</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Opening (Dr/Cr)</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Sales</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Receipts</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Balance</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:center;font-weight:600;">Dr/Cr</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                {{ forloop.counter }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                {{ row.party.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                {{ row.opening|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                {{ row.sales|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                {{ row.receipts|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                {{ row.net_abs|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:center;">
+                {{ row.net_type }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:center;">
+                No customers found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="2" style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              Grand Totals:
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ grand_opening|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ grand_sales|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ grand_receipts|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ grand_balance_abs|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:center;">
+              {{ grand_balance_type }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{# ---------- Customer Balances Chart JS ---------- #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  (function () {
+    const labels = [
+      {% for row in rows %}
+        "{{ row.party.name|escapejs }} ({{ row.net_type }})"{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    const balances = [
+      {% for row in rows %}
+        parseFloat("{{ row.net_abs|floatformat:2 }}") || 0{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    const canvas = document.getElementById('customerBalanceChart');
+    if (!canvas || labels.length === 0) return;
+
+    // Make the chart taller if there are many customers
+    const rowHeight = 20;  // px per bar
+    const baseHeight = 180;
+    canvas.height = Math.max(baseHeight, labels.length * rowHeight);
+
+    const ctx = canvas.getContext('2d');
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Net Balance (absolute)',
+          data: balances,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',  // horizontal bars
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              callback: function (value) {
+                return value.toLocaleString('en-PK');
+              }
+            },
+            title: {
+              display: true,
+              text: 'Amount (PKR)'
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const v = context.parsed.x || 0;
+                return 'Balance: ' + v.toLocaleString('en-PK', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                });
+              }
+            }
+          }
+        }
+      }
+    });
+  })();
+</script>
+
+{% endblock %}

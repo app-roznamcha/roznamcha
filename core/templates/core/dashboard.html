@@ -1,0 +1,592 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Page wrapper */
+  .dashboard-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+  }
+
+  /* Soft background to make cards pop */
+  .dashboard-shell {
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 55%);
+      border-radius: 18px;
+      padding: 18px 14px 26px;
+  }
+
+  .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+  }
+
+  .dashboard-title {
+      margin: 0 0 4px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+  }
+
+  .dashboard-subtitle {
+      margin: 0;
+      font-size: 15px;
+      color: #6b7280;
+  }
+  .dashboard-subtitle strong {
+      font-weight: 700;
+      color: #111827;
+  }
+
+  .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+  }
+
+  .btn-header-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      color: #374151;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+  }
+  .btn-header-logout:hover {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+  }
+  .btn-header-logout:focus {
+      outline: 3px solid rgba(239, 68, 68, 0.25);
+      outline-offset: 2px;
+  }
+
+  /* Top mini-cards */
+  .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);  /* 3 cards per row */
+        gap: 16px;
+        margin-bottom: 18px;
+        margin-top: 8px;
+    }
+    @media (max-width: 980px) {
+  .dashboard-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+    .dashboard-cards { grid-template-columns: 1fr; }
+    }
+  .dash-card {
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
+  }
+  .dash-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+      border-color: #dbeafe;
+  }
+  .dash-card:focus {
+      outline: 3px solid rgba(37, 99, 235, 0.18);
+      outline-offset: 3px;
+  }
+
+  .dash-card-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 6px;
+  }
+
+  .dash-card-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.02em;
+  }
+
+  .dashboard-main-label {
+      margin: 10px 0 12px;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: .12em;
+      color:#64748b;
+      font-weight: 700;
+  }
+
+  /* Section grid */
+  .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+  }
+
+  .dashboard-section {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      padding: 18px 18px 16px;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+  }
+
+  .dashboard-section h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #0f172a;
+  }
+
+  /* Indicator: will be themed per section */
+  .dashboard-section-title-indicator {
+      width: 4px;
+      height: 22px;
+      border-radius: 999px;
+      background: #2563eb;
+  }
+
+  .dashboard-section p {
+      margin: 2px 0 14px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.4;
+  }
+
+  /* --- Button layout --- */
+  .button-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+  }
+
+  .btn-pill {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 340px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      color: #111827;
+      transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
+  }
+
+  .btn-pill:hover {
+      background: #f3f4f6;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+      transform: translateY(-0.5px);
+      border-color: #dbeafe;
+  }
+
+  .btn-pill:focus {
+      outline: 3px solid rgba(37, 99, 235, 0.18);
+      outline-offset: 2px;
+  }
+
+  /* ========= Column colour themes ========= */
+
+  /* Column 1: Master Data – Blue */
+  .section-master .dashboard-section-title-indicator { background: #2563eb; }
+  .section-master .btn-pill {
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+      background: #eff6ff;
+  }
+  .section-master .btn-pill-primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff;
+      font-weight: 800;
+  }
+  .section-master .btn-pill-primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+  }
+
+  /* Column 2: Transactions – Green */
+  .section-transactions .dashboard-section-title-indicator { background: #059669; }
+  .section-transactions .btn-pill {
+      border-color: #a7f3d0;
+      color: #047857;
+      background: #ecfdf5;
+  }
+  .section-transactions .btn-pill-primary {
+      background: #059669;
+      border-color: #059669;
+      color: #ffffff;
+      font-weight: 800;
+  }
+  .section-transactions .btn-pill-primary:hover {
+      background: #047857;
+      border-color: #047857;
+  }
+
+  /* Column 3: Reports – Orange */
+  .section-reports .dashboard-section-title-indicator { background: #f97316; }
+  .section-reports .btn-pill {
+      border-color: #fed7aa;
+      color: #c2410c;
+      background: #fff7ed;
+  }
+  .section-reports .btn-pill-primary {
+      background: #f97316;
+      border-color: #f97316;
+      color: #ffffff;
+      font-weight: 800;
+  }
+  .section-reports .btn-pill-primary:hover {
+      background: #ea580c;
+      border-color: #ea580c;
+  }
+
+  /* Small screens: tighten spacing */
+  @media (max-width: 520px) {
+    .dashboard-title { font-size: 24px; }
+    .dashboard-shell { padding: 14px 10px 22px; }
+    .btn-pill { max-width: 100%; }
+  }
+
+  /* =========================
+   Dashboard user dropdown
+   (doesn't disappear on hover)
+   ========================= */
+
+.user-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.user-trigger-name {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.user-trigger-caret {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Hover-bridge so the dropdown doesn't vanish */
+.user-menu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 10px;   /* bridge space */
+}
+
+/* Dropdown panel */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  padding: 8px;
+  display: none;
+  z-index: 2000;
+}
+
+/* Show dropdown when hovering ANY part of menu (trigger+dropdown+bridge) */
+.user-menu:hover .user-dropdown {
+  display: block;
+}
+
+.user-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #111827;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.user-dropdown a:hover {
+  background: #f3f4f6;
+  text-decoration: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+  <div class="dashboard-shell">
+
+    <div class="dashboard-header">
+        <div>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                {% if company and company.logo %}
+                    <img src="{{ company.logo.url }}"
+                        alt="{{ company.name }}"
+                        style="width:46px;height:46px;border-radius:12px;object-fit:cover;border:1px solid #e5e7eb;background:#fff;">
+                    {% else %}
+                    <div style="width:46px;height:46px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;
+                                display:flex;align-items:center;justify-content:center;font-weight:800;color:#2563eb;">
+                        SZ
+                    </div>
+                    {% endif %}
+                <div>
+                  <h1 class="dashboard-title" style="margin-bottom:2px;">
+                    {% if company and company.name %}
+                        {{ company.name }}
+                    {% else %}
+                        Standard Zarai Markaz
+                    {% endif %}
+                    <span style="font-weight:700;color:#64748b;">— Dashboard</span>
+                  </h1>
+
+                  <p class="dashboard-subtitle">
+                    Welcome,
+                  
+                    {% if is_staff %}
+                      <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                    {% else %}
+                      <span class="user-menu">
+                        <span class="user-trigger">
+                          <span class="user-trigger-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                          <span class="user-trigger-caret">▾</span>
+                        </span>
+                  
+                        <span class="user-dropdown">
+                            <a href="{% url 'owner_profile_page' %}">👤 User Profile</a>
+                            <a href="{% url 'subscription_page' %}">💳 Subscription</a>
+                          
+                            {% if request.user.is_superuser %}
+                              <div style="height:1px;background:#e5e7eb;margin:8px 6px;"></div>
+                              <a href="{% url 'superadmin_dashboard' %}">🛡️ Super Admin Dashboard</a>
+                            {% endif %}
+                          </span>
+                      </span>
+                    {% endif %}
+                  
+                    — Today: {{ today }} — {{ now|date:"h:i A" }} (PKT)
+                  </p>
+                </div>
+              </div>
+        </div>
+    </div>
+
+
+
+    {# ---- Top financial metric cards (Owner/Superadmin only) ---- #}
+    {% if not is_staff %}
+    <div class="dashboard-cards">
+
+        <div class="dash-card">
+            <div class="dash-card-label">Cash / Bank Balance</div>
+            <div class="dash-card-value">
+                Rs {{ cash_bank_balance|default:0|floatformat:0 }}
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-label">This Month Sales</div>
+            <div class="dash-card-value">
+                Rs {{ month_sales|default:0|floatformat:0 }}
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-label">This Month Purchases</div>
+            <div class="dash-card-value">
+                Rs {{ month_purchases|default:0|floatformat:0 }}
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-label">This Month Profit (Simple)</div>
+            <div class="dash-card-value">
+                Rs {{ month_profit_simple|default:0|floatformat:0 }}
+            </div>
+        </div>
+
+        <a href="{% url 'customer_balances' %}" class="dash-card">
+            <div class="dash-card-label">Customer Receivable</div>
+            <div class="dash-card-value">
+                Rs {{ customer_receivable|default:0|floatformat:0 }}
+            </div>
+        </a>
+
+        <a href="{% url 'supplier_balances' %}" class="dash-card">
+            <div class="dash-card-label">Supplier Payable</div>
+            <div class="dash-card-value">
+                Rs {{ supplier_payable|default:0|floatformat:0 }}
+            </div>
+        </a>
+
+    </div>
+    {% endif %}    
+    <h3 class="dashboard-main-label">Main Menu</h3>
+    
+    <div class="dashboard-grid">
+    
+        {# =========== MASTER DATA =========== #}
+        <section class="dashboard-section section-master">
+            <h2>
+                <span class="dashboard-section-title-indicator"></span>
+                📁 Master Data
+            </h2>
+            <p>Create and manage customers, suppliers, products and accounts.</p>
+    
+            <div class="button-row">
+                <a href="{% url 'customer_create' %}" class="btn-pill btn-pill-primary">➕ New Customer</a>
+                {% if not is_staff %}
+                  <a href="{% url 'customer_list' %}" class="btn-pill">👥 Customer List</a>
+                {% endif %}
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'supplier_create' %}" class="btn-pill btn-pill-primary">➕ New Supplier</a>
+                {% if not is_staff %}
+                  <a href="{% url 'supplier_list' %}" class="btn-pill">🏭 Supplier List</a>
+                {% endif %}
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'product_create' %}" class="btn-pill btn-pill-primary">➕ New Product</a>
+                {% if not is_staff %}
+                  <a href="{% url 'product_list' %}" class="btn-pill">📦 Product List</a>
+                {% endif %}
+            </div>
+    
+            {% if not is_staff %}
+            <div class="button-row">
+                <a href="{% url 'user_accounts' %}" class="btn-pill">🏦 Bank &amp; Cash Accounts</a>
+                <a href="{% url 'account_ledger' %}" class="btn-pill">📒 Account Ledger</a>
+            </div>
+            {% endif %}
+        </section>
+    
+        {# =========== TRANSACTIONS =========== #}
+        <section class="dashboard-section section-transactions">
+            <h2>
+                <span class="dashboard-section-title-indicator"></span>
+                💳 Transactions
+            </h2>
+            <p>Record daily sales, purchases, customer receipts and supplier payments.</p>
+    
+            <div class="button-row">
+                <a href="{% url 'sales_new' %}" class="btn-pill btn-pill-primary">➕ New Sale</a>
+                {% if not is_staff %}
+                  <a href="{% url 'sales_list' %}" class="btn-pill">📄 Sales List</a>
+                {% endif %}
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'purchase_new' %}" class="btn-pill btn-pill-primary">➕ New Purchase</a>
+                {% if not is_staff %}
+                  <a href="{% url 'purchase_list' %}" class="btn-pill">📥 Purchase List</a>
+                {% endif %}
+            </div>
+    
+            <div class="button-row">
+              <a href="{% url 'sales_return_new' %}" class="btn-pill">↩️ Sales Return (Customer)</a>
+              <a href="{% url 'purchase_return_new' %}" class="btn-pill">↩️ Purchase Return (Supplier)</a>
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'payment_new' %}" class="btn-pill">💰 New Payment / Receipt</a>
+                {% if not is_staff %}
+                  <a href="{% url 'payments_list' %}" class="btn-pill">📃 Payments &amp; Receipts</a>
+                {% endif %}
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'adjustments_page' %}" class="btn-pill">🧾 Adjustments (Party + Stock)</a>
+              </div>
+        </section>
+    
+        {# =========== REPORTS & UTILITIES (Owner/Superadmin only) =========== #}
+        {% if not is_staff %}
+        <section class="dashboard-section section-reports">
+            <h2>
+                <span class="dashboard-section-title-indicator"></span>
+                📊 Reports &amp; Utilities
+            </h2>
+            <p>View key reports for stock, balances and financial performance.</p>
+    
+            <div class="button-row">
+              <a href="{% url 'stock_report' %}" class="btn-pill">📦 Stock Report</a>
+              <a href="{% url 'product_ledger' %}" class="btn-pill">📊 Product Ledger</a>
+            </div>
+    
+            <div class="button-row">
+              <a href="{% url 'day_summary' %}" class="btn-pill">📅 Day Summary</a>
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'customer_balances' %}" class="btn-pill">👤 Customer Balances</a>
+                <a href="{% url 'supplier_balances' %}" class="btn-pill">🏭 Supplier Balances</a>
+            </div>
+    
+            <div class="button-row">
+              <a href="{% url 'customer_ledger' %}" class="btn-pill">📒 Customer Ledger</a>
+              <a href="{% url 'supplier_ledger' %}" class="btn-pill">📕 Supplier Ledger</a>
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'trial_balance' %}" class="btn-pill">⚖️ Trial Balance</a>
+                <a href="{% url 'profit_loss' %}" class="btn-pill">📈 Profit &amp; Loss</a>
+            </div>
+    
+            <div class="button-row">
+                <a href="{% url 'balance_sheet' %}" class="btn-pill">🧮 Balance Sheet</a>
+            </div>
+    
+            <div class="button-row">
+              <a href="{% url 'backup_dashboard' %}" class="btn-pill">🗂️ Backups</a>
+            </div>
+        </section>
+        {% endif %}
+    
+    </div>
+    </div>
+    </div>
+    {% endblock %}

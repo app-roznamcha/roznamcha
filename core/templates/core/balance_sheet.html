@@ -1,0 +1,220 @@
+{% extends "core/base.html" %}
+
+{% block title %}Balance Sheet{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Balance Sheet</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        Snapshot of assets, liabilities, and equity for your business as of a specific date.
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filter Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      As-of date
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Select a date to see balances up to that point in time, then click <strong>Apply</strong>.
+    </p>
+
+    <form method="get"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:220px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">As of</label>
+        <input type="date"
+               name="to"
+               value="{{ as_of|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Assets Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Assets
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+              Account
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
+              Amount
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for row in assets %}
+              <tr>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                  {{ row.account.code }} – {{ row.account.name }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                  {{ row.amount|floatformat:2 }}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                  No asset balances.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        <tfoot>
+          <tr>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              Total Assets
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ total_assets|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  {# ---------- Liabilities Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Liabilities
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+              Account
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
+              Amount
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for row in liabilities %}
+              <tr>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                  {{ row.account.code }} – {{ row.account.name }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                  {{ row.amount|floatformat:2 }}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                  No liability balances.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        <tfoot>
+          <tr>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              Total Liabilities
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ total_liabilities|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  {# ---------- Equity Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Equity
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+              Account
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
+              Amount
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for row in equity %}
+              <tr>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                  {{ row.account.code }} – {{ row.account.name }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                  {{ row.amount|floatformat:2 }}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                  No equity balances.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        <tfoot>
+          <tr>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              Total Equity
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ total_equity|floatformat:2 }}
+            </th>
+          </tr>
+          <tr>
+            <th style="padding:7px 9px;font-size:16px;text-align:right;">
+              Liabilities + Equity
+            </th>
+            <th style="padding:7px 9px;font-size:16px;text-align:right;">
+              {{ total_liabilities|add:total_equity|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

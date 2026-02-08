@@ -1,0 +1,193 @@
+{% extends "core/base.html" %}
+{% block title %}{% if product %}Edit Product{% else %}New Product{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:720px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        {% if product %}Edit Product{% else %}New Product{% endif %}
+      </h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        Define base unit, packing, and prices for this product.
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'product_list' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Back to Products
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Error Message (if any) ---------- #}
+  {% if error %}
+    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
+                font-size:14px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    {# ---------- Basic Details Card ---------- #}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:10px;">
+        Basic Details
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Code <span style="color:#b91c1c">*</span>
+          </label>
+          <input type="text"
+                 name="code"
+                 value="{{ product.code|default_if_none:'' }}"
+                 required
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Name <span style="color:#b91c1c">*</span>
+          </label>
+          <input type="text"
+                 name="name"
+                 value="{{ product.name|default_if_none:'' }}"
+                 required
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Base Unit
+          </label>
+          <select name="unit"
+                  style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+            <option value="BAG"   {% if product and product.unit == "BAG" %}selected{% endif %}>Bag</option>
+            <option value="KG"    {% if product and product.unit == "KG" %}selected{% endif %}>Kilogram</option>
+            <option value="LITRE" {% if product and product.unit == "LITRE" %}selected{% endif %}>Litre</option>
+            <option value="UNIT"  {% if product and product.unit == "UNIT" %}selected{% endif %}>Unit / Piece</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    {# ---------- Packing Card ---------- #}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+        Packing
+      </div>
+
+      <p style="margin:0 0 12px;font-size:14px;color:#6b7280;">
+        Base unit = the smallest unit you sell (bottle, kg, piece). Packing = outer carton/bag/container.
+        Example: weedicide bottle as base unit, 12 bottles in one carton.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Packing Type
+          </label>
+          <select name="packing_type"
+                  style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+            <option value="NONE"      {% if product and product.packing_type == "NONE" %}selected{% endif %}>
+              No packing / loose
+            </option>
+            <option value="CARTON"    {% if product and product.packing_type == "CARTON" %}selected{% endif %}>
+              Carton
+            </option>
+            <option value="BAG"       {% if product and product.packing_type == "BAG" %}selected{% endif %}>
+              Bag
+            </option>
+            <option value="CONTAINER" {% if product and product.packing_type == "CONTAINER" %}selected{% endif %}>
+              Container
+            </option>
+            <option value="BUNDLE"    {% if product and product.packing_type == "BUNDLE" %}selected{% endif %}>
+              Bundle
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Pieces per Pack
+          </label>
+          <input type="number"
+                 step="0.001"
+                 min="1"
+                 name="pieces_per_pack"
+                 value="{% if product %}{{ product.pieces_per_pack }}{% else %}1{% endif %}"
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+      </div>
+    </div>
+
+    {# ---------- Prices Card ---------- #}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+        Prices
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Purchase Price per Unit
+          </label>
+          <input type="number"
+                 step="0.01"
+                 name="purchase_price_per_unit"
+                 value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}"
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:14px;margin-bottom:4px;">
+            Sale Price per Unit
+          </label>
+          <input type="number"
+                 step="0.01"
+                 name="sale_price_per_unit"
+                 value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}"
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div style="margin-top:6px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+            <input type="checkbox"
+                   name="is_active"
+                   {% if not product or product.is_active %}checked{% endif %}>
+            <span>Active (show in dropdowns)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    {# ---------- Actions ---------- #}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button type="submit"
+              class="btn btn-primary"
+              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        {% if product %}💾 Save Changes{% else %}➕ Create Product{% endif %}
+      </button>
+      <a href="{% url 'product_list' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

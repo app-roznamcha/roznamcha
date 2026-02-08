@@ -1,0 +1,841 @@
+{% extends "core/base.html" %}
+{% block title %}New Sale{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Buttons) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      {% if edit_mode %}
+        <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Edit Sale</h1>
+      {% else %}
+        <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">New Sale</h1>
+      {% endif %}
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        Create a new sales invoice, add items, and record payment from the customer.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'sales_list' %}"
+         class="btn btn-primary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        📄 Sales List
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Error (if any) ---------- #}
+  {% if error %}
+    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
+                font-size:14px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    {# ---------- Customer & Invoice Details Card ---------- #}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:10px;">
+        Customer &amp; Invoice Details
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+        <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+          <span>Customer</span>
+          <select name="customer" required
+                style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">-- Select Customer --</option>
+          {% for c in customers %}
+            <option value="{{ c.id }}"
+                    {% if edit_mode and selected_customer_id == c.id|stringformat:"s" %}
+                      selected
+                    {% endif %}>
+              {{ c.name }}
+            </option>
+          {% endfor %}
+        </select>
+        </label>
+
+        <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+          <span>Invoice Date</span>
+          <input type="date"
+                 name="invoice_date"
+                 value="{% if edit_mode %}{{ invoice.invoice_date|date:'Y-m-d' }}{% else %}{{ today }}{% endif %}"
+                 style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+        </label>
+
+        <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+          <span>Invoice #</span>
+          <input type="text"
+                 name="invoice_number"
+                 value="{% if edit_mode %}{{ invoice.invoice_number }}{% else %}{{ suggested_invoice_number }}{% endif %}"
+                 readonly
+                 style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;">
+        </label>
+      </div>
+
+      <label style="margin-top:12px;display:block;font-size:14px;">
+        <span style="display:block;margin-bottom:4px;">Notes</span>
+        <textarea name="notes"
+                  rows="2"
+                  style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;resize:vertical;">{% if edit_mode %}{{ invoice.notes }}{% endif %}</textarea>
+      </label>
+    </div>
+
+    {# ---------- Items Card ---------- #}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
+        <div style="font-size:18px;font-weight:600;">Items</div>
+        <div id="items-total-display" style="font-weight:600;font-size:15px;">
+          Total Sale: Rs <span id="items-total-amount">0.00</span>
+        </div>
+      </div>
+
+      <div style="width:100%;overflow-x:auto;margin-bottom:10px;">
+        <table id="items-table"
+                style="border-collapse:collapse;width:100%;min-width:980px;">
+          <thead>
+            <tr>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Product</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Unit</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">
+                Available Stock
+              </th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Unit Price</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Quantity</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Total Price</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {# --- If editing: show existing items --- #}
+            {% if edit_mode %}
+          
+              {% for item in items %}
+                {% with forloop.counter as idx %}
+                <tr data-row-index="{{ idx }}"
+                    data-unit-code="{{ item.product.unit }}"
+                    data-packing-type="{{ item.product.packing_type|default:'NONE' }}"
+                    data-pieces-per-pack="{{ item.product.pieces_per_pack|default:1 }}"
+                    data-packing-label="{{ item.product.get_packing_type_display|default:'' }}">
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                    <select name="product_{{ idx }}"
+                            class="product-select"
+                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                      <option value="">-- Select --</option>
+                      {% for p in products %}
+                        <option
+                          value="{{ p.id }}"
+                          data-unit="{{ p.unit }}"
+                          data-price="{{ p.sale_price_per_unit|floatformat:2 }}"
+                          data-stock="{{ p.current_stock|floatformat:3 }}"
+                          data-unit-label="{{ p.get_unit_display }}"
+                          data-packing-type="{{ p.packing_type|default:'NONE' }}"
+                          data-pieces-per-pack="{{ p.pieces_per_pack|default:1 }}"
+                          data-packing-label="{{ p.get_packing_type_display|default:'' }}"
+                          {% if p.id == item.product.id %}selected{% endif %}>
+                          {{ p.code }} - {{ p.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                    <select name="unit_{{ idx }}"
+                            class="unit-select"
+                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                      <option value="UNIT"
+                              {% if item.unit_mode|default:"UNIT" == "UNIT" %}selected{% endif %}>
+                        Base {{ item.product.get_unit_display }}
+                      </option>
+                      {% if item.product.packing_type != "NONE" and item.product.pieces_per_pack > 1 %}
+                        <option value="PACK"
+                                {% if item.unit_mode|default:"UNIT" == "PACK" %}selected{% endif %}>
+                          {{ item.product.get_packing_type_display }} ({{ item.product.pieces_per_pack }} × {{ item.product.get_unit_display }})
+                        </option>
+                      {% endif %}
+                    </select>
+                  </td>
+          
+                  {# ✅ Available Stock column #}
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
+                    <span class="stock-display" style="font-weight:600;color:#0f172a;">
+                      {{ item.product.current_stock|floatformat:3 }} {{ item.product.get_unit_display }}
+                    </span>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    <input type="number"
+                           step="0.01"
+                           name="unit_price_{{ idx }}"
+                           class="price-input"
+                           value="{{ item.unit_price|floatformat:2 }}"
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    <input type="number"
+                          step="0.001"
+                          class="qty-display-input"
+                          value="{{ item.quantity_units|floatformat:3 }}"
+                          style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                    <input type="hidden"
+                          name="quantity_{{ idx }}"
+                          class="qty-hidden-input"
+                          value="{{ item.quantity_units|floatformat:3 }}">
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    Rs <span class="line-total">0.00</span>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            onclick="removeRow(this)"
+                            style="padding:4px 9px;border-radius:999px;font-size:13px;">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                {% endwith %}
+              {% endfor %}
+          
+              {# ✅ add extra blank rows for new items (EDIT MODE) #}
+              {% for _ in "12" %}
+                {% with items|length|add:forloop.counter as idx %}
+                <tr data-row-index="{{ idx }}"
+                    data-unit-code=""
+                    data-packing-type="NONE"
+                    data-pieces-per-pack="1"
+                    data-packing-label="">
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                    <select name="product_{{ idx }}"
+                            class="product-select"
+                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                      <option value="">-- Select --</option>
+                      {% for p in products %}
+                        <option
+                          value="{{ p.id }}"
+                          data-unit="{{ p.unit }}"
+                          data-price="{{ p.sale_price_per_unit|floatformat:2 }}"
+                          data-stock="{{ p.current_stock|floatformat:3 }}"
+                          data-unit-label="{{ p.get_unit_display }}"
+                          data-packing-type="{{ p.packing_type|default:'NONE' }}"
+                          data-pieces-per-pack="{{ p.pieces_per_pack|default:1 }}"
+                          data-packing-label="{{ p.get_packing_type_display|default:'' }}">
+                          {{ p.code }} - {{ p.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                    <select name="unit_{{ idx }}"
+                            class="unit-select"
+                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                      <option value="">-- Unit --</option>
+                    </select>
+                  </td>
+          
+                  {# ✅ Stock cell exists (JS will fill it when product selected) #}
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
+                    <span class="stock-display" style="font-weight:600;color:#0f172a;">—</span>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    <input type="number"
+                           step="0.01"
+                           name="unit_price_{{ idx }}"
+                           class="price-input"
+                           readonly
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    <input type="number"
+                           step="0.001"
+                           class="qty-display-input"
+                           placeholder="Qty"
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                    <input type="hidden"
+                           name="quantity_{{ idx }}"
+                           class="qty-hidden-input">
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    Rs <span class="line-total">0.00</span>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            onclick="removeRow(this)"
+                            style="padding:4px 9px;border-radius:999px;font-size:13px;">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                {% endwith %}
+              {% endfor %}
+          
+            {% else %}
+          
+              {# ✅ NEW SALE: 5 blank rows #}
+              {% for _ in "12345" %}
+                {% with forloop.counter as idx %}
+                <tr data-row-index="{{ idx }}"
+                    data-unit-code=""
+                    data-packing-type="NONE"
+                    data-pieces-per-pack="1"
+                    data-packing-label="">
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                    <select name="product_{{ idx }}"
+                            class="product-select"
+                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                      <option value="">-- Select --</option>
+                      {% for p in products %}
+                        <option
+                          value="{{ p.id }}"
+                          data-unit="{{ p.unit }}"
+                          data-price="{{ p.sale_price_per_unit|floatformat:2 }}"
+                          data-stock="{{ p.current_stock|floatformat:3 }}"
+                          data-unit-label="{{ p.get_unit_display }}"
+                          data-packing-type="{{ p.packing_type|default:'NONE' }}"
+                          data-pieces-per-pack="{{ p.pieces_per_pack|default:1 }}"
+                          data-packing-label="{{ p.get_packing_type_display|default:'' }}">
+                          {{ p.code }} - {{ p.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                    <select name="unit_{{ idx }}"
+                            class="unit-select"
+                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                      <option value="">-- Unit --</option>
+                    </select>
+                  </td>
+          
+                  {# ✅ Stock column #}
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
+                    <span class="stock-display" style="font-weight:600;color:#0f172a;">—</span>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    <input type="number"
+                           step="0.01"
+                           name="unit_price_{{ idx }}"
+                           class="price-input"
+                           readonly
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    <input type="number"
+                           step="0.001"
+                           class="qty-display-input"
+                           placeholder="Qty"
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                    <input type="hidden"
+                           name="quantity_{{ idx }}"
+                           class="qty-hidden-input">
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                    Rs <span class="line-total">0.00</span>
+                  </td>
+          
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            onclick="removeRow(this)"
+                            style="padding:4px 9px;border-radius:999px;font-size:13px;">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                {% endwith %}
+              {% endfor %}
+          
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button"
+              class="btn btn-sm btn-secondary"
+              onclick="addRow()"
+              style="padding:7px 14px;border-radius:999px;font-size:14px;">
+        + Add Item Row
+      </button>
+    </div>
+
+    {# ---------- Payment Card ---------- #}
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+        Payment
+      </div>
+
+      <p style="margin-bottom:8px;font-weight:500;font-size:15px;">
+        Total Sale: Rs <span id="payment-total-amount">0.00</span>
+      </p>
+
+      <div class="field-group"
+           style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px;font-size:14px;">
+        <label>
+          <input type="radio" name="payment_type" value="FULL"
+                 {% if edit_mode and invoice.payment_type == 'FULL' %}checked{% endif %}>
+          Full Payment (Cash/Bank)
+        </label>
+        <label>
+          <input type="radio" name="payment_type" value="PARTIAL"
+                 {% if edit_mode and invoice.payment_type == 'PARTIAL' %}checked{% endif %}>
+          Partial Payment
+        </label>
+        <label>
+          <input type="radio" name="payment_type" value="CREDIT"
+                 {% if not edit_mode or invoice.payment_type == 'CREDIT' %}checked{% endif %}>
+          Credit (Customer will pay later)
+        </label>
+      </div>
+
+      <div id="payment-extra-fields" style="margin-top:4px;display:none;">
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:14px;">
+          <span>Amount Received Now</span>
+          <input type="number"
+                 step="0.01"
+                 name="payment_amount"
+                 id="payment-amount-input"
+                 value="{% if edit_mode %}{{ invoice.payment_amount|floatformat:2 }}{% else %}0.00{% endif %}"
+                 style="max-width:260px;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+        </label>
+        <p class="text-muted" style="margin:4px 0 10px;font-size:13px;color:#6b7280;">
+          For <strong>Full Payment</strong> this will be auto-filled from Total Sale and locked.
+          For <strong>Partial</strong>, you can type a smaller amount.
+        </p>
+
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:14px;max-width:320px;">
+          <span>Payment Account</span>
+          <select name="payment_account"
+                  id="payment-account-select"
+                  style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+            <option value="">-- Select Cash/Bank Account --</option>
+            {% for acc in accounts %}
+              <option value="{{ acc.id }}"
+                      {% if edit_mode and invoice.payment_account and invoice.payment_account.id == acc.id %}
+                        selected
+                      {% endif %}>
+                {{ acc.code }} - {{ acc.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <p class="text-muted" style="margin-top:4px;font-size:13px;color:#6b7280;">
+          Required for full or partial cash/bank payments.
+        </p>
+      </div>
+
+      <p id="credit-note"
+         class="text-muted"
+         style="margin-top:8px;font-size:13px;color:#6b7280;">
+        For <strong>CREDIT</strong> sales, no payment is recorded now and the full amount
+        will appear as receivable from the customer.
+      </p>
+    </div>
+
+    {# ---------- Form Actions ---------- #}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button type="submit"
+              class="btn btn-primary"
+              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        {% if edit_mode %}
+          💾 Update Invoice
+        {% else %}
+          💾 Save Sale (Unposted)
+        {% endif %}
+      </button>
+      <a href="{% url 'sales_list' %}"
+         class="btn btn-link"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;color:#0d6efd;cursor:pointer;white-space:nowrap;">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+</div>
+{# -------- JS: product meta + totals + payment behaviour -------- #}
+<script>
+let salesRowCounter = 5; // kept, but we’ll compute the real index from DOM when adding rows
+
+const UNIT_LABELS = {
+  "BAG": "Bag",
+  "KG": "Kilogram",
+  "LITRE": "Litre",
+  "UNIT": "Unit / Piece"
+};
+
+// Helper: format number to 2 decimal places
+function fmt(amount) {
+  const n = parseFloat(amount || 0) || 0;
+  return n.toFixed(2);
+}
+
+function recalcGrandTotal() {
+  const rows = document.querySelectorAll('#items-table tbody tr');
+  let itemsTotal = 0;
+
+  rows.forEach(tr => {
+    const totalSpan = tr.querySelector('.line-total');
+    const lineVal = parseFloat(totalSpan && totalSpan.textContent || 0) || 0;
+    itemsTotal += lineVal;
+  });
+
+  const grandTotal = itemsTotal;
+
+  document.getElementById('items-total-amount').textContent = fmt(grandTotal);
+  document.getElementById('payment-total-amount').textContent = fmt(grandTotal);
+
+  updatePaymentAmount(grandTotal);
+}
+
+function getSelectedPaymentType() {
+  const radios = document.querySelectorAll('input[name="payment_type"]');
+  let val = 'CREDIT';
+  radios.forEach(r => {
+    if (r.checked) val = r.value;
+  });
+  return val;
+}
+
+function updatePaymentAmount(grandTotal) {
+  const paymentAmountInput = document.getElementById('payment-amount-input');
+  if (!paymentAmountInput) return;
+
+  const paymentType = getSelectedPaymentType();
+
+  if (paymentType === 'FULL') {
+    paymentAmountInput.value = fmt(grandTotal);
+    paymentAmountInput.readOnly = true;
+  } else if (paymentType === 'PARTIAL') {
+    if (!paymentAmountInput.value || parseFloat(paymentAmountInput.value) === 0) {
+      paymentAmountInput.value = fmt(grandTotal);
+    }
+    paymentAmountInput.readOnly = false;
+  } else { // CREDIT
+    paymentAmountInput.value = fmt(0);
+    paymentAmountInput.readOnly = true;
+  }
+}
+
+// -------- Row sync logic (similar to purchase) --------
+function syncRow(tr) {
+  const productSelect = tr.querySelector('.product-select');
+  const unitSelect = tr.querySelector('.unit-select');
+  const priceInput = tr.querySelector('.price-input');
+  const qtyDisplayInput = tr.querySelector('.qty-display-input');
+  const qtyHiddenInput = tr.querySelector('.qty-hidden-input');
+  const totalSpan = tr.querySelector('.line-total');
+
+  if (!productSelect || !unitSelect || !priceInput || !qtyDisplayInput || !qtyHiddenInput || !totalSpan) {
+    return;
+  }
+
+  const price = parseFloat(priceInput.value || 0) || 0;
+  const displayQty = parseFloat(qtyDisplayInput.value || 0) || 0;
+
+  const unitMode = unitSelect.value || "UNIT";  // "UNIT" = base unit, "PACK" = carton/bag/container/bundle
+  const piecesPerPack = parseFloat(tr.dataset.piecesPerPack || "1") || 1;
+
+  let multiplier = 1;
+  if (unitMode === "PACK") {
+    multiplier = piecesPerPack;
+  }
+
+  const baseQty = displayQty * multiplier;
+
+  if (baseQty > 0) {
+    qtyHiddenInput.value = baseQty.toFixed(3);
+  } else {
+    qtyHiddenInput.value = "";
+  }
+
+  const lineTotal = baseQty * price;
+  totalSpan.textContent = fmt(lineTotal);
+}
+
+// When product changes: set price, packing metadata, and rebuild Unit dropdown
+function handleProductChange(selectEl) {
+  const tr = selectEl.closest('tr');
+  const unitSelect = tr.querySelector('.unit-select');
+  const priceInput = tr.querySelector('.price-input');
+
+  const opt = selectEl.selectedOptions[0];
+
+  // reset row packing metadata
+  tr.dataset.unitCode = "";
+  tr.dataset.packingType = "NONE";
+  tr.dataset.piecesPerPack = "1";
+  tr.dataset.packingLabel = "";
+
+  unitSelect.innerHTML = '<option value="">-- Unit --</option>';
+
+  if (opt) {
+    const unitCode = opt.dataset.unit || "";
+    const basePrice = opt.dataset.price || "";
+    const packingType = opt.dataset.packingType || "NONE";
+    const piecesPerPack = opt.dataset.piecesPerPack || "1";
+    const packingLabel = opt.dataset.packingLabel || "";
+
+    tr.dataset.unitCode = unitCode;
+    tr.dataset.packingType = packingType;
+    tr.dataset.piecesPerPack = piecesPerPack;
+    tr.dataset.packingLabel = packingLabel;
+
+    priceInput.value = basePrice;
+
+    if (unitCode) {
+      const baseLabel = UNIT_LABELS[unitCode] || "Unit";
+      const baseOpt = document.createElement('option');
+      baseOpt.value = "UNIT";
+      baseOpt.textContent = `Base ${baseLabel}`;
+      unitSelect.appendChild(baseOpt);
+    }
+
+    const ppNum = parseFloat(piecesPerPack || "1") || 1;
+    if (packingType !== "NONE" && ppNum > 1) {
+      const packOpt = document.createElement('option');
+      packOpt.value = "PACK";
+      const unitLabel = UNIT_LABELS[unitCode] || "Unit";
+      packOpt.textContent = `${packingLabel} (${ppNum} × ${unitLabel})`;
+      unitSelect.appendChild(packOpt);
+    }
+
+    // for changed product, default to base unit
+    unitSelect.value = "UNIT";
+  }
+
+  syncRow(tr);
+  updateStockDisplay(tr);
+  recalcGrandTotal();
+}
+
+function handleQtyOrPriceChange(inputEl) {
+  const tr = inputEl.closest('tr');
+  syncRow(tr);
+  recalcGrandTotal();
+}
+
+function handleUnitChange(selectEl) {
+  const tr = selectEl.closest('tr');
+  syncRow(tr);
+  updateStockDisplay(tr);
+  recalcGrandTotal();
+}
+
+function addRow() {
+  const tbody = document.querySelector('#items-table tbody');
+  const lastRow = tbody.querySelector('tr:last-child');
+
+  let nextIndex = 1;
+  if (lastRow) {
+    nextIndex = (parseInt(lastRow.dataset.rowIndex || "0", 10) || 0) + 1;
+  }
+
+  const row = document.createElement('tr');
+  row.setAttribute('data-row-index', nextIndex);
+  row.setAttribute('data-unit-code', '');
+  row.setAttribute('data-packing-type', 'NONE');
+  row.setAttribute('data-pieces-per-pack', '1');
+  row.setAttribute('data-packing-label', '');
+
+  // ✅ MUST MATCH HEADER: 7 tds (Product, Unit, Stock, Unit Price, Qty, Total, X)
+  row.innerHTML = `
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+      <select name="product_${nextIndex}" class="product-select"
+              style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+        <option value="">-- Select --</option>
+        {% for p in products %}
+          <option
+            value="{{ p.id }}"
+            data-unit="{{ p.unit }}"
+            data-price="{{ p.sale_price_per_unit|floatformat:2 }}"
+            data-stock="{{ p.current_stock|floatformat:3 }}"
+            data-unit-label="{{ p.get_unit_display }}"
+            data-packing-type="{{ p.packing_type|default:'NONE' }}"
+            data-pieces-per-pack="{{ p.pieces_per_pack|default:1 }}"
+            data-packing-label="{{ p.get_packing_type_display|default:'' }}">
+            {{ p.code }} - {{ p.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </td>
+
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+      <select name="unit_${nextIndex}" class="unit-select"
+              style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+        <option value="">-- Unit --</option>
+      </select>
+    </td>
+
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
+      <span class="stock-display" style="font-weight:600;color:#0f172a;">—</span>
+    </td>
+
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+      <input type="number"
+             step="0.01"
+             name="unit_price_${nextIndex}"
+             class="price-input"
+             readonly
+             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+    </td>
+
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+      <input type="number"
+             step="0.001"
+             class="qty-display-input"
+             placeholder="Qty"
+             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+      <input type="hidden"
+             name="quantity_${nextIndex}"
+             class="qty-hidden-input">
+    </td>
+
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+      Rs <span class="line-total">0.00</span>
+    </td>
+
+    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+      <button type="button"
+              class="btn btn-sm btn-danger"
+              onclick="removeRow(this)"
+              style="padding:4px 9px;border-radius:999px;font-size:13px;">
+        ✕
+      </button>
+    </td>
+  `;
+
+  tbody.appendChild(row);
+  attachRowEvents(row);
+  syncRow(row);
+  updateStockDisplay(row);
+  recalcGrandTotal();
+}
+
+function removeRow(btn) {
+  const tr = btn.closest('tr');
+  tr.parentNode.removeChild(tr);
+  recalcGrandTotal();
+}
+
+// ---- Payment section behaviour ----
+function updatePaymentVisibility() {
+  const type = getSelectedPaymentType();
+  const extra = document.getElementById('payment-extra-fields');
+  const creditNote = document.getElementById('credit-note');
+  const accountSelect = document.getElementById('payment-account-select');
+
+  if (type === 'CREDIT') {
+    if (extra) extra.style.display = 'none';
+    if (creditNote) creditNote.style.display = 'block';
+    if (accountSelect) {
+      accountSelect.value = '';
+    }
+  } else {
+    if (extra) extra.style.display = 'block';
+    if (creditNote) creditNote.style.display = 'none';
+  }
+
+  const currentTotal = parseFloat(document.getElementById('payment-total-amount').textContent || 0) || 0;
+  updatePaymentAmount(currentTotal);
+}
+
+function attachRowEvents(tr) {
+  const productSelect = tr.querySelector('.product-select');
+  const priceInput = tr.querySelector('.price-input');
+  const qtyDisplayInput = tr.querySelector('.qty-display-input');
+  const unitSelect = tr.querySelector('.unit-select');
+
+  if (productSelect) {
+    productSelect.addEventListener('change', () => handleProductChange(productSelect));
+  }
+  if (priceInput) {
+    priceInput.addEventListener('input', () => handleQtyOrPriceChange(priceInput));
+  }
+  if (qtyDisplayInput) {
+    qtyDisplayInput.addEventListener('input', () => handleQtyOrPriceChange(qtyDisplayInput));
+  }
+  if (unitSelect) {
+    unitSelect.addEventListener('change', () => handleUnitChange(unitSelect));
+  }
+}
+
+function updateStockDisplay(tr) {
+  const stockSpan = tr.querySelector('.stock-display');
+  const productSelect = tr.querySelector('.product-select');
+  const unitSelect = tr.querySelector('.unit-select');
+
+  if (!stockSpan || !productSelect) return;
+
+  const opt = productSelect.selectedOptions[0];
+  if (!opt || !opt.value) {
+    stockSpan.textContent = "—";
+    return;
+  }
+
+  const baseStock = parseFloat(opt.dataset.stock || "0") || 0;
+  const unitLabel = opt.dataset.unitLabel || "Unit";
+
+  const piecesPerPack = parseFloat(tr.dataset.piecesPerPack || "1") || 1;
+  const packingType = tr.dataset.packingType || "NONE";
+  const packingLabel = tr.dataset.packingLabel || "";
+
+  const mode = (unitSelect && unitSelect.value) ? unitSelect.value : "UNIT";
+
+  // Default: show base stock
+  let text = `${baseStock.toFixed(3)} ${unitLabel}`;
+
+  // If user selected PACK and packing exists, also show packs available
+  if (mode === "PACK" && packingType !== "NONE" && piecesPerPack > 1) {
+    const packs = baseStock / piecesPerPack;
+    text = `${packs.toFixed(3)} ${packingLabel}  (${baseStock.toFixed(3)} ${unitLabel})`;
+  }
+
+  stockSpan.textContent = text;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Attach events to all existing rows and compute initial totals
+  document.querySelectorAll('#items-table tbody tr').forEach(tr => {
+    attachRowEvents(tr);
+    syncRow(tr);  // so that existing lines (when editing) get proper totals
+    updateStockDisplay(tr);
+  });
+
+  const paymentRadios = document.querySelectorAll('input[name="payment_type"]');
+  paymentRadios.forEach(r => r.addEventListener('change', updatePaymentVisibility));
+
+  recalcGrandTotal();
+  updatePaymentVisibility();
+});
+</script>
+
+{% endblock %}
+

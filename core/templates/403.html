@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Access blocked</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="font-family:system-ui, -apple-system, Segoe UI, Roboto; background:#f8fafc; margin:0; padding:24px;">
+  <div style="max-width:680px; margin:40px auto; background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:20px; box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="font-size:20px; font-weight:700; margin-bottom:8px;">Access blocked</div>
+
+    {% if status == "EXPIRED" %}
+      <div style="padding:12px 14px; border-radius:12px; background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; margin:12px 0;">
+        Your subscription is <b>expired</b>. Please renew to continue.
+        {% if expires_at %}<div style="margin-top:6px; font-size:14px;">Expired on: <b>{{ expires_at }}</b></div>{% endif %}
+      </div>
+    {% elif status == "TRIAL" %}
+      <div style="padding:12px 14px; border-radius:12px; background:#fffbeb; border:1px solid #fde68a; color:#92400e; margin:12px 0;">
+        You are on <b>Trial</b>.
+        {% if days_left != None %}
+          <div style="margin-top:6px; font-size:14px;">Days left: <b>{{ days_left }}</b></div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div style="padding:12px 14px; border-radius:12px; background:#eef2ff; border:1px solid #c7d2fe; color:#3730a3; margin:12px 0;">
+        {{ message }}
+      </div>
+    {% endif %}
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+      <a href="/" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#0f172a; color:#fff; text-decoration:none;">
+        Go to Dashboard
+      </a>
+      <a href="{% url 'subscription_page' %}" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#16a34a; color:#fff; text-decoration:none;">
+        Renew Subscription
+      </a>
+
+      <form method="post" action="{% url 'logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#ef4444; color:#fff; border:none;">
+          Logout
+        </button>
+      </form>
+
+    </div>
+  </div>
+</body>
+</html>

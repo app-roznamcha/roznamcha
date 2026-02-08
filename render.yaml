@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: roznamcha
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn agri_business.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: "False"

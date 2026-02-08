@@ -1,0 +1,174 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+  {% if is_edit %}
+    Edit {{ party_type_label }}
+  {% else %}
+    New {{ party_type_label }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:720px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        {% if is_edit %}
+          Edit {{ party_type_label }}
+        {% else %}
+          New {{ party_type_label }}
+        {% endif %}
+      </h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        Basic details for this {{ party_type_label|lower }}.
+      </p>
+    </div>
+
+    <div>
+      {% if party_type == "CUSTOMER" %}
+        <a href="{% url 'customer_list' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+          ← Back to Customers
+        </a>
+      {% else %}
+        <a href="{% url 'supplier_list' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+          ← Back to Suppliers
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ---------- Card with Form & Messages ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+
+{# Flash messages #}
+{% if messages %}
+  <div style="margin-bottom:14px;">
+    {% for message in messages %}
+      {% if message.tags == 'error' %}
+        <div style="padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:8px;
+                    background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+          {{ message }}
+        </div>
+      {% else %}
+        <div style="padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:8px;
+                    background:#ecfdf3;color:#166534;border:1px solid #bbf7d0;">
+          {{ message }}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+
+        <div>
+          <label for="name" style="display:block;font-size:14px;margin-bottom:4px;">
+            Name <span style="color:#b91c1c;">*</span>
+          </label>
+          <input type="text"
+                 id="name"
+                 name="name"
+                 value="{{ party.name|default_if_none:'' }}"
+                 required
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div>
+          <label for="phone" style="display:block;font-size:14px;margin-bottom:4px;">
+            Phone
+          </label>
+          <input type="text"
+                 id="phone"
+                 name="phone"
+                 value="{{ party.phone|default_if_none:'' }}"
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div>
+          <label for="city" style="display:block;font-size:14px;margin-bottom:4px;">
+            City
+          </label>
+          <input type="text"
+                 id="city"
+                 name="city"
+                 value="{{ party.city|default_if_none:'' }}"
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        </div>
+
+        <div>
+          <label for="address" style="display:block;font-size:14px;margin-bottom:4px;">
+            Address
+          </label>
+          <textarea id="address"
+                    name="address"
+                    rows="3"
+                    style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;resize:vertical;">{{ party.address|default_if_none:'' }}</textarea>
+        </div>
+        {% if not is_edit %}
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:6px 0 2px;">
+      
+        <div>
+          <label for="opening_balance" style="display:block;font-size:14px;margin-bottom:4px;">
+            Opening Balance
+          </label>
+          <input type="number"
+                 step="0.01"
+                 min="0"
+                 id="opening_balance"
+                 name="opening_balance"
+                 value="{{ party.opening_balance|default_if_none:'' }}"
+                 placeholder="0.00"
+                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+                 <div style="margin-top:6px;display:flex;gap:14px;align-items:center;font-size:14px;color:#374151;">
+                  <label style="display:flex;gap:6px;align-items:center;">
+                    <input type="radio" name="opening_side" value="DR"
+                           {% if request.POST.opening_side == "CR" %}{% else %}checked{% endif %}>
+                    {% if party_type == "CUSTOMER" %}
+                      Dr (Customer owes me)
+                    {% else %}
+                      Dr (Advance paid to supplier)
+                    {% endif %}
+                  </label>
+                
+                  <label style="display:flex;gap:6px;align-items:center;">
+                    <input type="radio" name="opening_side" value="CR"
+                           {% if request.POST.opening_side == "CR" %}checked{% endif %}>
+                    {% if party_type == "CUSTOMER" %}
+                      Cr (Customer advance / I owe customer)
+                    {% else %}
+                      Cr (I owe supplier)
+                    {% endif %}
+                  </label>
+                </div>
+        </div>
+      {% endif %} 
+
+      </div>
+
+      <div style="margin-top:18px;display:flex;justify-content:flex-start;">
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          {% if is_edit %}
+            💾 Save Changes
+          {% else %}
+            ➕ Create {{ party_type_label }}
+          {% endif %}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

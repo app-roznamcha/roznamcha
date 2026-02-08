@@ -1,0 +1,384 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Super Admin — Owner{% endblock %}
+
+{% block extra_head %}
+<style>
+  .page-wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:24px 16px 48px;
+  }
+
+  .page-shell{
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 55%);
+    border-radius: 18px;
+    padding: 18px 14px 26px;
+  }
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+
+  .backlink{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 14px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+    color:#111827;
+    text-decoration:none;
+    font-weight:600;
+    font-size:13px;
+    box-shadow:0 10px 20px rgba(15,23,42,.05);
+    transition:transform .08s ease, box-shadow .08s ease, background .08s ease;
+  }
+  .backlink:hover{
+    background:#f3f4f6;
+    transform:translateY(-1px);
+    box-shadow:0 14px 26px rgba(15,23,42,.08);
+    text-decoration:none;
+  }
+  .backlink:focus{
+    outline:3px solid rgba(37,99,235,.18);
+    outline-offset:2px;
+  }
+
+  .pill{
+    font-size:12px;
+    font-weight:600;
+    color:#64748b;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    border-radius:999px;
+    padding:8px 12px;
+    box-shadow:0 10px 20px rgba(15,23,42,.05);
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    box-shadow:0 10px 26px rgba(15,23,42,.06);
+    overflow:hidden;
+  }
+
+  .card-head{
+    padding:18px 18px 14px;
+    border-bottom:1px solid #f1f5f9;
+  }
+
+  .owner-title{
+    margin:0;
+    font-size:22px;
+    font-weight:700;
+    color:#0f172a;
+    letter-spacing:-0.02em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .owner-sub{
+    margin:6px 0 0;
+    color:#64748b;
+    font-weight:500;
+    font-size:14px;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:12px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+    white-space:nowrap;
+  }
+  .badge-green{ background:#ecfdf5; border-color:#a7f3d0; color:#047857; }
+  .badge-blue{ background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; }
+  .badge-red{ background:#fef2f2; border-color:#fecaca; color:#b91c1c; }
+  .badge-amber{ background:#fffbeb; border-color:#fde68a; color:#b45309; }
+  .badge-gray{ background:#f3f4f6; border-color:#e5e7eb; color:#334155; }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:14px;
+    padding:16px 18px 18px;
+  }
+  @media (max-width: 720px){
+    .grid{ grid-template-columns:1fr; }
+  }
+
+  .info{
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:14px 14px;
+    background:#ffffff;
+  }
+
+  .info h3{
+    margin:0 0 8px;
+    font-size:14px;
+    font-weight:700;
+    color:#0f172a;
+    letter-spacing:.02em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .kv{
+    display:grid;
+    grid-template-columns: 140px 1fr;
+    gap:10px 12px;
+    margin-top:10px;
+    font-size:14px;
+  }
+  .k{ color:#64748b; font-weight:700; }
+  .v{ color:#0f172a; font-weight:600; }
+  .muted{ color:#6b7280; font-weight:500; }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:12px;
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:999px;
+    border:1px solid #e5e7eb;
+    background:#ffffff;
+    color:#111827;
+    text-decoration:none;
+    font-weight:700;
+    font-size:13px;
+    box-shadow:0 10px 20px rgba(15,23,42,.06);
+    transition:transform .08s ease, box-shadow .08s ease, background .08s ease;
+  }
+  .btn:hover{
+    background:#f3f4f6;
+    transform:translateY(-1px);
+    box-shadow:0 14px 26px rgba(15,23,42,.08);
+    text-decoration:none;
+  }
+  .btn:focus{
+    outline:3px solid rgba(37,99,235,.18);
+    outline-offset:2px;
+  }
+
+  .btn-dark{
+    background:#0f172a;
+    border-color:#0f172a;
+    color:#ffffff;
+  }
+  .btn-dark:hover{
+    background:#111827;
+    border-color:#111827;
+  }
+
+  .btn-red{
+    background:#b91c1c;
+    border-color:#b91c1c;
+    color:#ffffff;
+  }
+  .btn-red:hover{
+    background:#991b1b;
+    border-color:#991b1b;
+  }
+
+  .divider{
+    height:1px;
+    background:#f1f5f9;
+    margin:0;
+    border:0;
+  }
+
+  .danger{
+    padding:16px 18px 18px;
+  }
+
+  .danger-box{
+    border:1px solid #fecaca;
+    background:#fff5f5;
+    border-radius:16px;
+    padding:14px 14px;
+  }
+
+  .danger-title{
+    margin:0 0 6px;
+    font-weight:700;
+    color:#991b1b;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .danger-note{
+    margin:0 0 12px;
+    color:#7f1d1d;
+    font-weight:500;
+    font-size:13px;
+    line-height:1.45;
+  }
+
+  .confirm-input{
+    width:100%;
+    padding:12px 12px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    font-weight:600;
+    outline:none;
+    background:#fff;
+  }
+  .confirm-input:focus{
+    outline:3px solid rgba(239,68,68,.18);
+    outline-offset:2px;
+    border-color:#fecaca;
+  }
+
+  .inline-msg{
+    padding:12px 12px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    background:#f8fafc;
+    color:#334155;
+    font-weight:600;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="page-shell">
+
+    <div class="topbar">
+      <a class="backlink" href="{% url 'superadmin_dashboard' %}">← Back to Super Admin</a>
+      <span class="pill">Owner Detail</span>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h1 class="owner-title">
+          👤 {{ owner.username }}
+
+          {% if status == "ACTIVE" %}
+            <span class="badge badge-green">✅ ACTIVE{% if days_left != None %} ({{ days_left }}d){% endif %}</span>
+          {% elif status == "TRIAL" %}
+            <span class="badge badge-blue">🆓 TRIAL{% if days_left != None %} ({{ days_left }}d){% endif %}</span>
+          {% elif status == "EXPIRED" %}
+            <span class="badge badge-red">⛔ EXPIRED{% if days_left != None %} ({{ days_left }}d){% endif %}</span>
+          {% else %}
+            <span class="badge badge-gray">{{ status }}</span>
+          {% endif %}
+
+          {% if suspended %}
+            <span class="badge badge-amber">⏸ Suspended</span>
+          {% endif %}
+        </h1>
+
+        <p class="owner-sub">
+          Manage suspension, subscription, and purge eligibility for this company.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="info">
+          <h3>🏢 Company</h3>
+
+          <div class="kv">
+            <div class="k">Company</div>
+            <div class="v">{{ company.name|default:"—" }}</div>
+
+            <div class="k">Slug</div>
+            <div class="v">{{ company.slug|default:"—" }}</div>
+
+            <div class="k">Expires</div>
+            <div class="v">
+              {% if expires_at %}{{ expires_at }}{% else %}<span class="muted">—</span>{% endif %}
+            </div>
+
+            <div class="k">Suspended</div>
+            <div class="v">{% if suspended %}YES{% else %}NO{% endif %}</div>
+          </div>
+        </div>
+
+        <div class="info">
+          <h3>⚙️ Actions</h3>
+          <div class="muted">These actions affect access and billing status.</div>
+
+          <div class="actions">
+            <form method="post" action="{% url 'superadmin_toggle_suspend' owner.id %}">
+              {% csrf_token %}
+              <button class="btn btn-dark" type="submit">
+                {% if suspended %}✅ Unsuspend{% else %}⛔ Suspend{% endif %}
+              </button>
+            </form>
+
+            <a class="btn" href="{% url 'superadmin_subscription_update' owner.id %}">
+              💳 Activate / Extend
+            </a>
+          </div>
+
+    
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="danger">
+        <div class="danger-box">
+          <h3 class="danger-title">⚠️ Hard Purge (Danger Zone)</h3>
+          <p class="danger-note">
+            This permanently deletes the owner + company + all tenant data.
+            Only allowed when the company is <b>EXPIRED for 60+ days</b>.
+            Type the slug to confirm.
+          </p>
+
+          {% if eligible_for_purge %}
+            <form method="post" action="{% url 'superadmin_hard_purge_owner' owner.id %}">
+              {% csrf_token %}
+
+              <div style="display:grid; gap:10px;">
+                <input
+                  class="confirm-input"
+                  name="confirm"
+                  placeholder="Type: {{ company.slug|default:owner.username }}"
+                  autocomplete="off"
+                />
+
+                <button class="btn btn-red" type="submit" style="width:100%; padding:12px 14px;">
+                  🧨 PURGE NOW (Permanent)
+                </button>
+              </div>
+            </form>
+          {% else %}
+            <div class="inline-msg">Not eligible for purge.</div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

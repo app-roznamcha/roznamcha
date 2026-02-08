@@ -1,0 +1,188 @@
+{% extends "core/base.html" %}
+
+{% block title %}Customer Ledger{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  <!-- Top Bar -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        👤 Customer Ledger
+      </h1>
+      <p style="margin:0 0 16px;font-size:15px;color:#475569;">
+        View detailed statement of a single customer with running balance.
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'dashboard' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Filter
+    </div>
+    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">
+      Select a customer and optional date range, then click <strong>Apply</strong>.
+    </p>
+
+    <form method="get"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:260px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          Customer
+        </label>
+        <select name="customer"
+                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">-- Select customer --</option>
+          {% for c in customers %}
+            <option value="{{ c.id }}"
+              {% if selected_customer and c.id == selected_customer.id %}selected{% endif %}>
+              {{ c.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
+        <input type="date"
+               name="from"
+               value="{{ date_from|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
+        <input type="date"
+               name="to"
+               value="{{ date_to|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {% if selected_customer %}
+    <!-- Summary Card -->
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:16px 18px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:4px;">
+            {{ selected_customer.name }}
+          </div>
+          <div style="font-size:13px;color:#6b7280;">
+            As of:
+            {% if date_to %}
+              {{ date_to }}
+            {% else %}
+              All dates
+            {% endif %}
+          </div>
+        </div>
+        <div style="text-align:right;font-size:14px;">
+          <div>
+            Opening balance:
+            <strong>
+              {{ opening_balance|floatformat:2 }}
+              {{ opening_is_debit|yesno:"Dr,Cr" }}
+            </strong>
+          </div>
+          <div>
+            Closing balance:
+            <strong>
+              {{ closing_balance|floatformat:2 }}
+              {{ closing_is_debit|yesno:"Dr,Cr" }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print button for this customer's statement -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <button type="button"
+            onclick="window.print()"
+            style="display:inline-flex;align-items:center;justify-content:center;
+                   padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;
+                   border:1px solid #e5e7eb;background:#f3f4f6;color:#111827;cursor:pointer;">
+      🖨️ Print / Save as PDF
+    </button>
+  </div>
+
+    <!-- Ledger Table -->
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+        Ledger entries
+      </div>
+
+      <div style="width:100%;overflow-x:auto;">
+        <table style="border-collapse:collapse;width:100%;min-width:760px;">
+          <thead>
+            <tr>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:12%;">Date</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:14%;">Debit</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:14%;">Credit</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:16%;">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if rows %}
+              {% for r in rows %}
+                <tr>
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
+                    {{ r.date }}
+                  </td>
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
+                    {{ r.description }}
+                  </td>
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
+                    {{ r.debit|floatformat:2 }}
+                  </td>
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
+                    {{ r.credit|floatformat:2 }}
+                  </td>
+                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
+                    {{ r.balance|floatformat:2 }}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5"
+                    style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:14px;color:#6b7280;text-align:center;">
+                  No transactions found for this customer in the selected period.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div style="background:#f9fafb;border-radius:12px;border:1px dashed #d1d5db;
+                padding:18px 20px;font-size:14px;color:#6b7280;">
+      Please select a customer above and click <strong>Apply</strong> to view the ledger.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

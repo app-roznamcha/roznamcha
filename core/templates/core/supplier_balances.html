@@ -1,0 +1,163 @@
+{% extends "core/base.html" %}
+
+{% block title %}Supplier Balances{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        🏭 Supplier Balances
+      </h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        View supplier-wise opening balance, purchases, payments, and net payable/advance as of a specific date.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filter Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Filter by date
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Select an <strong>“as of”</strong> date to recalculate balances for all suppliers.
+    </p>
+
+    <form method="get"
+          class="filter-form"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:220px;">
+        <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">
+          As of date
+        </label>
+        <input type="date"
+               id="date"
+               name="date"
+               value="{{ as_of|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Supplier Balances Table Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:18px;font-weight:600;">
+        Supplier-wise balances as of {{ as_of|date:"d M Y" }}
+      </div>
+      <div style="font-size:13px;color:#6b7280;">
+        Positive balance with <strong>Dr</strong> means advance paid to supplier; with <strong>Cr</strong> means amount payable.
+      </div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:780px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:5%;">
+              #
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">
+              Supplier
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+              Opening (Dr/Cr)
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+              Purchases
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+              Payments
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+              Balance
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;width:8%;">
+              Dr/Cr
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {{ forloop.counter }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {{ row.party.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                {{ row.opening|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                {{ row.purchases|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                {{ row.payments|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                {{ row.net_abs|floatformat:2 }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+                {{ row.net_type }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7"
+                  style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;color:#6b7280;">
+                No suppliers found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="2"
+                style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              Grand Totals:
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              {{ grand_opening|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              {{ grand_purchases|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              {{ grand_payments|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              {{ grand_balance_abs|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+              {{ grand_balance_type }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

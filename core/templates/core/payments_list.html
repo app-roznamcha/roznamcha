@@ -1,0 +1,194 @@
+{% extends "core/base.html" %}
+
+{% block title %}Payments{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Buttons) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        Payments (Receipts &amp; Payments)
+      </h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        View and filter all money received from customers or paid to suppliers.
+      </p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'payment_new' %}"
+         class="btn btn-primary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:210px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+        + New Payment / Receipt
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filters Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Filters
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Narrow down payments by date, direction, and party, then click <strong>Apply</strong>.
+    </p>
+
+    <form method="get"
+          class="filters-form"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">From date</label>
+        <input type="date"
+               name="from_date"
+               value="{{ from_date }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">To date</label>
+        <input type="date"
+               name="to_date"
+               value="{{ to_date }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">Direction</label>
+        <select name="direction"
+                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">All</option>
+          <option value="IN" {% if selected_direction == "IN" %}selected{% endif %}>Receipt (IN)</option>
+          <option value="OUT" {% if selected_direction == "OUT" %}selected{% endif %}>Payment (OUT)</option>
+        </select>
+      </div>
+
+      <div style="min-width:220px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">Party</label>
+        <select name="party"
+                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+          <option value="">All parties</option>
+          {% for p in parties %}
+            <option value="{{ p.id }}"
+              {% if p.id|stringformat:"s" == selected_party_id %}selected{% endif %}>
+              {{ p.name }} ({{ p.get_party_type_display }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+        <a href="{% url 'payment_list' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+          Reset
+        </a>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Payments List Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:18px;font-weight:600;">
+        Payments List
+      </div>
+      <div style="font-size:14px;color:#6b7280;">
+        Total for filtered payments: <strong>{{ total_amount }}</strong>
+      </div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:780px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Direction</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Party</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Account</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Posted?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pay in payments %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {{ forloop.counter }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {{ pay.date|date:"M j, Y" }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {% if pay.direction == "IN" %}
+                  Receipt (IN)
+                {% else %}
+                  Payment (OUT)
+                {% endif %}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {% if pay.party %}
+                  {% if pay.party.party_type == "CUSTOMER" %}
+                    <a href="{% url 'customer_ledger' %}?customer={{ pay.party.id }}"
+                       style="color:#0d6efd;text-decoration:none;font-weight:600;">
+                      {{ pay.party.name }}
+                    </a>
+                    <span style="color:#6b7280;">(Customer)</span>
+                  {% elif pay.party.party_type == "SUPPLIER" %}
+                    <a href="{% url 'supplier_ledger' %}?supplier={{ pay.party.id }}"
+                       style="color:#0d6efd;text-decoration:none;font-weight:600;">
+                      {{ pay.party.name }}
+                    </a>
+                    <span style="color:#6b7280;">(Supplier)</span>
+                  {% else %}
+                    {{ pay.party.name }} ({{ pay.party.get_party_type_display }})
+                  {% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {{ pay.account.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                {{ pay.amount }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                {{ pay.description|default:"—" }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+                {% if pay.posted %}
+                  <span class="badge badge-success">Yes</span>
+                {% else %}
+                  <span class="badge badge-warning">No</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;text-align:center;">
+                No payments found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

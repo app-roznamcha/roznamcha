@@ -1,0 +1,263 @@
+{% extends "core/base.html" %}
+
+{% block title %}Profit &amp; Loss{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Profit &amp; Loss</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        View total income, expenses, and net profit (or loss) for a selected date range.
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filter Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Filter by date range
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Choose a start and end date, then click <strong>Apply</strong> to recalculate the report.
+    </p>
+
+    <form method="get"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:200px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
+        <input type="date"
+               name="from"
+               value="{{ date_from|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:200px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
+        <input type="date"
+               name="to"
+               value="{{ date_to|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Summary Chart Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
+      <div style="font-size:18px;font-weight:600;">
+        Summary – Income vs Expenses
+      </div>
+      <div style="font-size:14px;color:#6b7280;">
+        Period: 
+        <strong>
+          {{ date_from|date:"d M Y" }} – {{ date_to|date:"d M Y" }}
+        </strong>
+      </div>
+    </div>
+
+    <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">
+      Quick visual comparison of <strong>Total Income</strong>, 
+      <strong>Total Expenses</strong> and <strong>Net Profit / (Loss)</strong>.
+    </p>
+
+    <div style="width:100%;max-width:680px;">
+      <canvas id="plSummaryChart" height="120"></canvas>
+    </div>
+  </div>
+
+
+  {# ---------- Income Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Income
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+              Account
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
+              Amount
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in income_rows %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                {{ row.account.code }} – {{ row.account.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                {{ row.amount|floatformat:2 }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                No income accounts for this period.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              Total Income
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ total_income|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  {# ---------- Expenses Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      Expenses
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+              Account
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
+              Amount
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in expense_rows %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                {{ row.account.code }} – {{ row.account.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+                {{ row.amount|floatformat:2 }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+                No expense accounts for this period.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              Total Expenses
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              {{ total_expense|floatformat:2 }}
+            </th>
+          </tr>
+          <tr>
+            <th style="padding:7px 9px;font-size:16px;text-align:right;">
+              Net Profit / (Loss)
+            </th>
+            <th style="padding:7px 9px;font-size:16px;text-align:right;">
+              {{ net_profit|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
+{# ---------- P&L Summary Chart JS ---------- #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  (function () {
+    // Safely read Django numbers into JS
+    const totalIncome  = parseFloat("{{ total_income|floatformat:2 }}")  || 0;
+    const totalExpense = parseFloat("{{ total_expense|floatformat:2 }}") || 0;
+    const netProfit    = parseFloat("{{ net_profit|floatformat:2 }}")    || 0;
+
+    const ctx = document.getElementById('plSummaryChart');
+    if (!ctx) return;
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Income', 'Expenses', 'Net Profit / (Loss)'],
+        datasets: [{
+          label: 'Amount (Rs)',
+          data: [totalIncome, totalExpense, netProfit],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                // Format as 1,234,567
+                return value.toLocaleString('en-PK');
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const v = context.parsed.y || 0;
+                return 'Rs ' + v.toLocaleString('en-PK', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                });
+              }
+            }
+          },
+          title: {
+            display: false
+          }
+        }
+      }
+    });
+  })();
+</script>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h2>Sign in</h2>
+
+    {% if form.errors %}
+        <p style="color:#b91c1c; background:#fee2e2; padding:8px 12px; border-radius:8px;">
+            Please check your username and password.
+        </p>
+    {% endif %}
+
+    <form method="post" style="max-width:320px; margin-top:16px;">
+        {% csrf_token %}
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <div>
+                <label for="id_username">Username</label><br>
+                <input id="id_username" name="username" type="text"
+                       style="width:100%; padding:8px; border-radius:6px; border:1px solid #d1d5db;">
+            </div>
+
+            <div>
+                <label for="id_password">Password</label><br>
+                <input id="id_password" name="password" type="password"
+                       style="width:100%; padding:8px; border-radius:6px; border:1px solid #d1d5db;">
+            </div>
+
+            <button type="submit"
+                    style="margin-top:8px; padding:8px 16px; border-radius:999px; border:none;
+                           background:#2563eb; color:white; font-weight:500; cursor:pointer;">
+                Log in
+            </button>
+        </div>
+
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+    </form>
+{% endblock %}

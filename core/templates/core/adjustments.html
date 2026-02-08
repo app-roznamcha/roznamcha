@@ -1,0 +1,344 @@
+{% extends "core/base.html" %}
+{% block title %}Adjustments{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:50px auto 80px;padding:0 32px;font-size:17px;line-height:1.45;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 6px;font-size:34px;font-weight:700;">Adjustments</h1>
+      <p style="margin:0 0 20px;font-size:16px;color:#475569;">
+        Customer/Supplier opening balance corrections (no cash/bank involved). Posts against <strong>3000 Opening Balances</strong>.
+      </p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <a href="{% url 'dashboard' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+      <a href="{% url 'payments_list' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;">
+        Payments
+      </a>
+    </div>
+  </div>
+
+  {% if error %}
+    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
+                font-size:15px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  {% if messages %}
+    <div style="margin-bottom:16px;">
+      {% for message in messages %}
+        {% if "success" in message.tags %}
+          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:15px;
+                      background:#dcfce7;color:#166534;border:1px solid #bbf7d0;">
+            {{ message }}
+          </div>
+        {% elif "error" in message.tags %}
+          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:15px;
+                      background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+            {{ message }}
+          </div>
+        {% else %}
+          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:15px;
+                      background:#f3f4f6;color:#111827;border:1px solid #e5e7eb;">
+            {{ message }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- =========================
+       PARTY ADJUSTMENT (FORM)
+       ========================= -->
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:22px 24px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+
+    <h2 style="margin:0 0 14px;font-size:20px;font-weight:700;">New Adjustment</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="party_adjust">
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Date</label>
+          <input type="date" name="date" value="{{ today }}"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Party</label>
+          <select name="party" required
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+            <option value="">-- Select Party --</option>
+            {% for p in parties %}
+              <option value="{{ p.id }}">{{ p.name }} ({{ p.get_party_type_display }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Amount (Rs)</label>
+          <input type="number" name="amount" step="0.01" min="0" required
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Side</label>
+          <select name="side"
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+            <option value="DR" selected>DR (Increase Receivable / Reduce Payable)</option>
+            <option value="CR">CR (Reduce Receivable / Increase Payable)</option>
+          </select>
+        </div>
+
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Note / Reason (optional)</label>
+          <input type="text" name="note" maxlength="255"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+      </div>
+
+      <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button type="submit"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          💾 Save &amp; Post Adjustment
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- =========================
+       PARTY ADJUSTMENT (HISTORY)
+       ========================= -->
+  <div style="margin-top:22px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:16px 18px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+      <h2 style="margin:0;font-size:20px;font-weight:700;">Adjustment History</h2>
+      <div style="font-size:14px;color:#475569;">
+        Total (amount sum): <strong>{{ total_adjustments }}</strong>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:860px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Party</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Type</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Side</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in adjustments %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.date }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.party.name }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.party.get_party_type_display }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.adjustment_side }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ a.amount }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;color:#475569;">{{ a.description|default:"—" }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" style="padding:14px 9px;text-align:center;color:#6b7280;">
+                No adjustments yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin:12px 0 0;font-size:13px;color:#6b7280;">
+      Posting rule: hits <strong>Customer Control (1300)</strong> or <strong>Supplier Control (2100)</strong> vs <strong>Opening Balances (3000)</strong>.
+    </p>
+  </div>
+
+  {# ===================== STOCK ADJUSTMENT CARD ===================== #}
+  <div style="margin-top:26px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:22px 24px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+  
+    <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">Stock Adjustment</h2>
+    <p style="margin:0 0 18px;font-size:15px;color:#475569;">
+      Damage/expiry or correction of stock with accounting impact.
+    </p>
+  
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="stock_adjust">
+  
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+  
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Date</label>
+          <input type="date" name="date" value="{{ today }}"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+  
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Product</label>
+          <select name="product" id="sa_product" required
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+            <option value="">-- Select Product --</option>
+            {% for p in products %}
+              <option value="{{ p.id }}"
+                      data-cost="{{ p.purchase_price_per_unit|default_if_none:0|floatformat:2 }}">
+                {{ p.code }} - {{ p.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+  
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Direction</label>
+          <select name="direction" id="sa_direction"
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+            <option value="DOWN" selected>DOWN (Damage / Expiry / Loss)</option>
+            <option value="UP">UP (Extra / Found / Correction)</option>
+          </select>
+        </div>
+  
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Quantity</label>
+          <input type="number" name="qty" id="sa_qty" step="0.001" min="0"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+  
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Unit Cost (Rs)</label>
+          <input type="number" name="unit_cost" id="sa_unit_cost" step="0.01" min="0"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+          <div style="margin-top:6px;font-size:13px;color:#6b7280;">
+            Auto-fills from product purchase price.
+          </div>
+        </div>
+  
+        <div>
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Total (Rs)</label>
+          <input type="text" id="sa_total" readonly
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;background:#f9fafb;">
+        </div>
+  
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:15px;margin-bottom:6px;">Reason (optional)</label>
+          <input type="text" name="reason" maxlength="255"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+  
+      </div>
+  
+      <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button type="submit"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          💾 Save &amp; Post Stock Adjustment
+        </button>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+  (function () {
+    const productEl = document.getElementById("sa_product");
+    const qtyEl = document.getElementById("sa_qty");
+    const unitEl = document.getElementById("sa_unit_cost");
+    const totalEl = document.getElementById("sa_total");
+  
+    if (!productEl || !qtyEl || !unitEl || !totalEl) return;
+  
+    function toNumber(val) {
+      const n = parseFloat(val);
+      return isNaN(n) ? 0 : n;
+    }
+  
+    function fmt(n) {
+      return (toNumber(n)).toFixed(2);
+    }
+  
+    function recalc() {
+      const qty = toNumber(qtyEl.value);
+      const unit = toNumber(unitEl.value);
+      totalEl.value = fmt(qty * unit);
+    }
+  
+    // ✅ Match your sale template style: opt.dataset.cost
+    productEl.addEventListener("change", function () {
+      const opt = productEl.selectedOptions[0];
+      if (!opt) return;
+  
+      const cost = opt.dataset.cost;  // <-- like opt.dataset.price in Sale page
+      if (cost !== undefined && cost !== null && cost !== "") {
+        unitEl.value = cost;
+      }
+      recalc();
+    });
+  
+    qtyEl.addEventListener("input", recalc);
+    unitEl.addEventListener("input", recalc);
+  
+    recalc();
+  })();
+  </script>
+  <!-- =========================
+       STOCK ADJUSTMENT (HISTORY)
+       ========================= -->
+  <div style="margin-top:22px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:16px 18px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <h2 style="margin:0;font-size:20px;font-weight:700;">Stock Adjustment History</h2>
+
+    <div style="margin-top:12px;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:900px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Product</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Direction</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Qty</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Unit Cost</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in stock_adjustments %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ s.date }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">
+                {{ s.product.code }} - {{ s.product.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ s.direction }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ s.qty }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ s.unit_cost }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ s.amount }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;color:#475569;">{{ s.reason|default:"—" }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="padding:14px 9px;text-align:center;color:#6b7280;">
+                No stock adjustments yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin:12px 0 0;font-size:13px;color:#6b7280;">
+      Posting rule: <strong>DOWN</strong> → Dr Inventory Write-off (5100) / Cr Inventory (1400),
+      <strong>UP</strong> → Dr Inventory (1400) / Cr Opening Balances (3000).
+    </p>
+  </div>
+
+</div>
+{% endblock %}

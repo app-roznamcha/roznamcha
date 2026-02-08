@@ -1,0 +1,499 @@
+{% extends "core/base.html" %}
+
+{% block title %}Day Summary{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
+  <style>
+    .mini-box{
+      margin-top:12px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:12px;
+      display:flex;
+      gap:18px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:flex-start;
+    }
+    .mini-table{
+      min-width:320px;
+      flex:1;
+    }
+    .mini-table table{
+      width:100%;
+      border-collapse:collapse;
+    }
+    .mini-table td{
+      padding:6px 8px;
+      border-bottom:1px solid #f1f5f9;
+      font-size:14px;
+    }
+    .mini-right{ text-align:right; white-space:nowrap; }
+    .net-strip{
+      margin-top:14px;
+      background:#0f172a;
+      color:#fff;
+      border-radius:14px;
+      padding:14px 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .net-strip small{ opacity:.75; font-size:13px; }
+    .net-strip strong{ font-size:18px; }
+  </style>
+  {# ---------- Top Bar (Title + Back Button) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Day Summary</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        View all posted sales, purchases, and payments for a single day.
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <style>
+    .tbl{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      min-width:980px;
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:15px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      background:#f9fafb;
+      font-weight:600;
+      text-align:left;
+    }
+    .right{ text-align:right; }
+    .center{ text-align:center; }
+    .nowrap{ white-space:nowrap; }
+    .truncate{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .pill{
+      display:inline-block;
+      padding:2px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      color:#111827;
+      white-space:nowrap;
+    }
+  </style>
+
+  {# ---------- Filter Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">Select date</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Choose a date to see all activity for that day, then click <strong>Apply</strong>.
+    </p>
+
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:220px;">
+        <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">Date</label>
+        <input type="date"
+               id="date"
+               name="date"
+               value="{{ selected_date|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Top Summary Strip ---------- #}
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0, 1fr));
+    gap:12px;
+    margin-bottom:22px;
+  ">
+  
+    {% comment %} Card style helper {% endcomment %}
+    {% for label,value,color in "" %}
+    {% endfor %}
+  
+    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
+                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Total Sales</div>
+      <div style="font-size:20px;font-weight:700;color:#065f46;">
+        {{ total_sales|floatformat:2 }}
+      </div>
+    </div>
+  
+    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
+                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Total Purchases</div>
+      <div style="font-size:20px;font-weight:700;color:#7c2d12;">
+        {{ total_purchases|floatformat:2 }}
+      </div>
+    </div>
+  
+    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
+                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Money In</div>
+      <div style="font-size:20px;font-weight:700;color:#1d4ed8;">
+        {{ total_payments_in|floatformat:2 }}
+      </div>
+    </div>
+  
+    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
+                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Money Out</div>
+      <div style="font-size:20px;font-weight:700;color:#b91c1c;">
+        {{ total_payments_out|floatformat:2 }}
+      </div>
+    </div>
+  
+    <div style="background:#111827;border-radius:14px;
+                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.18);">
+      <div style="font-size:13px;color:#9ca3af;margin-bottom:6px;">Net Movement</div>
+      <div style="font-size:20px;font-weight:800;color:#ffffff;">
+        {{ net_cash_flow|floatformat:2 }}
+      </div>
+    </div>
+  
+  </div>
+
+
+  {# ---------- Sales Invoices Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:600;">Sales Invoices (Posted)</div>
+      <div class="pill">Count: {{ sales_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:16%;">
+          <col style="width:14%;">
+          <col style="width:26%;">
+          <col style="width:10%;">
+          <col style="width:14%;">
+          <col style="width:14%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Invoice #</th>
+            <th class="nowrap">Date</th>
+            <th>Customer</th>
+            <th class="center nowrap">Items</th>
+            <th>Products</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in sales_qs %}
+            <tr>
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ inv.invoice_number|default:"—" }}</td>
+              <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
+              <td class="truncate" title="{{ inv.customer.name }}">{{ inv.customer.name }}</td>
+
+              <td class="center nowrap">{{ inv.items.count }}</td>
+
+              <td class="truncate"
+                  title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
+                {% with first_item=inv.items.first %}
+                  {% if first_item %}
+                    {{ first_item.product.name }}
+                    {% if inv.items.count > 1 %}
+                      + {{ inv.items.count|add:"-1" }} more
+                    {% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                {% endwith %}
+              </td>
+
+              <td class="right nowrap">{{ inv.calculate_total|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="text-align:center;padding:10px;color:#6b7280;">
+                No sales invoices for this date.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="6" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Sales
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_sales|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  {# ---------- Purchase Invoices Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:600;">Purchase Invoices (Posted)</div>
+      <div class="pill">Count: {{ purchase_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:16%;">
+          <col style="width:14%;">
+          <col style="width:26%;">
+          <col style="width:10%;">
+          <col style="width:14%;">
+          <col style="width:14%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Invoice #</th>
+            <th class="nowrap">Date</th>
+            <th>Supplier</th>
+            <th class="center nowrap">Items</th>
+            <th>Products</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in purchase_qs %}
+            <tr>
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ inv.invoice_number|default:"—" }}</td>
+              <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
+              <td class="truncate" title="{{ inv.supplier.name }}">{{ inv.supplier.name }}</td>
+
+              <td class="center nowrap">{{ inv.items.count }}</td>
+
+              <td class="truncate"
+                  title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
+                {% with first_item=inv.items.first %}
+                  {% if first_item %}
+                    {{ first_item.product.name }}
+                    {% if inv.items.count > 1 %}
+                      + {{ inv.items.count|add:"-1" }} more
+                    {% endif %}
+                  {% else %}
+                    —
+                  {% endif %}
+                {% endwith %}
+              </td>
+
+              <td class="right nowrap">{{ inv.calculate_total|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="text-align:center;padding:10px;color:#6b7280;">
+                No purchase invoices for this date.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="6" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Purchases
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_purchases|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  {# ---------- Payments In Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:600;">Payments (Money In)</div>
+      <div class="pill">Count: {{ payments_in_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl" style="min-width:920px;">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:22%;">
+          <col style="width:20%;">
+          <col style="width:38%;">
+          <col style="width:14%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th>Party</th>
+            <th>Account</th>
+            <th>Description</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments_in_qs %}
+            <tr>
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="truncate" title="{{ p.party }}">{{ p.party }}</td>
+              <td class="truncate" title="{{ p.account }}">{{ p.account }}</td>
+              <td class="truncate" title="{{ p.description }}">{{ p.description }}</td>
+              <td class="right nowrap">{{ p.amount|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" style="text-align:center;padding:10px;color:#6b7280;">
+                No payments received for this date.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Money In
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_payments_in|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+      {% if payments_in_by_account %}
+        <div class="mini-box">
+          <div class="mini-table">
+            <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:#334155;">
+              Money In by Account
+            </div>
+            <table>
+              {% for row in payments_in_by_account %}
+                <tr>
+                  <td>{{ row.account__name }}</td>
+                  <td class="mini-right">{{ row.total|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ---------- Payments Out Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:600;">Payments (Money Out)</div>
+      <div class="pill">Count: {{ payments_out_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl" style="min-width:920px;">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:22%;">
+          <col style="width:20%;">
+          <col style="width:38%;">
+          <col style="width:14%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th>Party</th>
+            <th>Account</th>
+            <th>Description</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments_out_qs %}
+            <tr>
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="truncate" title="{{ p.party }}">{{ p.party }}</td>
+              <td class="truncate" title="{{ p.account }}">{{ p.account }}</td>
+              <td class="truncate" title="{{ p.description }}">{{ p.description }}</td>
+              <td class="right nowrap">{{ p.amount|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" style="text-align:center;padding:10px;color:#6b7280;">
+                No payments made for this date.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Money Out
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_payments_out|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+      {% if payments_out_by_account %}
+        <div class="mini-box">
+          <div class="mini-table">
+            <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:#334155;">
+              Money Out by Account
+            </div>
+            <table>
+              {% for row in payments_out_by_account %}
+                <tr>
+                  <td>{{ row.account__name }}</td>
+                  <td class="mini-right">{{ row.total|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="net-strip">
+    <div>
+      <div style="font-size:14px;font-weight:600;">Net Cash Flow (Today)</div>
+      <small>Money In − Money Out</small>
+    </div>
+    <strong>{{ net_cash_flow|floatformat:2 }}</strong>
+  </div>
+</div>
+{% endblock %}

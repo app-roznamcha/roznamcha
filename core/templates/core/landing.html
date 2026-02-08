@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Roznamcha — Smart Khata & Hisab System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f4f6;color:#111827}
+    a{text-decoration:none}
+    .header{background:#fff;border-bottom:1px solid #e5e7eb}
+    .header-inner{max-width:1200px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .logo{height:64px;width:auto;object-fit:contain;border-radius:12px}
+    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;border:1px solid #e5e7eb;font-weight:700;font-size:14px}
+    .btn-primary{background:#2563eb;border-color:#2563eb;color:#fff}
+    .btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+    .btn-secondary{background:#fff;color:#111827}
+    .btn-secondary:hover{background:#f3f4f6}
+    .wrap{max-width:1200px;margin:0 auto;padding:40px 16px}
+    .hero{display:grid;grid-template-columns:1.2fr 0.8fr;gap:22px;align-items:center}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px;box-shadow:0 10px 22px rgba(15,23,42,.06)}
+    h1{margin:0 0 10px;font-size:34px;letter-spacing:-.02em}
+    p{margin:0 0 14px;color:#6b7280;line-height:1.5}
+    .bullets{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+    .bullets li{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-weight:600}
+    @media(max-width:900px){.hero{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha" class="logo">
+
+    <div class="actions">
+      <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
+      <a class="btn btn-primary" href="{% url 'signup' %}">Create Account</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Smart Khata & Hisab System</h1>
+      <p>
+        Roznamcha helps you manage customers, suppliers, products, sales, purchases, payments, and reports —
+        all in one clean system built for real business workflows.
+      </p>
+
+      <div class="actions" style="margin-top:16px;">
+        <a class="btn btn-primary" href="{% url 'signup' %}">Create Free Account</a>
+        <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
+      </div>
+
+      <ul class="bullets">
+        <li>✅ Sales / Purchases with posting</li>
+        <li>✅ Party ledgers + cash/bank accounts</li>
+        <li>✅ Trial + subscription control</li>
+        <li>✅ Owner + up to 3 Staff accounts</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 10px;">Built for clarity</h3>
+      <p style="margin:0;color:#6b7280;">
+        Clean UI. Fast workflows. Strong permissions. Real accounting logic.
+      </p>
+      <div style="margin-top:14px;">
+        <a class="btn btn-primary" style="width:100%" href="{% url 'signup' %}">Start Now</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

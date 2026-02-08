@@ -1,0 +1,147 @@
+{% extends "core/base.html" %}
+
+{% block title %}Trial Balance{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# ---------- Top Bar (Title) ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        📊 Trial Balance
+      </h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+        Summary of debit and credit balances for all ledger accounts in the selected period.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Filter Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Filter by date
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+      Select a date range to view the trial balance for that period.
+    </p>
+
+    <form method="get"
+          class="filter-form"
+          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:220px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          From
+        </label>
+        <input type="date"
+               name="from"
+               value="{{ date_from|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:220px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          To
+        </label>
+        <input type="date"
+               name="to"
+               value="{{ date_to|date:'Y-m-d' }}"
+               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Trial Balance Table Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:18px;font-weight:600;">
+        Trial balance from {{ date_from|date:"d M Y" }} to {{ date_to|date:"d M Y" }}
+      </div>
+      <div style="font-size:13px;color:#6b7280;">
+        Total debits should be equal to total credits for a balanced ledger.
+      </div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:700px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:12%;">
+              Code
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">
+              Account
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:18%;">
+              Debit
+            </th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:18%;">
+              Credit
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if rows %}
+            {% for r in rows %}
+              <tr>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                  {{ r.account.code }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+                  {{ r.account.name }}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                  {% if r.debit %}{{ r.debit|floatformat:2 }}{% endif %}
+                </td>
+                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                  {% if r.credit %}{{ r.credit|floatformat:2 }}{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4"
+                  style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;color:#6b7280;">
+                No journal entries for this period.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="2"
+                style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              Totals
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              {{ total_debits|floatformat:2 }}
+            </th>
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              {{ total_credits|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

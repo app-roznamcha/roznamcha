@@ -1,0 +1,111 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  {# -------- Top Bar -------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        {{ party_type_label }}s
+      </h1>
+      <p style="margin:0;font-size:15px;color:#475569;">
+        Manage {{ party_type_label|lower }} records used in sales, purchases, and payments.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="{% url 'dashboard' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+          ← Dashboard
+        </a>
+      
+        <a href="{% url party_type|lower|add:'_create' %}"
+           class="btn btn-primary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          ➕ New {{ party_type_label }}
+        </a>
+      </div>
+  </div>
+
+  {# -------- List Card -------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:16px 18px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:17px;font-weight:600;">
+        All {{ party_type_label }}s
+      </div>
+      <div style="font-size:13px;color:#6b7280;">
+        Click <strong>Edit</strong> to update a {{ party_type_label|lower }}’s details.
+      </div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:780px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:60px;">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Name</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:160px;">City</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:160px;">Phone</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Address</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:center;font-weight:600;width:120px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in parties %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+                {{ forloop.counter }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#111827;font-weight:500;">
+                {{ p.name }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+                {{ p.city|default:"—" }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+                {{ p.phone|default:"—" }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#4b5563;">
+                {{ p.address|default:"—" }}
+              </td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
+                {% if party_type == "CUSTOMER" %}
+                  <a href="{% url 'customer_edit' p.id %}"
+                     style="font-size:13px;color:#0d6efd;text-decoration:none;font-weight:500;">
+                    Edit
+                  </a>
+                  <span style="color:#9ca3af;"> | </span>
+                  <a href="{% url 'party_statement' p.id %}"
+                     style="font-size:13px;color:#111827;text-decoration:none;font-weight:600;">
+                    Statement
+                  </a>
+                {% else %}
+                  <a href="{% url 'supplier_edit' p.id %}"
+                     style="font-size:13px;color:#0d6efd;text-decoration:none;font-weight:500;">
+                    Edit
+                  </a>
+                  <span style="color:#9ca3af;"> | </span>
+                  <a href="{% url 'party_statement' p.id %}"
+                     style="font-size:13px;color:#111827;text-decoration:none;font-weight:600;">
+                    Statement
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6"
+                  style="padding:14px 9px;font-size:14px;text-align:center;color:#6b7280;">
+                No {{ party_type_label|lower }}s yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
