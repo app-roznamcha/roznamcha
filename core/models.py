@@ -1793,7 +1793,7 @@ class CompanyProfile(TimeStampedModel):
     phone = models.CharField(max_length=50, blank=True)
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
