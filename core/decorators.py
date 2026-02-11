@@ -213,13 +213,19 @@ def subscription_required(view_func):
 def staff_blocked(view_func):
     """
     Blocks STAFF users from restricted views.
+    Also enforces OWNER subscription (staff inherits owner subscription).
     Use this on OWNER-only pages.
     """
     @login_required
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
+        # ✅ Resolve owner + tenant and enforce subscription first
+        owner, _ = _ensure_owner_and_tenant(request, require_company=False)
+        _enforce_subscription(owner)
+
         user = request.user
 
+        # Superadmin bypass (but subscription already checked safely)
         if getattr(user, "is_superuser", False):
             return view_func(request, *args, **kwargs)
 
