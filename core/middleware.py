@@ -9,6 +9,7 @@ class TenantMiddleware(MiddlewareMixin):
     SAFE_PATH_PREFIXES = (
         "/login/",
         "/logout/",
+        "/subscription/",   # ✅ add this
         "/static/",
         "/media/",
         "/admin/",
@@ -79,13 +80,12 @@ class TenantMiddleware(MiddlewareMixin):
             request.company = company
             return None
 
-        # Superuser bypass
+        # Superuser bypass (but keep tenant context based on host)
         if user.is_superuser:
             request.tenant = company
-            request.owner = company.owner
+            request.owner = company.owner   # tenant owner (not superadmin)
             request.company = company
             return None
-
         profile = getattr(user, "profile", None)
         if not profile:
             raise PermissionDenied("User profile missing")
@@ -106,6 +106,21 @@ class TenantMiddleware(MiddlewareMixin):
         # 🔒 HARD TENANT MATCH
         if owner != company.owner:
             raise PermissionDenied("Tenant mismatch.")
+        
+                # =========================
+        # Subscription enforcement (OWNER + STAFF)
+        # =========================
+        if not user.is_superuser:
+            # owner is already resolved as OWNER user (either user itself or staff's owner)
+            owner_profile = getattr(owner, "profile", None)
+            status = owner_profile.get_effective_status() if owner_profile else "EXPIRED"
+
+            # Allow subscription page + auth pages even if expired
+            if status == "EXPIRED":
+                if not path.startswith("/subscription/"):
+                    # force them to renew
+                    from django.shortcuts import redirect
+                    return redirect("subscription_page")
 
         request.tenant = company
         request.owner = owner
