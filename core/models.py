@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from datetime import timedelta
+import re
 
 # --------------------------
 # Helpers (Design 1: owner = company)
@@ -1796,10 +1797,26 @@ class CompanyProfile(TimeStampedModel):
     slug = models.SlugField(max_length=50, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = (self.owner.username or "").lower().strip()
-        else:
-            self.slug = (self.slug or "").lower().strip()
+        # Source for slug:
+        # - if slug manually set, use it
+        # - else use owner's username
+        raw = self.slug or (self.owner.username if self.owner_id else "") or ""
+
+        # DNS-safe slug:
+        # - lowercase
+        # - convert "_" and spaces to "-"
+        # - remove everything except a-z, 0-9, "-"
+        # - collapse multiple "-"
+        # - trim "-" from ends
+        s = raw.lower().strip()
+        s = s.replace("_", "-")
+        s = re.sub(r"\s+", "-", s)
+        s = re.sub(r"[^a-z0-9-]", "", s)
+        s = re.sub(r"-{2,}", "-", s).strip("-")
+
+        # keep within SlugField max_length
+        self.slug = s[:50] if s else ""
+
         super().save(*args, **kwargs)
 
     def __str__(self):
