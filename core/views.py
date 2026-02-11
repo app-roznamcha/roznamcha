@@ -378,14 +378,7 @@ def signup_submit(request):
         user.last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
         user.save(update_fields=["first_name", "last_name"])
 
-    # ---- Create owner profile ----
-    prof, _ = UserProfile.objects.get_or_create(user=user)
-    prof.role = "OWNER"
-    prof.owner = user
-    prof.is_active = True
-    prof.save()
-
-    # ---- Create company (safe: do NOT crash if already exists) ----
+    # ---- Create/ensure company FIRST (so signals won't create it with wrong slug) ----
     company, created = CompanyProfile.objects.get_or_create(
         owner=user,
         defaults={
@@ -395,6 +388,28 @@ def signup_submit(request):
             "email": email or "",
         },
     )
+
+    # If company existed, you CAN enforce slug here only if you want:
+    # (optional) update name/phone/email if blank
+    changed = False
+    if not company.name:
+        company.name = company_name
+        changed = True
+    if phone and not company.phone:
+        company.phone = phone
+        changed = True
+    if email and not company.email:
+        company.email = email
+        changed = True
+    if changed:
+        company.save()
+
+    # ---- Now set OWNER role (this triggers signals to seed accounts) ----
+    prof, _ = UserProfile.objects.get_or_create(user=user)
+    prof.role = "OWNER"
+    prof.owner = None          # ✅ IMPORTANT
+    prof.is_active = True
+    prof.save()
 
     # If company existed (rare), ensure slug is set correctly
     if not created:
@@ -413,7 +428,8 @@ def signup_submit(request):
     login(request, user)
 
     # ---- Redirect to correct subdomain ----
-    base_domain = getattr(settings, "PUBLIC_BASE_DOMAIN", None)
+    base_domain = getattr(settings, "SAAS_BASE_DOMAIN", "") or request.get_host()
+    base_domain = base_domain.lstrip(".")
     if not base_domain:
         base_domain = request.get_host()
 
@@ -5194,16 +5210,22 @@ def owner_profile_page(request):
 
     company = getattr(owner, "company_profile", None)
 
-    # Only create fallback company if absolutely missing
+    # If missing, repair safely (never invent random slugs)
     if company is None:
+        # preferred: use existing slug rule (owner.username)
+        safe_slug = (owner.username or "").lower().strip()
+
+        # if somehow slug is empty, last fallback uses owner id (still deterministic)
+        if not safe_slug:
+            safe_slug = f"owner-{owner.id}"
+
         company = CompanyProfile.objects.create(
             owner=owner,
-            name="New Company",
-            slug=f"company-{owner.id}",
+            name=owner.get_full_name() or "New Company",
+            slug=safe_slug,
             phone="",
             email=owner.email or "",
         )
-
     # staff listing (MUST be outside the if, so it exists for GET + POST)
     staff_profiles = (
         UserProfile.objects.select_related("user")
@@ -5243,6 +5265,8 @@ def owner_profile_page(request):
                 return redirect("owner_profile_page")
 
             user = User.objects.create_user(username=username, password=password)
+            user.is_active = True
+            user.save(update_fields=["is_active"])
 
             if full_name:
                 parts = full_name.split()
@@ -5304,7 +5328,7 @@ def owner_profile_page(request):
             messages.success(request, "Staff account deactivated.")
             return redirect("owner_profile_page")
 
-            # (5) Activate staff
+        # (5) Activate staff
         if action == "activate_staff":
             staff_id = request.POST.get("staff_id")
             if not staff_id:
