@@ -205,26 +205,34 @@
     </header>
 
     <div class="app-container {% block container_class %}{% endblock %}">
-        {% if request.user.is_authenticated %}
-  {% with owner=request.owner|default:None %}
-    {% if owner and owner.profile %}
-      {% if owner.profile.subscription_status == "TRIAL" %}
-        <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;">
-          You are on <b>Trial</b>. Please activate subscription before trial ends.
-          <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#92400e;">View</a>
-        </div>
-      {% elif owner.profile.subscription_status == "EXPIRED" %}
-        <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;">
-          Your subscription is <b>expired</b>. Some actions are blocked.
-          <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#9f1239;">Renew</a>
-        </div>
+      {% if request.user.is_authenticated %}
+    
+        {# ✅ Never show subscription banners to Super Admin #}
+        {% with prof=request.user.profile|default:None %}
+          {% if request.user.is_superuser or prof.role == "SUPERADMIN" %}
+            {# do nothing #}
+          {% else %}
+            {% with owner=request.owner|default:None %}
+              {% if owner and owner.profile %}
+                {% if owner.profile.subscription_status == "TRIAL" %}
+                  <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;">
+                    You are on <b>Trial</b>. Please activate subscription before trial ends.
+                    <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#92400e;">View</a>
+                  </div>
+                {% elif owner.profile.subscription_status == "EXPIRED" %}
+                  <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;">
+                    Your subscription is <b>expired</b>. Some actions are blocked.
+                    <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#9f1239;">Renew</a>
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        {% endwith %}
+    
       {% endif %}
-    {% endif %}
-  {% endwith %}
-{% endif %}
-
-{% block content %}{% endblock %}
+    
+      {% block content %}{% endblock %}
     </div>
-
 </body>
 </html>

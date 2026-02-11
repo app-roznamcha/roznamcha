@@ -70,15 +70,22 @@ def _ensure_owner_and_tenant(request, require_company=False):
     # If tenant middleware set tenant, keep it available
     current_tenant = getattr(request, "tenant", None) or getattr(request, "company", None)
 
-    # Django superuser: bypass subscription/role, but DO NOT wipe tenant context
+    # ✅ Superuser behavior:
+    # - If middleware already resolved a tenant (subdomain), respect it (view tenant as superadmin)
+    # - If no tenant (www/base), treat as global superadmin
     if user and getattr(user, "is_superuser", False):
-        request.owner = user
-        request.tenant = current_tenant
-        request.company = current_tenant
-        if require_company and not current_tenant:
-            raise PermissionDenied("Company not found for this tenant")
-        return user, current_tenant
+        current_tenant = getattr(request, "tenant", None)
+        if current_tenant is not None:
+            # tenant mode: owner = tenant owner
+            request.owner = current_tenant.owner
+            request.tenant = current_tenant
+            return request.owner, request.tenant
 
+        # global mode (www/base): no tenant
+        request.owner = user
+        request.tenant = None
+        return user, None
+    
     owner = _resolve_owner(user)
     company = _get_company_for_owner(owner)
 

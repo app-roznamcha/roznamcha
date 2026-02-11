@@ -467,10 +467,16 @@ def dashboard(request):
     is_owner = (role == "OWNER")
     is_superadmin = bool(getattr(request.user, "is_superuser", False))
 
+    # ✅ OPTIONAL: if superadmin is on www/base domain (no tenant), go to superadmin dashboard
+    if is_superadmin and getattr(request, "tenant", None) is None:
+        return redirect("superadmin_dashboard")
+
+
     owner = request.owner
     month_start = today.replace(day=1)
-    company = CompanyProfile.objects.filter(owner=owner).order_by("-id").first()
-# Don't set request.tenant in owner-only design
+    # Prefer middleware-resolved tenant if present (subdomain mode)
+    company = getattr(request, "tenant", None) or CompanyProfile.objects.filter(owner=owner).order_by("-id").first()
+    # Don't set request.tenant in owner-only design
 
     MONEY = DecimalField(max_digits=14, decimal_places=2)
     ZERO = Value(Decimal("0.00"), output_field=MONEY)
