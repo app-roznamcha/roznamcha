@@ -111,6 +111,7 @@ urlpatterns = [
     path("backup/", staff_blocked(views.backup_dashboard), name="backup_dashboard"),
     path("backup/create/", staff_blocked(views.create_backup), name="create_backup"),
     path("backup/restore/", staff_blocked(views.restore_backup), name="restore_backup"),
+    path("backup/download/<str:filename>/", staff_blocked(views.download_backup), name="download_backup"),
 
     # =========================
     # Subscription / Profile (STAFF blocked)

@@ -57,7 +57,7 @@
     </div>
     <p style="font-size:15px;color:#475569;margin-bottom:14px;">
       Click the button below to generate a backup of the current database.
-      Your browser will download a <code>.json</code> file to your computer.
+      A <code>.json</code> backup will be created and saved on the server (last 3 retained). You can download it from the list below.
     </p>
 
     <form method="post" action="{% url 'create_backup' %}">
@@ -68,9 +68,65 @@
                      padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;
                      border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;
                      cursor:pointer;white-space:nowrap;">
-        ⬇️ Create &amp; Download Backup
+        💾 Create Backup
       </button>
     </form>
+  </div>
+
+  {# ---------- Last 3 Backups Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Last 3 backups
+    </div>
+    <p style="font-size:15px;color:#475569;margin-bottom:14px;">
+      These backups are saved on the server for this company. Only the latest 3 are kept automatically.
+    </p>
+
+    {% if backups %}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid #e5e7eb;">
+              <th style="padding:10px 8px;font-size:13px;color:#64748b;font-weight:600;">File</th>
+              <th style="padding:10px 8px;font-size:13px;color:#64748b;font-weight:600;white-space:nowrap;">Size</th>
+              <th style="padding:10px 8px;font-size:13px;color:#64748b;font-weight:600;white-space:nowrap;">Updated</th>
+              <th style="padding:10px 8px;font-size:13px;color:#64748b;font-weight:600;white-space:nowrap;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in backups %}
+              <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="padding:10px 8px;font-size:14px;color:#0f172a;">
+                  {{ b.name }}
+                </td>
+                <td style="padding:10px 8px;font-size:14px;color:#334155;white-space:nowrap;">
+                  {{ b.size }} bytes
+                </td>
+                <td style="padding:10px 8px;font-size:14px;color:#334155;white-space:nowrap;">
+                  {{ b.modified }}
+                </td>
+                <td style="padding:10px 8px;white-space:nowrap;">
+                  <a href="{% url 'download_backup' b.name %}"
+                     class="btn btn-secondary"
+                     style="display:inline-flex;align-items:center;justify-content:center;
+                            padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;
+                            border:1px solid #d1d5db;background:#f3f4f6;color:#111827;
+                            cursor:pointer;white-space:nowrap;text-decoration:none;">
+                    ⬇️ Download
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="padding:12px 12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;color:#334155;">
+        No server backups found yet. Create your first backup above.
+      </div>
+    {% endif %}
   </div>
 
   {# ---------- Restore Backup Card ---------- #}

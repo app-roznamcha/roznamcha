@@ -62,6 +62,8 @@ from datetime import timedelta
 from functools import wraps
 from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
+from django.http import FileResponse
+from pathlib import Path
 
 
 
@@ -3164,16 +3166,26 @@ def user_account_delete(request, pk):
 @owner_required
 @staff_blocked
 def backup_dashboard(request):
-    """
-    Simple page with two actions:
-    - Create & download backup
-    - Restore from uploaded backup file
+    owner = request.owner
+    company = getattr(owner, "company_profile", None)
 
-    SaaS note:
-    Backups must be tenant-scoped (never dump the whole DB).
-    """
-    return render(request, "core/backup.html")
+    backups = []
+    if company:
+        folder = Path(settings.MEDIA_ROOT) / "backups" / (company.slug or f"owner-{owner.id}")
+        if folder.exists():
+            files = sorted(
+                [p for p in folder.iterdir() if p.is_file() and p.name.endswith(".json")],
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )
+            # show last 3
+            backups = [{
+                "name": f.name,
+                "size": f.stat().st_size,
+                "modified": timezone.datetime.fromtimestamp(f.stat().st_mtime),
+            } for f in files[:3]]
 
+    return render(request, "core/backup.html", {"backups": backups})
 
 @login_required
 @resolve_tenant_context(require_company=True)
@@ -3181,15 +3193,17 @@ def backup_dashboard(request):
 @staff_blocked
 @subscription_required
 def create_backup(request):
-    """
-    Create a JSON dump (TENANT-SCOPED) and send it as a download.
-    """
     if request.method != "POST":
         return redirect("backup_dashboard")
 
     from django.core import serializers
 
     owner = request.owner
+    company = getattr(owner, "company_profile", None)
+    if not company:
+        messages.error(request, "Company not found for backup.")
+        return redirect("backup_dashboard")
+
     models_to_dump = [
         CompanyProfile,
         Account,
@@ -3209,11 +3223,7 @@ def create_backup(request):
     ]
 
     all_objects = []
-
-    # Always include this tenant's company profile
-    all_objects.extend(
-        CompanyProfile.objects.filter(owner=owner)
-    )
+    all_objects.extend(CompanyProfile.objects.filter(owner=owner))
 
     for m in models_to_dump:
         if m is CompanyProfile:
@@ -3223,10 +3233,28 @@ def create_backup(request):
 
     data = serializers.serialize("json", all_objects)
 
-    filename = f"standard_zarai_backup_{timezone.now().strftime('%Y%m%d_%H%M%S')}.json"
-    response = HttpResponse(data, content_type="application/json")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return response
+    # ✅ Save to server
+    folder = Path(settings.MEDIA_ROOT) / "backups" / (company.slug or f"owner-{owner.id}")
+    folder.mkdir(parents=True, exist_ok=True)
+
+    filename = f"backup_{company.slug or owner.username}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.json"
+    out_path = folder / filename
+    out_path.write_text(data, encoding="utf-8")
+
+    # ✅ Keep only last 3
+    files = sorted(
+        [p for p in folder.iterdir() if p.is_file() and p.name.endswith(".json")],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    for old in files[3:]:
+        try:
+            old.unlink()
+        except Exception:
+            pass
+
+    messages.success(request, "Backup created and saved (last 3 retained).")
+    return redirect("backup_dashboard")
 
 @login_required
 @resolve_tenant_context(require_company=True)
@@ -3287,6 +3315,25 @@ def restore_backup(request):
     return redirect("backup_dashboard")
 
 
+@login_required
+@resolve_tenant_context(require_company=True)
+@owner_required
+@staff_blocked
+@subscription_required
+def download_backup(request, filename):
+    owner = request.owner
+    company = getattr(owner, "company_profile", None)
+    if not company:
+        raise PermissionDenied("Company not found")
+
+    folder = Path(settings.MEDIA_ROOT) / "backups" / (company.slug or f"owner-{owner.id}")
+    file_path = folder / filename
+
+    # ✅ Safety: file must be inside this tenant folder and exist
+    if not file_path.exists() or not file_path.is_file():
+        raise PermissionDenied("Backup file not found")
+
+    return FileResponse(open(file_path, "rb"), as_attachment=True, filename=filename)
 # ---------- RETURNS: SALES RETURN ----------
 
 @login_required
