@@ -57,16 +57,27 @@ def _get_company_for_owner(owner_user):
 def _ensure_owner_and_tenant(request, require_company=False):
     """
     Ensures request.owner and request.tenant are set consistently.
-    Enforces: if request.tenant already exists (from subdomain middleware),
-    it must match the resolved owner's company.
+
+    If tenant middleware already set request.tenant (from subdomain),
+    it MUST match the resolved owner's company.
+
+    For Django superuser:
+    - keep tenant context if middleware already resolved it
+      (so superadmin can browse inside a tenant subdomain safely).
     """
     user = getattr(request, "user", None)
 
-    # superuser bypass: no tenant required
+    # If tenant middleware set tenant, keep it available
+    current_tenant = getattr(request, "tenant", None) or getattr(request, "company", None)
+
+    # Django superuser: bypass subscription/role, but DO NOT wipe tenant context
     if user and getattr(user, "is_superuser", False):
         request.owner = user
-        request.tenant = None
-        return user, None
+        request.tenant = current_tenant
+        request.company = current_tenant
+        if require_company and not current_tenant:
+            raise PermissionDenied("Company not found for this tenant")
+        return user, current_tenant
 
     owner = _resolve_owner(user)
     company = _get_company_for_owner(owner)
@@ -75,15 +86,20 @@ def _ensure_owner_and_tenant(request, require_company=False):
         raise PermissionDenied("Company not found for this user")
 
     # If subdomain middleware already set a tenant, it MUST match
-    current_tenant = getattr(request, "tenant", None)
     if current_tenant is not None and company is not None:
         if getattr(current_tenant, "id", None) != getattr(company, "id", None):
             raise PermissionDenied("Tenant mismatch (wrong subdomain for this account)")
 
+    # Always set both (some views use request.company)
     request.owner = owner
-    request.tenant = company
-    return owner, company
+    request.tenant = company or current_tenant
+    request.company = company or current_tenant
 
+    # If require_company=True, enforce after final resolution
+    if require_company and not request.tenant:
+        raise PermissionDenied("Company not found")
+
+    return request.owner, request.tenant
 
 def _enforce_subscription(owner_user):
     """
