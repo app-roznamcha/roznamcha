@@ -5478,3 +5478,21 @@ def superadmin_hard_purge_owner(request, owner_id):
     owner.delete()
     messages.success(request, "Company hard purged successfully.")
     return redirect("superadmin_dashboard")
+
+def offline_page(request):
+    # simple offline page
+    from django.shortcuts import render
+    return render(request, "core/offline.html")
+
+
+def service_worker(request):
+    # Serve /service-worker.js from the repo file core/pwa/service-worker.js
+    sw_path = Path(settings.BASE_DIR) / "core" / "pwa" / "service-worker.js"
+    content = sw_path.read_text(encoding="utf-8")
+
+    response = HttpResponse(content, content_type="application/javascript")
+    # allow SW to control all paths
+    response["Service-Worker-Allowed"] = "/"
+    # avoid aggressive caching while developing
+    response["Cache-Control"] = "no-cache"
+    return response

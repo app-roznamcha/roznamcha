@@ -137,6 +137,9 @@ urlpatterns = [
     path("ledger/trial-balance/", staff_blocked(trial_balance_api), name="trial_balance_api"),
     path("ledger/account-ledger/view/", staff_blocked(account_ledger_view), name="account_ledger_view"),
     path("ledger/party/<int:party_id>/", staff_blocked(party_ledger_view), name="party_ledger"),
+
+    path("offline/", views.offline_page, name="offline_page"),
+    path("service-worker.js", views.service_worker, name="service_worker"),
 ]
 
 urlpatterns += [
