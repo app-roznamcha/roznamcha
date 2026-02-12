@@ -117,6 +117,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = []
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+WHITENOISE_MIMETYPES = {
+    ".webmanifest": "application/manifest+json",
+}
 # Media (uploads like company logo)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
