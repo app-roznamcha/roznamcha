@@ -4,7 +4,7 @@
 {% block container_class %}is-fluid{% endblock %}
 
 {% block content %}
-<div class="page" style="width:100%;margin:40px 0 60px;padding:0 32px;">
+<div class="page" style="width:100%;margin:40px 0 60px;padding:0 16px;">
 
   {# ---------- Top Bar (Title + Back Button) ---------- #}
   <div class="top-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
@@ -17,7 +17,7 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <a href="{% url 'dashboard' %}"
          class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:140px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
         ← Dashboard
       </a>
     </div>
@@ -36,7 +36,7 @@
     <form method="get"
           class="filter-form"
           style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:280px;flex:1;">
+          <div style="min-width:220px;flex:1;">
         <label style="display:block;font-size:14px;margin-bottom:4px;">Account</label>
         <select name="account"
                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
@@ -50,7 +50,7 @@
         </select>
       </div>
 
-      <div style="min-width:200px;">
+      <div style="min-width:160px;">
         <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
         <input type="date"
                name="from"
@@ -58,7 +58,7 @@
                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
       </div>
 
-      <div style="min-width:200px;">
+      <div style="min-width:160px;">
         <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
         <input type="date"
                name="to"
@@ -103,7 +103,7 @@
       </div>
 
       <div class="table-wrapper" style="width:100%;overflow-x:auto;">
-        <table style="border-collapse:collapse;width:100%;min-width:1200px;">
+        <table style="border-collapse:collapse;width:100%;min-width:900px;">
           <thead>
             <tr>
               <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Date</th>

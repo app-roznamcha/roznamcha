@@ -1,10 +1,10 @@
 {% extends "core/base.html" %}
 {% block content %}
 
-<div class="container" style="max-width: 900px; margin-top: 30px;">
-  <h2>Subscription</h2>
+<div class="container" style="max-width:900px;margin:30px auto 60px;padding:0 16px;">
+  <h2 style="margin:0 0 10px;font-size:28px;font-weight:800;">Subscription</h2>
 
-  <div style="margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px;">
+  <div style="margin:15px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <p><strong>Status:</strong> {{ status|default:"-" }}</p>
     <p><strong>Trial Started:</strong> {{ trial_started_at|date:"Y-m-d H:i" }}</p>
 
@@ -16,7 +16,7 @@
     {% endif %}
   </div>
 
-  <div style="padding: 12px; border: 1px solid #ddd; border-radius: 10px;">
+  <div style="padding:14px 16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4>Renew / Activate Subscription</h4>
     <p style="color: #666;">
       (Phase 4) Payment gateway will be connected here. For now, this form is a placeholder.
@@ -26,14 +26,14 @@
       {% csrf_token %}
 
       <label style="display:block; margin-top:10px;">Select Plan</label>
-      <select name="plan" required style="width: 250px; padding: 8px;">
+      <select name="plan" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
         <option value="">-- Select --</option>
         <option value="MONTHLY">Monthly</option>
         <option value="YEARLY">Yearly</option>
       </select>
 
       <div style="margin-top: 15px;">
-        <button type="submit" style="padding: 10px 16px;">
+        <button type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">
           Submit Renewal Request
         </button>
       </div>
@@ -41,7 +41,9 @@
   </div>
 
   <div style="margin-top: 20px;">
-    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    <a href="{% url 'dashboard' %}" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;color:#111827;font-weight:700;text-decoration:none;">
+      ← Back to Dashboard
+    </a>
   </div>
 </div>
 

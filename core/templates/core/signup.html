@@ -5,12 +5,35 @@
   <meta charset="utf-8">
   <title>Roznamcha — Create Account</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  @media (max-width:640px){
+    .signup-wrap{
+      margin:16px auto !important;
+      border-radius:12px !important;
+      padding:16px !important;
+    }
+
+    .signup-logo{
+      height:44px !important;
+    }
+
+    .signup-input{
+      padding:12px !important;
+      font-size:16px !important; /* prevents iOS zoom */
+    }
+
+    .signup-title{
+      font-size:18px !important;
+    }
+  }
+</style>
 </head>
 <body style="font-family:system-ui;background:#f3f4f6;margin:0;">
 
-<div style="max-width:720px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
+  <div class="signup-wrap" style="max-width:720px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
   <div style="display:flex;gap:12px;align-items:center;">
-    <img src="{% static 'core/branding/roznamcha.png' %}" style="height:56px;">
+    <img class="signup-logo" src="{% static 'core/branding/roznamcha.png' %}" style="height:56px;">
   </div>
 
   {% if messages %}
@@ -26,26 +49,26 @@
   <form method="post" action="{% url 'signup_submit' %}" style="margin-top:14px;">
     {% csrf_token %}
 
-    <h3 style="margin:0 0 8px;">Owner Account</h3>
+    <h3 class="signup-title" style="margin:0 0 8px;">Owner Account</h3>
     <label>Username*</label><br>
-    <input name="username" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;"><br><br>
+    <input class="signup-input" name="username" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
 
     <label>Password*</label><br>
-    <input name="password" type="password" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;"><br><br>
+    <input class="signup-input" name="password" type="password" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
 
     <label>Full Name</label><br>
-    <input name="full_name" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;"><br><br>
+    <input class="signup-input" name="full_name" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
 
     <label>Email</label><br>
-    <input name="email" type="email" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;"><br><br>
+    <input class="signup-input" name="email" type="email" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
 
-    <h3 style="margin:10px 0 8px;">Company</h3>
+    <h3 class="signup-title" style="margin:10px 0 8px;">Company</h3>
     <label>Company Name*</label><br>
-    <input name="company_name" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;"><br><br>
+    <input class="signup-input" name="company_name" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
 
     
     <label>Phone</label><br>
-    <input name="phone" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;"><br><br>
+    <input class="signup-input" name="phone" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
 
     <button type="submit" style="width:100%;padding:12px;border-radius:12px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;">
       Create Account

@@ -3,7 +3,7 @@
 {% block title %}Day Summary{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
+<div class="page day-summary-page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
   <style>
     .mini-box{
       margin-top:12px;
@@ -42,6 +42,17 @@
     }
     .net-strip small{ opacity:.75; font-size:13px; }
     .net-strip strong{ font-size:18px; }
+
+    /* ---------- Mobile tweaks (only this page) ---------- */
+    @media (max-width: 640px) {
+      .day-summary-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
+      .day-summary-page h1 { font-size: 26px !important; }
+      .day-summary-page p { font-size: 14px !important; }
+      .day-summary-page .tbl { min-width: 820px !important; } /* still scrolls */
+      .day-summary-page .mini-table { min-width: 100% !important; }
+      .day-summary-page .mini-right { text-align: left !important; white-space: normal !important; }
+      .day-summary-page .net-strip { flex-direction: column; align-items: flex-start; }
+    }
   </style>
   {# ---------- Top Bar (Title + Back Button) ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
@@ -96,6 +107,15 @@
       color:#111827;
       white-space:nowrap;
     }
+
+    /* Summary cards grid: 5 → 2 → 1 on small screens */
+    @media (max-width: 1024px) {
+      .top-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    }
+    @media (max-width: 640px) {
+      .top-summary-grid { grid-template-columns: 1fr !important; }
+      .tbl th, .tbl td { font-size: 14px; }
+    }
   </style>
 
   {# ---------- Filter Card ---------- #}
@@ -114,7 +134,7 @@
                id="date"
                name="date"
                value="{{ selected_date|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;"
       </div>
 
       <div>
@@ -128,7 +148,7 @@
   </div>
 
   {# ---------- Top Summary Strip ---------- #}
-  <div style="
+  <div class="top-summary-grid" style="
     display:grid;
     grid-template-columns:repeat(5, minmax(0, 1fr));
     gap:12px;
@@ -191,7 +211,7 @@
       <div class="pill">Count: {{ sales_qs|length }}</div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
+    <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="tbl">
         <colgroup>
           <col style="width:6%;">

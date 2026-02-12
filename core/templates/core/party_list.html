@@ -1,28 +1,38 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+  <style>
+    /* Mobile tweaks for this page only */
+    @media (max-width: 640px){
+      .ps-title{ font-size:24px !important; }
+      .ps-sub{ font-size:14px !important; }
+      .ps-btn{ padding:9px 14px !important; font-size:14px !important; min-width:auto !important; }
+      .ps-table th, .ps-table td{ padding:8px 8px !important; font-size:13px !important; }
+      .ps-truncate{ max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    }
+  </style>
 
   {# -------- Top Bar -------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+      <h1 class="ps-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">
         {{ party_type_label }}s
       </h1>
-      <p style="margin:0;font-size:15px;color:#475569;">
+      <p class="ps-sub" style="margin:0;font-size:15px;color:#475569;">
         Manage {{ party_type_label|lower }} records used in sales, purchases, and payments.
       </p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="{% url 'dashboard' %}"
-           class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+      <a href="{% url 'dashboard' %}"
+      class="btn btn-secondary ps-btn"
+      style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:130px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
           ← Dashboard
         </a>
       
         <a href="{% url party_type|lower|add:'_create' %}"
-           class="btn btn-primary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+           class="btn btn-primary ps-btn"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
           ➕ New {{ party_type_label }}
         </a>
       </div>
@@ -41,7 +51,7 @@
     </div>
 
     <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:780px;">
+      <table class="ps-table" style="border-collapse:collapse;width:100%;min-width:640px;">
         <thead>
           <tr>
             <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:60px;">#</th>
@@ -67,7 +77,7 @@
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
                 {{ p.phone|default:"—" }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#4b5563;">
+              <td class="ps-truncate" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#4b5563;">
                 {{ p.address|default:"—" }}
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">

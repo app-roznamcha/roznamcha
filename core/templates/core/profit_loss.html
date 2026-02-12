@@ -4,17 +4,35 @@
 
 {% block content %}
 <div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+  <style>
+    @media (max-width:640px){
+      .pl-title{font-size:24px !important;}
+      .pl-sub{font-size:14px !important;margin-bottom:12px !important;}
+      .pl-btn{
+        padding:9px 14px !important;
+        font-size:14px !important;
+        min-width:auto !important;
+      }
+      .pl-filter-row > div{ min-width:160px !important; }
+      .pl-chart-wrap{ max-width:100% !important; }
+      .pl-chart-wrap canvas{ height:180px !important; } /* better touch view */
+      .page{ padding:0 16px !important; }
+      .pl-table{ min-width:560px !important; } /* still scrolls, but less */
+      .pl-th, .pl-td{ font-size:14px !important; }
+    }
+  </style>
 
   {# ---------- Top Bar (Title + Back Button) ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Profit &amp; Loss</h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <h1 class="pl-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">Profit &amp; Loss</h1>
+      <p class="pl-sub" style="margin:0 0 20px;font-size:15px;color:#475569;">
         View total income, expenses, and net profit (or loss) for a selected date range.
       </p>
     </div>
     <div>
       <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary pl-btn"
          class="btn btn-secondary"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
         ← Back to Dashboard
@@ -34,6 +52,7 @@
     </p>
 
     <form method="get"
+          class="pl-filter-row"
           style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
       <div style="min-width:200px;">
         <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
@@ -82,7 +101,7 @@
       <strong>Total Expenses</strong> and <strong>Net Profit / (Loss)</strong>.
     </p>
 
-    <div style="width:100%;max-width:680px;">
+    <div class="pl-chart-wrap" style="width:100%;max-width:680px;">
       <canvas id="plSummaryChart" height="120"></canvas>
     </div>
   </div>
@@ -97,10 +116,10 @@
     </div>
 
     <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+      <table class="pl-table" style="border-collapse:collapse;width:100%;min-width:620px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+            <th class="pl-th" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
               Account
             </th>
             <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
@@ -151,7 +170,7 @@
       <table style="border-collapse:collapse;width:100%;min-width:620px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
+            <th class="pl-th" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
               Account
             </th>
             <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
@@ -162,10 +181,10 @@
         <tbody>
           {% for row in expense_rows %}
             <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+              <td class="pl-td" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
                 {{ row.account.code }} – {{ row.account.name }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              <td class="pl-td" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
                 {{ row.amount|floatformat:2 }}
               </td>
             </tr>

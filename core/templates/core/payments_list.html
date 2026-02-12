@@ -23,7 +23,7 @@
       </a>
       <a href="{% url 'payment_new' %}"
          class="btn btn-primary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:210px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:210px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #2563eb;cursor:pointer;white-space:nowrap;background:#2563eb;color:#ffffff;">
         + New Payment / Receipt
       </a>
     </div>
@@ -86,7 +86,7 @@
       <div style="display:flex;gap:8px;align-items:flex-end;">
         <button type="submit"
                 class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
           Apply
         </button>
         <a href="{% url 'payment_list' %}"
@@ -106,7 +106,7 @@
         Payments List
       </div>
       <div style="font-size:14px;color:#6b7280;">
-        Total for filtered payments: <strong>{{ total_amount }}</strong>
+        Total for filtered payments: <strong>{{ total_amount|floatformat:2 }}</strong>
       </div>
     </div>
 
@@ -144,13 +144,13 @@
                 {% if pay.party %}
                   {% if pay.party.party_type == "CUSTOMER" %}
                     <a href="{% url 'customer_ledger' %}?customer={{ pay.party.id }}"
-                       style="color:#0d6efd;text-decoration:none;font-weight:600;">
+                        style="color:#2563eb;text-decoration:none;font-weight:600;">
                       {{ pay.party.name }}
                     </a>
                     <span style="color:#6b7280;">(Customer)</span>
                   {% elif pay.party.party_type == "SUPPLIER" %}
                     <a href="{% url 'supplier_ledger' %}?supplier={{ pay.party.id }}"
-                       style="color:#0d6efd;text-decoration:none;font-weight:600;">
+                        style="color:#2563eb;text-decoration:none;font-weight:600;">
                       {{ pay.party.name }}
                     </a>
                     <span style="color:#6b7280;">(Supplier)</span>
@@ -165,7 +165,7 @@
                 {{ pay.account.name }}
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                {{ pay.amount }}
+                {{ pay.amount|floatformat:2 }}
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                 {{ pay.description|default:"—" }}

@@ -3,12 +3,12 @@
 {% block title %}Supplier Ledger{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
 
   <!-- Top Bar -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+      <h1 style="margin:0 0 4px;font-size:28px;font-weight:800;line-height:1.15;">
         🧾 Supplier Ledger
       </h1>
       <p style="margin:0 0 16px;font-size:15px;color:#475569;">
@@ -17,7 +17,7 @@
     </div>
     <div>
       <a href="{% url 'dashboard' %}"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;">
+      style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:700;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
         ← Dashboard
       </a>
     </div>
@@ -41,7 +41,7 @@
           Supplier
         </label>
         <select name="supplier"
-                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+            style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
           <option value="">-- Select supplier --</option>
           {% for s in suppliers %}
             <option value="{{ s.id }}"
@@ -70,7 +70,7 @@
 
       <div>
         <button type="submit"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:140px;">
           Apply
         </button>
       </div>
@@ -123,7 +123,7 @@
       </div>
 
       <div style="width:100%;overflow-x:auto;">
-        <table style="border-collapse:collapse;width:100%;min-width:760px;">
+        <table style="border-collapse:collapse;width:100%;min-width:860px;">
           <thead>
             <tr>
               <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:12%;">Date</th>

@@ -3,15 +3,15 @@
 {% block title %}Supplier Balances{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
 
   {# ---------- Top Bar (Title + Button) ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+      <h1 style="margin:0 0 4px;font-size:28px;font-weight:800;line-height:1.15;">
         🏭 Supplier Balances
       </h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <p style="margin:0 0 20px;font-size:14px;color:#475569;">
         View supplier-wise opening balance, purchases, payments, and net payable/advance as of a specific date.
       </p>
     </div>
@@ -31,7 +31,7 @@
     <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
       Filter by date
     </div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+    <p style="font-size:14px;color:#475569;margin-bottom:12px;">
       Select an <strong>“as of”</strong> date to recalculate balances for all suppliers.
     </p>
 
@@ -46,13 +46,13 @@
                id="date"
                name="date"
                value="{{ as_of|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
       </div>
 
       <div>
         <button type="submit"
                 class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:140px;">
           Apply
         </button>
       </div>
@@ -72,28 +72,28 @@
     </div>
 
     <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:780px;">
+      <table style="border-collapse:collapse;width:100%;min-width:860px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:5%;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:5%;">
               #
             </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">
               Supplier
             </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
               Opening (Dr/Cr)
             </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
               Purchases
             </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
               Payments
             </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
               Balance
             </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;width:8%;">
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:center;font-weight:600;width:8%;">
               Dr/Cr
             </th>
           </tr>
@@ -101,32 +101,32 @@
         <tbody>
           {% for row in rows %}
             <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
                 {{ forloop.counter }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
                 {{ row.party.name }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.opening|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.purchases|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.payments|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.net_abs|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
                 {{ row.net_type }}
               </td>
             </tr>
           {% empty %}
             <tr>
               <td colspan="7"
-                  style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;color:#6b7280;">
+                  style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:14px;color:#6b7280;">
                 No suppliers found.
               </td>
             </tr>
@@ -135,22 +135,22 @@
         <tfoot>
           <tr>
             <th colspan="2"
-                style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+                style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
               Grand Totals:
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
               {{ grand_opening|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
               {{ grand_purchases|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
               {{ grand_payments|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
               {{ grand_balance_abs|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
               {{ grand_balance_type }}
             </th>
           </tr>

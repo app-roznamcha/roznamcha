@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:720px;margin:40px auto 60px;padding:0 26px;">
+<div class="page" style="max-width:720px;margin:40px auto 60px;padding:0 16px;">
 
   {# ---------- Top Bar (Title + Back Button) ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
@@ -30,13 +30,13 @@
       {% if party_type == "CUSTOMER" %}
         <a href="{% url 'customer_list' %}"
            class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
           ← Back to Customers
         </a>
       {% else %}
         <a href="{% url 'supplier_list' %}"
            class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
           ← Back to Suppliers
         </a>
       {% endif %}
@@ -45,7 +45,7 @@
 
   {# ---------- Card with Form & Messages ---------- #}
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+              padding:16px 14px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
 
 {# Flash messages #}
 {% if messages %}
@@ -129,7 +129,7 @@
                  value="{{ party.opening_balance|default_if_none:'' }}"
                  placeholder="0.00"
                  style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
-                 <div style="margin-top:6px;display:flex;gap:14px;align-items:center;font-size:14px;color:#374151;">
+                 <div style="margin-top:6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:14px;color:#374151;">
                   <label style="display:flex;gap:6px;align-items:center;">
                     <input type="radio" name="opening_side" value="DR"
                            {% if request.POST.opening_side == "CR" %}{% else %}checked{% endif %}>

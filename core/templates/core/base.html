@@ -231,18 +231,22 @@
         }
       }
 
-      /* Tables: allow horizontal scroll without breaking layout */
-      .table-wrap {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
       /* Generic card spacing on mobile */
       @media (max-width: 640px) {
         .app-container {
           padding: 16px 12px 30px;
         }
+      }
+
+      /* Tables: allow horizontal scroll without breaking layout */
+      .table-wrap{
+        width:100%;
+        overflow-x:auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 14px;
+      }
+      .table-wrap table{
+        min-width: 980px; /* keeps columns readable on phone */
       }
     </style>
 

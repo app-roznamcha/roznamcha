@@ -13,10 +13,10 @@
   <!-- =========================
        Owner Details (View + Edit)
        ========================= -->
-  <div style="margin-top:18px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
+       <div class="profile-card" style="margin-top:18px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4 style="margin:0 0 10px;">Owner Details</h4>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="profile-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div style="padding:12px;border:1px solid #f1f5f9;border-radius:12px;background:#f8fafc;">
         <p style="margin:6px 0;"><strong>Username:</strong> {{ owner.username }}</p>
         <p style="margin:6px 0;"><strong>Role:</strong> {{ profile.role }}</p>
@@ -34,7 +34,7 @@
       {% csrf_token %}
       <input type="hidden" name="action" value="update_owner"/>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div class="profile-grid-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
         <div>
           <label style="font-weight:600;">First name</label><br/>
           {{ owner_form.first_name }}
@@ -70,7 +70,7 @@
   <!-- =========================
        Company Profile (View + Edit)
        ========================= -->
-  <div style="margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
+       <div class="profile-card" style="margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4 style="margin:0 0 10px;">Company Profile</h4>
 
     <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
@@ -152,14 +152,14 @@
   <!-- =========================
        Staff (Create + List)
        ========================= -->
-  <div style="margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
+       <div style="margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4 style="margin:0 0 10px;">Create Staff (Max 3 accounts)</h4>
 
     <form method="post" style="margin:0;">
       {% csrf_token %}
       <input type="hidden" name="action" value="create_staff"/>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:820px;">
+      <div class="profile-grid-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:820px;">
         <div>
           <label style="font-weight:600;">Username</label><br/>
           <input name="username" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #e5e7eb;">
@@ -187,7 +187,7 @@
     <h4 style="margin:0 0 10px;">Existing Staff</h4>
     {% if staff_profiles %}
       <div style="overflow:auto;">
-        <table style="width:100%;border-collapse:collapse;min-width:520px;">
+        <table class="profile-table" style="width:100%;border-collapse:collapse;min-width:520px;">
             <thead>
                 <tr>
                   <th style="text-align:left;border-bottom:1px solid #e5e7eb;padding:10px;">Username</th>
@@ -258,12 +258,24 @@
     border-radius: 10px;
     border: 1px solid #e5e7eb;
     outline: none;
+    font-size: 16px; /* prevents iOS zoom on focus */
   }
   input:focus, select:focus, textarea:focus {
     border-color: #93c5fd;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   }
   textarea { min-height: 80px; }
+
+  /* ---------- Mobile tweaks ---------- */
+  @media (max-width: 700px) {
+    .profile-grid-2 { grid-template-columns: 1fr !important; }
+    .profile-grid-3 { grid-template-columns: 1fr !important; }
+  }
+
+  @media (max-width: 520px) {
+    .profile-card { padding: 14px !important; }
+    .profile-table th, .profile-table td { padding: 8px !important; font-size: 14px !important; }
+  }
 </style>
 
 {% endblock %}

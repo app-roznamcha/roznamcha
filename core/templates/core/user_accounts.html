@@ -3,7 +3,7 @@
 {% block title %}Bank & Cash Accounts{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:900px;margin:40px auto 60px;padding:0 26px;">
+<div class="page" style="max-width:900px;margin:40px auto 60px;padding:0 16px;">
 
   {# ---------- Top Bar ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
@@ -65,14 +65,14 @@
                  id="code"
                  required
                  placeholder="e.g. HBL01, CASH1"
-                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                 style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
           <div style="font-size:12px;color:#6b7280;margin-top:3px;">
             Short unique code for this account.
           </div>
         </div>
 
               <!-- Opening balance for NEW accounts (optional) -->
-      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:10px;">
+
         <div style="flex:1 1 180px;min-width:220px;max-width:260px;">
           <label for="opening_amount" style="display:block;font-size:14px;margin-bottom:4px;">
             Opening Balance (optional)
@@ -82,19 +82,19 @@
                  name="opening_amount"
                  id="opening_amount"
                  placeholder="e.g. 50000.00"
-                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-          <div style="font-size:12px;color:#6b7280;margin-top:3px;">
-            Leave blank for zero. Applied only when creating a new account.
-          </div>
-        </div>
-
-        <div style="flex:0 0 140px;min-width:140px;">
+                 style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+                 <div style="font-size:12px;color:#6b7280;margin-top:3px;">
+                  Leave blank for zero. Applied only when creating a new account.
+                </div>
+              </div>
+      
+              <div style="flex:0 0 140px;min-width:140px;">
           <label for="opening_side" style="display:block;font-size:14px;margin-bottom:4px;">
             Dr / Cr
           </label>
           <select name="opening_side"
                   id="opening_side"
-                  style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                  style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;">
             <option value="DEBIT" selected>Debit (positive balance)</option>
             <option value="CREDIT">Credit (overdraft)</option>
           </select>
@@ -110,7 +110,7 @@
                  id="name"
                  required
                  placeholder="e.g. HBL Main Branch, Easypaisa Wallet"
-                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+                 style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
 
 
@@ -118,7 +118,7 @@
 
       <button type="submit"
               class="btn-primary"
-              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+              style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:800;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:160px;">
         💾 Save Account
       </button>
     </form>

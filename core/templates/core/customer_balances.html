@@ -3,7 +3,7 @@
 {% block title %}Customer Balances{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
 
   {# ---------- Top Bar (Title + Back Button) ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
@@ -73,8 +73,10 @@
       Hover over a bar to see the exact balance. Labels include Dr/Cr.
     </p>
 
-    <div style="width:100%;max-width:900px;">
-      <canvas id="customerBalanceChart" height="200"></canvas>
+    <div style="width:100%;max-width:900px;overflow-x:auto;">
+      <div style="min-width:520px;">
+        <canvas id="customerBalanceChart" height="200"></canvas>
+      </div>
     </div>
   </div>
 
@@ -89,43 +91,43 @@
       <table style="border-collapse:collapse;width:100%;min-width:760px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">Customer</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Opening (Dr/Cr)</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Sales</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Receipts</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">Balance</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:center;font-weight:600;">Dr/Cr</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Customer</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Opening (Dr/Cr)</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Sales</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Receipts</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Balance</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Dr/Cr</th>
           </tr>
         </thead>
         <tbody>
           {% for row in rows %}
             <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
                 {{ forloop.counter }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
                 {{ row.party.name }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.opening|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.sales|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.receipts|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
                 {{ row.net_abs|floatformat:2 }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:center;">
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
                 {{ row.net_type }}
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:center;">
+              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
                 No customers found.
               </td>
             </tr>
@@ -133,22 +135,22 @@
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="2" style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+            <th colspan="2" style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
               Grand Totals:
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
               {{ grand_opening|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
               {{ grand_sales|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
               {{ grand_receipts|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
               {{ grand_balance_abs|floatformat:2 }}
             </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:center;">
+            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
               {{ grand_balance_type }}
             </th>
           </tr>
@@ -159,26 +161,47 @@
 
 </div>
 
+{# ---------- Data for Chart (kept same logic, just moved out of JS to avoid VSCode errors) ---------- #}
+<script id="customerBalanceData" type="application/json">
+{
+  "labels": [
+    {% for row in rows %}
+      "{{ row.party.name|escapejs }} ({{ row.net_type }})"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "balances": [
+    {% for row in rows %}
+      {{ row.net_abs|default:0|floatformat:2 }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+
 {# ---------- Customer Balances Chart JS ---------- #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
   (function () {
-    const labels = [
-      {% for row in rows %}
-        "{{ row.party.name|escapejs }} ({{ row.net_type }})"{% if not forloop.last %},{% endif %}
-      {% endfor %}
-    ];
+    const dataEl = document.getElementById('customerBalanceData');
+    if (!dataEl) return;
 
-    const balances = [
-      {% for row in rows %}
-        parseFloat("{{ row.net_abs|floatformat:2 }}") || 0{% if not forloop.last %},{% endif %}
-      {% endfor %}
-    ];
+    let parsed = {};
+    try {
+      parsed = JSON.parse(dataEl.textContent || "{}");
+    } catch (e) {
+      parsed = {};
+    }
+
+    const labels = Array.isArray(parsed.labels) ? parsed.labels : [];
+    const balancesRaw = Array.isArray(parsed.balances) ? parsed.balances : [];
+    const balances = balancesRaw.map(v => {
+      const n = parseFloat(v);
+      return isNaN(n) ? 0 : n;
+    });
 
     const canvas = document.getElementById('customerBalanceChart');
-    if (!canvas || labels.length === 0) return;
+    if (!canvas || labels.length === 0 || typeof Chart === "undefined") return;
 
-    // Make the chart taller if there are many customers
+    // Make the chart taller if there are many customers (same behavior)
     const rowHeight = 20;  // px per bar
     const baseHeight = 180;
     canvas.height = Math.max(baseHeight, labels.length * rowHeight);
@@ -204,7 +227,8 @@
             beginAtZero: true,
             ticks: {
               callback: function (value) {
-                return value.toLocaleString('en-PK');
+                try { return Number(value).toLocaleString('en-PK'); }
+                catch (e) { return value; }
               }
             },
             title: {
@@ -218,7 +242,7 @@
           tooltip: {
             callbacks: {
               label: function (context) {
-                const v = context.parsed.x || 0;
+                const v = (context.parsed && typeof context.parsed.x === "number") ? context.parsed.x : 0;
                 return 'Balance: ' + v.toLocaleString('en-PK', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2

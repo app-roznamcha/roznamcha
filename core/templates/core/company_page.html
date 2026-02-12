@@ -2,10 +2,12 @@
 {% block title %}Company{% endblock %}
 {% block content %}
 
-<div class="container" style="max-width: 900px; margin: 30px auto;">
-  <h2>Company Profile</h2>
+<div class="page" style="max-width:900px;margin:40px auto 60px;padding:0 16px;">
+  <h1 style="margin:0 0 18px;font-size:32px;font-weight:700;">Company Profile</h1>
 
-  <form method="post" enctype="multipart/form-data" style="padding:12px;border:1px solid #ddd;border-radius:10px;">
+  <form method="post" enctype="multipart/form-data"
+      style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+             padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
     {% csrf_token %}
 
     <label>Company Name</label><br/>
@@ -23,8 +25,22 @@
     <label>Logo</label><br/>
     <input type="file" name="logo"><br/><br/>
 
-    <button type="submit" style="padding:10px 16px;">Save</button>
-    <a href="{% url 'owner_profile_page' %}" style="margin-left:10px;">Back</a>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button type="submit"
+              style="display:inline-flex;align-items:center;justify-content:center;
+                     padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;
+                     border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;">
+        💾 Save
+      </button>
+    
+      <a href="{% url 'owner_profile_page' %}"
+         style="display:inline-flex;align-items:center;justify-content:center;
+                padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;
+                border:1px solid #d1d5db;background:#f3f4f6;color:#111827;
+                text-decoration:none;">
+        ← Back
+      </a>
+    </div>
   </form>
 </div>
 
