@@ -202,6 +202,48 @@
           padding-right: 14px;
         }
       }
+
+      /* =========================
+        Responsive helpers
+        ========================= */
+
+      /* Make header wrap nicely on small screens */
+      @media (max-width: 768px) {
+        .app-header-inner {
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .brand {
+          width: 100%;
+          justify-content: center;
+          gap: 14px;
+        }
+
+        .brand-logo {
+          height: 52px; /* slightly smaller on mobile */
+        }
+
+        .header-actions {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      /* Tables: allow horizontal scroll without breaking layout */
+      .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Generic card spacing on mobile */
+      @media (max-width: 640px) {
+        .app-container {
+          padding: 16px 12px 30px;
+        }
+      }
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -241,7 +283,7 @@
         </div>
     </header>
 
-    <div class="app-container {% block container_class %}{% endblock %}">
+    <div class="app-container {% block container_class %}{% endblock %} {% block page_class %}{% endblock %}">
       {% if request.user.is_authenticated %}
     
         {# ✅ Never show subscription banners to Super Admin #}
