@@ -8,163 +8,200 @@
       </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Global base styles -->
     <style>
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f3f4f6;
-            color: #111827;
-        }
-
-        a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-        a:hover { text-decoration: underline; }
-
-        /* Top header bar */
-        .app-header {
-            background: #ffffff;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .app-header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 26px;
-            min-width: 0;
-        }
-
-        .brand-logo {
-    height: 64px;          /* bigger */
-    width: auto;           /* keep aspect ratio */
-    object-fit: contain;
-    border-radius: 12px;
-    border: 0;
-    background: transparent;
-}
-
-        .brand-name {
-            font-weight: 800;
-            font-size: 16px;
-            color: #111827;
-            line-height: 1.1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 520px;
-        }
-
-        .brand-sub {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 520px;
-        }
-
-        /* Simple container for regular pages.
-           Dashboard adds its own .dashboard-page so this won’t hurt. */
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px 16px 40px;
-        }
-
-        /* Generic primary button */
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            border-radius: 999px;
-            background: #2563eb;
-            border: 1px solid #2563eb;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .btn-primary:hover {
-            background: #1d4ed8;
-            border-color: #1d4ed8;
-        }
-
-        /* Secondary button */
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            border-radius: 999px;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .btn-secondary:hover { background: #f3f4f6; }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        /* Logout button (same styling as your dashboard logout) */
-        .btn-header-logout {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            border-radius: 999px;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .btn-header-logout:hover {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #b91c1c;
-        }
+      * { box-sizing: border-box; }
     
-        /* Allow certain pages to go full width */
-        .app-container.is-fluid {
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f3f4f6;
+        color: #111827;
+        -webkit-text-size-adjust: 100%;
+      }
+    
+      a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      a:hover { text-decoration: underline; }
+    
+      /* Make media responsive everywhere */
+      img, video, canvas, svg {
+        max-width: 100%;
+        height: auto;
+      }
+    
+      /* Prevent iOS zoom on form fields */
+      input, select, textarea, button {
+        font-size: 16px;
+      }
+    
+      /* Top header bar */
+      .app-header {
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+      }
+    
+      .app-header-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+    
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        min-width: 0;
+      }
+    
+      .brand-logo {
+        height: 64px;
+        width: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        border: 0;
+        background: transparent;
+      }
+    
+      .brand-name {
+        font-weight: 800;
+        font-size: 16px;
+        color: #111827;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 520px;
+      }
+    
+      .brand-sub {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 520px;
+      }
+    
+      /* Simple container for regular pages. */
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+    
+      /* Allow certain pages to go full width */
+      .app-container.is-fluid {
         max-width: 100%;
         padding-left: 32px;
         padding-right: 32px;
+      }
+    
+      /* Generic primary button */
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #2563eb;
+        border: 1px solid #2563eb;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn-primary:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+      }
+    
+      /* Secondary button */
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn-secondary:hover { background: #f3f4f6; }
+    
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+    
+      /* Logout button */
+      .btn-header-logout {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn-header-logout:hover {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #b91c1c;
+      }
+    
+      /* ✅ MOBILE: header stacks, logo shrinks, spacing tightens */
+      @media (max-width: 640px) {
+        .app-header-inner {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+          padding: 12px 14px;
         }
-
-        /* Optional: a bit tighter on small screens */
-        @media (max-width: 640px) {
+    
+        .brand {
+          justify-content: center;
+        }
+    
+        .brand-logo {
+          height: 52px;
+          border-radius: 10px;
+        }
+    
+        .header-actions {
+          justify-content: center;
+        }
+    
+        .app-container {
+          padding: 16px 12px 28px;
+        }
+    
         .app-container.is-fluid {
-            padding-left: 14px;
-            padding-right: 14px;
+          padding-left: 14px;
+          padding-right: 14px;
         }
-        }
-
+      }
     </style>
 
     {% block extra_head %}{% endblock %}
