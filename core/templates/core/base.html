@@ -251,6 +251,14 @@
     </style>
 
     {% block extra_head %}{% endblock %}
+    <!-- PWA -->
+    <link rel="manifest" href="{% static 'core/pwa/manifest.webmanifest' %}">
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- iOS (Add to Home Screen) -->
+    <link rel="apple-touch-icon" href="{% static 'core/pwa/icons/apple-touch-icon.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 
 <body>
@@ -317,5 +325,15 @@
     
       {% block content %}{% endblock %}
     </div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/service-worker.js")
+            .catch(function (err) {
+              console.log("SW registration failed:", err);
+            });
+        });
+      }
+    </script>
 </body>
 </html>

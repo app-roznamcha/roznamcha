@@ -6,6 +6,8 @@ from .views import account_ledger_api, account_balance_api, account_ledger_view
 from .views import party_ledger_api, party_balance_api
 from .views import trial_balance_api, party_ledger_view
 from django.views.generic import RedirectView
+from django.views.generic import TemplateView
+
 
 urlpatterns = [
     # =========================
@@ -135,4 +137,15 @@ urlpatterns = [
     path("ledger/trial-balance/", staff_blocked(trial_balance_api), name="trial_balance_api"),
     path("ledger/account-ledger/view/", staff_blocked(account_ledger_view), name="account_ledger_view"),
     path("ledger/party/<int:party_id>/", staff_blocked(party_ledger_view), name="party_ledger"),
+]
+
+urlpatterns += [
+    path(
+        "service-worker.js",
+        TemplateView.as_view(
+            template_name="core/service-worker.js",
+            content_type="application/javascript",
+        ),
+        name="service_worker",
+    ),
 ]
