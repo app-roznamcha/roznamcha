@@ -5,8 +5,11 @@ from .models import CompanyProfile, AppBranding, UserProfile
 def _safe_profile(user):
     """
     Safe access for OneToOne reverse relation: user.profile
-    Prevents 500 when profile doesn't exist.
+    Prevents 500 when profile doesn't exist (or user is None).
     """
+    if not user:
+        return None
+
     try:
         return user.profile
     except UserProfile.DoesNotExist:
