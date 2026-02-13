@@ -13,7 +13,7 @@
   <!-- =========================
        Owner Details (View + Edit)
        ========================= -->
-       <div class="profile-card" style="margin-top:18px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
+    <div class="profile-card" style="margin-top:18px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4 style="margin:0 0 10px;">Owner Details</h4>
 
     <div class="profile-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -67,6 +67,50 @@
     </form>
   </div>
 
+
+    <!-- =========================
+       Change Password
+       ========================= -->
+       <div class="profile-card" style="margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
+        <h4 style="margin:0 0 10px;">Change Password</h4>
+        <p style="margin:0 0 10px;color:#6b7280;">For security, choose a strong password you don’t reuse elsewhere.</p>
+    
+        <form method="post" style="margin:0;max-width:520px;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="change_password"/>
+    
+          <div style="display:grid;gap:10px;">
+            <div>
+              <label style="font-weight:600;">Current password</label><br/>
+              {{ password_form.old_password }}
+              {% if password_form.old_password.errors %}
+                <div style="color:#b91c1c;font-size:13px;">{{ password_form.old_password.errors }}</div>
+              {% endif %}
+            </div>
+    
+            <div>
+              <label style="font-weight:600;">New password</label><br/>
+              {{ password_form.new_password1 }}
+              {% if password_form.new_password1.errors %}
+                <div style="color:#b91c1c;font-size:13px;">{{ password_form.new_password1.errors }}</div>
+              {% endif %}
+            </div>
+    
+            <div>
+              <label style="font-weight:600;">Confirm new password</label><br/>
+              {{ password_form.new_password2 }}
+              {% if password_form.new_password2.errors %}
+                <div style="color:#b91c1c;font-size:13px;">{{ password_form.new_password2.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+    
+          <button type="submit"
+                  style="margin-top:12px;padding:10px 16px;border-radius:10px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;">
+            Update Password
+          </button>
+        </form>
+      </div>
   <!-- =========================
        Company Profile (View + Edit)
        ========================= -->

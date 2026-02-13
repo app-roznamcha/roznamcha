@@ -94,6 +94,9 @@ from .tenant_utils import (
     tenant_qs,
     get_owner_account,
 )
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+
 
 class TenantAwareLoginView(auth_views.LoginView):
     template_name = "core/login.html"
@@ -5140,6 +5143,8 @@ def owner_profile_page(request):
     # Forms (prefill)
     owner_form = OwnerUpdateForm(instance=owner)
     company_form = CompanyUpdateForm(instance=company)
+    # Password form (prefill)
+    password_form = PasswordChangeForm(user=request.user)
 
     # =========================
     # POST actions
@@ -5207,6 +5212,19 @@ def owner_profile_page(request):
                 messages.error(request, "Please correct the company form errors.")
             return redirect("owner_profile_page")
         
+        # (7) Change password
+        if action == "change_password":
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # keep logged in
+                messages.success(request, "Password updated successfully.")
+            else:
+                messages.error(request, "Please fix the password form errors.")
+
+            return redirect("owner_profile_page")
+
         # (4) Deactivate staff
         if action == "deactivate_staff":
             staff_id = request.POST.get("staff_id")
@@ -5289,6 +5307,7 @@ def owner_profile_page(request):
         "staff_profiles": staff_profiles,
         "owner_form": owner_form,
         "company_form": company_form,
+        "password_form": password_form,
     }
     return render(request, "core/owner_profile_page.html", context)
 
