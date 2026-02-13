@@ -71,6 +71,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.company_profile",
                 "core.context_processors.app_branding",
+                "core.context_processors.subscription_context",
             ],
         },
     },

@@ -108,21 +108,34 @@ def _ensure_owner_and_tenant(request, require_company=False):
 
     return request.owner, request.tenant
 
-def _enforce_subscription(owner_user):
+def _enforce_subscription(request, owner_user):
     """
-    Enforces subscription rules using fields on owner's profile (if present).
-    Dev-safe: if subscription fields aren't wired, do not block.
+    Enforces subscription rules using EFFECTIVE status/expiry.
+    Rule:
+      - Allow SAFE_METHODS (GET/HEAD/OPTIONS) even if expired (so user can view dashboards + renewal page).
+      - Block non-safe methods (POST/PUT/PATCH/DELETE) when expired/inactive.
     """
     if getattr(owner_user, "is_superuser", False):
+        return
+
+    # ✅ Allow read-only browsing always (your UI already shows banners + blocks actions)
+    if getattr(request, "method", "GET") in SAFE_METHODS:
         return
 
     prof = _profile(owner_user)
     if not prof:
         return
 
-    status = getattr(prof, "subscription_status", None)
-    expires_at = getattr(prof, "subscription_expires_at", None)
-    trial_started = getattr(prof, "trial_started_at", None)
+    # ✅ Prefer effective logic
+    try:
+        status = prof.get_effective_status()
+    except Exception:
+        status = getattr(prof, "subscription_status", None)
+
+    try:
+        expires_at = prof.get_effective_expires_at()
+    except Exception:
+        expires_at = getattr(prof, "subscription_expires_at", None)
 
     # If subscription system not wired => allow
     if not status:
@@ -130,30 +143,18 @@ def _enforce_subscription(owner_user):
 
     now = timezone.now()
 
+    # Expiry check (effective)
     if expires_at and expires_at < now:
         raise PermissionDenied("Subscription expired. Please renew.")
 
     if status == "EXPIRED":
         raise PermissionDenied("Subscription expired. Please renew.")
 
-    if status == "TRIAL":
-        if not trial_started:
-            trial_started = getattr(prof, "created_at", None)
-
-        if trial_started and (trial_started + timedelta(days=TRIAL_DAYS)) < now:
-            # optional auto-mark expired
-            try:
-                prof.subscription_status = "EXPIRED"
-                prof.save(update_fields=["subscription_status"])
-            except Exception:
-                pass
-            raise PermissionDenied("Trial expired. Please activate subscription.")
-
-    if status == "ACTIVE" or status == "TRIAL":
+    # ✅ ACTIVE or TRIAL allowed for writes (if not expired)
+    if status in ("ACTIVE", "TRIAL"):
         return
 
     raise PermissionDenied("Subscription inactive")
-
 
 def owner_required(view_func):
     """
@@ -164,7 +165,7 @@ def owner_required(view_func):
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
         owner, _ = _ensure_owner_and_tenant(request, require_company=False)
-        _enforce_subscription(owner)
+        _enforce_subscription(request, owner)
         return view_func(request, *args, **kwargs)
 
     return _wrapped
@@ -190,9 +191,9 @@ def resolve_tenant_context(require_company: bool = False):
 
 def subscription_required(view_func):
     """
-    Blocks if OWNER subscription is not active.
-    Staff inherit Owner subscription automatically.
-    Django superuser bypass always.
+    Blocks write actions when OWNER subscription is expired/inactive.
+    Uses effective subscription logic.
+    Allows SAFE_METHODS for viewing dashboards/renewal pages.
     """
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
@@ -201,36 +202,47 @@ def subscription_required(view_func):
         if not user or not user.is_authenticated:
             raise PermissionDenied("Authentication required")
 
-        # Django superuser bypass
+        # Superadmin bypass
         if getattr(user, "is_superuser", False):
             return view_func(request, *args, **kwargs)
 
-        # ✅ CRITICAL: Always check OWNER subscription (staff inherits)
+        # Resolve owner (staff inherits owner subscription)
         owner = getattr(request, "owner", None) or get_company_owner(user)
         if not owner:
             raise PermissionDenied("Owner not resolved")
 
-        profile = getattr(owner, "profile", None)
-        if not profile:
-            raise PermissionDenied("Owner profile missing")
-
-        status = getattr(profile, "subscription_status", None)
-        expires_at = getattr(profile, "subscription_expires_at", None)
-
-        today = timezone.now().date()
-        expired = False
-        if expires_at:
-            try:
-                expired = expires_at.date() < today
-            except Exception:
-                expired = False
-
-        # ✅ Allow TRIAL and ACTIVE as long as not expired
-        if status in ("TRIAL", "ACTIVE") and not expired:
+        # ✅ Allow safe methods always (GET/HEAD/OPTIONS)
+        if getattr(request, "method", "GET") in SAFE_METHODS:
             return view_func(request, *args, **kwargs)
 
-        # ❌ Block only if expired or inactive
-        raise PermissionDenied("Subscription expired. Please renew.")
+        profile = getattr(owner, "profile", None)
+        if not profile:
+            return view_func(request, *args, **kwargs)
+
+        # Effective status
+        try:
+            status = profile.get_effective_status()
+        except Exception:
+            status = getattr(profile, "subscription_status", None)
+
+        try:
+            expires_at = profile.get_effective_expires_at()
+        except Exception:
+            expires_at = getattr(profile, "subscription_expires_at", None)
+
+        now = timezone.now()
+
+        if expires_at and expires_at < now:
+            raise PermissionDenied("Subscription expired. Please renew.")
+
+        if status == "EXPIRED":
+            raise PermissionDenied("Subscription expired. Please renew.")
+
+        if status in ("ACTIVE", "TRIAL"):
+            return view_func(request, *args, **kwargs)
+
+        raise PermissionDenied("Subscription inactive")
+
     return _wrapped
 
 def staff_blocked(view_func):
@@ -244,7 +256,7 @@ def staff_blocked(view_func):
     def _wrapped(request, *args, **kwargs):
         # ✅ Resolve owner + tenant and enforce subscription first
         owner, _ = _ensure_owner_and_tenant(request, require_company=False)
-        _enforce_subscription(owner)
+        _enforce_subscription(request, owner)
 
         user = request.user
 

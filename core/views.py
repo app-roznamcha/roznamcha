@@ -326,7 +326,7 @@ def dashboard(request):
         return redirect("superadmin_dashboard")
 
 
-    owner = request.owner
+    owner = getattr(request, "owner", None) or get_company_owner(request.user)
     month_start = today.replace(day=1)
     # Prefer middleware-resolved tenant if present (subdomain mode)
     company = getattr(request, "tenant", None) or CompanyProfile.objects.filter(owner=owner).order_by("-id").first()
@@ -4421,16 +4421,13 @@ def subscription_page(request):
         messages.error(request, "Profile not found.")
         return redirect("dashboard")
 
-    # ✅ Effective status/expiry (depends on your helper methods we placed in UserProfile)
-    try:
-        status = profile.get_effective_status()
-    except Exception:
-        status = getattr(profile, "subscription_status", "TRIAL")
+        # ✅ Always use effective logic (single source of truth)
+    status = "TRIAL"
+    expires_at = None
 
-    try:
+    if profile:
+        status = profile.get_effective_status()
         expires_at = profile.get_effective_expires_at()
-    except Exception:
-        expires_at = getattr(profile, "subscription_expires_at", None)
 
     trial_started = getattr(profile, "trial_started_at", None)
 
@@ -5335,7 +5332,7 @@ def superadmin_dashboard(request):
     rows = []
     for prof in owners:
         owner = prof.user
-        company = getattr(owner, "company_profile", None)
+        company = CompanyProfile.objects.filter(owner=owner).first()
 
         status = prof.get_effective_status()
         expires_at = prof.get_effective_expires_at()
@@ -5367,7 +5364,7 @@ def superadmin_dashboard(request):
 def superadmin_owner_detail(request, owner_id):
     owner = get_object_or_404(UserProfile, role="OWNER", user__id=owner_id).user
     prof = owner.profile
-    company = getattr(owner, "company_profile", None)
+    company = CompanyProfile.objects.filter(owner=owner).first()
 
     status = prof.get_effective_status()
     expires_at = prof.get_effective_expires_at()
@@ -5454,7 +5451,7 @@ def superadmin_hard_purge_owner(request, owner_id):
     """
     owner = get_object_or_404(UserProfile, role="OWNER", user__id=owner_id).user
     prof = owner.profile
-    company = getattr(owner, "company_profile", None)
+    company = CompanyProfile.objects.filter(owner=owner).first()
 
     confirm = (request.POST.get("confirm") or "").strip().lower()
     expected = (company.slug if company else owner.username).lower()
