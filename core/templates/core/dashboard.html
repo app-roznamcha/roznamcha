@@ -388,11 +388,11 @@ html[dir="rtl"] .dashboard-section{
                     {% else %}
                         Dashboard
                       {% endif %}
-                    <span style="font-weight:700;color:#64748b;">— Dashboard</span>
+                      <span style="font-weight:700;color:#64748b;" data-i18n="dash_suffix">— Dashboard</span>
                   </h1>
 
                   <p class="dashboard-subtitle">
-                    Welcome,
+                    <span data-i18n="welcome">Welcome</span>,
                   
                     {% if is_staff %}
                       <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
@@ -404,18 +404,18 @@ html[dir="rtl"] .dashboard-section{
                         </span>
                   
                         <span class="user-dropdown">
-                            <a href="{% url 'owner_profile_page' %}">👤 User Profile</a>
-                            <a href="{% url 'subscription_page' %}">💳 Subscription</a>
+                            <a href="{% url 'owner_profile_page' %}"><span data-i18n="user_profile">👤 User Profile</span></a>
+                            <a href="{% url 'subscription_page' %}"><span data-i18n="subscription">💳 Subscription</span></a>
                           
                             {% if request.user.is_superuser %}
                               <div style="height:1px;background:#e5e7eb;margin:8px 6px;"></div>
-                              <a href="{% url 'superadmin_dashboard' %}">🛡️ Super Admin Dashboard</a>
+                              <a href="{% url 'superadmin_dashboard' %}"><span data-i18n="superadmin_dash">🛡️ Super Admin Dashboard</span></a>
                             {% endif %}
                           </span>
                       </span>
                     {% endif %}
                   
-                    — Today: {{ today }} — {{ now|date:"h:i A" }} (PKT)
+                    — <span data-i18n="today">Today</span>: {{ today }} — {{ now|date:"h:i A" }} (PKT)
                   </p>
                 </div>
               </div>
@@ -455,9 +455,7 @@ html[dir="rtl"] .dashboard-section{
         </div>
 
         <div class="dash-card">
-            <div class="dash-card-label" data-i18n="month_profit">
-                This Month Profit (Simple)
-              </div>
+            <div class="dash-card-label" data-i18n="month_profit">This Month Profit (Simple)</div>
             <div class="dash-card-value">
                 Rs {{ month_profit_simple|default:0|floatformat:0 }}
             </div>
@@ -535,33 +533,34 @@ html[dir="rtl"] .dashboard-section{
             <p data-i18n="transactions_desc">Record daily sales, purchases, customer receipts and supplier payments.</p>
     
             <div class="button-row">
-                <a href="{% url 'sales_new' %}" class="btn-pill btn-pill-primary">➕ New Sale</a>
+                <a href="{% url 'sales_new' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_sale">➕ New Sale</span></a>
                 {% if not is_staff %}
-                  <a href="{% url 'sales_list' %}" class="btn-pill">📄 Sales List</a>
+                <a href="{% url 'sales_list' %}" class="btn-pill"><span data-i18n="sales_list">📄 Sales List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'purchase_new' %}" class="btn-pill btn-pill-primary">➕ New Purchase</a>
+                <a href="{% url 'purchase_new' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_purchase">➕ New Purchase</span></a>
                 {% if not is_staff %}
-                  <a href="{% url 'purchase_list' %}" class="btn-pill">📥 Purchase List</a>
+                <a href="{% url 'purchase_list' %}" class="btn-pill"><span data-i18n="purchase_list">📥 Purchase List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-              <a href="{% url 'sales_return_new' %}" class="btn-pill">↩️ Sales Return (Customer)</a>
-              <a href="{% url 'purchase_return_new' %}" class="btn-pill">↩️ Purchase Return (Supplier)</a>
+                <a href="{% url 'sales_return_new' %}" class="btn-pill"><span data-i18n="sales_return">↩️ Sales Return (Customer)</span></a>
+                <a href="{% url 'purchase_return_new' %}" class="btn-pill"><span data-i18n="purchase_return">↩️ Purchase Return (Supplier)</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'payment_new' %}" class="btn-pill">💰 New Payment / Receipt</a>
+                <a href="{% url 'payment_new' %}" class="btn-pill"><span data-i18n="new_payment">💰 New Payment / Receipt</span></a>
+
                 {% if not is_staff %}
-                  <a href="{% url 'payments_list' %}" class="btn-pill">📃 Payments &amp; Receipts</a>
+                <a href="{% url 'payments_list' %}" class="btn-pill"><span data-i18n="payments_list">📃 Payments &amp; Receipts</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'adjustments_page' %}" class="btn-pill">🧾 Adjustments (Party + Stock)</a>
+                <a href="{% url 'adjustments_page' %}" class="btn-pill"><span data-i18n="adjustments">🧾 Adjustments (Party + Stock)</span></a>
               </div>
         </section>
     
@@ -572,38 +571,38 @@ html[dir="rtl"] .dashboard-section{
                 <span class="dashboard-section-title-indicator"></span>
                 <span data-i18n="reports">📊 Reports &amp; Utilities</span>
             </h2>
-            <p>View key reports for stock, balances and financial performance.</p>
+            <p data-i18n="reports_desc">View key reports for stock, balances and financial performance.</p>
     
             <div class="button-row">
-              <a href="{% url 'stock_report' %}" class="btn-pill">📦 Stock Report</a>
-              <a href="{% url 'product_ledger' %}" class="btn-pill">📊 Product Ledger</a>
+                <a href="{% url 'stock_report' %}" class="btn-pill"><span data-i18n="stock_report">📦 Stock Report</span></a>
+                <a href="{% url 'product_ledger' %}" class="btn-pill"><span data-i18n="product_ledger">📊 Product Ledger</span></a>
             </div>
     
             <div class="button-row">
-              <a href="{% url 'day_summary' %}" class="btn-pill">📅 Day Summary</a>
+                <a href="{% url 'day_summary' %}" class="btn-pill"><span data-i18n="day_summary">📅 Day Summary</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'customer_balances' %}" class="btn-pill">👤 Customer Balances</a>
-                <a href="{% url 'supplier_balances' %}" class="btn-pill">🏭 Supplier Balances</a>
+                <a href="{% url 'customer_balances' %}" class="btn-pill"><span data-i18n="customer_balances">👤 Customer Balances</span></a>
+                <a href="{% url 'supplier_balances' %}" class="btn-pill"><span data-i18n="supplier_balances">🏭 Supplier Balances</span></a>
             </div>
     
             <div class="button-row">
-              <a href="{% url 'customer_ledger' %}" class="btn-pill">📒 Customer Ledger</a>
-              <a href="{% url 'supplier_ledger' %}" class="btn-pill">📕 Supplier Ledger</a>
+                <a href="{% url 'customer_ledger' %}" class="btn-pill"><span data-i18n="customer_ledger">📒 Customer Ledger</span></a>
+                <a href="{% url 'supplier_ledger' %}" class="btn-pill"><span data-i18n="supplier_ledger">📕 Supplier Ledger</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'trial_balance' %}" class="btn-pill">⚖️ Trial Balance</a>
-                <a href="{% url 'profit_loss' %}" class="btn-pill">📈 Profit &amp; Loss</a>
+                <a href="{% url 'trial_balance' %}" class="btn-pill"><span data-i18n="trial_balance">⚖️ Trial Balance</span></a>
+                <a href="{% url 'profit_loss' %}" class="btn-pill"><span data-i18n="profit_loss">📈 Profit &amp; Loss</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'balance_sheet' %}" class="btn-pill">🧮 Balance Sheet</a>
+                <a href="{% url 'balance_sheet' %}" class="btn-pill"><span data-i18n="balance_sheet">🧮 Balance Sheet</span></a>
             </div>
     
             <div class="button-row">
-              <a href="{% url 'backup_dashboard' %}" class="btn-pill">🗂️ Backups</a>
+                <a href="{% url 'backup_dashboard' %}" class="btn-pill"><span data-i18n="backups">🗂️ Backups</span></a>
             </div>
         </section>
         {% endif %}
@@ -615,6 +614,42 @@ html[dir="rtl"] .dashboard-section{
 <script>
 const dict = {
 en: {
+dash_suffix: "— Dashboard",
+welcome: "Welcome",
+today: "Today",
+
+user_profile: "👤 User Profile",
+subscription: "💳 Subscription",
+superadmin_dash: "🛡️ Super Admin Dashboard",
+
+cash_balance: "Cash / Bank Balance",
+month_sales: "This Month Sales",
+month_purchases: "This Month Purchases",
+month_profit: "This Month Profit (Simple)",
+customer_receivable: "Customer Receivable",
+supplier_payable: "Supplier Payable",
+
+new_sale: "➕ New Sale",
+sales_list: "📄 Sales List",
+new_purchase: "➕ New Purchase",
+purchase_list: "📥 Purchase List",
+sales_return: "↩️ Sales Return (Customer)",
+purchase_return: "↩️ Purchase Return (Supplier)",
+new_payment: "💰 New Payment / Receipt",
+payments_list: "📃 Payments & Receipts",
+adjustments: "🧾 Adjustments (Party + Stock)",
+
+stock_report: "📦 Stock Report",
+product_ledger: "📊 Product Ledger",
+day_summary: "📅 Day Summary",
+customer_balances: "👤 Customer Balances",
+supplier_balances: "🏭 Supplier Balances",
+customer_ledger: "📒 Customer Ledger",
+supplier_ledger: "📕 Supplier Ledger",
+trial_balance: "⚖️ Trial Balance",
+profit_loss: "📈 Profit & Loss",
+balance_sheet: "🧮 Balance Sheet",
+backups: "🗂️ Backups",
 main_menu: "Main Menu",
 master_data: "Master Data",
 transactions: "Transactions",
@@ -635,6 +670,42 @@ bank_cash_accounts: "🏦 Bank & Cash Accounts",
 account_ledger: "📒 Account Ledger"
 },
 ur: {
+    dash_suffix: "— ڈیش بورڈ",
+welcome: "خوش آمدید",
+today: "آج",
+
+user_profile: "👤 یوزر پروفائل",
+subscription: "💳 سبسکرپشن",
+superadmin_dash: "🛡️ سپر ایڈمن ڈیش بورڈ",
+
+cash_balance: "کیش / بینک بیلنس",
+month_sales: "اس مہینے کی سیلز",
+month_purchases: "اس مہینے کی پرچیز",
+month_profit: "اس مہینے کا منافع (سادہ)",
+customer_receivable: "کسٹمر سے وصولی",
+supplier_payable: "سپلائر کو ادائیگی",
+
+new_sale: "➕ نئی سیل",
+sales_list: "📄 سیلز لسٹ",
+new_purchase: "➕ نئی پرچیز",
+purchase_list: "📥 پرچیز لسٹ",
+sales_return: "↩️ سیلز ریٹرن (کسٹمر)",
+purchase_return: "↩️ پرچیز ریٹرن (سپلائر)",
+new_payment: "💰 نئی ادائیگی / رسید",
+payments_list: "📃 ادائیگیاں اور رسیدیں",
+adjustments: "🧾 ایڈجسٹمنٹس (پارٹی + اسٹاک)",
+
+stock_report: "📦 اسٹاک رپورٹ",
+product_ledger: "📊 پروڈکٹ لیجر",
+day_summary: "📅 روزانہ خلاصہ",
+customer_balances: "👤 کسٹمر بیلنس",
+supplier_balances: "🏭 سپلائر بیلنس",
+customer_ledger: "📒 کسٹمر لیجر",
+supplier_ledger: "📕 سپلائر لیجر",
+trial_balance: "⚖️ ٹرائل بیلنس",
+profit_loss: "📈 منافع و نقصان",
+balance_sheet: "🧮 بیلنس شیٹ",
+backups: "🗂️ بیک اپس",
 main_menu: "مین مینو",
 master_data: "ماسٹر ڈیٹا",
 transactions: "ٹرانزیکشنز",
