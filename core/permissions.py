@@ -48,7 +48,7 @@ def staff_allowed(view_func):
         # STAFF / OWNER must be on a valid tenant and must pass OWNER subscription
         if role in ("STAFF", "OWNER"):
             owner, _company = _ensure_owner_and_tenant(request, require_company=True)
-            _enforce_subscription(owner)
+            _enforce_subscription(request, owner)
             return view_func(request, *args, **kwargs)
 
         raise PermissionDenied("Not allowed")
@@ -91,7 +91,7 @@ def owner_only(view_func):
         # OWNER: must be on tenant + subscription must be valid
         if role == "OWNER":
             owner, _company = _ensure_owner_and_tenant(request, require_company=True)
-            _enforce_subscription(owner)
+            _enforce_subscription(request, owner)
             return view_func(request, *args, **kwargs)
 
         raise PermissionDenied("Not allowed")
