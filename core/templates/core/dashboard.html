@@ -23,23 +23,25 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
   }
 
   .dashboard-title {
-      margin: 0 0 10px;
-      font-size: 28px;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: -0.02em;
-  }
+    margin: 0;
+    font-size: 26px;
+    font-weight: 850;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    }
 
   .dashboard-subtitle {
-      margin: 0 0 10px;   /* new spacing */
-      font-size: 15px;
-      color: #6b7280;
-  }
+    margin: 0;
+    font-size: 14.5px;
+    color: #6b7280;
+    line-height: 1.35;
+    }
   .dashboard-subtitle strong {
       font-weight: 700;
       color: #111827;
@@ -362,49 +364,52 @@ html[dir="rtl"] .dashboard-section{
   text-align:right;
 }
 
-/* ===== Header meta (clean company + welcome + date/time) ===== */
+/* ===== Header meta (professional balance) ===== */
 .header-meta{
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:10px;              /* nicer separation */
+  padding-top:2px;
 }
 
 .header-meta-top{
   display:flex;
-  align-items:baseline;
+  align-items:center;
   flex-wrap:wrap;
-  gap:6px;
+  gap:8px;
 }
 
 .header-meta-bottom{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
-  margin-top:2px;
+  gap:10px;
+  margin-top:0;
 }
 
 .meta-pill{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  padding:6px 10px;
+  padding:7px 12px;
   border-radius:999px;
   border:1px solid #e5e7eb;
-  background:#fff;
+  background:#f8fafc;     /* soft pill background */
   color:#64748b;
   font-size:13px;
   font-weight:700;
 }
 
 .meta-pill strong{
-  color:#111827;
-  font-weight:800;
+  color:#0f172a;
+  font-weight:850;
 }
 
-/* On small screens: keep meta pills nice */
+/* Mobile polish */
 @media (max-width: 560px){
-  .header-meta-bottom{gap:6px}
-  .meta-pill{font-size:12.5px;padding:6px 9px}
+  .dashboard-title{font-size:22px;}
+  .header-meta{gap:8px;}
+  .header-meta-bottom{gap:8px;}
+  .meta-pill{font-size:12.5px;padding:7px 10px;}
 }
 </style>
 {% endblock %}
@@ -439,7 +444,7 @@ html[dir="rtl"] .dashboard-section{
                   <div class="header-meta">
 
                     <div class="dashboard-subtitle header-meta-top">
-                      <span data-i18n="welcome">Welcome</span>,
+                        <span data-i18n="welcome">Welcome</span><span style="margin:0 6px;">·</span>
                       {% if is_staff %}
                         <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
                       {% else %}
