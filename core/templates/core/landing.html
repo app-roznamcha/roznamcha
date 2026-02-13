@@ -64,17 +64,6 @@
     .btn-ghost{background:transparent}
     .btn-ghost:hover{background:#f8fafc}
 
-    .lang-toggle{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:8px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;
-      font-weight:800;font-size:13px;color:#334155;
-    }
-    .lang-toggle button{
-      border:none;background:transparent;cursor:pointer;
-      font-weight:900;font-size:13px;padding:4px 8px;border-radius:999px;color:#334155;
-    }
-    .lang-toggle button.active{background:#eff6ff;color:#1d4ed8}
-
     /* Hero */
     .hero-wrap{padding:34px 0 22px}
     .hero{
@@ -91,7 +80,7 @@
     }
     .headline{
       margin:0 0 10px;
-      font-size:40px;line-height:1.08;font-weight:950;letter-spacing:-.04em;
+      font-size:40px;line-height:1.08;font-weight:700;letter-spacing:-.04em;
       color:#0f172a;
     }
     .subhead{
@@ -119,7 +108,7 @@
       padding:16px 16px 14px;
       box-shadow:0 12px 22px rgba(15,23,42,.08);
     }
-    .mini h3{margin:0 0 6px;font-size:16px;font-weight:950}
+    .mini h3{margin:0 0 6px;font-size:16px;font-weight:700}
     .mini p{margin:0;color:#64748b;font-size:14px;line-height:1.55}
     .mini .btn{width:100%;margin-top:12px;padding:12px 16px}
 
@@ -127,7 +116,7 @@
     .section{padding:18px 0 34px}
     .section-title{
       margin:0 0 12px;
-      font-size:14px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;
+      font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
       color:#64748b;
     }
     .features{
@@ -147,7 +136,7 @@
       font-size:18px;
       margin-bottom:10px;
     }
-    .feature h4{margin:0 0 6px;font-size:15px;font-weight:950}
+    .feature h4{margin:0 0 6px;font-size:15px;font-weight:700}
     .feature p{margin:0;color:#64748b;font-size:14px;line-height:1.55}
 
     /* Footer CTA */
@@ -158,19 +147,9 @@
       padding:18px;
       display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
     }
-    .bottom-cta strong{font-size:16px;font-weight:950}
+    .bottom-cta strong{font-size:16px;font-weight:700}
     .bottom-cta span{color:#64748b;font-size:14px}
     .bottom-cta .btn{padding:12px 18px}
-
-    /* Urdu RTL support */
-    html[dir="rtl"] body{font-family: system-ui, "Noto Nastaliq Urdu", "Noto Sans Arabic", sans-serif;}
-    html[dir="rtl"] .header-inner,
-    html[dir="rtl"] .bottom-cta{direction:rtl}
-    html[dir="rtl"] .brand{flex-direction:row-reverse}
-    html[dir="rtl"] .actions{justify-content:flex-start}
-    html[dir="rtl"] .pill{direction:rtl}
-    html[dir="rtl"] .feature{text-align:right}
-    html[dir="rtl"] .cta-row{justify-content:flex-start}
 
     /* Responsive */
     @media(max-width:980px){
@@ -197,17 +176,10 @@
     <div class="header-inner">
       <div class="brand">
         <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha" class="logo">
-        <div class="tagline">
-          <strong data-i18n="brand_title">Roznamcha</strong>
-          <span data-i18n="brand_sub">Smart Khata & Hisab for real businesses</span>
-        </div>
       </div>
 
       <div class="actions">
-        <div class="lang-toggle" title="Language">
-          <button type="button" id="btnEN" class="active">EN</button>
-          <button type="button" id="btnUR">اردو</button>
-        </div>
+        <!-- Language toggle removed -->
 
         <a class="btn btn-ghost" href="{% url 'login' %}" data-i18n="login">Login</a>
         <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="create_account">Create Account</a>
@@ -311,100 +283,6 @@
     <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="bottom_btn">Create Account</a>
   </div>
 </div>
-
-<script>
-  // Simple bilingual labels (EN/UR only) — labels only, as you decided.
-  const dict = {
-    en: {
-      brand_title: "Roznamcha",
-      brand_sub: "Smart Khata & Hisab for real businesses",
-      login: "Login",
-      create_account: "Create Account",
-      headline: "Smart Khata & Hisab System — Fast, Clean, Accurate",
-      subhead: "Manage customers, suppliers, products, sales, purchases, payments and reports — in one clean system built for practical business workflows.",
-      cta_primary: "Create Free Account",
-      cta_secondary: "Login",
-      pill_1: "✅ Owner + up to 3 Staff users",
-      pill_2: "✅ Cash/Bank accounts + ledgers",
-      pill_3: "✅ Trial + subscription control",
-      mini_title: "Built for clarity",
-      mini_text: "Clean UI. Fast workflows. Strong permissions. Real accounting logic.",
-      mini_btn: "Start Now",
-      mini2_title: "Works on phone + laptop",
-      mini2_text: "Responsive design — comfortable for daily entry and checking reports.",
-      features_title: "Core features",
-      f1_title: "Sales & Purchases",
-      f1_text: "Post entries properly with clean lists and quick search.",
-      f2_title: "Customer & Supplier Ledgers",
-      f2_text: "View balances and statements with running totals.",
-      f3_title: "Cash/Bank Accounts",
-      f3_text: "Record payments/receipts with proper account tracking.",
-      f4_title: "Stock & Product Reports",
-      f4_text: "Know what’s in stock and what moved today.",
-      f5_title: "Trial Balance",
-      f5_text: "See debit/credit summary for your ledgers.",
-      f6_title: "Simple permissions",
-      f6_text: "Owner controls everything, staff has limited actions.",
-      bottom_title: "Start in 2 minutes",
-      bottom_text: "Create your company and start entering sales/purchases.",
-      bottom_btn: "Create Account",
-    },
-    ur: {
-      brand_title: "روزنامچہ",
-      brand_sub: "اسمارٹ کھاتہ اور حساب — حقیقی کاروبار کے لیے",
-      login: "لاگ اِن",
-      create_account: "اکاؤنٹ بنائیں",
-      headline: "اسمارٹ کھاتہ اور حساب سسٹم — تیز، صاف، درست",
-      subhead: "کسٹمر، سپلائر، پروڈکٹ، سیل، خرید، ادائیگی اور رپورٹس — سب ایک صاف اور عملی سسٹم میں۔",
-      cta_primary: "مفت اکاؤنٹ بنائیں",
-      cta_secondary: "لاگ اِن",
-      pill_1: "✅ اونر + 3 اسٹاف یوزرز تک",
-      pill_2: "✅ کیش/بینک اکاؤنٹس + لیجر",
-      pill_3: "✅ ٹرائل + سبسکرپشن کنٹرول",
-      mini_title: "صاف اور آسان",
-      mini_text: "کلین UI، تیز ورک فلو، مضبوط اجازتیں، اور حقیقی اکاؤنٹنگ لاجک۔",
-      mini_btn: "شروع کریں",
-      mini2_title: "موبائل اور لیپ ٹاپ پر بہتر",
-      mini2_text: "ریسپانسیو ڈیزائن — روزانہ انٹری اور رپورٹس آسانی سے۔",
-      features_title: "اہم فیچرز",
-      f1_title: "سیلز اور خرید",
-      f1_text: "صحیح پوسٹنگ کے ساتھ صاف لسٹس اور تیز سرچ۔",
-      f2_title: "کسٹمر اور سپلائر لیجر",
-      f2_text: "رننگ بیلنس کے ساتھ بیلنس اور اسٹیٹمنٹ دیکھیں۔",
-      f3_title: "کیش/بینک اکاؤنٹس",
-      f3_text: "ادائیگی/وصولی کے ساتھ درست اکاؤنٹ ٹریکنگ۔",
-      f4_title: "اسٹاک اور پروڈکٹ رپورٹس",
-      f4_text: "کیا اسٹاک میں ہے اور آج کیا موو ہوا — واضح۔",
-      f5_title: "ٹرائل بیلنس",
-      f5_text: "لیجرز کا ڈیبٹ/کریڈٹ خلاصہ دیکھیں۔",
-      f6_title: "سادہ اجازتیں",
-      f6_text: "اونر کے پاس مکمل کنٹرول، اسٹاف محدود ایکشنز۔",
-      bottom_title: "2 منٹ میں شروع کریں",
-      bottom_text: "اپنی کمپنی بنائیں اور سیل/خرید کی انٹری شروع کریں۔",
-      bottom_btn: "اکاؤنٹ بنائیں",
-    }
-  };
-
-  function applyLang(lang) {
-    localStorage.setItem("roz_lang", lang);
-    const isUr = lang === "ur";
-    document.documentElement.lang = isUr ? "ur" : "en";
-    document.documentElement.dir = isUr ? "rtl" : "ltr";
-
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (dict[lang] && dict[lang][key]) el.textContent = dict[lang][key];
-    });
-
-    document.getElementById("btnEN").classList.toggle("active", lang === "en");
-    document.getElementById("btnUR").classList.toggle("active", lang === "ur");
-  }
-
-  document.getElementById("btnEN").addEventListener("click", () => applyLang("en"));
-  document.getElementById("btnUR").addEventListener("click", () => applyLang("ur"));
-
-  applyLang(localStorage.getItem("roz_lang") || "en");
-</script>
 
 </body>
 </html>
