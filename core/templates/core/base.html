@@ -281,22 +281,38 @@
             </div>
 
             <div class="header-actions">
-                {% if user.is_authenticated %}
-              
-                  <form method="post" action="{% url 'logout' %}" style="margin:0;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-header-logout" title="Logout">⏻ Logout</button>
-                  </form>
-              
-                {% else %}
-                  <a href="{% url 'login' %}" class="btn-primary">Login</a>
-                {% endif %}
-              </div>
+              <button id="installBtn" class="btn-secondary" type="button" style="display:none;">
+                ⬇️ Install App
+              </button>
+            
+              {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-header-logout" title="Logout">⏻ Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="btn-primary">Login</a>
+              {% endif %}
+            </div>
             
         </div>
     </header>
 
     <div class="app-container {% block container_class %}{% endblock %} {% block page_class %}{% endblock %}">
+      <div id="iosA2HS" style="display:none;max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-weight:600;">
+        📱 On iPhone: Tap <b>Share</b> (⬆️) then <b>Add to Home Screen</b> to install Roznamcha.
+      </div>
+      
+      <script>
+        (function () {
+          const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+          const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+          if (isIos && !isStandalone) {
+            const bar = document.getElementById("iosA2HS");
+            if (bar) bar.style.display = "block";
+          }
+        })();
+      </script>
       {% if request.user.is_authenticated %}
     
         {# ✅ Never show subscription banners to Super Admin #}
@@ -335,6 +351,32 @@
             });
         });
       }
+    </script>
+    <script>
+      let deferredPrompt = null;
+    
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById("installBtn");
+        if (btn) btn.style.display = "inline-flex";
+      });
+    
+      window.addEventListener("appinstalled", () => {
+        deferredPrompt = null;
+        const btn = document.getElementById("installBtn");
+        if (btn) btn.style.display = "none";
+      });
+    
+      document.addEventListener("click", async (e) => {
+        if (e.target && e.target.id === "installBtn") {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          e.target.style.display = "none";
+        }
+      });
     </script>
 </body>
 </html>
