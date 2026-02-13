@@ -140,6 +140,11 @@ urlpatterns = [
 
     path("offline/", views.offline_page, name="offline_page"),
     path("service-worker.js", views.service_worker, name="service_worker"),
+
+    path("privacy/", views.privacy_policy, name="privacy_policy"),
+    path("terms/", views.terms_conditions, name="terms_conditions"),
+    path("refund/", views.refund_policy, name="refund_policy"),
+    path("service/", views.service_policy, name="service_policy"),
 ]
 
 urlpatterns += [

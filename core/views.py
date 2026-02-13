@@ -5493,3 +5493,15 @@ def service_worker(request):
     # avoid aggressive caching while developing
     response["Cache-Control"] = "no-cache"
     return response
+
+def privacy_policy(request):
+    return render(request, "legal/privacy.html")
+
+def terms_conditions(request):
+    return render(request, "legal/terms.html")
+
+def refund_policy(request):
+    return render(request, "legal/refund.html")
+
+def service_policy(request):
+    return render(request, "legal/service.html")

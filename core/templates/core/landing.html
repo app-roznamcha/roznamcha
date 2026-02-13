@@ -84,9 +84,22 @@
       color:#0f172a;
     }
     .subhead{
-      margin:0 0 16px;
+      margin:0 0 10px;
       color:#475569;font-size:16px;line-height:1.65;
     }
+
+    /* NEW: pocket accountant line */
+    .microcopy{
+      margin:0 0 16px;
+      color:#334155;
+      font-size:15px;
+      line-height:1.65;
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      padding:10px 12px;
+      border-radius:14px;
+    }
+    .microcopy strong{font-weight:900}
 
     .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
     .pill{
@@ -151,6 +164,66 @@
     .bottom-cta span{color:#64748b;font-size:14px}
     .bottom-cta .btn{padding:12px 18px}
 
+    /* NEW: Footer (PayFast requirement) */
+    .site-footer{
+      margin-top:22px;
+      background:rgba(255,255,255,.86);
+      border-top:1px solid #e5e7eb;
+      padding:18px 0;
+    }
+    .footer-inner{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .footer-brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:240px;
+    }
+    .footer-title{
+      font-weight:900;
+      letter-spacing:-.02em;
+      font-size:14px;
+      color:#0f172a;
+    }
+    .footer-sub{
+      color:#64748b;
+      font-size:13px;
+      line-height:1.5;
+      max-width:520px;
+    }
+    .footer-links{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:13px;
+      color:#334155;
+    }
+    .footer-links a{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:6px 10px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      border-radius:12px;
+      width:fit-content;
+    }
+    .footer-links a:hover{
+      box-shadow:0 10px 18px rgba(15,23,42,.06);
+      transform:translateY(-1px);
+      transition:transform .08s ease, box-shadow .08s ease;
+    }
+    .footer-bottom{
+      margin-top:12px;
+      color:#94a3b8;
+      font-size:12px;
+    }
+
     /* Responsive */
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
@@ -199,6 +272,13 @@
       <p class="subhead" data-i18n="subhead">
         Manage customers, suppliers, products, sales, purchases, payments and reports —
         in one clean system built for practical business workflows.
+      </p>
+
+      <!-- NEW: polished positioning message -->
+      <p class="microcopy">
+        <strong>The Accountant in Your Pocket.</strong>
+        Unlike simple khata apps that only record debt, Roznamcha is a complete financial system.
+        You record the sale — we build your ledgers and reports automatically.
       </p>
 
       <div class="cta-row">
@@ -284,5 +364,102 @@
   </div>
 </div>
 
+
+<div class="container section">
+  <div class="section-title">Products & Services</div>
+
+  <div class="features">
+
+    <div class="feature">
+      <h4>Sales Management</h4>
+      <p>Create and manage customer sales invoices.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Purchase Management</h4>
+      <p>Track supplier purchases and expenses.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Customer & Supplier Ledgers</h4>
+      <p>Automatic running balances and statements.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Cash & Bank Accounts</h4>
+      <p>Record receipts and payments securely.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Stock & Product Reports</h4>
+      <p>Monitor inventory and product movement.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Financial Reports</h4>
+      <p>Trial balance and summary reports.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Multi-User Access</h4>
+      <p>Owner + staff permission control.</p>
+    </div>
+
+    <div class="feature">
+      <h4>Subscription & Cloud Backup</h4>
+      <p>Secure hosted accounting platform.</p>
+    </div>
+
+  </div>
+</div>
+<!-- Footer with PayFast compliance -->
+<footer class="site-footer">
+  <div class="container">
+
+    <div class="footer-inner">
+
+      <!-- Company Info -->
+      <div class="footer-brand">
+        <div class="footer-title">
+          Roznamcha — Smart Khata & Hisab System
+        </div>
+
+        <div class="footer-sub">
+          Office No. 7, 2nd Floor, Shaheen View,<br>
+          Model Town, Quetta Cantt
+        </div>
+
+        <div class="footer-bottom">
+          © {% now "Y" %} Roznamcha. All rights reserved.
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-links">
+        <a href="mailto:app.roznamcha@gmail.com">
+          ✉️ app.roznamcha@gmail.com
+        </a>
+
+        <a href="https://wa.me/923495952363" target="_blank">
+          💬 WhatsApp: +92 349 5952363
+        </a>
+
+        <a href="tel:+923495952363">
+          📞 +92 349 5952363
+        </a>
+      </div>
+
+      <!-- Policies -->
+      <div class="footer-links">
+        <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        <a href="{% url 'terms_conditions' %}">Terms & Conditions</a>
+        <a href="{% url 'refund_policy' %}">Refund Policy</a>
+        <a href="{% url 'service_policy' %}">Service Policy</a>
+      </div>
+
+    </div>
+
+  </div>
+</footer>
 </body>
 </html>
