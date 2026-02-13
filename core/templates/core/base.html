@@ -300,7 +300,7 @@
       {% if request.user.is_authenticated %}
     
         {# ✅ Never show subscription banners to Super Admin #}
-        {% with prof=request.user.profile|default:None %}
+        {% with prof=user_profile %}
         {% if request.user.is_superuser or prof.role == "SUPERADMIN" %}
           {# ✅ Never show subscription banners to Super Admin #}
         {% else %}

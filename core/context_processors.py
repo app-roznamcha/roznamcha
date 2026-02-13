@@ -1,5 +1,18 @@
-from .models import CompanyProfile, AppBranding
 from django.utils import timezone
+from .models import CompanyProfile, AppBranding, UserProfile
+
+
+def _safe_profile(user):
+    """
+    Safe access for OneToOne reverse relation: user.profile
+    Prevents 500 when profile doesn't exist.
+    """
+    try:
+        return user.profile
+    except UserProfile.DoesNotExist:
+        return None
+    except Exception:
+        return None
 
 
 def company_profile(request):
@@ -15,13 +28,15 @@ def company_profile(request):
     if user and user.is_authenticated:
         owner = getattr(request, "owner", None) or user
 
-        # If user is STAFF and owner isn't resolved, try profile.owner
-        if getattr(owner, "profile", None) and owner.profile.role == "STAFF":
-            owner = owner.profile.owner or owner
+        # If the resolved "owner" is actually STAFF, jump to real OWNER
+        owner_prof = _safe_profile(owner)
+        if owner_prof and owner_prof.role == "STAFF":
+            owner = owner_prof.owner or owner
 
         cp = CompanyProfile.objects.filter(owner=owner).first()
 
     return {"company_profile": cp}
+
 
 def app_branding(request):
     branding = AppBranding.objects.order_by("-id").first()
@@ -33,42 +48,51 @@ def subscription_context(request):
     Global subscription context for templates (banner/UI).
     Uses effective status (trial/active/expired) instead of stored subscription_status.
 
-    Returns:
-      subscription_status_effective: "TRIAL"/"ACTIVE"/"EXPIRED"/None
-      subscription_expires_effective: datetime/None
-      subscription_days_left: int/None
-      subscription_is_trial / _is_active / _is_expired: bool
+    Provides BOTH:
+    - simple names used by base.html banner
+    - *_effective names (optional)
     """
     user = getattr(request, "user", None)
+
+    # Not logged in
     if not user or not user.is_authenticated:
         return {
-            "subscription_status_effective": None,
-            "subscription_expires_effective": None,
+            "user_profile": None,
+            "subscription_status": None,
+            "subscription_expires_at": None,
             "subscription_days_left": None,
             "subscription_is_trial": False,
             "subscription_is_active": False,
             "subscription_is_expired": False,
+            "subscription_status_effective": None,
+            "subscription_expires_effective": None,
         }
 
     # Prefer middleware/decorator resolved owner
     owner = getattr(request, "owner", None) or user
 
-    # If somehow owner is STAFF, resolve its real OWNER
+    # If owner is STAFF, resolve real OWNER
     try:
-        if getattr(owner, "profile", None) and owner.profile.role == "STAFF":
-            owner = owner.profile.owner or owner
+        owner_prof = _safe_profile(owner)
+        if owner_prof and owner_prof.role == "STAFF":
+            owner = owner_prof.owner or owner
     except Exception:
         pass
 
-    profile = getattr(owner, "profile", None)
+    profile = _safe_profile(owner)
+
+    # Profile missing
     if not profile:
         return {
-            "subscription_status_effective": None,
-            "subscription_expires_effective": None,
+            "user_profile": _safe_profile(user),
+            "subscription_status": None,
+            "subscription_expires_at": None,
             "subscription_days_left": None,
             "subscription_is_trial": False,
             "subscription_is_active": False,
             "subscription_is_expired": False,
+            "subscription_status_effective": None,
+            "subscription_expires_effective": None,
         }
 
     # Effective status
@@ -83,7 +107,7 @@ def subscription_context(request):
     except Exception:
         expires_at = getattr(profile, "subscription_expires_at", None)
 
-    # Days left (safe)
+    # Days left
     days_left = None
     try:
         if hasattr(profile, "days_left"):
@@ -93,8 +117,11 @@ def subscription_context(request):
     except Exception:
         days_left = None
 
-        return {
-        # ✅ simple names used by templates (base.html banner)
+    return {
+        # ✅ safe for templates (base.html should use this)
+        "user_profile": _safe_profile(user),
+
+        # ✅ simple names used by templates (banner/UI)
         "subscription_status": status,
         "subscription_expires_at": expires_at,
         "subscription_days_left": days_left,
@@ -102,7 +129,7 @@ def subscription_context(request):
         "subscription_is_active": (status == "ACTIVE"),
         "subscription_is_expired": (status == "EXPIRED"),
 
-        # ✅ keep your “_effective” names too (optional but harmless)
+        # ✅ keep your “effective” names too
         "subscription_status_effective": status,
         "subscription_expires_effective": expires_at,
     }

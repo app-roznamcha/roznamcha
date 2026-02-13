@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 
-from core.models import CompanyProfile
+from core.models import CompanyProfile, UserProfile
 from .models import get_company_owner
 
 
@@ -16,7 +16,16 @@ SAFE_METHODS = ("GET", "HEAD", "OPTIONS")
 
 
 def _profile(user):
-    return getattr(user, "profile", None)
+    """
+    Safe access for OneToOne reverse relation: user.profile
+    Prevents 500 when profile doesn't exist.
+    """
+    try:
+        return user.profile
+    except UserProfile.DoesNotExist:
+        return None
+    except Exception:
+        return None
 
 
 def _resolve_owner(user):
