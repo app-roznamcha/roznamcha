@@ -361,6 +361,51 @@ html[dir="rtl"]{
 html[dir="rtl"] .dashboard-section{
   text-align:right;
 }
+
+/* ===== Header meta (clean company + welcome + date/time) ===== */
+.header-meta{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.header-meta-top{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.header-meta-bottom{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:2px;
+}
+
+.meta-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:#64748b;
+  font-size:13px;
+  font-weight:700;
+}
+
+.meta-pill strong{
+  color:#111827;
+  font-weight:800;
+}
+
+/* On small screens: keep meta pills nice */
+@media (max-width: 560px){
+  .header-meta-bottom{gap:6px}
+  .meta-pill{font-size:12.5px;padding:6px 9px}
+}
 </style>
 {% endblock %}
 
@@ -391,40 +436,63 @@ html[dir="rtl"] .dashboard-section{
                       <span style="font-weight:700;color:#64748b;" data-i18n="dash_suffix">— Dashboard</span>
                   </h1>
 
-                  <p class="dashboard-subtitle">
-                    <span data-i18n="welcome">Welcome</span>,
+                  <div class="header-meta">
+
+                    <div class="dashboard-subtitle header-meta-top">
+                      <span data-i18n="welcome">Welcome</span>,
+                      {% if is_staff %}
+                        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                      {% else %}
+                        <span class="user-menu">
+                          <span class="user-trigger">
+                            <span class="user-trigger-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                            <span class="user-trigger-caret">▾</span>
+                          </span>
                   
-                    {% if is_staff %}
-                      <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
-                    {% else %}
-                      <span class="user-menu">
-                        <span class="user-trigger">
-                          <span class="user-trigger-name">{{ request.user.get_full_name|default:request.user.username }}</span>
-                          <span class="user-trigger-caret">▾</span>
-                        </span>
-                  
-                        <span class="user-dropdown">
+                          <span class="user-dropdown">
                             <a href="{% url 'owner_profile_page' %}"><span data-i18n="user_profile">👤 User Profile</span></a>
                             <a href="{% url 'subscription_page' %}"><span data-i18n="subscription">💳 Subscription</span></a>
-                          
+                  
                             {% if request.user.is_superuser %}
                               <div style="height:1px;background:#e5e7eb;margin:8px 6px;"></div>
                               <a href="{% url 'superadmin_dashboard' %}"><span data-i18n="superadmin_dash">🛡️ Super Admin Dashboard</span></a>
                             {% endif %}
                           </span>
-                      </span>
-                    {% endif %}
+                        </span>
+                      {% endif %}
+                    </div>
                   
-                    — <span data-i18n="today">Today</span>: {{ today }} — {{ now|date:"h:i A" }} (PKT)
-                  </p>
+                    <div class="header-meta-bottom">
+                      <span class="meta-pill">
+                        <span>📅</span>
+                        <span data-i18n="today">Today</span>:
+                        <strong>{{ today }}</strong>
+                      </span>
+                  
+                      <span class="meta-pill">
+                        <span>🕒</span>
+                        <span data-i18n="time">Time</span>:
+                        <strong>{{ now|date:"h:i A" }}</strong> <span>(PKT)</span>
+                      </span>
+                    </div>
+                  
+                  </div>
                 </div>
               </div>
         </div>
         <!-- ✅ ADD THIS EXACT BLOCK HERE -->
-        <div class="lang-toggle" style="margin-top:4px;">
-            <button type="button" id="btnEN" class="active">EN</button>
-            <button type="button" id="btnUR">اردو</button>
-        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:4px;">
+            <div class="lang-toggle">
+                <button type="button" id="btnEN" class="active">EN</button>
+                <button type="button" id="btnUR">اردو</button>
+            </div>
+          
+            {% if not is_staff %}
+              <button type="button" id="metricsToggle" class="btn-pill" style="max-width:none; width:auto; padding:10px 14px;">
+                <span data-i18n="show_summary">👁️ Show Summary</span>
+              </button>
+            {% endif %}
+          </div>
 
         </div>
     </div>
@@ -433,7 +501,7 @@ html[dir="rtl"] .dashboard-section{
 
     {# ---- Top financial metric cards (Owner/Superadmin only) ---- #}
     {% if not is_staff %}
-    <div class="dashboard-cards">
+    <div class="dashboard-cards" id="metricsCards" style="display:none;">
 
         <div class="dash-card">
             <div class="dash-card-label" data-i18n="cash_balance">Cash / Bank Balance</div>
@@ -667,10 +735,14 @@ new_product: "➕ New Product",
 product_list: "📦 Product List",
 
 bank_cash_accounts: "🏦 Bank & Cash Accounts",
-account_ledger: "📒 Account Ledger"
+account_ledger: "📒 Account Ledger",
+time: "Time",
+show_summary: "👁️ Show Summary",
+hide_summary: "🙈 Hide Summary",
 },
 ur: {
-    dash_suffix: "— ڈیش بورڈ",
+
+dash_suffix: "— ڈیش بورڈ",
 welcome: "خوش آمدید",
 today: "آج",
 
@@ -723,7 +795,10 @@ new_product: "➕ نیا پروڈکٹ",
 product_list: "📦 پروڈکٹ لسٹ",
 
 bank_cash_accounts: "🏦 بینک / کیش اکاؤنٹس",
-account_ledger: "📒 اکاؤنٹ لیجر"
+account_ledger: "📒 اکاؤنٹ لیجر",
+time: "وقت",
+show_summary: "👁️ خلاصہ دکھائیں",
+hide_summary: "🙈 خلاصہ چھپائیں",
 }
 };
 
@@ -738,6 +813,7 @@ const key = el.getAttribute("data-i18n");
 if (dict[lang] && dict[lang][key]) {
   el.textContent = dict[lang][key];
 }
+setMetricsVisibility(localStorage.getItem("roz_metrics_visible") === "1");
 });
 
 const enBtn = document.getElementById("btnEN");
@@ -748,14 +824,43 @@ urBtn.classList.toggle("active", lang === "ur");
 }
 }
 
+function setMetricsVisibility(show){
+  const cards = document.getElementById("metricsCards");
+  const btn = document.getElementById("metricsToggle");
+  if (!cards || !btn) return;
+
+  cards.style.display = show ? "" : "none";
+  localStorage.setItem("roz_metrics_visible", show ? "1" : "0");
+
+  const lang = localStorage.getItem("roz_lang") || "en";
+  const key = show ? "hide_summary" : "show_summary";
+  const labelEl = btn.querySelector("[data-i18n]");
+  if (labelEl && dict[lang] && dict[lang][key]) labelEl.textContent = dict[lang][key];
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-const enBtn = document.getElementById("btnEN");
-const urBtn = document.getElementById("btnUR");
+  const enBtn = document.getElementById("btnEN");
+  const urBtn = document.getElementById("btnUR");
 
-if (enBtn) enBtn.addEventListener("click", () => applyLang("en"));
-if (urBtn) urBtn.addEventListener("click", () => applyLang("ur"));
+  if (enBtn) enBtn.addEventListener("click", () => applyLang("en"));
+  if (urBtn) urBtn.addEventListener("click", () => applyLang("ur"));
 
-applyLang(localStorage.getItem("roz_lang") || "en");
+  // Apply language first
+  applyLang(localStorage.getItem("roz_lang") || "en");
+
+  // Default hidden
+  const visible = localStorage.getItem("roz_metrics_visible") === "1";
+  setMetricsVisibility(visible);
+
+  // Toggle button
+  const toggleBtn = document.getElementById("metricsToggle");
+  if (toggleBtn){
+    toggleBtn.addEventListener("click", () => {
+      const cards = document.getElementById("metricsCards");
+      const isHidden = !cards || cards.style.display === "none";
+      setMetricsVisibility(isHidden);
+    });
+  }
 });
 </script>
 
