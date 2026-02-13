@@ -326,6 +326,41 @@
   background: #f3f4f6;
   text-decoration: none;
 }
+/* Language toggle */
+.lang-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 8px;
+  border-radius:999px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  font-weight:800;
+  font-size:13px;
+}
+
+.lang-toggle button{
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-weight:900;
+  padding:4px 8px;
+  border-radius:999px;
+}
+
+.lang-toggle button.active{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+/* RTL support */
+html[dir="rtl"]{
+  direction:rtl;
+}
+
+html[dir="rtl"] .dashboard-section{
+  text-align:right;
+}
 </style>
 {% endblock %}
 
@@ -385,6 +420,13 @@
                 </div>
               </div>
         </div>
+        <!-- ✅ ADD THIS EXACT BLOCK HERE -->
+        <div class="lang-toggle" style="margin-top:4px;">
+            <button type="button" id="btnEN" class="active">EN</button>
+            <button type="button" id="btnUR">اردو</button>
+        </div>
+
+        </div>
     </div>
 
 
@@ -394,42 +436,46 @@
     <div class="dashboard-cards">
 
         <div class="dash-card">
-            <div class="dash-card-label">Cash / Bank Balance</div>
+            <div class="dash-card-label" data-i18n="cash_balance">Cash / Bank Balance</div>
             <div class="dash-card-value">
                 Rs {{ cash_bank_balance|default:0|floatformat:0 }}
             </div>
         </div>
 
         <div class="dash-card">
-            <div class="dash-card-label">This Month Sales</div>
-            <div class="dash-card-value">
-                Rs {{ month_sales|default:0|floatformat:0 }}
-            </div>
+            <div class="dash-card-label" data-i18n="month_sales">This Month Sales</div>
+            <div class="dash-card-value">Rs {{ month_sales|default:0|floatformat:0 }}</div>
         </div>
 
         <div class="dash-card">
-            <div class="dash-card-label">This Month Purchases</div>
+            <div class="dash-card-label" data-i18n="month_purchases">This Month Purchases</div>
             <div class="dash-card-value">
                 Rs {{ month_purchases|default:0|floatformat:0 }}
             </div>
         </div>
 
         <div class="dash-card">
-            <div class="dash-card-label">This Month Profit (Simple)</div>
+            <div class="dash-card-label" data-i18n="month_profit">
+                This Month Profit (Simple)
+              </div>
             <div class="dash-card-value">
                 Rs {{ month_profit_simple|default:0|floatformat:0 }}
             </div>
         </div>
 
         <a href="{% url 'customer_balances' %}" class="dash-card">
-            <div class="dash-card-label">Customer Receivable</div>
+            <div class="dash-card-label" data-i18n="customer_receivable">
+                Customer Receivable
+              </div>
             <div class="dash-card-value">
                 Rs {{ customer_receivable|default:0|floatformat:0 }}
             </div>
         </a>
 
         <a href="{% url 'supplier_balances' %}" class="dash-card">
-            <div class="dash-card-label">Supplier Payable</div>
+            <div class="dash-card-label" data-i18n="supplier_payable">
+                Supplier Payable
+              </div>
             <div class="dash-card-value">
                 Rs {{ supplier_payable|default:0|floatformat:0 }}
             </div>
@@ -437,7 +483,7 @@
 
     </div>
     {% endif %}    
-    <h3 class="dashboard-main-label">Main Menu</h3>
+    <h3 class="dashboard-main-label" data-i18n="main_menu">Main Menu</h3>
     
     <div class="dashboard-grid">
     
@@ -445,35 +491,37 @@
         <section class="dashboard-section section-master">
             <h2>
                 <span class="dashboard-section-title-indicator"></span>
-                📁 Master Data
-            </h2>
-            <p>Create and manage customers, suppliers, products and accounts.</p>
+                <span data-i18n="master_data">📁 Master Data</span>
+              </h2>
+              <p data-i18n="master_desc">Create and manage customers, suppliers, products and accounts.</p>
     
             <div class="button-row">
-                <a href="{% url 'customer_create' %}" class="btn-pill btn-pill-primary">➕ New Customer</a>
+                <a href="{% url 'customer_create' %}" class="btn-pill btn-pill-primary">
+                    <span data-i18n="new_customer">➕ New Customer</span>
+                  </a>
                 {% if not is_staff %}
-                  <a href="{% url 'customer_list' %}" class="btn-pill">👥 Customer List</a>
+                  <a href="{% url 'customer_list' %}" class="btn-pill"><span data-i18n="customer_list">👥 Customer List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'supplier_create' %}" class="btn-pill btn-pill-primary">➕ New Supplier</a>
+                <a href="{% url 'supplier_create' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_supplier">➕ New Supplier</span></a>
                 {% if not is_staff %}
-                  <a href="{% url 'supplier_list' %}" class="btn-pill">🏭 Supplier List</a>
+                  <a href="{% url 'supplier_list' %}" class="btn-pill"><span data-i18n="supplier_list">🏭 Supplier List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'product_create' %}" class="btn-pill btn-pill-primary">➕ New Product</a>
+                <a href="{% url 'product_create' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_product">➕ New Product</span></a>
                 {% if not is_staff %}
-                  <a href="{% url 'product_list' %}" class="btn-pill">📦 Product List</a>
+                  <a href="{% url 'product_list' %}" class="btn-pill"><span data-i18n="product_list">📦 Product List</span></a>
                 {% endif %}
             </div>
     
             {% if not is_staff %}
             <div class="button-row">
-                <a href="{% url 'user_accounts' %}" class="btn-pill">🏦 Bank &amp; Cash Accounts</a>
-                <a href="{% url 'account_ledger' %}" class="btn-pill">📒 Account Ledger</a>
+                <a href="{% url 'user_accounts' %}" class="btn-pill"><span data-i18n="bank_cash_accounts">🏦 Bank &amp; Cash Accounts</span></a>
+                <a href="{% url 'account_ledger' %}" class="btn-pill"><span data-i18n="account_ledger">📒 Account Ledger</span></a>
             </div>
             {% endif %}
         </section>
@@ -482,9 +530,9 @@
         <section class="dashboard-section section-transactions">
             <h2>
                 <span class="dashboard-section-title-indicator"></span>
-                💳 Transactions
+                <span data-i18n="transactions">💳 Transactions</span>
             </h2>
-            <p>Record daily sales, purchases, customer receipts and supplier payments.</p>
+            <p data-i18n="transactions_desc">Record daily sales, purchases, customer receipts and supplier payments.</p>
     
             <div class="button-row">
                 <a href="{% url 'sales_new' %}" class="btn-pill btn-pill-primary">➕ New Sale</a>
@@ -522,7 +570,7 @@
         <section class="dashboard-section section-reports">
             <h2>
                 <span class="dashboard-section-title-indicator"></span>
-                📊 Reports &amp; Utilities
+                <span data-i18n="reports">📊 Reports &amp; Utilities</span>
             </h2>
             <p>View key reports for stock, balances and financial performance.</p>
     
@@ -561,6 +609,83 @@
         {% endif %}
     
     </div>
-    </div>
-    </div>
-    {% endblock %}
+</div>
+</div>
+
+<script>
+const dict = {
+en: {
+main_menu: "Main Menu",
+master_data: "Master Data",
+transactions: "Transactions",
+reports: "Reports & Utilities",
+
+master_desc: "Create and manage customers, suppliers, products and accounts.",
+transactions_desc: "Record daily sales, purchases, customer receipts and supplier payments.",
+reports_desc: "View key reports for stock, balances and financial performance.",
+
+new_customer: "➕ New Customer",
+customer_list: "👥 Customer List",
+new_supplier: "➕ New Supplier",
+supplier_list: "🏭 Supplier List",
+new_product: "➕ New Product",
+product_list: "📦 Product List",
+
+bank_cash_accounts: "🏦 Bank & Cash Accounts",
+account_ledger: "📒 Account Ledger"
+},
+ur: {
+main_menu: "مین مینو",
+master_data: "ماسٹر ڈیٹا",
+transactions: "ٹرانزیکشنز",
+reports: "رپورٹس اور یوٹیلٹیز",
+
+master_desc: "کسٹمر، سپلائر، پروڈکٹ اور اکاؤنٹس کا ریکارڈ بنائیں اور مینج کریں۔",
+transactions_desc: "سیلز، پرچیز، کسٹمر رسید اور سپلائر پیمنٹس درج کریں۔",
+reports_desc: "اسٹاک، بیلنس اور مالی کارکردگی کی رپورٹس دیکھیں۔",
+
+new_customer: "➕ نیا کسٹمر",
+customer_list: "👥 کسٹمر لسٹ",
+new_supplier: "➕ نیا سپلائر",
+supplier_list: "🏭 سپلائر لسٹ",
+new_product: "➕ نیا پروڈکٹ",
+product_list: "📦 پروڈکٹ لسٹ",
+
+bank_cash_accounts: "🏦 بینک / کیش اکاؤنٹس",
+account_ledger: "📒 اکاؤنٹ لیجر"
+}
+};
+
+function applyLang(lang) {
+localStorage.setItem("roz_lang", lang);
+
+document.documentElement.lang = (lang === "ur") ? "ur" : "en";
+document.documentElement.dir = (lang === "ur") ? "rtl" : "ltr";
+
+document.querySelectorAll("[data-i18n]").forEach(el => {
+const key = el.getAttribute("data-i18n");
+if (dict[lang] && dict[lang][key]) {
+  el.textContent = dict[lang][key];
+}
+});
+
+const enBtn = document.getElementById("btnEN");
+const urBtn = document.getElementById("btnUR");
+if (enBtn && urBtn) {
+enBtn.classList.toggle("active", lang === "en");
+urBtn.classList.toggle("active", lang === "ur");
+}
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+const enBtn = document.getElementById("btnEN");
+const urBtn = document.getElementById("btnUR");
+
+if (enBtn) enBtn.addEventListener("click", () => applyLang("en"));
+if (urBtn) urBtn.addEventListener("click", () => applyLang("ur"));
+
+applyLang(localStorage.getItem("roz_lang") || "en");
+});
+</script>
+
+{% endblock %}

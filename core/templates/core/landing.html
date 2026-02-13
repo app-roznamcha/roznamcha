@@ -1,88 +1,410 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="docRoot">
 <head>
   <meta charset="utf-8">
   <title>Roznamcha — Smart Khata & Hisab System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f4f6;color:#111827}
-    a{text-decoration:none}
-    .header{background:#fff;border-bottom:1px solid #e5e7eb}
-    .header-inner{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .logo{height:56px;width:auto;max-width:180px;object-fit:contain;border-radius:12px}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(37,99,235,.12), transparent 60%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(5,150,105,.10), transparent 55%),
+                  #f3f4f6;
+      color:#0f172a;
+    }
+    a{text-decoration:none;color:inherit}
+    img{max-width:100%;height:auto}
+    .container{max-width:1180px;margin:0 auto;padding:0 16px}
+
+    /* Header */
+    .header{
+      position:sticky;top:0;z-index:50;
+      background:rgba(255,255,255,.82);
+      backdrop-filter:saturate(160%) blur(10px);
+      border-bottom:1px solid #e5e7eb;
+    }
+    .header-inner{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px 0;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;min-width:0;
+    }
+    .logo{
+      height:52px;width:auto;max-width:190px;object-fit:contain;
+      border-radius:12px;
+    }
+    .tagline{
+      display:flex;flex-direction:column;gap:2px;min-width:0;
+    }
+    .tagline strong{
+      font-size:14px;font-weight:900;letter-spacing:-.02em;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .tagline span{
+      font-size:12px;color:#64748b;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+
     .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;border:1px solid #e5e7eb;font-weight:700;font-size:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 16px;border-radius:999px;border:1px solid #e5e7eb;
+      font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;
+      background:#fff;
+      transition:transform .08s ease, box-shadow .08s ease, background .08s ease, border-color .08s ease;
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 18px rgba(15,23,42,.08)}
     .btn-primary{background:#2563eb;border-color:#2563eb;color:#fff}
     .btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
-    .btn-secondary{background:#fff;color:#111827}
-    .btn-secondary:hover{background:#f3f4f6}
-    .wrap{max-width:1200px;margin:0 auto;padding:40px 16px}
-    .hero{display:grid;grid-template-columns:1.2fr 0.8fr;gap:22px;align-items:center}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px;box-shadow:0 10px 22px rgba(15,23,42,.06)}
-    h1{margin:0 0 10px;font-size:34px;letter-spacing:-.02em}
-    p{margin:0 0 14px;color:#6b7280;line-height:1.6;font-size:16px}
-    .bullets{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:10px}
-    .bullets li{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-weight:600}
-    @media(max-width:900px){.hero{grid-template-columns:1fr}}
-    @media(max-width:520px){
-      .header-inner{flex-direction:column;align-items:flex-start}
-      .actions{width:100%}
-      .actions .btn{flex:1;min-width:140px}
-      h1{font-size:28px}
-      .wrap{padding:28px 14px}
-      .hero .actions .btn{width:100%}
+    .btn-ghost{background:transparent}
+    .btn-ghost:hover{background:#f8fafc}
+
+    .lang-toggle{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;
+      font-weight:800;font-size:13px;color:#334155;
+    }
+    .lang-toggle button{
+      border:none;background:transparent;cursor:pointer;
+      font-weight:900;font-size:13px;padding:4px 8px;border-radius:999px;color:#334155;
+    }
+    .lang-toggle button.active{background:#eff6ff;color:#1d4ed8}
+
+    /* Hero */
+    .hero-wrap{padding:34px 0 22px}
+    .hero{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    .hero-card{
+      background:rgba(255,255,255,.9);
+      border:1px solid #e5e7eb;border-radius:20px;
+      box-shadow:0 18px 34px rgba(15,23,42,.10);
+      padding:22px;
+    }
+    .headline{
+      margin:0 0 10px;
+      font-size:40px;line-height:1.08;font-weight:950;letter-spacing:-.04em;
+      color:#0f172a;
+    }
+    .subhead{
+      margin:0 0 16px;
+      color:#475569;font-size:16px;line-height:1.65;
+    }
+
+    .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid #e5e7eb;background:#f8fafc;
+      font-weight:800;font-size:13px;color:#334155;
+    }
+
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .cta-row .btn{padding:12px 18px;font-size:15px}
+
+    /* Right column: quick panel */
+    .panel{
+      display:flex;flex-direction:column;gap:14px;
+    }
+    .panel .mini{
+      background:#fff;border:1px solid #e5e7eb;border-radius:18px;
+      padding:16px 16px 14px;
+      box-shadow:0 12px 22px rgba(15,23,42,.08);
+    }
+    .mini h3{margin:0 0 6px;font-size:16px;font-weight:950}
+    .mini p{margin:0;color:#64748b;font-size:14px;line-height:1.55}
+    .mini .btn{width:100%;margin-top:12px;padding:12px 16px}
+
+    /* Feature grid */
+    .section{padding:18px 0 34px}
+    .section-title{
+      margin:0 0 12px;
+      font-size:14px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;
+      color:#64748b;
+    }
+    .features{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .feature{
+      background:#fff;border:1px solid #e5e7eb;border-radius:18px;
+      padding:16px;
+      box-shadow:0 10px 18px rgba(15,23,42,.06);
+    }
+    .feature .icon{
+      width:40px;height:40px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      background:#eff6ff;border:1px solid #bfdbfe;
+      font-size:18px;
+      margin-bottom:10px;
+    }
+    .feature h4{margin:0 0 6px;font-size:15px;font-weight:950}
+    .feature p{margin:0;color:#64748b;font-size:14px;line-height:1.55}
+
+    /* Footer CTA */
+    .bottom-cta{
+      margin-top:14px;
+      background:linear-gradient(90deg, rgba(37,99,235,.12), rgba(5,150,105,.10));
+      border:1px solid #e5e7eb;border-radius:22px;
+      padding:18px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    }
+    .bottom-cta strong{font-size:16px;font-weight:950}
+    .bottom-cta span{color:#64748b;font-size:14px}
+    .bottom-cta .btn{padding:12px 18px}
+
+    /* Urdu RTL support */
+    html[dir="rtl"] body{font-family: system-ui, "Noto Nastaliq Urdu", "Noto Sans Arabic", sans-serif;}
+    html[dir="rtl"] .header-inner,
+    html[dir="rtl"] .bottom-cta{direction:rtl}
+    html[dir="rtl"] .brand{flex-direction:row-reverse}
+    html[dir="rtl"] .actions{justify-content:flex-start}
+    html[dir="rtl"] .pill{direction:rtl}
+    html[dir="rtl"] .feature{text-align:right}
+    html[dir="rtl"] .cta-row{justify-content:flex-start}
+
+    /* Responsive */
+    @media(max-width:980px){
+      .hero{grid-template-columns:1fr}
+      .headline{font-size:34px}
+      .features{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:560px){
+      .headline{font-size:28px}
+      .features{grid-template-columns:1fr}
+      .header-inner{flex-direction:column;align-items:stretch}
+      .actions{justify-content:center}
+      .logo{height:50px}
+      .tagline{text-align:center}
+      .brand{justify-content:center}
     }
   </style>
 </head>
+
 <body>
 
 <header class="header">
-  <div class="header-inner">
-    <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha" class="logo">
+  <div class="container">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha" class="logo">
+        <div class="tagline">
+          <strong data-i18n="brand_title">Roznamcha</strong>
+          <span data-i18n="brand_sub">Smart Khata & Hisab for real businesses</span>
+        </div>
+      </div>
 
-    <div class="actions">
-      <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
-      <a class="btn btn-primary" href="{% url 'signup' %}">Create Account</a>
+      <div class="actions">
+        <div class="lang-toggle" title="Language">
+          <button type="button" id="btnEN" class="active">EN</button>
+          <button type="button" id="btnUR">اردو</button>
+        </div>
+
+        <a class="btn btn-ghost" href="{% url 'login' %}" data-i18n="login">Login</a>
+        <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="create_account">Create Account</a>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="wrap">
+<div class="container hero-wrap">
   <div class="hero">
-    <div>
-      <h1>Smart Khata & Hisab System</h1>
-      <p>
-        Roznamcha helps you manage customers, suppliers, products, sales, purchases, payments, and reports —
-        all in one clean system built for real business workflows.
+
+    <!-- Left: Hero -->
+    <div class="hero-card">
+      <h1 class="headline" data-i18n="headline">
+        Smart Khata & Hisab System — Fast, Clean, Accurate
+      </h1>
+      <p class="subhead" data-i18n="subhead">
+        Manage customers, suppliers, products, sales, purchases, payments and reports —
+        in one clean system built for practical business workflows.
       </p>
 
-      <div class="actions" style="margin-top:16px;">
-        <a class="btn btn-primary" href="{% url 'signup' %}">Create Free Account</a>
-        <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="cta_primary">Create Free Account</a>
+        <a class="btn" href="{% url 'login' %}" data-i18n="cta_secondary">Login</a>
       </div>
 
-      <ul class="bullets">
-        <li>✅ Sales / Purchases with posting</li>
-        <li>✅ Party ledgers + cash/bank accounts</li>
-        <li>✅ Trial + subscription control</li>
-        <li>✅ Owner + up to 3 Staff accounts</li>
-      </ul>
+      <div class="pill-row">
+        <span class="pill" data-i18n="pill_1">✅ Owner + up to 3 Staff users</span>
+        <span class="pill" data-i18n="pill_2">✅ Cash/Bank accounts + ledgers</span>
+        <span class="pill" data-i18n="pill_3">✅ Trial + subscription control</span>
+      </div>
     </div>
 
-    <div class="card">
-      <h3 style="margin:0 0 10px;">Built for clarity</h3>
-      <p style="margin:0;color:#6b7280;">
-        Clean UI. Fast workflows. Strong permissions. Real accounting logic.
-      </p>
-      <div style="margin-top:14px;">
-        <a class="btn btn-primary" style="width:100%" href="{% url 'signup' %}">Start Now</a>
+    <!-- Right: Panel -->
+    <div class="panel">
+      <div class="mini">
+        <h3 data-i18n="mini_title">Built for clarity</h3>
+        <p data-i18n="mini_text">
+          Clean UI. Fast workflows. Strong permissions. Real accounting logic.
+        </p>
+        <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="mini_btn">Start Now</a>
+      </div>
+
+      <div class="mini">
+        <h3 data-i18n="mini2_title">Works on phone + laptop</h3>
+        <p data-i18n="mini2_text">
+          Responsive design — comfortable for daily entry and checking reports.
+        </p>
       </div>
     </div>
 
   </div>
 </div>
+
+<div class="container section">
+  <div class="section-title" data-i18n="features_title">Core features</div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🧾</div>
+      <h4 data-i18n="f1_title">Sales & Purchases</h4>
+      <p data-i18n="f1_text">Post entries properly with clean lists and quick search.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">👤</div>
+      <h4 data-i18n="f2_title">Customer & Supplier Ledgers</h4>
+      <p data-i18n="f2_text">View balances and statements with running totals.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">🏦</div>
+      <h4 data-i18n="f3_title">Cash/Bank Accounts</h4>
+      <p data-i18n="f3_text">Record payments/receipts with proper account tracking.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">📦</div>
+      <h4 data-i18n="f4_title">Stock & Product Reports</h4>
+      <p data-i18n="f4_text">Know what’s in stock and what moved today.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">⚖️</div>
+      <h4 data-i18n="f5_title">Trial Balance</h4>
+      <p data-i18n="f5_text">See debit/credit summary for your ledgers.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">🛡️</div>
+      <h4 data-i18n="f6_title">Simple permissions</h4>
+      <p data-i18n="f6_text">Owner controls everything, staff has limited actions.</p>
+    </div>
+  </div>
+
+  <div class="bottom-cta">
+    <div>
+      <strong data-i18n="bottom_title">Start in 2 minutes</strong><br>
+      <span data-i18n="bottom_text">Create your company and start entering sales/purchases.</span>
+    </div>
+    <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="bottom_btn">Create Account</a>
+  </div>
+</div>
+
+<script>
+  // Simple bilingual labels (EN/UR only) — labels only, as you decided.
+  const dict = {
+    en: {
+      brand_title: "Roznamcha",
+      brand_sub: "Smart Khata & Hisab for real businesses",
+      login: "Login",
+      create_account: "Create Account",
+      headline: "Smart Khata & Hisab System — Fast, Clean, Accurate",
+      subhead: "Manage customers, suppliers, products, sales, purchases, payments and reports — in one clean system built for practical business workflows.",
+      cta_primary: "Create Free Account",
+      cta_secondary: "Login",
+      pill_1: "✅ Owner + up to 3 Staff users",
+      pill_2: "✅ Cash/Bank accounts + ledgers",
+      pill_3: "✅ Trial + subscription control",
+      mini_title: "Built for clarity",
+      mini_text: "Clean UI. Fast workflows. Strong permissions. Real accounting logic.",
+      mini_btn: "Start Now",
+      mini2_title: "Works on phone + laptop",
+      mini2_text: "Responsive design — comfortable for daily entry and checking reports.",
+      features_title: "Core features",
+      f1_title: "Sales & Purchases",
+      f1_text: "Post entries properly with clean lists and quick search.",
+      f2_title: "Customer & Supplier Ledgers",
+      f2_text: "View balances and statements with running totals.",
+      f3_title: "Cash/Bank Accounts",
+      f3_text: "Record payments/receipts with proper account tracking.",
+      f4_title: "Stock & Product Reports",
+      f4_text: "Know what’s in stock and what moved today.",
+      f5_title: "Trial Balance",
+      f5_text: "See debit/credit summary for your ledgers.",
+      f6_title: "Simple permissions",
+      f6_text: "Owner controls everything, staff has limited actions.",
+      bottom_title: "Start in 2 minutes",
+      bottom_text: "Create your company and start entering sales/purchases.",
+      bottom_btn: "Create Account",
+    },
+    ur: {
+      brand_title: "روزنامچہ",
+      brand_sub: "اسمارٹ کھاتہ اور حساب — حقیقی کاروبار کے لیے",
+      login: "لاگ اِن",
+      create_account: "اکاؤنٹ بنائیں",
+      headline: "اسمارٹ کھاتہ اور حساب سسٹم — تیز، صاف، درست",
+      subhead: "کسٹمر، سپلائر، پروڈکٹ، سیل، خرید، ادائیگی اور رپورٹس — سب ایک صاف اور عملی سسٹم میں۔",
+      cta_primary: "مفت اکاؤنٹ بنائیں",
+      cta_secondary: "لاگ اِن",
+      pill_1: "✅ اونر + 3 اسٹاف یوزرز تک",
+      pill_2: "✅ کیش/بینک اکاؤنٹس + لیجر",
+      pill_3: "✅ ٹرائل + سبسکرپشن کنٹرول",
+      mini_title: "صاف اور آسان",
+      mini_text: "کلین UI، تیز ورک فلو، مضبوط اجازتیں، اور حقیقی اکاؤنٹنگ لاجک۔",
+      mini_btn: "شروع کریں",
+      mini2_title: "موبائل اور لیپ ٹاپ پر بہتر",
+      mini2_text: "ریسپانسیو ڈیزائن — روزانہ انٹری اور رپورٹس آسانی سے۔",
+      features_title: "اہم فیچرز",
+      f1_title: "سیلز اور خرید",
+      f1_text: "صحیح پوسٹنگ کے ساتھ صاف لسٹس اور تیز سرچ۔",
+      f2_title: "کسٹمر اور سپلائر لیجر",
+      f2_text: "رننگ بیلنس کے ساتھ بیلنس اور اسٹیٹمنٹ دیکھیں۔",
+      f3_title: "کیش/بینک اکاؤنٹس",
+      f3_text: "ادائیگی/وصولی کے ساتھ درست اکاؤنٹ ٹریکنگ۔",
+      f4_title: "اسٹاک اور پروڈکٹ رپورٹس",
+      f4_text: "کیا اسٹاک میں ہے اور آج کیا موو ہوا — واضح۔",
+      f5_title: "ٹرائل بیلنس",
+      f5_text: "لیجرز کا ڈیبٹ/کریڈٹ خلاصہ دیکھیں۔",
+      f6_title: "سادہ اجازتیں",
+      f6_text: "اونر کے پاس مکمل کنٹرول، اسٹاف محدود ایکشنز۔",
+      bottom_title: "2 منٹ میں شروع کریں",
+      bottom_text: "اپنی کمپنی بنائیں اور سیل/خرید کی انٹری شروع کریں۔",
+      bottom_btn: "اکاؤنٹ بنائیں",
+    }
+  };
+
+  function applyLang(lang) {
+    localStorage.setItem("roz_lang", lang);
+    const isUr = lang === "ur";
+    document.documentElement.lang = isUr ? "ur" : "en";
+    document.documentElement.dir = isUr ? "rtl" : "ltr";
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[lang] && dict[lang][key]) el.textContent = dict[lang][key];
+    });
+
+    document.getElementById("btnEN").classList.toggle("active", lang === "en");
+    document.getElementById("btnUR").classList.toggle("active", lang === "ur");
+  }
+
+  document.getElementById("btnEN").addEventListener("click", () => applyLang("en"));
+  document.getElementById("btnUR").addEventListener("click", () => applyLang("ur"));
+
+  applyLang(localStorage.getItem("roz_lang") || "en");
+</script>
 
 </body>
 </html>
