@@ -400,9 +400,54 @@
     <script>
       let deferredPrompt = null;
     
-      window.addEventListener("beforeinstallprompt", (e) => {
+      function isStandaloneMode() {
+        return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+      }
+    
+      async function isAppInstalled() {
+        // 1) If running as installed app (standalone), it IS installed
+        if (isStandaloneMode()) return true;
+    
+        // 2) Chrome/Edge: detect installed related app (best available check)
+        if (navigator.getInstalledRelatedApps) {
+          try {
+            const related = await navigator.getInstalledRelatedApps();
+            // If you later add an id in manifest, you can check it here.
+            if (related && related.length > 0) return true;
+          } catch (e) {
+            // ignore
+          }
+        }
+    
+        return false;
+      }
+    
+      async function hideInstallIfInstalled() {
+        const btn = document.getElementById("installBtn");
+        if (!btn) return;
+    
+        // Always default hidden
+        btn.style.display = "none";
+    
+        // If installed, keep hidden forever
+        const installed = await isAppInstalled();
+        if (installed) {
+          deferredPrompt = null;
+          btn.style.display = "none";
+        }
+      }
+    
+      // Run early
+      document.addEventListener("DOMContentLoaded", hideInstallIfInstalled);
+    
+      window.addEventListener("beforeinstallprompt", async (e) => {
+        // Only show if NOT installed
+        const installed = await isAppInstalled();
+        if (installed) return;
+    
         e.preventDefault();
         deferredPrompt = e;
+    
         const btn = document.getElementById("installBtn");
         if (btn) btn.style.display = "inline-flex";
       });
@@ -414,13 +459,16 @@
       });
     
       document.addEventListener("click", async (e) => {
-        if (e.target && e.target.id === "installBtn") {
-          if (!deferredPrompt) return;
-          deferredPrompt.prompt();
-          await deferredPrompt.userChoice;
-          deferredPrompt = null;
-          e.target.style.display = "none";
-        }
+        if (!(e.target && e.target.id === "installBtn")) return;
+    
+        if (!deferredPrompt) return;
+    
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+    
+        const btn = document.getElementById("installBtn");
+        if (btn) btn.style.display = "none";
       });
     </script>
 </body>
