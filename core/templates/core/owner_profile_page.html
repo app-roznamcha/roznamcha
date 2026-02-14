@@ -203,7 +203,7 @@
       {% csrf_token %}
       <input type="hidden" name="action" value="create_staff"/>
 
-      <div class="profile-grid-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:820px;">
+      <div class="profile-grid-3" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:820px;">
         <div>
           <label style="font-weight:600;">Username</label><br/>
           <input name="username" required style="width:100%;padding:10px;border-radius:10px;border:1px solid #e5e7eb;">
@@ -211,6 +211,12 @@
         <div>
           <label style="font-weight:600;">Full Name</label><br/>
           <input name="full_name" style="width:100%;padding:10px;border-radius:10px;border:1px solid #e5e7eb;">
+        </div>
+        <div>
+          <label style="font-weight:600;">Email</label><br/>
+          <input name="email" type="email" required
+                 style="width:100%;padding:10px;border-radius:10px;border:1px solid #e5e7eb;"
+                 placeholder="staff@example.com">
         </div>
         <div>
             <label style="font-weight:600;">Password</label><br/>

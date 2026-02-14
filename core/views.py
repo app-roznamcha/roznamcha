@@ -186,7 +186,7 @@ def signup_submit(request):
     username = (request.POST.get("username") or "").strip()
     password = (request.POST.get("password") or "").strip()
     full_name = (request.POST.get("full_name") or "").strip()
-    email = (request.POST.get("email") or "").strip()
+    email = (request.POST.get("email") or "").strip().lower()
 
     company_name = (request.POST.get("company_name") or "").strip()
     slug_input = (request.POST.get("slug") or "").strip().lower()
@@ -208,7 +208,10 @@ def signup_submit(request):
     if User.objects.filter(username=username).exists():
         messages.error(request, "This username is already taken.")
         return redirect("signup")
-
+    if User.objects.filter(email__iexact=email).exists():
+        messages.error(request, "This email is already in use.")
+        return redirect("signup")
+    
     from .models import CompanyProfile, UserProfile  # keep local import
 
     # ---- Slug (auto-generate if blank) ----
@@ -5164,6 +5167,7 @@ def owner_profile_page(request):
             username = (request.POST.get("username") or "").strip()
             full_name = (request.POST.get("full_name") or "").strip()
             password = (request.POST.get("password") or "").strip()
+            email = (request.POST.get("email") or "").strip().lower()
 
             if not username:
                 messages.error(request, "Username is required.")
@@ -5172,13 +5176,28 @@ def owner_profile_page(request):
             if not password:
                 messages.error(request, "Password is required.")
                 return redirect("owner_profile_page")
+            
+            if not email:
+                messages.error(request, "Email is required.")
+                return redirect("owner_profile_page")
+
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                messages.error(request, "Please enter a valid email address.")
+                return redirect("owner_profile_page")
+
+            if User.objects.filter(email__iexact=email).exists():
+                messages.error(request, "This email is already in use.")
+                return redirect("owner_profile_page")
             if User.objects.filter(username=username).exists():
                 messages.error(request, "This username already exists.")
                 return redirect("owner_profile_page")
 
-            user = User.objects.create_user(username=username, password=password)
-            user.is_active = True
-            user.save(update_fields=["is_active"])
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                is_active=True
+            )
 
             if full_name:
                 parts = full_name.split()
