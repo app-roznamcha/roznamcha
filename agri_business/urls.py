@@ -17,8 +17,6 @@ urlpatterns = [
     # Logout (use Django default)
     path("logout/", auth_views.LogoutView.as_view(next_page="landing"), name="logout"),
 
-    # Keep Django auth URLs for password reset, etc.
-    path("", include("django.contrib.auth.urls")),
 ]
 
 if settings.DEBUG:
