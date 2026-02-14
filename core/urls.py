@@ -7,6 +7,7 @@ from .views import party_ledger_api, party_balance_api
 from .views import trial_balance_api, party_ledger_view
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
@@ -145,6 +146,11 @@ urlpatterns = [
     path("terms/", views.terms_conditions, name="terms_conditions"),
     path("refund/", views.refund_policy, name="refund_policy"),
     path("service/", views.service_policy, name="service_policy"),
+
+    path("password-reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
+    path("password-reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
+    path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
 ]
 
 urlpatterns += [
