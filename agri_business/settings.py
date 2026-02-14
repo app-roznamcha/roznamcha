@@ -168,6 +168,13 @@ LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "landing"
 
 # =========================
+# Session timeout (idle logout)
+# =========================
+SESSION_COOKIE_AGE = 30 * 60  # 30 minutes (in seconds)
+SESSION_SAVE_EVERY_REQUEST = True  # refresh expiry on every request (idle-based)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# =========================
 # LOGGING (Show 500 errors in Render logs)
 # =========================
 LOGGING = {
