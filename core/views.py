@@ -194,8 +194,12 @@ def signup_submit(request):
     phone = (request.POST.get("phone") or "").strip()
 
     # ---- Basic validation ----
-    if not username or not password or not company_name:
-        messages.error(request, "Please fill all required fields.")
+    if not username or not password or not company_name or not email:
+        messages.error(request, "Username, email, company name and password are required.")
+        return redirect("signup")
+
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        messages.error(request, "Please enter a valid email address.")
         return redirect("signup")
 
     if len(password) < 6:

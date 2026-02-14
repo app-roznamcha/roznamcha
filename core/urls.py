@@ -153,13 +153,3 @@ urlpatterns = [
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
 ]
 
-urlpatterns += [
-    path(
-        "service-worker.js",
-        TemplateView.as_view(
-            template_name="core/service-worker.js",
-            content_type="application/javascript",
-        ),
-        name="service_worker",
-    ),
-]
