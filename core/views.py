@@ -99,8 +99,7 @@ from django.contrib.auth import update_session_auth_hash
 
 
 class TenantAwareLoginView(auth_views.LoginView):
-    template_name = "core/login.html"
-
+    template_name = "registration/login.html"
     def form_valid(self, form):
         """
         After login:
