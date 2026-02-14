@@ -23,7 +23,24 @@ from .models import (
     StockAdjustment,
 )
 from .models import get_company_owner
+from django.contrib.admin import AdminSite
 
+
+
+class SuperAdminOnlyAdminSite(AdminSite):
+    site_header = "Roznamcha Super Admin"
+    site_title = "Roznamcha Admin"
+    index_title = "Administration"
+
+    def has_permission(self, request):
+        # must be authenticated + staff
+        if not (request.user.is_active and request.user.is_staff):
+            return False
+
+        prof = getattr(request.user, "profile", None)
+
+        # allow Django superuser OR profile SUPERADMIN
+        return bool(request.user.is_superuser or (prof and prof.role == "SUPERADMIN"))
 # -------------------------
 # Role helpers
 # -------------------------
