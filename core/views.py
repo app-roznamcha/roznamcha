@@ -318,6 +318,70 @@ def superadmin_required(view_func):
         return HttpResponseForbidden("Super Admin access required.")
     return _wrapped
 
+def _tenant_backup_folder(owner, company: CompanyProfile) -> Path:
+    base = Path(getattr(settings, "BACKUP_DIR", ""))  # Render: /var/data/backups
+    if not str(base).strip():
+        base = Path(settings.MEDIA_ROOT) / "backups"  # local fallback
+    folder = company.slug or f"owner-{owner.id}"
+    return base / folder
+
+def _list_last_backups(folder: Path, limit: int = 3):
+    if not folder.exists():
+        return []
+    files = sorted(
+        [p for p in folder.iterdir() if p.is_file() and p.name.endswith(".json")],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    out = []
+    for f in files[:limit]:
+        out.append({
+            "name": f.name,
+            "size": f.stat().st_size,
+            "modified": timezone.datetime.fromtimestamp(
+                f.stat().st_mtime, tz=timezone.get_current_timezone()
+            ),
+        })
+    return out
+
+def _keep_last_n(folder: Path, n: int = 3):
+    if not folder.exists():
+        return
+    files = sorted(
+        [p for p in folder.iterdir() if p.is_file() and p.name.endswith(".json")],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    for old in files[n:]:
+        try:
+            old.unlink()
+        except Exception:
+            pass
+
+def _wipe_tenant_data(owner):
+    # delete children first
+    SalesInvoiceItem.objects.filter(owner=owner).delete()
+    PurchaseInvoiceItem.objects.filter(owner=owner).delete()
+    SalesReturnItem.objects.filter(owner=owner).delete()
+    PurchaseReturnItem.objects.filter(owner=owner).delete()
+
+    # documents
+    SalesInvoice.objects.filter(owner=owner).delete()
+    PurchaseInvoice.objects.filter(owner=owner).delete()
+    SalesReturn.objects.filter(owner=owner).delete()
+    PurchaseReturn.objects.filter(owner=owner).delete()
+    Payment.objects.filter(owner=owner).delete()
+    StockAdjustment.objects.filter(owner=owner).delete()
+
+    # ledger + masters
+    JournalEntry.objects.filter(owner=owner).delete()
+    Party.objects.filter(owner=owner).delete()
+    Product.objects.filter(owner=owner).delete()
+    Account.objects.filter(owner=owner).delete()
+
+    # CompanyProfile is NOT deleted here (keep tenant identity)
+
+
 @login_required
 @owner_required
 def dashboard(request):
@@ -3040,21 +3104,11 @@ def backup_dashboard(request):
 
     backups = []
     if company:
-        folder = Path(settings.MEDIA_ROOT) / "backups" / (company.slug or f"owner-{owner.id}")
-        if folder.exists():
-            files = sorted(
-                [p for p in folder.iterdir() if p.is_file() and p.name.endswith(".json")],
-                key=lambda p: p.stat().st_mtime,
-                reverse=True,
-            )
-            # show last 3
-            backups = [{
-                "name": f.name,
-                "size": f.stat().st_size,
-                "modified": timezone.datetime.fromtimestamp(f.stat().st_mtime),
-            } for f in files[:3]]
+        folder = _tenant_backup_folder(owner, company)
+        backups = _list_last_backups(folder, limit=3)
 
     return render(request, "core/backup.html", {"backups": backups})
+
 
 @login_required
 @resolve_tenant_context(require_company=True)
@@ -3102,28 +3156,18 @@ def create_backup(request):
 
     data = serializers.serialize("json", all_objects)
 
-    # ✅ Save to server
-    folder = Path(settings.MEDIA_ROOT) / "backups" / (company.slug or f"owner-{owner.id}")
+    folder = _tenant_backup_folder(owner, company)
     folder.mkdir(parents=True, exist_ok=True)
 
     filename = f"backup_{company.slug or owner.username}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.json"
     out_path = folder / filename
     out_path.write_text(data, encoding="utf-8")
 
-    # ✅ Keep only last 3
-    files = sorted(
-        [p for p in folder.iterdir() if p.is_file() and p.name.endswith(".json")],
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    for old in files[3:]:
-        try:
-            old.unlink()
-        except Exception:
-            pass
+    _keep_last_n(folder, n=3)
 
     messages.success(request, "Backup created and saved (last 3 retained).")
     return redirect("backup_dashboard")
+
 
 @login_required
 @resolve_tenant_context(require_company=True)
@@ -3132,15 +3176,6 @@ def create_backup(request):
 @transaction.atomic
 @subscription_required
 def restore_backup(request):
-    """
-    Restore TENANT-SCOPED data from an uploaded JSON backup created by create_backup().
-
-    SaaS note:
-    We restore only objects for this tenant.
-    We also keep it safe by:
-      - wrapping in a transaction
-      - forcing tenant assignment on objects before saving
-    """
     if request.method != "POST":
         return redirect("backup_dashboard")
 
@@ -3152,6 +3187,10 @@ def restore_backup(request):
     from django.core import serializers
 
     owner = request.owner
+    company = getattr(owner, "company_profile", None)
+    if not company:
+        messages.error(request, "Company not found.")
+        return redirect("backup_dashboard")
 
     raw = uploaded.read().decode("utf-8", errors="ignore")
 
@@ -3162,20 +3201,45 @@ def restore_backup(request):
         return redirect("backup_dashboard")
 
     try:
+        # ✅ Only allow known models in restore file
+        ALLOWED_MODELS = {
+            CompanyProfile,
+            Account, Party, Product,
+            SalesInvoice, SalesInvoiceItem,
+            PurchaseInvoice, PurchaseInvoiceItem,
+            SalesReturn, SalesReturnItem,
+            PurchaseReturn, PurchaseReturnItem,
+            Payment, JournalEntry, StockAdjustment,
+        }
+
+        for obj in objs:
+            instance = obj.object
+            if type(instance) not in ALLOWED_MODELS:
+                raise ValueError(f"Unsupported data in backup: {type(instance).__name__}")
+
+        # ✅ make restore deterministic (no duplicates)
+        _wipe_tenant_data(owner)
+
         for obj in objs:
             instance = obj.object
 
-            # Force tenant ownership
+            # force tenant ownership on owner-scoped models
             if hasattr(instance, "owner_id"):
                 instance.owner = owner
 
-            # CompanyProfile: update instead of duplicate
+            # company profile: update current (never create new)
             if isinstance(instance, CompanyProfile):
                 existing = CompanyProfile.objects.filter(owner=owner).first()
                 if existing:
                     instance.pk = existing.pk
+                instance.owner = owner
 
             obj.save()
+
+    except Exception as e:
+        messages.error(request, f"Restore failed: {e}")
+        return redirect("backup_dashboard")
+
     except Exception as e:
         messages.error(request, f"Restore failed: {e}")
         return redirect("backup_dashboard")
@@ -3195,14 +3259,21 @@ def download_backup(request, filename):
     if not company:
         raise PermissionDenied("Company not found")
 
-    folder = Path(settings.MEDIA_ROOT) / "backups" / (company.slug or f"owner-{owner.id}")
-    file_path = folder / filename
+    folder = _tenant_backup_folder(owner, company)
+    folder.mkdir(parents=True, exist_ok=True)
 
-    # ✅ Safety: file must be inside this tenant folder and exist
-    if not file_path.exists() or not file_path.is_file():
+    # ✅ prevent path traversal
+    safe_folder = folder.resolve()
+    file_path = (folder / filename).resolve()
+
+    if safe_folder not in file_path.parents:
+        raise PermissionDenied("Invalid backup path")
+
+    if not file_path.exists() or not file_path.is_file() or not file_path.name.endswith(".json"):
         raise PermissionDenied("Backup file not found")
 
-    return FileResponse(open(file_path, "rb"), as_attachment=True, filename=filename)
+    fh = open(file_path, "rb")
+    return FileResponse(fh, as_attachment=True, filename=file_path.name)
 # ---------- RETURNS: SALES RETURN ----------
 
 @login_required

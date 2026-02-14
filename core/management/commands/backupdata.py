@@ -17,11 +17,13 @@ from core.models import (
 
 
 def _backup_dir_for_company(company: CompanyProfile) -> Path:
-    base = Path(settings.MEDIA_ROOT) / "backups"
-    # keep folder stable even if slug is blank
+    base = Path(getattr(settings, "BACKUP_DIR", ""))  # should be set in settings.py
+    if not str(base).strip():
+        # local fallback (only if BACKUP_DIR not configured)
+        base = Path(settings.BASE_DIR) / "backups"
+
     folder = company.slug or f"owner-{company.owner_id}"
     return base / folder
-
 
 def _write_tenant_backup(owner, company: CompanyProfile) -> Path:
     models_to_dump = [
