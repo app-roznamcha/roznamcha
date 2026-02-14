@@ -19,6 +19,16 @@ urlpatterns = [
     path("signup/submit/", views.signup_submit, name="signup_submit"),
 
     # =========================
+    # Auth
+    # =========================
+    path(
+        "login/",
+        auth_views.LoginView.as_view(template_name="registration/login.html"),
+        name="login",
+    ),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+
+    # =========================
     # App (authenticated)
     # =========================
     path("dashboard/", views.dashboard, name="dashboard"),
@@ -151,5 +161,6 @@ urlpatterns = [
     path("password-reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
+    
 ]
 
