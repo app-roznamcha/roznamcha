@@ -2,41 +2,206 @@
 
 {% block title %}Tax Pack{% endblock %}
 
-{% block content %}
-<div style="max-width:980px;margin:0 auto;padding:24px 16px 44px;">
-  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 10px 26px rgba(15,23,42,.06);padding:18px;">
-    <h1 style="margin:0 0 6px;font-size:26px;font-weight:900;color:#0f172a;">📦 Tax Pack</h1>
-    <p style="margin:0 0 14px;color:#64748b;font-weight:650;">
-      Download Excel templates/ledgers for tax preparation. (For owner/lawyer use — not FBR API integrated.)
-    </p>
+{% block extra_head %}
+<style>
+  .tp-wrap{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 0 30px;
+  }
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px;">
-      <a href="{% url 'tax_pack_zip_download' %}"
-         style="display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;background:#111827;color:#fff;text-decoration:none;font-weight:900;">
-        ⬇️ Download Full ZIP
-      </a>
-      <a href="{% url 'dashboard' %}"
-         style="display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;color:#111827;text-decoration:none;font-weight:900;">
-        ← Back to Dashboard
-      </a>
+  .tp-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+
+  .tp-title{
+    margin:0;
+    font-size:26px;
+    font-weight:900;
+    color:#0f172a;
+    letter-spacing:-0.02em;
+    line-height:1.1;
+  }
+
+  .tp-sub{
+    margin:6px 0 0;
+    color:#6b7280;
+    font-size:14px;
+    line-height:1.4;
+    max-width:780px;
+  }
+
+  .tp-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+
+  .tp-card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    box-shadow: 0 8px 18px rgba(15,23,42,0.06);
+    padding:16px;
+    margin-top:14px;
+  }
+
+  .tp-card h2{
+    margin:0 0 6px;
+    font-size:18px;
+    font-weight:900;
+    color:#0f172a;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .tp-card p{
+    margin:0 0 14px;
+    color:#6b7280;
+    font-size:14px;
+  }
+
+  .tp-grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:12px;
+  }
+
+  @media (max-width: 700px){
+    .tp-grid{ grid-template-columns: 1fr; }
+  }
+
+  .tp-item{
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:14px;
+    background:#f8fafc;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .tp-item-title{
+    font-weight:900;
+    color:#0f172a;
+    font-size:15px;
+    line-height:1.2;
+  }
+
+  .tp-item-meta{
+    color:#6b7280;
+    font-size:13px;
+    margin-top:-4px;
+  }
+
+  .tp-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:999px;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    color:#111827;
+    font-size:14px;
+    font-weight:800;
+    text-decoration:none;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tp-btn:hover{
+    background:#f3f4f6;
+    text-decoration:none;
+  }
+
+  .tp-btn-primary{
+    background:#2563eb;
+    border-color:#2563eb;
+    color:#fff;
+  }
+  .tp-btn-primary:hover{
+    background:#1d4ed8;
+    border-color:#1d4ed8;
+  }
+
+  .tp-note{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid #fde68a;
+    background:#fffbeb;
+    color:#92400e;
+    font-weight:700;
+    font-size:13.5px;
+    line-height:1.45;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tp-wrap">
+
+  <div class="tp-header">
+    <div>
+      <h1 class="tp-title">🧾 Tax Pack</h1>
+      <p class="tp-sub">
+        Download all tax-related Excel files for this company/owner. You can also download a single ZIP containing everything.
+      </p>
     </div>
 
-    <div style="border-top:1px solid #e5e7eb;margin:16px 0;"></div>
+    <div class="tp-actions">
+      <a class="tp-btn" href="{% url 'dashboard' %}">← Back to Dashboard</a>
 
-    <h3 style="margin:0 0 10px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#64748b;font-weight:900;">Excel Downloads</h3>
-
-    <ul style="margin:0;padding-left:18px;line-height:1.9;font-weight:800;color:#0f172a;">
-      <li><a href="{% url 'tax_sales_ledger' %}">Sales Ledger (Invoices + Returns)</a></li>
-      <li><a href="{% url 'tax_purchase_ledger' %}">Purchase Ledger (Invoices + Returns)</a></li>
-      <li><a href="{% url 'tax_payments_ledger' %}">Payments / Receipts Ledger</a></li>
-      <li><a href="{% url 'tax_products_download' %}">Products List</a></li>
-      <li><a href="{% url 'tax_parties_download' %}">Parties List (Customers/Suppliers)</a></li>
-      <li><a href="{% url 'tax_accounts_download' %}">Accounts List (Cash/Bank/Other)</a></li>
-    </ul>
-
-    <p style="margin:16px 0 0;color:#6b7280;font-size:13px;font-weight:700;">
-      Generated on: {{ today }}
-    </p>
+      {# If your view provides zip_url, show it #}
+      {% if zip_url %}
+        <a class="tp-btn tp-btn-primary" href="{{ zip_url }}">⬇️ Download Full ZIP</a>
+      {% endif %}
+    </div>
   </div>
+
+  <div class="tp-card">
+    <h2>📁 Excel Downloads</h2>
+    <p>Click any file to download instantly.</p>
+
+    <div class="tp-grid">
+      {# Best architecture: view passes a list "downloads" #}
+      {% if downloads %}
+        {% for d in downloads %}
+          <div class="tp-item">
+            <div>
+              <div class="tp-item-title">{{ d.title }}</div>
+              {% if d.subtitle %}
+                <div class="tp-item-meta">{{ d.subtitle }}</div>
+              {% endif %}
+            </div>
+            <div>
+              <a class="tp-btn" href="{{ d.url }}">⬇️ Download Excel</a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="tp-note">
+          ⚠️ No download links were provided by the view.
+          <br>
+          In <b>views.py</b>, pass <code>downloads</code> (list of {title, url}) and optionally <code>zip_url</code>.
+        </div>
+      {% endif %}
+    </div>
+
+    {% if not zip_url %}
+      <div class="tp-note">
+        Tip: Add a <b>Full ZIP</b> link by passing <code>zip_url</code> from the view.
+      </div>
+    {% endif %}
+  </div>
+
 </div>
 {% endblock %}
