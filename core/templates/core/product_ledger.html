@@ -47,12 +47,15 @@
       {% endif %}
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      class="ledger-btn"
-        style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;
+      <a href="{% url 'dashboard' %}"
+         class="ledger-btn"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
         ← Dashboard
       </a>
-      class="ledger-btn"
-style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;
+    
+      <a href="{% url 'product_list' %}"
+         class="ledger-btn"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;white-space:nowrap;">
         📦 Product List
       </a>
     </div>
