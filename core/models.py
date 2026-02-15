@@ -129,14 +129,7 @@ class UserProfile(TimeStampedModel):
     TRIAL_DAYS = 15
     DORMANCY_DAYS_AFTER_EXPIRE = 60  # ~2 months
 
-    # Optional: Owner NTN (for Tax Pack documents)
-    owner_ntn = models.CharField(
-        max_length=25,
-        blank=True,
-        null=True,
-        help_text="Optional NTN for owner (used in Tax Pack documents).",
-    )
-
+    
     def is_trial_active(self):
         if self.role != "OWNER":
             return False
@@ -1916,32 +1909,3 @@ def seed_default_accounts_for_owner(owner: User) -> None:
                 acct.save(update_fields=["name", "account_type", "is_cash_or_bank", "allow_for_payments"])
 
 
-class TaxType(models.Model):
-    APPLY_CHOICES = [
-        ("SALE", "Sale"),
-        ("PURCHASE", "Purchase"),
-        ("BOTH", "Both"),
-    ]
-
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=20, unique=True)  # e.g. GST, FURTHER, WHT
-    default_rate = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        default=Decimal("0.00"),
-        help_text="Percentage value. Example: 18.00 for 18%."
-    )
-    applies_to = models.CharField(
-        max_length=10,
-        choices=APPLY_CHOICES,
-        default="SALE"
-    )
-    is_active = models.BooleanField(default=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        return f"{self.name} ({self.default_rate}%)"

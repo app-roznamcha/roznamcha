@@ -33,13 +33,4 @@ class CompanyUpdateForm(forms.ModelForm):
 class OwnerProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ["owner_ntn"]
-
-    def clean_owner_ntn(self):
-        ntn = (self.cleaned_data.get("owner_ntn") or "").strip()
-        if not ntn:
-            return ""  # optional
-        allowed = set("0123456789-")
-        if any(ch not in allowed for ch in ntn):
-            raise ValidationError("NTN can contain only digits and hyphen (-).")
-        return ntn
+        fields = []  # No editable fields from UserProfile for owner now

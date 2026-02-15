@@ -20,11 +20,6 @@ urlpatterns = [
     path("signup/", views.signup_page, name="signup"),
     path("signup/submit/", views.signup_submit, name="signup_submit"),
 
-    # Tax Types (Super Admin)
-    path("superadmin/tax-types/", views.superadmin_tax_types, name="superadmin_tax_types"),
-    path("superadmin/tax-types/<int:pk>/toggle/", views.superadmin_tax_type_toggle, name="superadmin_tax_type_toggle"),
-    path("superadmin/tax-types/<int:pk>/delete/", views.superadmin_tax_type_delete, name="superadmin_tax_type_delete"),
-
     # =========================
     # Auth
     # =========================
@@ -167,6 +162,17 @@ urlpatterns = [
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     
+    # =========================
+    # Tax Pack (STAFF blocked)
+    # =========================
+    path("tax-pack/", staff_blocked(views.tax_pack_page), name="tax_pack_page"),
+    path("tax-pack/sales-ledger/", staff_blocked(views.tax_sales_ledger_download), name="tax_sales_ledger"),
+    path("tax-pack/purchase-ledger/", staff_blocked(views.tax_purchase_ledger_download), name="tax_purchase_ledger"),
+    path("tax-pack/payments-ledger/", staff_blocked(views.tax_payments_ledger_download), name="tax_payments_ledger"),
+    path("tax-pack/products/", staff_blocked(views.tax_products_download), name="tax_products_download"),
+    path("tax-pack/parties/", staff_blocked(views.tax_parties_download), name="tax_parties_download"),
+    path("tax-pack/accounts/", staff_blocked(views.tax_accounts_download), name="tax_accounts_download"),
+    path("tax-pack/full-zip/", staff_blocked(views.tax_pack_zip_download), name="tax_pack_zip_download"),
 ]
 urlpatterns += [
     path("internal/run-backup/", run_backup_job, name="run_backup_job"),

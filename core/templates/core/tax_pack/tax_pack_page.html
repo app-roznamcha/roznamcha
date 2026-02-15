@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+
+{% block title %}Tax Pack{% endblock %}
+
+{% block content %}
+<div style="max-width:980px;margin:0 auto;padding:24px 16px 44px;">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 10px 26px rgba(15,23,42,.06);padding:18px;">
+    <h1 style="margin:0 0 6px;font-size:26px;font-weight:900;color:#0f172a;">📦 Tax Pack</h1>
+    <p style="margin:0 0 14px;color:#64748b;font-weight:650;">
+      Download Excel templates/ledgers for tax preparation. (For owner/lawyer use — not FBR API integrated.)
+    </p>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px;">
+      <a href="{% url 'tax_pack_zip_download' %}"
+         style="display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;background:#111827;color:#fff;text-decoration:none;font-weight:900;">
+        ⬇️ Download Full ZIP
+      </a>
+      <a href="{% url 'dashboard' %}"
+         style="display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;color:#111827;text-decoration:none;font-weight:900;">
+        ← Back to Dashboard
+      </a>
+    </div>
+
+    <div style="border-top:1px solid #e5e7eb;margin:16px 0;"></div>
+
+    <h3 style="margin:0 0 10px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#64748b;font-weight:900;">Excel Downloads</h3>
+
+    <ul style="margin:0;padding-left:18px;line-height:1.9;font-weight:800;color:#0f172a;">
+      <li><a href="{% url 'tax_sales_ledger' %}">Sales Ledger (Invoices + Returns)</a></li>
+      <li><a href="{% url 'tax_purchase_ledger' %}">Purchase Ledger (Invoices + Returns)</a></li>
+      <li><a href="{% url 'tax_payments_ledger' %}">Payments / Receipts Ledger</a></li>
+      <li><a href="{% url 'tax_products_download' %}">Products List</a></li>
+      <li><a href="{% url 'tax_parties_download' %}">Parties List (Customers/Suppliers)</a></li>
+      <li><a href="{% url 'tax_accounts_download' %}">Accounts List (Cash/Bank/Other)</a></li>
+    </ul>
+
+    <p style="margin:16px 0 0;color:#6b7280;font-size:13px;font-weight:700;">
+      Generated on: {{ today }}
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -97,7 +97,16 @@ from .tenant_utils import (
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from core.forms import OwnerProfileUpdateForm
-from .models import TaxType
+from django.http import HttpResponse
+from .tax_pack import (
+    generate_sales_ledger,
+    generate_purchase_ledger,
+    generate_payments_ledger,
+    generate_products_list,
+    generate_parties_list,
+    generate_accounts_list,
+    build_tax_pack_zip,
+)
 
 class TenantAwareLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
@@ -5714,111 +5723,91 @@ def refund_policy(request):
 def service_policy(request):
     return render(request, "legal/service.html")
 
+@staff_blocked
+def tax_pack_page(request):
+    owner = get_company_owner(request.user)
+    ctx = {
+        "today": timezone.now().date(),
+    }
+    return render(request, "core/tax_pack/tax_pack.html", ctx)
 
-@superadmin_required
-def superadmin_tax_types(request):
-    """
-    Single merged page:
-    - List all TaxType
-    - Add new TaxType
-    - Edit existing TaxType (via ?edit=<id>)
-    """
-    edit_id = request.GET.get("edit")
-    edit_obj = None
-    if edit_id:
-        try:
-            edit_obj = TaxType.objects.filter(pk=int(edit_id)).first()
-        except Exception:
-            edit_obj = None
 
-    if request.method == "POST":
-        # If tax_id exists -> update, else create
-        tax_id = request.POST.get("tax_id")  # hidden field
-        name = (request.POST.get("name") or "").strip()
-        code = (request.POST.get("code") or "").strip().upper()
-        applies_to = (request.POST.get("applies_to") or "SALE").strip().upper()
-        is_active = True if request.POST.get("is_active") == "on" else False
-
-        # default_rate as Decimal
-        raw_rate = (request.POST.get("default_rate") or "0").strip()
-        try:
-            default_rate = Decimal(raw_rate)
-        except Exception:
-            default_rate = Decimal("0.00")
-
-        # Basic validation
-        if not name:
-            messages.error(request, "Tax name is required.")
-            return redirect(reverse("superadmin_tax_types") + (f"?edit={tax_id}" if tax_id else ""))
-        if not code:
-            messages.error(request, "Tax code is required (example: GST).")
-            return redirect(reverse("superadmin_tax_types") + (f"?edit={tax_id}" if tax_id else ""))
-
-        # Create / Update
-        if tax_id:
-            obj = get_object_or_404(TaxType, pk=tax_id)
-            obj.name = name
-            obj.code = code
-            obj.default_rate = default_rate
-            obj.applies_to = applies_to
-            obj.is_active = is_active
-
-            try:
-                obj.full_clean()
-                obj.save()
-                messages.success(request, "Tax type updated successfully.")
-                return redirect("superadmin_tax_types")
-            except Exception as e:
-                messages.error(request, f"Update failed: {e}")
-                return redirect(reverse("superadmin_tax_types") + f"?edit={tax_id}")
-
-        else:
-            obj = TaxType(
-                name=name,
-                code=code,
-                default_rate=default_rate,
-                applies_to=applies_to,
-                is_active=is_active,
-            )
-            try:
-                obj.full_clean()
-                obj.save()
-                messages.success(request, "Tax type created successfully.")
-            except Exception as e:
-                messages.error(request, f"Create failed: {e}")
-
-            return redirect("superadmin_tax_types")
-
-    tax_types = TaxType.objects.all().order_by("name")
-    return render(
-        request,
-        "core/superadmin/tax_types.html",
-        {
-            "tax_types": tax_types,
-            "edit_obj": edit_obj,
-        },
+@staff_blocked
+def tax_sales_ledger_download(request):
+    owner = get_company_owner(request.user)
+    file_bytes = generate_sales_ledger(owner)
+    resp = HttpResponse(
+        file_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+    resp["Content-Disposition"] = "attachment; filename=Sales_Ledger.xlsx"
+    return resp
 
 
-@superadmin_required
-def superadmin_tax_type_toggle(request, pk):
-    obj = get_object_or_404(TaxType, pk=pk)
-    obj.is_active = not obj.is_active
-    obj.save(update_fields=["is_active"])
-    messages.success(request, f"Tax type '{obj.code}' is now {'ACTIVE' if obj.is_active else 'INACTIVE'}.")
-    return redirect("superadmin_tax_types")
+@staff_blocked
+def tax_purchase_ledger_download(request):
+    owner = get_company_owner(request.user)
+    file_bytes = generate_purchase_ledger(owner)
+    resp = HttpResponse(
+        file_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = "attachment; filename=Purchase_Ledger.xlsx"
+    return resp
 
 
-@superadmin_required
-def superadmin_tax_type_delete(request, pk):
-    obj = get_object_or_404(TaxType, pk=pk)
+@staff_blocked
+def tax_payments_ledger_download(request):
+    owner = get_company_owner(request.user)
+    file_bytes = generate_payments_ledger(owner)
+    resp = HttpResponse(
+        file_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = "attachment; filename=Payments_Ledger.xlsx"
+    return resp
 
-    if request.method == "POST":
-        code = obj.code
-        obj.delete()
-        messages.success(request, f"Tax type '{code}' deleted.")
-        return redirect("superadmin_tax_types")
 
-    # Safety: if someone hits URL directly, don’t delete without POST
-    messages.error(request, "Delete must be confirmed.")
-    return redirect("superadmin_tax_types")
+@staff_blocked
+def tax_products_download(request):
+    owner = get_company_owner(request.user)
+    file_bytes = generate_products_list(owner)
+    resp = HttpResponse(
+        file_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = "attachment; filename=Products_List.xlsx"
+    return resp
+
+
+@staff_blocked
+def tax_parties_download(request):
+    owner = get_company_owner(request.user)
+    file_bytes = generate_parties_list(owner)
+    resp = HttpResponse(
+        file_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = "attachment; filename=Parties_List.xlsx"
+    return resp
+
+
+@staff_blocked
+def tax_accounts_download(request):
+    owner = get_company_owner(request.user)
+    file_bytes = generate_accounts_list(owner)
+    resp = HttpResponse(
+        file_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = "attachment; filename=Accounts_List.xlsx"
+    return resp
+
+
+@staff_blocked
+def tax_pack_zip_download(request):
+    owner = get_company_owner(request.user)
+    zip_bytes = build_tax_pack_zip(owner)
+    resp = HttpResponse(zip_bytes, content_type="application/zip")
+    resp["Content-Disposition"] = "attachment; filename=Tax_Pack_Full.zip"
+    return resp
