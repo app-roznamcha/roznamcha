@@ -5729,7 +5729,7 @@ def tax_pack_page(request):
     ctx = {
         "today": timezone.now().date(),
     }
-    return render(request, "core/tax_pack/tax_pack.html", ctx)
+    return render(request, "core/tax_pack/tax_pack_page.html", ctx)
 
 
 @staff_blocked
