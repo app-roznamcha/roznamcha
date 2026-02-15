@@ -48,3 +48,22 @@ def post_party_opening_balance(sender, instance, created, **kwargs):
     if created:
         instance.post_opening_balance()
 
+@receiver(post_save, sender=UserProfile)
+def sync_user_admin_flags(sender, instance: UserProfile, **kwargs):
+    u = instance.user
+
+    if instance.role == "SUPERADMIN":
+        # allow admin site
+        if not u.is_staff:
+            u.is_staff = True
+        # optional: keep superuser only for you (recommended)
+        # if not u.is_superuser:
+        #     u.is_superuser = True
+    else:
+        # block admin site for OWNER + STAFF
+        if u.is_staff:
+            u.is_staff = False
+        if u.is_superuser:
+            u.is_superuser = False
+
+    u.save(update_fields=["is_staff", "is_superuser"])
