@@ -25,6 +25,7 @@
       <div style="padding:12px;border:1px solid #f1f5f9;border-radius:12px;background:#f8fafc;">
         <p style="margin:6px 0;"><strong>Current Name:</strong> {{ owner.get_full_name|default:"-" }}</p>
         <p style="margin:6px 0;"><strong>Email:</strong> {{ owner.email|default:"-" }}</p>
+        <p style="margin:6px 0;"><strong>NTN:</strong> {{ profile.owner_ntn|default:"-" }}</p>
       </div>
     </div>
 
@@ -56,6 +57,14 @@
           {{ owner_form.email }}
           {% if owner_form.email.errors %}
             <div style="color:#b91c1c;font-size:13px;">{{ owner_form.email.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label style="font-weight:600;">Owner NTN (optional)</label><br/>
+          {{ profile_form.owner_ntn }}
+          {% if profile_form.owner_ntn.errors %}
+            <div style="color:#b91c1c;font-size:13px;">{{ profile_form.owner_ntn.errors }}</div>
           {% endif %}
         </div>
       </div>

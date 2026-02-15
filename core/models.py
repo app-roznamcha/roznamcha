@@ -129,6 +129,14 @@ class UserProfile(TimeStampedModel):
     TRIAL_DAYS = 15
     DORMANCY_DAYS_AFTER_EXPIRE = 60  # ~2 months
 
+    # Optional: Owner NTN (for Tax Pack documents)
+    owner_ntn = models.CharField(
+        max_length=25,
+        blank=True,
+        null=True,
+        help_text="Optional NTN for owner (used in Tax Pack documents).",
+    )
+
     def is_trial_active(self):
         if self.role != "OWNER":
             return False
@@ -231,6 +239,7 @@ class UserProfile(TimeStampedModel):
                 raise ValidationError("Only OWNER accounts can have subscription status.")
             if self.trial_started_at or self.subscription_expires_at:
                 raise ValidationError("Only OWNER accounts can have trial/subscription dates.")
+            
     def __str__(self):
         return f"{self.user.username} ({self.role})"
 

@@ -96,6 +96,7 @@ from .tenant_utils import (
 )
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from core.forms import OwnerProfileUpdateForm
 
 
 class TenantAwareLoginView(auth_views.LoginView):
@@ -5219,6 +5220,7 @@ def owner_profile_page(request):
 
     # Forms (prefill)
     owner_form = OwnerUpdateForm(instance=owner)
+    profile_form = OwnerProfileUpdateForm(instance=profile)
     company_form = CompanyUpdateForm(instance=company)
     # Password form (prefill)
     password_form = PasswordChangeForm(user=request.user)
@@ -5285,15 +5287,31 @@ def owner_profile_page(request):
             messages.success(request, f"Staff created: {username}")
             return redirect("owner_profile_page")
 
-        # (2) Update owner info
+        # (2) Update owner info + owner NTN
         if action == "update_owner":
             owner_form = OwnerUpdateForm(request.POST, instance=owner)
-            if owner_form.is_valid():
+            profile_form = OwnerProfileUpdateForm(request.POST, instance=profile)
+
+            if owner_form.is_valid() and profile_form.is_valid():
                 owner_form.save()
+                profile_form.save()
                 messages.success(request, "Owner profile updated successfully.")
+                return redirect("owner_profile_page")
             else:
                 messages.error(request, "Please correct the owner form errors.")
-            return redirect("owner_profile_page")
+                # IMPORTANT: do NOT redirect, render page with errors
+                context = {
+                    "owner": owner,
+                    "profile": profile,
+                    "company": company,
+                    "staff_profiles": staff_profiles,
+                    "owner_form": owner_form,
+                    "profile_form": profile_form,
+                    "company_form": company_form,
+                    "password_form": password_form,
+                    "profile_form": profile_form,
+                }
+                return render(request, "core/owner_profile_page.html", context)
 
         # (3) Update company info
         if action == "update_company":
