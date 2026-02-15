@@ -24,8 +24,12 @@ from .models import (
 )
 from .models import get_company_owner
 from django.contrib.admin import AdminSite
+from .models import TaxType
 
 
+admin.site.site_header = "Roznamcha Super Admin"
+admin.site.site_title = "Roznamcha Admin"
+admin.site.index_title = "Administration"
 
 class SuperAdminOnlyAdminSite(AdminSite):
     site_header = "Roznamcha Super Admin"
@@ -349,3 +353,9 @@ class GroupAdminHiddenFromStaff(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+    
+@admin.register(TaxType)
+class TaxTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "code", "default_rate", "applies_to", "is_active")
+    list_filter = ("applies_to", "is_active")
+    search_fields = ("name", "code")

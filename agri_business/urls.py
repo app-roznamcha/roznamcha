@@ -4,15 +4,12 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
-from core.admin import SuperAdminOnlyAdminSite
 
 
-
-superadmin_site = SuperAdminOnlyAdminSite()
 
 urlpatterns = [
-    path("admin/", superadmin_site.urls),
-
+    path("admin/", admin.site.urls),
+    
     # App routes
     path("", include("core.urls")),
 
