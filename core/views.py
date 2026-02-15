@@ -4461,6 +4461,75 @@ def adjustments_page(request):
                 return redirect("adjustments_page")
 
 
+                # -------------------------------------------------
+        # B) STOCK ADJUSTMENT
+        # -------------------------------------------------
+        if form_type == "stock_adjust":
+            date_str = request.POST.get("date") or ""
+            product_id = request.POST.get("product") or ""
+            direction = (request.POST.get("direction") or "DOWN").upper()  # UP / DOWN
+            qty_str = request.POST.get("qty") or "0"
+            unit_cost_str = request.POST.get("unit_cost") or "0"
+            reason = (request.POST.get("reason") or "").strip()
+
+            try:
+                adj_date = date.fromisoformat(date_str) if date_str else date.today()
+            except Exception:
+                adj_date = date.today()
+
+            try:
+                qty = Decimal(qty_str)
+            except Exception:
+                qty = Decimal("0")
+
+            try:
+                unit_cost = Decimal(unit_cost_str)
+            except Exception:
+                unit_cost = Decimal("0")
+
+            if direction not in ("UP", "DOWN"):
+                direction = "DOWN"
+
+            if not product_id:
+                messages.error(request, "Please select a product.")
+                return redirect("adjustments_page")
+
+            if qty <= 0:
+                messages.error(request, "Quantity must be greater than zero.")
+                return redirect("adjustments_page")
+
+            if unit_cost < 0:
+                messages.error(request, "Unit cost cannot be negative.")
+                return redirect("adjustments_page")
+
+            product = tenant_get_object_or_404(
+                request,
+                Product,
+                pk=product_id,
+                is_active=True,
+            )
+
+            kwargs = {
+                "owner": owner,
+                "date": adj_date,
+                "product": product,
+                "direction": direction,  # UP/DOWN
+                "qty": qty,
+                "unit_cost": unit_cost,
+                "reason": reason,
+                "posted": False,
+            }
+            kwargs = set_tenant_on_create_kwargs(request, kwargs, StockAdjustment)
+
+            sa = StockAdjustment.objects.create(**kwargs)
+
+            # If your model has post(), call it so accounting + stock updates happen
+            if hasattr(sa, "post") and callable(sa.post):
+                sa.post()
+
+            messages.success(request, "Stock adjustment saved & posted successfully.")
+            return redirect("adjustments_page")
+
     # =========================
     # RENDER
     # =========================
