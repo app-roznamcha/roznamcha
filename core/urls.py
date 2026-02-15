@@ -20,6 +20,11 @@ urlpatterns = [
     path("signup/", views.signup_page, name="signup"),
     path("signup/submit/", views.signup_submit, name="signup_submit"),
 
+    # Tax Types (Super Admin)
+    path("superadmin/tax-types/", views.superadmin_tax_types, name="superadmin_tax_types"),
+    path("superadmin/tax-types/<int:pk>/toggle/", views.superadmin_tax_type_toggle, name="superadmin_tax_type_toggle"),
+    path("superadmin/tax-types/<int:pk>/delete/", views.superadmin_tax_type_delete, name="superadmin_tax_type_delete"),
+
     # =========================
     # Auth
     # =========================

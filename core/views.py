@@ -97,7 +97,7 @@ from .tenant_utils import (
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from core.forms import OwnerProfileUpdateForm
-
+from .models import TaxType
 
 class TenantAwareLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
@@ -5713,3 +5713,112 @@ def refund_policy(request):
 
 def service_policy(request):
     return render(request, "legal/service.html")
+
+
+@superadmin_required
+def superadmin_tax_types(request):
+    """
+    Single merged page:
+    - List all TaxType
+    - Add new TaxType
+    - Edit existing TaxType (via ?edit=<id>)
+    """
+    edit_id = request.GET.get("edit")
+    edit_obj = None
+    if edit_id:
+        try:
+            edit_obj = TaxType.objects.filter(pk=int(edit_id)).first()
+        except Exception:
+            edit_obj = None
+
+    if request.method == "POST":
+        # If tax_id exists -> update, else create
+        tax_id = request.POST.get("tax_id")  # hidden field
+        name = (request.POST.get("name") or "").strip()
+        code = (request.POST.get("code") or "").strip().upper()
+        applies_to = (request.POST.get("applies_to") or "SALE").strip().upper()
+        is_active = True if request.POST.get("is_active") == "on" else False
+
+        # default_rate as Decimal
+        raw_rate = (request.POST.get("default_rate") or "0").strip()
+        try:
+            default_rate = Decimal(raw_rate)
+        except Exception:
+            default_rate = Decimal("0.00")
+
+        # Basic validation
+        if not name:
+            messages.error(request, "Tax name is required.")
+            return redirect(reverse("superadmin_tax_types") + (f"?edit={tax_id}" if tax_id else ""))
+        if not code:
+            messages.error(request, "Tax code is required (example: GST).")
+            return redirect(reverse("superadmin_tax_types") + (f"?edit={tax_id}" if tax_id else ""))
+
+        # Create / Update
+        if tax_id:
+            obj = get_object_or_404(TaxType, pk=tax_id)
+            obj.name = name
+            obj.code = code
+            obj.default_rate = default_rate
+            obj.applies_to = applies_to
+            obj.is_active = is_active
+
+            try:
+                obj.full_clean()
+                obj.save()
+                messages.success(request, "Tax type updated successfully.")
+                return redirect("superadmin_tax_types")
+            except Exception as e:
+                messages.error(request, f"Update failed: {e}")
+                return redirect(reverse("superadmin_tax_types") + f"?edit={tax_id}")
+
+        else:
+            obj = TaxType(
+                name=name,
+                code=code,
+                default_rate=default_rate,
+                applies_to=applies_to,
+                is_active=is_active,
+            )
+            try:
+                obj.full_clean()
+                obj.save()
+                messages.success(request, "Tax type created successfully.")
+            except Exception as e:
+                messages.error(request, f"Create failed: {e}")
+
+            return redirect("superadmin_tax_types")
+
+    tax_types = TaxType.objects.all().order_by("name")
+    return render(
+        request,
+        "core/superadmin/tax_types.html",
+        {
+            "tax_types": tax_types,
+            "edit_obj": edit_obj,
+        },
+    )
+
+
+@superadmin_required
+def superadmin_tax_type_toggle(request, pk):
+    obj = get_object_or_404(TaxType, pk=pk)
+    obj.is_active = not obj.is_active
+    obj.save(update_fields=["is_active"])
+    messages.success(request, f"Tax type '{obj.code}' is now {'ACTIVE' if obj.is_active else 'INACTIVE'}.")
+    return redirect("superadmin_tax_types")
+
+
+@superadmin_required
+def superadmin_tax_type_delete(request, pk):
+    obj = get_object_or_404(TaxType, pk=pk)
+
+    if request.method == "POST":
+        code = obj.code
+        obj.delete()
+        messages.success(request, f"Tax type '{code}' deleted.")
+        return redirect("superadmin_tax_types")
+
+    # Safety: if someone hits URL directly, don’t delete without POST
+    messages.error(request, "Delete must be confirmed.")
+    return redirect("superadmin_tax_types")

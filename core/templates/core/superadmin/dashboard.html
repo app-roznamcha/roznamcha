@@ -157,6 +157,10 @@
         <p class="subtitle">Manage owners & companies (suspension, subscription updates, and hard purge eligibility).</p>
       </div>
 
+      <div class="header-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn" href="{% url 'superadmin_tax_types' %}">🧾 Tax Types</a>
+      </div>
+
       <div class="right-note">
         Logged in as: {{ request.user.username }}
       </div>
