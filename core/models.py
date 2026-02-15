@@ -1710,8 +1710,12 @@ class StockAdjustment(OwnerRequiredMixin, TimeStampedModel):
     def post(self):
         """
         Creates JournalEntry:
-          DOWN: Dr Inventory Write-off (Expense 5100), Cr Inventory (1200)
-          UP:   Dr Inventory (1200), Cr Opening Balances (3000)
+        DOWN: Dr Inventory Write-off (Expense 5100), Cr Inventory (1200)
+        UP:   Dr Inventory (1200), Cr Opening Balances (3000)
+
+        ALSO updates Product.current_stock (single source of truth):
+        DOWN -> subtract qty
+        UP   -> add qty
         """
         if self.posted or self.amount <= 0:
             return
@@ -1723,6 +1727,11 @@ class StockAdjustment(OwnerRequiredMixin, TimeStampedModel):
             raise PermissionDenied("Cross-owner product detected in StockAdjustment")
 
         with transaction.atomic():
+            # Lock this row to prevent double-posts in race conditions
+            locked = StockAdjustment.objects.select_for_update().get(pk=self.pk)
+            if locked.posted:
+                return
+
             inventory_acct = get_company_account(
                 owner=self.owner,
                 code="1200",
@@ -1758,11 +1767,16 @@ class StockAdjustment(OwnerRequiredMixin, TimeStampedModel):
                 debit_account = writeoff_acct
                 credit_account = inventory_acct
                 desc = f"Stock adjustment (DOWN) - {self.product}"
+
+                stock_delta = -(self.qty or Decimal("0"))
             else:
                 debit_account = inventory_acct
                 credit_account = opening_acct
                 desc = f"Stock adjustment (UP) - {self.product}"
 
+                stock_delta = (self.qty or Decimal("0"))
+
+            # 🔒 Idempotent JournalEntry create
             if not JournalEntry.objects.filter(
                 owner=self.owner,
                 related_model="StockAdjustment",
@@ -1779,8 +1793,16 @@ class StockAdjustment(OwnerRequiredMixin, TimeStampedModel):
                     related_id=self.id,
                 )
 
+            # ✅ CRITICAL: Update Product.current_stock once
+            if stock_delta != 0:
+                self.product.adjust_stock(stock_delta)
+
+            # Mark posted
+            locked.posted = True
+            locked.save(update_fields=["posted"])
+
+            # Keep in-memory instance consistent
             self.posted = True
-            self.save(update_fields=["posted"])
 
     class Meta:
         constraints = []
