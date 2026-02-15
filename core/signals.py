@@ -47,3 +47,4 @@ def ensure_company_and_accounts_for_owner(sender, instance, created, **kwargs):
 def post_party_opening_balance(sender, instance, created, **kwargs):
     if created:
         instance.post_opening_balance()
+
