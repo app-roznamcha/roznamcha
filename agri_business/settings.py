@@ -207,3 +207,4 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "app.roznamcha@gmail.com")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 
 DEFAULT_FROM_EMAIL = "Roznamcha <app.roznamcha@gmail.com>"
+CRON_TOKEN = os.getenv("CRON_TOKEN", "")

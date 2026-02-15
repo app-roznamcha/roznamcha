@@ -3277,6 +3277,15 @@ def download_backup(request, filename):
     return FileResponse(fh, as_attachment=True, filename=file_path.name)
 # ---------- RETURNS: SALES RETURN ----------
 
+def run_backup_job(request):
+    # Simple secret token check (cron will call this)
+    token = request.headers.get("X-CRON-TOKEN") or request.GET.get("token")
+    if not token or token != getattr(settings, "CRON_TOKEN", ""):
+        return HttpResponseForbidden("Forbidden")
+
+    call_command("backupdata", keep=3)
+    return JsonResponse({"ok": True})
+
 @login_required
 @resolve_tenant_context(require_company=True)
 @owner_required

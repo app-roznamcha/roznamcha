@@ -8,6 +8,8 @@ from .views import trial_balance_api, party_ledger_view
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
+from .views import run_backup_job
+
 
 
 urlpatterns = [
@@ -161,4 +163,6 @@ urlpatterns = [
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     
 ]
-
+urlpatterns += [
+    path("internal/run-backup/", run_backup_job, name="run_backup_job"),
+]
