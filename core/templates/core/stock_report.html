@@ -47,7 +47,14 @@
     /* Chart wrapper */
     .chart-wrap{
       width:100%;
-      overflow:hidden;
+      overflow-x:auto;   /* allow scroll if labels are long */
+      overflow-y:hidden;
+    }
+    .chart-box{
+      min-width:920px;   /* give room for long product names */
+    }
+    @media (max-width: 640px){
+      .chart-box{ min-width:980px; } /* mobile: keep readable */
     }
     .chart-box{
       width:100%;
@@ -266,6 +273,9 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: { left: 180 }   // reserve space for product names
+        },
         scales: {
           x: {
             beginAtZero: true,
@@ -276,7 +286,10 @@
             }
           },
           y: {
-            ticks: { autoSkip: true, maxTicksLimit: 18 }
+            ticks: {
+              autoSkip: false,     // show ALL product names
+              font: { size: 12 }   // slightly smaller so they fit better
+            }
           }
         },
         plugins: {
