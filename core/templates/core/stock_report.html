@@ -273,9 +273,10 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        layout: {
-          padding: { left: 180 }   // reserve space for product names
-        },
+
+        // ✅ Remove the forced empty padding
+        // layout: { padding: { left: 180 } },
+
         scales: {
           x: {
             beginAtZero: true,
@@ -287,11 +288,15 @@
           },
           y: {
             ticks: {
-              autoSkip: false,     // show ALL product names
-              font: { size: 12 }   // slightly smaller so they fit better
+              autoSkip: false,
+              font: { size: 12 },
+
+              // ✅ This is the correct way: reserve space for long labels
+              padding: 6,
             }
           }
         },
+
         plugins: {
           legend: { display: false },
           tooltip: {
