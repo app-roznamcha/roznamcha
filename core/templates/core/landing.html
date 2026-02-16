@@ -38,17 +38,6 @@
       height:52px;width:auto;max-width:190px;object-fit:contain;
       border-radius:12px;
     }
-    .tagline{
-      display:flex;flex-direction:column;gap:2px;min-width:0;
-    }
-    .tagline strong{
-      font-size:14px;font-weight:900;letter-spacing:-.02em;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
-    .tagline span{
-      font-size:12px;color:#64748b;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
 
     .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .btn{
@@ -88,7 +77,6 @@
       color:#475569;font-size:16px;line-height:1.65;
     }
 
-    /* NEW: pocket accountant line */
     .microcopy{
       margin:0 0 16px;
       color:#334155;
@@ -108,6 +96,11 @@
       border:1px solid #e5e7eb;background:#f8fafc;
       font-weight:800;font-size:13px;color:#334155;
     }
+    .pill.soon{
+      background:#fff7ed;
+      border-color:#fed7aa;
+      color:#9a3412;
+    }
 
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
     .cta-row .btn{padding:12px 18px;font-size:15px}
@@ -121,7 +114,7 @@
       padding:16px 16px 14px;
       box-shadow:0 12px 22px rgba(15,23,42,.08);
     }
-    .mini h3{margin:0 0 6px;font-size:16px;font-weight:700}
+    .mini h3{margin:0 0 6px;font-size:16px;font-weight:800}
     .mini p{margin:0;color:#64748b;font-size:14px;line-height:1.55}
     .mini .btn{width:100%;margin-top:12px;padding:12px 16px}
 
@@ -129,7 +122,7 @@
     .section{padding:18px 0 34px}
     .section-title{
       margin:0 0 12px;
-      font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      font-size:14px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
       color:#64748b;
     }
     .features{
@@ -141,6 +134,11 @@
       background:#fff;border:1px solid #e5e7eb;border-radius:18px;
       padding:16px;
       box-shadow:0 10px 18px rgba(15,23,42,.06);
+      transition:transform .10s ease, box-shadow .10s ease;
+    }
+    .feature:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 28px rgba(15,23,42,.10);
     }
     .feature .icon{
       width:40px;height:40px;border-radius:12px;
@@ -149,8 +147,19 @@
       font-size:18px;
       margin-bottom:10px;
     }
-    .feature h4{margin:0 0 6px;font-size:15px;font-weight:700}
+    .feature h4{margin:0 0 6px;font-size:15px;font-weight:800}
     .feature p{margin:0;color:#64748b;font-size:14px;line-height:1.55}
+    .note{
+      margin-top:8px;
+      font-size:12px;
+      color:#9a3412;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      font-weight:800;
+    }
 
     /* Footer CTA */
     .bottom-cta{
@@ -160,11 +169,11 @@
       padding:18px;
       display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
     }
-    .bottom-cta strong{font-size:16px;font-weight:700}
+    .bottom-cta strong{font-size:16px;font-weight:800}
     .bottom-cta span{color:#64748b;font-size:14px}
     .bottom-cta .btn{padding:12px 18px}
 
-    /* NEW: Footer (PayFast requirement) */
+    /* Footer (PayFast requirement) */
     .site-footer{
       margin-top:22px;
       background:rgba(255,255,255,.86);
@@ -236,7 +245,6 @@
       .header-inner{flex-direction:column;align-items:stretch}
       .actions{justify-content:center}
       .logo{height:50px}
-      .tagline{text-align:center}
       .brand{justify-content:center}
     }
   </style>
@@ -252,8 +260,6 @@
       </div>
 
       <div class="actions">
-        <!-- Language toggle removed -->
-
         <a class="btn btn-ghost" href="{% url 'login' %}" data-i18n="login">Login</a>
         <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="create_account">Create Account</a>
       </div>
@@ -274,7 +280,6 @@
         in one clean system built for practical business workflows.
       </p>
 
-      <!-- NEW: polished positioning message -->
       <p class="microcopy">
         <strong>The Accountant in Your Pocket.</strong>
         Unlike simple khata apps that only record debt, Roznamcha is a complete financial system.
@@ -289,7 +294,7 @@
       <div class="pill-row">
         <span class="pill" data-i18n="pill_1">✅ Owner + up to 3 Staff users</span>
         <span class="pill" data-i18n="pill_2">✅ Cash/Bank accounts + ledgers</span>
-        <span class="pill" data-i18n="pill_3">✅ Trial + subscription control</span>
+        <span class="pill soon">🧾 Tax Pack (FBR-ready)</span>
       </div>
     </div>
 
@@ -307,6 +312,15 @@
         <h3 data-i18n="mini2_title">Works on phone + laptop</h3>
         <p data-i18n="mini2_text">
           Responsive design — comfortable for daily entry and checking reports.
+        </p>
+      </div>
+
+      <!-- ✅ NEW: Tax Pack mini card -->
+      <div class="mini">
+        <h3>Tax Pack</h3>
+        <p>
+          Generate tax-friendly exports and downloads (configurable tax settings).
+          Designed for businesses that want clean reporting.
         </p>
       </div>
     </div>
@@ -349,9 +363,29 @@
     </div>
 
     <div class="feature">
+      <div class="icon">🧮</div>
+      <h4>Tax Pack (FBR-ready)</h4>
+      <p>
+        Configurable tax settings + downloadable tax reports (Level 1 & 2 + per-file downloads + full ZIP).
+      </p>
+    </div>
+
+    <div class="feature">
       <div class="icon">🛡️</div>
       <h4 data-i18n="f6_title">Simple permissions</h4>
       <p data-i18n="f6_text">Owner controls everything, staff has limited actions.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">☁️</div>
+      <h4>Secure Cloud Backup</h4>
+      <p>Keep your business data safe with hosted storage and controlled access.</p>
+    </div>
+
+    <div class="feature">
+      <div class="icon">⚡</div>
+      <h4>Fast daily workflow</h4>
+      <p>Designed for real shops — minimal clicks, clear screens, and quick entry.</p>
     </div>
   </div>
 
@@ -400,9 +434,12 @@
       <p>Trial balance and summary reports.</p>
     </div>
 
+    <!-- ✅ NEW: Tax Pack in services -->
     <div class="feature">
-      <h4>Multi-User Access</h4>
-      <p>Owner + staff permission control.</p>
+      <h4>Tax Pack</h4>
+      <p>
+        Configurable tax settings + tax downloads (individual files + full ZIP).
+      </p>
     </div>
 
     <div class="feature">
@@ -412,6 +449,7 @@
 
   </div>
 </div>
+
 <!-- Footer with PayFast compliance -->
 <footer class="site-footer">
   <div class="container">
