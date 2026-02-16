@@ -5826,3 +5826,31 @@ def tax_pack_zip_download(request):
     resp = HttpResponse(zip_bytes, content_type="application/zip")
     resp["Content-Disposition"] = "attachment; filename=Tax_Pack_Full.zip"
     return resp
+
+def sitemap_xml(request):
+    pages = [
+        reverse("landing"),
+        reverse("privacy_policy"),
+        reverse("terms_conditions"),
+        reverse("refund_policy"),
+        reverse("service_policy"),
+        # Add more public pages here later:
+        # reverse("pricing"),
+        # reverse("features"),
+    ]
+
+    base = "https://roznamcha.app"
+    xml_items = []
+    for p in pages:
+        xml_items.append(f"""
+  <url>
+    <loc>{base}{p}</loc>
+  </url>
+""")
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{''.join(xml_items)}
+</urlset>
+"""
+    return HttpResponse(xml, content_type="application/xml")
