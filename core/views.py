@@ -1811,12 +1811,23 @@ def day_summary(request):
     )
 
     payments_in_qs = (
-        Payment.objects.filter(owner=request.owner, date=selected_date, direction="IN")
+        Payment.objects.filter(
+            owner=request.owner,
+            date=selected_date,
+            posted=True,
+            is_adjustment=False,
+            direction="IN",
+        )
         .select_related("party", "account")
     )
-
     payments_out_qs = (
-        Payment.objects.filter(owner=request.owner, date=selected_date, direction="OUT")
+        Payment.objects.filter(
+            owner=request.owner,
+            date=selected_date,
+            posted=True,
+            is_adjustment=False,
+            direction="OUT",
+        )
         .select_related("party", "account")
     )
     # 4) Totals (all in Python, no weird ORM math)
@@ -1896,9 +1907,8 @@ def party_adjustments_net(party, as_of):
     """
     Net adjustments for a party up to a date.
     Convention:
-      - direction="IN"  => +amount  (reduces receivable / increases payable credit)
-      - direction="OUT" => -amount  (increases receivable / reduces payable credit)
-
+      - DR => +amount
+      - CR => -amount
     Returns a Decimal (positive or negative).
     """
     qs = Payment.objects.filter(
@@ -1909,10 +1919,15 @@ def party_adjustments_net(party, as_of):
         date__lte=as_of,
     )
 
-    ins = qs.filter(direction="IN").aggregate(total=Coalesce(Sum("amount"), Decimal("0")))["total"] or Decimal("0")
-    outs = qs.filter(direction="OUT").aggregate(total=Coalesce(Sum("amount"), Decimal("0")))["total"] or Decimal("0")
+    dr = qs.filter(adjustment_side="DR").aggregate(
+        total=Coalesce(Sum("amount"), Decimal("0"))
+    )["total"] or Decimal("0")
 
-    return ins - outs
+    cr = qs.filter(adjustment_side="CR").aggregate(
+        total=Coalesce(Sum("amount"), Decimal("0"))
+    )["total"] or Decimal("0")
+
+    return dr - cr
 
 @login_required
 @resolve_tenant_context(require_company=True)
