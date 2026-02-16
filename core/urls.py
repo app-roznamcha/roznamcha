@@ -11,6 +11,7 @@ from django.contrib.auth import views as auth_views
 from .views import run_backup_job
 from .views_public import robots_txt
 from .views_public import google_verify
+from .views_public import robots_txt, google_verify, sitemap_xml
 
 
 
@@ -182,5 +183,5 @@ urlpatterns += [
     path("internal/run-backup/", run_backup_job, name="run_backup_job"),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("googlea8d36177338cf4b5.html", google_verify),
-
+    path("sitemap.xml", sitemap_xml, name="sitemap_xml"),
 ]
