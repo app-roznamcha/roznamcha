@@ -195,6 +195,7 @@ def signup_submit(request):
 
     username = (request.POST.get("username") or "").strip()
     password = (request.POST.get("password") or "").strip()
+    password2 = (request.POST.get("password2") or "").strip()  # ✅ NEW (confirm password)
     full_name = (request.POST.get("full_name") or "").strip()
     email = (request.POST.get("email") or "").strip().lower()
 
@@ -203,8 +204,13 @@ def signup_submit(request):
     phone = (request.POST.get("phone") or "").strip()
 
     # ---- Basic validation ----
-    if not username or not password or not company_name or not email:
+    if not username or not password or not password2 or not company_name or not email:
         messages.error(request, "Username, email, company name and password are required.")
+        return redirect("signup")
+
+    # ✅ NEW: confirm password check
+    if password != password2:
+        messages.error(request, "Passwords do not match.")
         return redirect("signup")
 
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):

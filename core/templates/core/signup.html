@@ -1,84 +1,333 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Roznamcha — Create Account</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-  @media (max-width:640px){
-    .signup-wrap{
-      margin:16px auto !important;
-      border-radius:12px !important;
-      padding:16px !important;
+  <style>
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(37,99,235,.12), transparent 60%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(5,150,105,.10), transparent 55%),
+                  #f3f4f6;
+      color:#0f172a;
+    }
+    a{ color:#2563eb; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .wrap{
+      max-width:760px;
+      margin:42px auto;
+      padding:0 16px;
+    }
+    .card{
+      background:rgba(255,255,255,.92);
+      border:1px solid #e5e7eb;
+      border-radius:18px;
+      box-shadow:0 18px 34px rgba(15,23,42,.10);
+      padding:20px;
     }
 
-    .signup-logo{
-      height:44px !important;
+    .top{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:12px;
+    }
+    .logo{
+      height:58px;
+      width:auto;
+      object-fit:contain;
+      border-radius:12px;
+    }
+    .titleblock{ min-width:0; }
+    .title{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .subtitle{
+      margin:4px 0 0;
+      color:#64748b;
+      font-size:13px;
+      line-height:1.5;
     }
 
-    .signup-input{
-      padding:12px !important;
-      font-size:16px !important; /* prevents iOS zoom */
+    .msg-wrap{ margin:12px 0 0; }
+    .msg{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#f1f5f9;
+      color:#0f172a;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+    /* If you use Django message tags, we can style those too */
+    .msg-success{ background:#ecfdf5; color:#065f46; border-color:#10b981; }
+    .msg-error{ background:#fef2f2; color:#991b1b; border-color:#ef4444; }
+    .msg-warning{ background:#fffbeb; color:#92400e; border-color:#f59e0b; }
+
+    form{ margin-top:14px; }
+    .section-title{
+      margin:16px 0 10px;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#64748b;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    label{
+      font-size:13px;
+      font-weight:800;
+      color:#111827;
+    }
+    .req{ color:#ef4444; font-weight:900; }
+
+    .input{
+      width:100%;
+      padding:12px 12px;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      background:#fff;
+      outline:none;
+      font-size:16px; /* prevents iOS zoom */
+      transition:border-color .08s ease, box-shadow .08s ease;
+    }
+    .input:focus{
+      border-color:#2563eb;
+      box-shadow:0 0 0 4px rgba(37,99,235,.14);
+    }
+    .help{
+      font-size:12px;
+      color:#64748b;
+      line-height:1.45;
+      margin-top:2px;
     }
 
-    .signup-title{
-      font-size:18px !important;
+    .pw-wrap{
+      position:relative;
     }
-  }
-</style>
+    .pw-btn{
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform:translateY(-50%);
+      border:1px solid #e5e7eb;
+      background:#fff;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:900;
+      color:#334155;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pw-btn:hover{ background:#f8fafc; }
+
+    .error-inline{
+      display:none;
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #ef4444;
+      background:#fef2f2;
+      color:#991b1b;
+      font-weight:800;
+    }
+
+    .btn{
+      width:100%;
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:999px;
+      border:1px solid #2563eb;
+      background:#2563eb;
+      color:#fff;
+      font-weight:900;
+      font-size:15px;
+      cursor:pointer;
+      transition:transform .08s ease, box-shadow .08s ease, background .08s ease, border-color .08s ease;
+    }
+    .btn:hover{
+      background:#1d4ed8;
+      border-color:#1d4ed8;
+      transform:translateY(-1px);
+      box-shadow:0 14px 24px rgba(15,23,42,.12);
+    }
+    .footer{
+      margin-top:12px;
+      text-align:center;
+      color:#475569;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    @media (max-width:720px){
+      .grid{ grid-template-columns:1fr; }
+    }
+    @media (max-width:640px){
+      .wrap{ margin:18px auto; }
+      .card{ padding:16px; border-radius:14px; }
+      .logo{ height:48px; border-radius:10px; }
+      .title{ font-size:16px; }
+    }
+  </style>
 </head>
-<body style="font-family:system-ui;background:#f3f4f6;margin:0;">
 
-  <div class="signup-wrap" style="max-width:720px;margin:40px auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
-  <div style="display:flex;gap:12px;align-items:center;">
-    <img class="signup-logo" src="{% static 'core/branding/roznamcha.png' %}" style="height:56px;">
+<body>
+  <div class="wrap">
+    <div class="card">
+
+      <div class="top">
+        <img class="logo" src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
+        <div class="titleblock">
+          <h1 class="title">Create Owner Account</h1>
+          <p class="subtitle">Set up your company in minutes. You can add staff after login.</p>
+        </div>
+      </div>
+
+      {% if messages %}
+        <div class="msg-wrap">
+          {% for m in messages %}
+            <div class="msg
+              {% if m.tags == 'success' %} msg-success
+              {% elif m.tags == 'error' %} msg-error
+              {% elif m.tags == 'warning' %} msg-warning
+              {% endif %}
+            ">
+              {{ m }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form id="signupForm" method="post" action="{% url 'signup_submit' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="section-title">Owner Account</div>
+
+        <div class="grid">
+          <div class="field">
+            <label>Username <span class="req">*</span></label>
+            <input class="input" name="username" required autocomplete="username" placeholder="e.g., roznamcha_owner">
+            <div class="help">Used for login. Keep it simple and memorable.</div>
+          </div>
+
+          <div class="field">
+            <label>Full Name</label>
+            <input class="input" name="full_name" autocomplete="name" placeholder="e.g., Syed Amir Shah">
+          </div>
+
+          <div class="field">
+            <label>Password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input id="pw1" class="input" name="password" type="password" required autocomplete="new-password" placeholder="Minimum 8 characters">
+              <button class="pw-btn" type="button" data-toggle="pw1">Show</button>
+            </div>
+            <div class="help">Tip: Use at least 8 characters with a mix of letters & numbers.</div>
+          </div>
+
+          <div class="field">
+            <label>Confirm Password <span class="req">*</span></label>
+            <div class="pw-wrap">
+              <input id="pw2" class="input" name="confirm_password" type="password" required autocomplete="new-password" placeholder="Re-type your password">
+              <button class="pw-btn" type="button" data-toggle="pw2">Show</button>
+            </div>
+            <div class="help">Must match the password exactly.</div>
+          </div>
+
+          <div class="field" style="grid-column:1/-1;">
+            <label>Email*</label><br>
+            <input 
+              class="signup-input" 
+              name="email" 
+              type="email" 
+              required 
+              style="width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:10px;"
+            >
+          </div>
+        </div>
+
+        <div class="section-title">Company</div>
+
+        <div class="grid">
+          <div class="field">
+            <label>Company Name <span class="req">*</span></label>
+            <input class="input" name="company_name" required placeholder="e.g., Standard Zarai Traders">
+          </div>
+
+          <div class="field">
+            <label>Phone</label>
+            <input class="input" name="phone" autocomplete="tel" placeholder="e.g., 0349 5952363">
+          </div>
+        </div>
+
+        <div id="pwError" class="error-inline">Passwords do not match. Please re-check.</div>
+
+        <button class="btn" type="submit">Create Account</button>
+
+        <div class="footer">
+          Already have an account? <a href="{% url 'login' %}">Login</a>
+        </div>
+      </form>
+
+    </div>
   </div>
 
-  {% if messages %}
-    <div style="margin-top:12px;">
-      {% for m in messages %}
-        <div style="padding:10px 12px;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:8px;">
-          {{ m }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+  <script>
+    (function () {
+      // Show/Hide toggles
+      document.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-toggle]");
+        if (!btn) return;
 
-  <form method="post" action="{% url 'signup_submit' %}" style="margin-top:14px;">
-    {% csrf_token %}
+        const id = btn.getAttribute("data-toggle");
+        const input = document.getElementById(id);
+        if (!input) return;
 
-    <h3 class="signup-title" style="margin:0 0 8px;">Owner Account</h3>
-    <label>Username*</label><br>
-    <input class="signup-input" name="username" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
+        const isPw = input.getAttribute("type") === "password";
+        input.setAttribute("type", isPw ? "text" : "password");
+        btn.textContent = isPw ? "Hide" : "Show";
+      });
 
-    <label>Password*</label><br>
-    <input class="signup-input" name="password" type="password" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
+      // Password match validation (frontend)
+      const form = document.getElementById("signupForm");
+      const pw1 = document.getElementById("pw1");
+      const pw2 = document.getElementById("pw2");
+      const err = document.getElementById("pwError");
 
-    <label>Full Name</label><br>
-    <input class="signup-input" name="full_name" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
+      if (form && pw1 && pw2 && err) {
+        form.addEventListener("submit", function (e) {
+          const a = (pw1.value || "").trim();
+          const b = (pw2.value || "").trim();
 
-    <label>Email</label><br>
-    <input class="signup-input" name="email" type="email" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
+          if (!a || !b || a !== b) {
+            e.preventDefault();
+            err.style.display = "block";
+            pw2.focus();
+            return false;
+          }
+          err.style.display = "none";
+        });
 
-    <h3 class="signup-title" style="margin:10px 0 8px;">Company</h3>
-    <label>Company Name*</label><br>
-    <input class="signup-input" name="company_name" required style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
-
-    
-    <label>Phone</label><br>
-    <input class="signup-input" name="phone" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;">
-
-    <button type="submit" style="width:100%;padding:12px;border-radius:12px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;">
-      Create Account
-    </button>
-
-    <div style="margin-top:10px;text-align:center;">
-      Already have an account? <a href="{% url 'login' %}">Login</a>
-    </div>
-  </form>
-</div>
-
+        // Hide error as user types
+        pw2.addEventListener("input", function () {
+          err.style.display = "none";
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
