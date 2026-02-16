@@ -94,9 +94,12 @@
           <label style="display:block;font-size:15px;margin-bottom:6px;">Side</label>
           <select name="side"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="DR" selected>DR (Increase Receivable / Reduce Payable)</option>
-            <option value="CR">CR (Reduce Receivable / Increase Payable)</option>
+            <option value="DR" selected>DR — Add balance (customer owes more / you owe supplier less)</option>
+            <option value="CR">CR — Reduce balance (customer owes less / you owe supplier more)</option>
           </select>
+          <div style="margin-top:6px;font-size:13px;color:#6b7280;">
+            Easy rule: <strong>DR adds</strong> to the party balance, <strong>CR reduces</strong> it.
+          </div>
         </div>
 
         <div style="grid-column:1/-1;">
