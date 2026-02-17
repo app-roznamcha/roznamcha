@@ -166,19 +166,17 @@ def _enforce_subscription(request, owner_user):
     raise PermissionDenied("Subscription inactive")
 
 def owner_required(view_func):
-    """
-    Sets request.owner and request.tenant.
-    Enforces subscription for ALL methods (read + write).
-    """
     @login_required
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
-        owner, _ = _ensure_owner_and_tenant(request, require_company=False)
+        owner, tenant = _ensure_owner_and_tenant(request, require_company=False)
+
+        request.owner = owner
+        request.tenant = tenant
+
         _enforce_subscription(request, owner)
         return view_func(request, *args, **kwargs)
-
     return _wrapped
-
 
 def resolve_tenant_context(require_company: bool = False):
     """

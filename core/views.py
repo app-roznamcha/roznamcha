@@ -107,6 +107,9 @@ from .tax_pack import (
     generate_accounts_list,
     build_tax_pack_zip,
 )
+from django.db.models.functions import Cast
+from django.db.models import IntegerField
+
 
 class TenantAwareLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
@@ -1316,9 +1319,14 @@ def sales_new(request):
 
     today_str = timezone.now().date().isoformat()
 
-    next_invoice_number = (
-        SalesInvoice.objects.filter(owner=request.owner).aggregate(max_id=Max("id"))["max_id"] or 0
-    ) + 1
+    # Get max numeric invoice_number for this owner (ignore non-numeric)
+    qs = SalesInvoice.objects.filter(owner=request.owner).exclude(invoice_number__isnull=True).exclude(invoice_number="")
+
+    max_num = qs.annotate(
+        inv_num_int=Cast("invoice_number", IntegerField())
+    ).aggregate(m=Max("inv_num_int"))["m"] or 0
+
+    next_invoice_number = max_num + 1
 
     error = None
 
