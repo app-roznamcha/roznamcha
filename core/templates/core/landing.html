@@ -3,76 +3,84 @@
 <html lang="en" id="docRoot">
 <head>
   <meta charset="utf-8">
-  <title>Roznamcha — Smart Khata & Hisab System</title>
+  <title>Roznamcha — Sahi Hisaab. Saaf Karobaar.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- SEO -->
-  <meta name="description" content="Roznamcha.app is a smart khata & hisab system for Pakistani businesses. Manage sales, purchases, customers, suppliers, stock, payments, reports, and tax pack exports in one clean cloud system.">
-  <meta name="keywords" content="khata app Pakistan, hisab system, accounting software Pakistan, business ledger app, stock management Pakistan, tax pack export Pakistan">
+  <meta name="description" content="Roznamcha is a complete accounting system for Pakistani wholesalers: sales, purchases, stock, ledgers, double-entry reports, backups, and Tax Pack exports designed for Pakistan compliance workflows.">
+  <meta name="keywords" content="khata app Pakistan, accounting software Pakistan, double entry accounting, wholesaler accounting, stock management, ledger app, tax exports Pakistan">
   <link rel="canonical" href="https://roznamcha.app/">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Roznamcha — Smart Khata & Hisab System">
-  <meta property="og:description" content="Complete business accounting system with sales, purchases, stock, ledgers and tax pack exports.">
+  <meta property="og:title" content="Roznamcha — Sahi Hisaab. Saaf Karobaar.">
+  <meta property="og:description" content="Built for Pakistani wholesalers: proper accounting, owner/staff controls, and Tax Pack exports for compliance workflows.">
   <meta property="og:url" content="https://roznamcha.app/">
   <meta property="og:type" content="website">
 
   <!-- Schema -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Roznamcha",
-    "url": "https://roznamcha.app",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web",
-    "description": "Smart khata and hisab system for businesses in Pakistan. Includes ledgers, stock, reports, and Tax Pack exports.",
-    "areaServed": "PK"
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"Roznamcha",
+    "url":"https://roznamcha.app",
+    "applicationCategory":"BusinessApplication",
+    "operatingSystem":"Web",
+    "description":"Complete accounting system for Pakistani wholesalers with sales/purchases, stock, ledgers, reports and Tax Pack exports.",
+    "areaServed":"PK"
   }
   </script>
 
   <style>
     *{box-sizing:border-box}
-    html,body{height:100%}
+    html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      color:#0f172a;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
       background:
-        radial-gradient(900px 520px at 15% -10%, rgba(37,99,235,.16), transparent 60%),
-        radial-gradient(900px 520px at 90% 0%, rgba(5,150,105,.14), transparent 55%),
-        #f1f5f9;
+        radial-gradient(1200px 600px at 20% -10%, rgba(37,99,235,.12), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(5,150,105,.10), transparent 55%),
+        #f3f4f6;
+      color:#0f172a;
     }
     a{text-decoration:none;color:inherit}
     img{max-width:100%;height:auto}
-    .container{max-width:1160px;margin:0 auto;padding:0 16px}
+    .container{max-width:1180px;margin:0 auto;padding:0 16px}
 
     /* Header */
     .header{
-      position:sticky;top:0;z-index:60;
-      background:rgba(255,255,255,.82);
+      position:sticky;top:0;z-index:50;
+      background:rgba(255,255,255,.86);
       backdrop-filter:saturate(160%) blur(10px);
       border-bottom:1px solid #e5e7eb;
     }
     .header-inner{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:12px 0;
+      padding:10px 0;
     }
     .brand{display:flex;align-items:center;gap:12px;min-width:0}
     .logo{
-      height:48px;width:auto;max-width:190px;object-fit:contain;
+      height:46px;width:auto;max-width:190px;object-fit:contain;
       border-radius:12px;
     }
 
-    .nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .nav{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+      justify-content:center;
+    }
     .chip{
-      display:inline-flex;align-items:center;gap:8px;
+      display:inline-flex;align-items:center;justify-content:center;
       padding:8px 12px;border-radius:999px;
       border:1px solid #e5e7eb;background:#fff;
       font-weight:800;font-size:13px;color:#334155;
-      transition:transform .08s ease, box-shadow .08s ease;
+      transition:transform .08s ease, box-shadow .08s ease, background .08s ease;
+      white-space:nowrap;
     }
-    .chip:hover{transform:translateY(-1px);box-shadow:0 10px 18px rgba(15,23,42,.06)}
+    .chip:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.08);
+      background:#f8fafc;
+    }
 
     .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .btn{
@@ -82,132 +90,125 @@
       background:#fff;
       transition:transform .08s ease, box-shadow .08s ease, background .08s ease, border-color .08s ease;
     }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 22px rgba(15,23,42,.08)}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 18px rgba(15,23,42,.08)}
     .btn-primary{background:#2563eb;border-color:#2563eb;color:#fff}
     .btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
-    .btn-ghost{background:transparent}
-    .btn-ghost:hover{background:#f8fafc}
     .btn-dark{background:#0f172a;border-color:#0f172a;color:#fff}
     .btn-dark:hover{background:#111827;border-color:#111827}
+    .btn-ghost{background:transparent}
+    .btn-ghost:hover{background:#f8fafc}
+    .btn-wa{
+      background:#10b981;border-color:#10b981;color:#fff;
+      font-weight:950;
+    }
+    .btn-wa:hover{background:#059669;border-color:#059669}
+
+    /* Language toggle */
+    .lang-toggle{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 7px;border-radius:999px;
+      border:1px solid #e5e7eb;background:#fff;
+      font-weight:900;font-size:13px;
+    }
+    .lang-toggle button{
+      border:none;background:transparent;cursor:pointer;
+      font-weight:950;padding:5px 10px;border-radius:999px;
+    }
+    .lang-toggle button.active{background:#eff6ff;color:#1d4ed8}
+    html[dir="rtl"]{direction:rtl}
+    html[dir="rtl"] .hero, html[dir="rtl"] .grid3, html[dir="rtl"] .grid2, html[dir="rtl"] .compare, html[dir="rtl"] .pricing{
+      direction:rtl;
+    }
+    html[dir="rtl"] .hero, html[dir="rtl"] .section, html[dir="rtl"] .footer-inner{ text-align:right; }
 
     /* Hero */
-    .hero-wrap{padding:30px 0 18px}
+    .hero-wrap{padding:26px 0 18px}
     .hero{
       display:grid;
-      grid-template-columns: 1.12fr .88fr;
+      grid-template-columns: 1.08fr .92fr;
       gap:16px;
       align-items:stretch;
     }
     .card{
       background:rgba(255,255,255,.92);
-      border:1px solid #e5e7eb;
-      border-radius:20px;
+      border:1px solid #e5e7eb;border-radius:22px;
       box-shadow:0 18px 34px rgba(15,23,42,.10);
       padding:22px;
     }
     .eyebrow{
-      display:inline-flex;align-items:center;gap:8px;
-      font-weight:900;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
-      color:#64748b;
-      background:#f8fafc;
-      border:1px solid #e5e7eb;
-      padding:8px 10px;border-radius:999px;
+      display:inline-flex;gap:8px;align-items:center;
+      padding:7px 10px;border-radius:999px;
+      border:1px solid #e5e7eb;background:#f8fafc;
+      font-weight:950;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+      color:#334155;
     }
     .headline{
       margin:12px 0 10px;
-      font-size:42px;line-height:1.06;font-weight:900;letter-spacing:-.05em;
+      font-size:40px;line-height:1.08;font-weight:950;letter-spacing:-.04em;
       color:#0f172a;
     }
     .subhead{
-      margin:0 0 10px;
+      margin:0 0 12px;
       color:#475569;font-size:16px;line-height:1.7;
     }
+    .subhead strong{font-weight:950;color:#0f172a}
 
-    .trust-row{
-      display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px;
+    .micro-proof{
+      display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 0;
     }
-    .trust{
+    .proof{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 10px;border-radius:999px;
       border:1px solid #e5e7eb;background:#fff;
       font-weight:900;font-size:13px;color:#334155;
     }
-    .trust.soft{
-      background:#ecfdf5;border-color:#a7f3d0;color:#065f46;
-    }
-    .trust.orange{
-      background:#fff7ed;border-color:#fed7aa;color:#9a3412;
-    }
+    .proof.green{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+    .proof.blue{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .proof.orange{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
 
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
     .cta-row .btn{padding:12px 18px;font-size:15px}
 
     .fineprint{
-      margin:10px 0 0;
-      color:#64748b;
-      font-size:13px;
-      line-height:1.5;
+      margin:12px 0 0;color:#64748b;font-size:13.5px;line-height:1.6;
     }
 
-    /* Right column */
+    /* Panel */
     .panel{display:flex;flex-direction:column;gap:14px}
     .mini{
-      background:#fff;border:1px solid #e5e7eb;border-radius:18px;
-      padding:16px;
+      background:#fff;border:1px solid #e5e7eb;border-radius:20px;
+      padding:16px 16px 14px;
       box-shadow:0 12px 22px rgba(15,23,42,.08);
     }
-    .mini h3{margin:0 0 6px;font-size:16px;font-weight:900}
-    .mini p{margin:0;color:#64748b;font-size:14px;line-height:1.6}
-
-    .mini .btn{width:100%;margin-top:12px;padding:12px 16px}
-    .list{
-      margin:10px 0 0;
-      padding:0;
-      list-style:none;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .list li{
-      display:flex;gap:10px;align-items:flex-start;
-      color:#334155;
-      font-size:14px;
-      line-height:1.55;
-      padding:10px 10px;
-      background:#f8fafc;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;margin-top:5px;
-      background:#2563eb;flex:0 0 auto;
-    }
-    .dot.green{background:#059669}
+    .mini h3{margin:0 0 6px;font-size:16px;font-weight:950}
+    .mini p{margin:0;color:#64748b;font-size:14px;line-height:1.65}
+    .list{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+    .li{display:flex;gap:10px;align-items:flex-start}
+    .dot{width:10px;height:10px;border-radius:999px;background:#2563eb;margin-top:6px;flex:0 0 auto}
+    .dot.green{background:#10b981}
     .dot.orange{background:#f97316}
+    .mini .btn{width:100%;margin-top:12px;padding:12px 16px}
 
     /* Sections */
     .section{padding:18px 0 34px}
     .section-title{
-      margin:0 0 12px;
-      font-size:13px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
+      margin:0 0 10px;
+      font-size:14px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;
       color:#64748b;
     }
 
-    .features{
+    .grid3{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap:14px;
     }
     .feature{
-      background:#fff;border:1px solid #e5e7eb;border-radius:18px;
+      background:#fff;border:1px solid #e5e7eb;border-radius:20px;
       padding:16px;
       box-shadow:0 10px 18px rgba(15,23,42,.06);
       transition:transform .10s ease, box-shadow .10s ease;
     }
-    .feature:hover{
-      transform:translateY(-2px);
-      box-shadow:0 18px 28px rgba(15,23,42,.10);
-    }
+    .feature:hover{transform:translateY(-2px);box-shadow:0 18px 28px rgba(15,23,42,.10)}
     .icon{
       width:42px;height:42px;border-radius:14px;
       display:flex;align-items:center;justify-content:center;
@@ -215,112 +216,192 @@
       font-size:18px;
       margin-bottom:10px;
     }
-    .feature h4{margin:0 0 6px;font-size:15px;font-weight:900}
+    .feature h4{margin:0 0 6px;font-size:15px;font-weight:950}
     .feature p{margin:0;color:#64748b;font-size:14px;line-height:1.6}
+    .pill-note{
+      margin-top:10px;
+      font-size:12px;
+      color:#9a3412;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      font-weight:950;
+    }
 
-    /* Comparison */
-    .compare{
+    /* Fear/Ambition blocks */
+    .grid2{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:1fr 1fr;
       gap:14px;
       margin-top:14px;
     }
-    .compare .box{
-      background:#fff;border:1px solid #e5e7eb;border-radius:18px;
+    .block{
+      background:#fff;border:1px solid #e5e7eb;border-radius:22px;
       padding:16px;
       box-shadow:0 10px 18px rgba(15,23,42,.06);
     }
-    .box h4{margin:0 0 8px;font-size:15px;font-weight:900}
-    .box ul{margin:0;padding-left:18px;color:#475569;line-height:1.6}
-    .box li{margin:6px 0}
+    .block h4{margin:0 0 6px;font-size:15px;font-weight:950}
+    .block p{margin:0;color:#64748b;font-size:14px;line-height:1.65}
+    .kicker{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid #e5e7eb;background:#f8fafc;
+      font-weight:950;font-size:12px;color:#334155;
+      margin-bottom:10px;
+    }
+
+    /* Compare */
+    .compare{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .box{
+      background:#fff;border:1px solid #e5e7eb;border-radius:22px;
+      padding:16px;
+      box-shadow:0 10px 18px rgba(15,23,42,.06);
+    }
+    .box h4{margin:0 0 8px;font-size:15px;font-weight:950}
+    .box ul{margin:0;padding-left:18px;color:#64748b;line-height:1.8}
+    html[dir="rtl"] .box ul{padding-left:0;padding-right:18px}
+
+    /* Steps */
+    .step{
+      background:linear-gradient(90deg, rgba(37,99,235,.10), rgba(5,150,105,.08));
+      border:1px solid #e5e7eb;border-radius:22px;
+      padding:16px;
+    }
+    .step strong{font-weight:950}
+    .step p{margin:8px 0 0;color:#475569;line-height:1.6}
+
+    /* Pricing */
+    .pricing{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+    .price-card{
+      background:#fff;border:1px solid #e5e7eb;border-radius:22px;
+      padding:18px;
+      box-shadow:0 12px 22px rgba(15,23,42,.08);
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius:999px;
+      border:1px solid #e5e7eb;background:#f8fafc;
+      font-weight:950;font-size:12px;color:#334155;
+    }
+    .price{
+      margin:10px 0 6px;
+      font-size:34px;font-weight:950;letter-spacing:-.03em;
+      color:#0f172a;
+    }
+    .price small{font-size:14px;color:#64748b;font-weight:900}
+    .muted{color:#64748b;line-height:1.6;font-size:14px}
+    .price-list{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+    .price-list li{display:flex;gap:10px;align-items:flex-start;color:#334155;line-height:1.5}
+    .tick{width:18px;flex:0 0 auto}
+
+    .founder{
+      margin-top:12px;
+      font-size:13px;
+      color:#334155;
+      line-height:1.6;
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:800;
+    }
+
+    .legal{
+      margin-top:12px;
+      font-size:12.5px;
+      color:#6b7280;
+      line-height:1.55;
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      padding:10px 12px;
+      border-radius:14px;
+    }
 
     /* CTA strip */
     .bottom-cta{
-      margin-top:16px;
-      background:linear-gradient(90deg, rgba(37,99,235,.14), rgba(5,150,105,.12));
+      margin-top:14px;
+      background:linear-gradient(90deg, rgba(37,99,235,.12), rgba(5,150,105,.10));
       border:1px solid #e5e7eb;border-radius:22px;
       padding:18px;
       display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
     }
-    .bottom-cta strong{font-size:16px;font-weight:900}
+    .bottom-cta strong{font-size:16px;font-weight:950}
     .bottom-cta span{color:#64748b;font-size:14px}
     .bottom-cta .btn{padding:12px 18px}
 
     /* Footer */
     .site-footer{
       margin-top:22px;
-      background:rgba(255,255,255,.86);
+      background:rgba(255,255,255,.88);
       border-top:1px solid #e5e7eb;
       padding:18px 0;
     }
     .footer-inner{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-      justify-content:space-between;
-      flex-wrap:wrap;
+      display:flex;gap:14px;
+      align-items:flex-start;justify-content:space-between;flex-wrap:wrap;
     }
-    .footer-brand{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width:240px;
-    }
-    .footer-title{
-      font-weight:900;
-      letter-spacing:-.02em;
-      font-size:14px;
-      color:#0f172a;
-    }
-    .footer-sub{
-      color:#64748b;
-      font-size:13px;
-      line-height:1.5;
-      max-width:520px;
-    }
-    .footer-links{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      font-size:13px;
-      color:#334155;
-    }
+    .footer-brand{display:flex;flex-direction:column;gap:6px;min-width:240px}
+    .footer-title{font-weight:950;letter-spacing:-.02em;font-size:14px;color:#0f172a}
+    .footer-sub{color:#64748b;font-size:13px;line-height:1.5;max-width:520px}
+    .footer-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:#334155}
     .footer-links a{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:6px 10px;
-      border:1px solid #e5e7eb;
-      background:#fff;
-      border-radius:12px;
-      width:fit-content;
+      display:inline-flex;gap:8px;align-items:center;
+      padding:6px 10px;border:1px solid #e5e7eb;background:#fff;border-radius:12px;width:fit-content;
     }
     .footer-links a:hover{
       box-shadow:0 10px 18px rgba(15,23,42,.06);
       transform:translateY(-1px);
       transition:transform .08s ease, box-shadow .08s ease;
     }
-    .footer-bottom{
-      margin-top:12px;
-      color:#94a3b8;
-      font-size:12px;
+    .footer-bottom{margin-top:12px;color:#94a3b8;font-size:12px}
+
+    /* Sticky mobile CTA */
+    .sticky-cta{
+      position:fixed;
+      left:12px; right:12px; bottom:12px;
+      z-index:80;
+      display:none;
+      gap:10px;
+      background:rgba(255,255,255,.92);
+      border:1px solid #e5e7eb;
+      border-radius:18px;
+      padding:10px;
+      box-shadow:0 18px 34px rgba(15,23,42,.14);
+      backdrop-filter:saturate(160%) blur(10px);
+    }
+    .sticky-cta .btn{flex:1; padding:12px 14px}
+    @media(max-width:620px){
+      .sticky-cta{display:flex}
     }
 
     /* Responsive */
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
-      .headline{font-size:36px}
-      .features{grid-template-columns:1fr 1fr}
+      .headline{font-size:34px}
+      .grid3{grid-template-columns:1fr 1fr}
       .compare{grid-template-columns:1fr}
+      .pricing{grid-template-columns:1fr}
+      .grid2{grid-template-columns:1fr}
     }
-    @media(max-width:560px){
-      .headline{font-size:30px}
-      .features{grid-template-columns:1fr}
+    @media(max-width:620px){
+      .headline{font-size:28px}
       .header-inner{flex-direction:column;align-items:stretch}
       .actions{justify-content:center}
-      .logo{height:46px}
-      .brand{justify-content:center}
       .nav{justify-content:center}
+      .brand{justify-content:center}
+      .logo{height:44px}
     }
   </style>
 </head>
@@ -335,14 +416,21 @@
       </div>
 
       <div class="nav">
-        <a class="chip" href="#features">Features</a>
-        <a class="chip" href="#taxpack">Tax Pack</a>
-        <a class="chip" href="#pricing">Pricing</a>
+        <a class="chip" href="#features" data-i18n="nav_features">Features</a>
+        <a class="chip" href="#taxpack" data-i18n="nav_taxpack">Tax Pack</a>
+        <a class="chip" href="#pricing" data-i18n="nav_pricing">Pricing</a>
+        <a class="chip" href="#contact" data-i18n="nav_contact">Contact</a>
       </div>
 
       <div class="actions">
-        <a class="btn btn-ghost" href="{% url 'login' %}">Login</a>
-        <a class="btn btn-primary" href="{% url 'signup' %}">Create Account</a>
+        <span class="lang-toggle" title="Language">
+          <button type="button" id="btnEN" class="active">EN</button>
+          <button type="button" id="btnUR">اردو</button>
+        </span>
+
+        <a class="btn btn-ghost" href="{% url 'login' %}" data-i18n="login">Login</a>
+        <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="create_account">Create Account</a>
+        <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="wa_cta">WhatsApp</a>
       </div>
     </div>
   </div>
@@ -353,56 +441,67 @@
 
     <!-- Left -->
     <div class="card">
-      <span class="eyebrow">Built for wholesalers & growing businesses in Pakistan</span>
+      <span class="eyebrow" data-i18n="eyebrow">Built for Pakistani wholesalers & distributors</span>
 
       <h1 class="headline">
-        Accounting that feels simple — with the power you actually need.
+        <span data-i18n="hero_title">Apni ghalati sudharein, staff ki chori rokein.</span>
       </h1>
 
-      <p class="subhead">
-        Sales, purchases, stock, customer/supplier ledgers, cash/bank accounts, reports, backups — and a <strong>Tax Pack</strong> designed for real export needs.
+      <p class="subhead" data-i18n="hero_sub">
+        The wholesaler’s remote control: <strong>track every rupee</strong>, keep the “ghallah” matching the books,
+        and generate <strong>audit-ready reports</strong> with proper double-entry — plus a <strong>Tax Pack</strong> for standardized exports & downloads.
       </p>
 
-      <div class="trust-row">
-        <span class="trust soft">✅ Owner + up to 3 Staff users</span>
-        <span class="trust">✅ Phone + laptop friendly</span>
-        <span class="trust orange">🧾 Tax Pack exports</span>
+      <div class="micro-proof">
+        <span class="proof green" data-i18n="proof_1">✅ Owner controls edits (staff enters)</span>
+        <span class="proof blue" data-i18n="proof_2">📊 Double-entry reports (Trial Balance, P&L, Balance Sheet)</span>
+        <span class="proof orange" data-i18n="proof_3">🧾 Standardized Annex-C style exports</span>
       </div>
 
       <div class="cta-row">
-        <a class="btn btn-primary" href="{% url 'signup' %}">Create Free Account</a>
-        <a class="btn btn-dark" href="{% url 'login' %}">Login</a>
+        <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="cta_primary">Create Account</a>
+        <a class="btn btn-dark" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="cta_secondary">Start on WhatsApp</a>
       </div>
 
-      <p class="fineprint">
-        Start in minutes. Clean workflows for daily entry. Strong permissions so staff can’t access what they shouldn’t.
+      <p class="fineprint" data-i18n="hero_note">
+        Polished but locally grounded. Hamari team WhatsApp par aapki madad ke liye hazir hai.
       </p>
     </div>
 
     <!-- Right -->
     <div class="panel">
       <div class="mini">
-        <h3>Why Roznamcha?</h3>
-        <p>
-          Most “khata apps” stop at debt notes. Roznamcha builds full ledgers and reports from proper entries — so your data stays usable.
+        <h3 data-i18n="panel_why_title">The 3-Layered Shield</h3>
+        <p data-i18n="panel_why_text">
+          Control (Security) → Protection (Compliance workflows) → Growth (Bank-ready reporting).
+          Roznamcha is the professional upgrade from “khata notes” to real accounting.
         </p>
 
         <ul class="list">
-          <li><span class="dot"></span><span><strong>Proper accounting flow:</strong> sales/purchases create ledgers automatically.</span></li>
-          <li><span class="dot green"></span><span><strong>Multi-tenant SaaS:</strong> each company runs on its own subdomain.</span></li>
-          <li><span class="dot orange"></span><span><strong>Tax Pack:</strong> exports + downloads designed for compliance workflows.</span></li>
+          <li class="li">
+            <span class="dot"></span>
+            <span data-i18n="bullet_1"><strong>Control:</strong> activity logs + owner-level permissions (no silent edits).</span>
+          </li>
+          <li class="li">
+            <span class="dot orange"></span>
+            <span data-i18n="bullet_2"><strong>Protection:</strong> standardized exports for Pakistan compliance workflows.</span>
+          </li>
+          <li class="li">
+            <span class="dot green"></span>
+            <span data-i18n="bullet_3"><strong>Growth:</strong> audit-ready reports banks and partners respect.</span>
+          </li>
         </ul>
 
-        <a class="btn btn-primary" href="{% url 'signup' %}">Start Now</a>
+        <a class="btn btn-primary" href="#pricing" data-i18n="panel_btn">See Pricing</a>
       </div>
 
       <div class="mini">
-        <h3>Who it’s for</h3>
-        <p>Medium wholesalers and businesses that need speed, control, and clean reporting.</p>
+        <h3 data-i18n="panel_for_title">Made for real markets</h3>
+        <p data-i18n="panel_for_text">Fertilizers, pesticides, tools, general trade — with staff entry + owner oversight.</p>
         <ul class="list">
-          <li><span class="dot green"></span><span>Fertilizers, pesticides, tools, general trade</span></li>
-          <li><span class="dot"></span><span>Businesses with staff entry + owner oversight</span></li>
-          <li><span class="dot orange"></span><span>Anyone who wants clean reports & exports</span></li>
+          <li class="li"><span class="dot green"></span><span data-i18n="for_1">Multi-device access (phone + laptop)</span></li>
+          <li class="li"><span class="dot"></span><span data-i18n="for_2">Fast daily entry: minimal clicks</span></li>
+          <li class="li"><span class="dot orange"></span><span data-i18n="for_3">Exports you can hand to a consultant</span></li>
         </ul>
       </div>
     </div>
@@ -410,102 +509,220 @@
   </div>
 </div>
 
+<!-- HOOK / FEARS -->
 <div class="container section" id="features">
-  <div class="section-title">Core features</div>
+  <div class="section-title" data-i18n="hook_title">What keeps owners worried</div>
 
-  <div class="features">
+  <div class="grid2">
+    <div class="block">
+      <span class="kicker" data-i18n="fear_k1">🔒 CONTROL (Security)</span>
+      <h4 data-i18n="fear_1_title">Stop worrying about the counter</h4>
+      <p data-i18n="fear_1_text">Staff can enter sales/purchases — but owner controls edits and sensitive actions. Know who did what, and when.</p>
+    </div>
+
+    <div class="block" id="taxpack">
+      <span class="kicker" data-i18n="fear_k2">🧾 PROTECTION (Compliance workflows)</span>
+      <h4 data-i18n="fear_2_title">No more “surprise notice” fear</h4>
+      <p data-i18n="fear_2_text">Standardized exports & downloads (Level 1/2, per-file, full ZIP) so your data is prepared for professional portal workflows.</p>
+    </div>
+
+    <div class="block">
+      <span class="kicker" data-i18n="fear_k3">☁️ SAFETY (Data)</span>
+      <h4 data-i18n="fear_3_title">Your data is never hostage</h4>
+      <p data-i18n="fear_3_text">Controlled backups + multi-device access so business continues even if a phone is lost or replaced.</p>
+    </div>
+
+    <div class="block">
+      <span class="kicker" data-i18n="fear_k4">📉 CLARITY (Cash & Profit)</span>
+      <h4 data-i18n="fear_4_title">Fix the “ghallah mismatch”</h4>
+      <p data-i18n="fear_4_text">Real-time Profit & Loss and ledgers help you find leaks: expenses, bad debt, or pricing issues — early.</p>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:18px" data-i18n="features_title">Core capabilities</div>
+
+  <div class="grid3">
     <div class="feature">
       <div class="icon">🧾</div>
-      <h4>Sales & Purchases</h4>
-      <p>Fast entry, clean lists, and proper posting that affects ledgers.</p>
+      <h4 data-i18n="f1_title">Sales & Purchases</h4>
+      <p data-i18n="f1_text">Fast entry, clean lists, and proper posting that affects ledgers automatically.</p>
     </div>
 
     <div class="feature">
       <div class="icon">👤</div>
-      <h4>Customer & Supplier Ledgers</h4>
-      <p>Running balances, statements, and party-wise history.</p>
-    </div>
-
-    <div class="feature">
-      <div class="icon">🏦</div>
-      <h4>Cash/Bank Accounts</h4>
-      <p>Track payments/receipts with proper account mapping.</p>
+      <h4 data-i18n="f2_title">Customer & Supplier Ledgers</h4>
+      <p data-i18n="f2_text">Running balances, statements, and party-wise history — always updated.</p>
     </div>
 
     <div class="feature">
       <div class="icon">📦</div>
-      <h4>Stock & Product Reports</h4>
-      <p>Know what’s in stock and what moved today.</p>
+      <h4 data-i18n="f4_title">Stock & Product Reports</h4>
+      <p data-i18n="f4_text">Know what’s in stock and what moved today — with product ledger support.</p>
     </div>
 
     <div class="feature">
       <div class="icon">⚖️</div>
-      <h4>Trial Balance</h4>
-      <p>Debit/credit view of your ledgers, ready for review.</p>
+      <h4 data-i18n="f5_title">Audit-Ready Double-Entry Reports</h4>
+      <p data-i18n="f5_text">Trial Balance, Profit & Loss, Balance Sheet — built from real entries.</p>
+      <span class="pill-note" data-i18n="f5_note">Built for professional review</span>
     </div>
 
     <div class="feature">
       <div class="icon">🛡️</div>
-      <h4>Strong permissions</h4>
-      <p>Owner controls everything; staff has limited actions only.</p>
+      <h4 data-i18n="f6_title">Owner + Staff Controls</h4>
+      <p data-i18n="f6_text">Granular roles: staff enters, owner approves/controls sensitive actions.</p>
+      <span class="pill-note" data-i18n="f6_note">Activity log support</span>
     </div>
 
     <div class="feature">
-      <div class="icon">☁️</div>
-      <h4>Secure backups</h4>
-      <p>Keep your business data safe with downloadable backups.</p>
-    </div>
-
-    <div class="feature" id="taxpack">
       <div class="icon">🧮</div>
-      <h4>Tax Pack</h4>
-      <p>Configurable tax settings + tax downloads (individual files + full ZIP).</p>
-    </div>
-
-    <div class="feature">
-      <div class="icon">⚡</div>
-      <h4>Fast daily workflow</h4>
-      <p>Built for real shops — minimal clicks, clean screens, quick entry.</p>
+      <h4 data-i18n="f8_title">Tax Pack</h4>
+      <p data-i18n="f8_text">Standardized exports + downloads (Level 1 & 2, per-file, and full ZIP).</p>
+      <span class="pill-note" data-i18n="f8_note">Annex-C style structure</span>
     </div>
   </div>
 
+  <!-- Comparison -->
   <div class="compare">
     <div class="box">
-      <h4>Most “khata apps”</h4>
+      <h4 data-i18n="cmp_left_title">Simple “khata apps”</h4>
       <ul>
-        <li>Only debt notes</li>
-        <li>Weak reporting</li>
-        <li>No proper ledger flow</li>
-        <li>No staff controls</li>
+        <li data-i18n="cmp_l1">Single-entry notes (easy to miss/fake)</li>
+        <li data-i18n="cmp_l2">Weak stock + weak reporting</li>
+        <li data-i18n="cmp_l3">No audit-ready statements</li>
+        <li data-i18n="cmp_l4">Everyone sees everything</li>
       </ul>
     </div>
+
     <div class="box">
-      <h4>Roznamcha</h4>
+      <h4 data-i18n="cmp_right_title">Roznamcha (Professional Upgrade)</h4>
       <ul>
-        <li>Proper sales/purchase posting → ledgers</li>
-        <li>Customer/supplier statements</li>
-        <li>Owner + staff permissions</li>
-        <li>Tax Pack downloads + exports</li>
+        <li data-i18n="cmp_r1">Proper posting → ledgers & reports</li>
+        <li data-i18n="cmp_r2">Owner + staff permissions</li>
+        <li data-i18n="cmp_r3">Audit-ready Trial Balance / P&L / Balance Sheet</li>
+        <li data-i18n="cmp_r4">Standardized exports + downloads (Tax Pack)</li>
       </ul>
     </div>
   </div>
 
-  <div class="bottom-cta" id="pricing">
-    <div>
-      <strong>Start in minutes</strong><br>
-      <span>Create your company and begin entering sales/purchases today.</span>
+  <!-- Bazaar workflow -->
+  <div class="grid2">
+    <div class="step">
+      <strong data-i18n="step1_title">1) Entry (Staff)</strong>
+      <p data-i18n="step1_text">Staff records sale/purchase. System posts it correctly so ledgers stay clean.</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'signup' %}">Create Account</a>
+    <div class="step">
+      <strong data-i18n="step2_title">2) Control (Owner)</strong>
+      <p data-i18n="step2_text">Owner reviews summaries and makes sure the “ghallah” matches the books.</p>
+    </div>
+    <div class="step">
+      <strong data-i18n="step3_title">3) Export (Tax Pack)</strong>
+      <p data-i18n="step3_text">Download standardized files/ZIP for your consultant — no manual retyping.</p>
+    </div>
+    <div class="step">
+      <strong data-i18n="step4_title">4) Growth (Bank-ready)</strong>
+      <p data-i18n="step4_text">Double-entry reporting supports financing and professional supplier/bank relationships.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRICING -->
+<div class="container section" id="pricing">
+  <div class="section-title" data-i18n="pricing_title">Pricing (Fixed fee, no surprises)</div>
+
+  <div class="pricing">
+    <div class="price-card">
+      <span class="badge" data-i18n="plan_monthly_badge">Wholesaler Plan (Monthly)</span>
+      <div class="price">Rs 500 <small data-i18n="per_month">/ month</small></div>
+      <div class="muted" data-i18n="plan_monthly_desc">No hidden charges. Owner + up to 3 Staff. Cancel anytime.</div>
+      <ul class="price-list">
+        <li><span class="tick">✅</span><span data-i18n="p1">Sales, Purchases, Stock, Ledgers</span></li>
+        <li><span class="tick">✅</span><span data-i18n="p2">Audit-ready Double-Entry Reports</span></li>
+        <li><span class="tick">✅</span><span data-i18n="p3">Tax Pack exports + downloads (Level 1/2 + ZIP)</span></li>
+        <li><span class="tick">✅</span><span data-i18n="p4">Owner + Staff controls</span></li>
+      </ul>
+      <div class="founder" data-i18n="founder_note">
+        Why Rs 500? We keep costs low so Pakistani SMEs can go digital without “enterprise” pricing — no fancy offices, just solid workflows.
+      </div>
+      <div style="margin-top:14px;">
+        <a class="btn btn-primary" href="{% url 'signup' %}" style="width:100%;" data-i18n="pricing_cta">Create Account</a>
+      </div>
+    </div>
+
+    <div class="price-card">
+      <span class="badge" style="background:#ecfdf5;border-color:#a7f3d0;color:#065f46" data-i18n="plan_yearly_badge">Yearly (Best Value)</span>
+      <div class="price">Rs 4,500 <small data-i18n="per_year">/ year</small></div>
+      <div class="muted" data-i18n="plan_yearly_desc">25% discount — predictable cost for the full year.</div>
+      <ul class="price-list">
+        <li><span class="tick">✅</span><span data-i18n="y1">Save 25% vs monthly</span></li>
+        <li><span class="tick">✅</span><span data-i18n="y2">Best for compliance season peace of mind</span></li>
+        <li><span class="tick">✅</span><span data-i18n="y3">Same full features as monthly</span></li>
+        <li><span class="tick">✅</span><span data-i18n="y4">WhatsApp support available</span></li>
+      </ul>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-primary" href="{% url 'signup' %}" style="flex:1;" data-i18n="pricing_cta2">Start</a>
+        <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" style="flex:1;" data-i18n="pricing_wa">Chat on WhatsApp</a>
+      </div>
+
+      <!-- Anchor (trust builder) -->
+      <div class="legal" style="margin-top:12px;" data-i18n="anchor_note">
+        Optional future “Professional” plan (multi-branch / 10 staff) will be higher priced. Today’s plan is focused for wholesalers: control + reporting + exports.
+      </div>
+    </div>
+  </div>
+
+  <div class="legal" data-i18n="legal_note">
+    Roznamcha provides tools to facilitate record-keeping and standardized exports for Pakistan compliance workflows.
+    Final filing and compliance remain the responsibility of the business owner and their tax consultant.
+  </div>
+
+  <div class="bottom-cta">
+    <div>
+      <strong data-i18n="bottom_title">Start in minutes</strong><br>
+      <span data-i18n="bottom_text">Create your company and begin entering sales/purchases today.</span>
+    </div>
+    <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="bottom_btn">Create Account</a>
   </div>
 </div>
 
+<!-- CONTACT / ABOUT -->
+<div class="container section" id="contact">
+  <div class="section-title" data-i18n="contact_title">About & Contact</div>
+
+  <div class="grid2">
+    <div class="box">
+      <h4 data-i18n="about_title">Built in Quetta, for the bazaars of Pakistan</h4>
+      <p class="muted" data-i18n="about_text">
+        Polished but locally grounded. We understand bazaar terms and accounting terms — both.
+        Roznamcha is designed for wholesalers who want control, clean reporting, and professional exports without slow “enterprise” complexity.
+      </p>
+      <div class="legal" style="margin-top:12px;" data-i18n="about_addr">
+        Office No. 7, 2nd Floor, Shaheen View, Model Town, Quetta Cantt
+      </div>
+    </div>
+
+    <div class="box">
+      <h4 data-i18n="support_title">Support</h4>
+      <p class="muted" data-i18n="support_text">
+        Hamari team WhatsApp par aapki madad ke liye hazir hai. Get help with setup, daily workflow, and exports.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+        <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" style="flex:1;" data-i18n="support_wa">WhatsApp</a>
+        <a class="btn" href="mailto:app.roznamcha@gmail.com" style="flex:1;">Email</a>
+        <a class="btn" href="tel:+923495952363" style="flex:1;">Call</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
 <footer class="site-footer">
   <div class="container">
     <div class="footer-inner">
-
       <div class="footer-brand">
-        <div class="footer-title">Roznamcha — Smart Khata & Hisab System</div>
-        <div class="footer-sub">
+        <div class="footer-title" data-i18n="footer_title">Roznamcha — Smart Khata & Hisab System</div>
+        <div class="footer-sub" data-i18n="footer_addr">
           Office No. 7, 2nd Floor, Shaheen View,<br>
           Model Town, Quetta Cantt
         </div>
@@ -516,20 +733,198 @@
 
       <div class="footer-links">
         <a href="mailto:app.roznamcha@gmail.com">✉️ app.roznamcha@gmail.com</a>
-        <a href="https://wa.me/923495952363" target="_blank">💬 WhatsApp: +92 349 5952363</a>
+        <a href="https://wa.me/923495952363" target="_blank" rel="noopener">💬 WhatsApp: +92 349 5952363</a>
         <a href="tel:+923495952363">📞 +92 349 5952363</a>
       </div>
 
       <div class="footer-links">
-        <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
-        <a href="{% url 'terms_conditions' %}">Terms & Conditions</a>
-        <a href="{% url 'refund_policy' %}">Refund Policy</a>
-        <a href="{% url 'service_policy' %}">Service Policy</a>
+        <a href="{% url 'privacy_policy' %}" data-i18n="privacy">Privacy Policy</a>
+        <a href="{% url 'terms_conditions' %}" data-i18n="terms">Terms &amp; Conditions</a>
+        <a href="{% url 'refund_policy' %}" data-i18n="refund">Refund Policy</a>
+        <a href="{% url 'service_policy' %}" data-i18n="service">Service Policy</a>
       </div>
-
     </div>
   </div>
 </footer>
+
+<!-- Sticky CTA (mobile) -->
+<div class="sticky-cta" aria-label="Quick actions">
+  <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="sticky_wa">WhatsApp</a>
+  <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="sticky_start">Create Account</a>
+</div>
+
+<script>
+  // EN/UR toggle
+  const dict = {
+    en: {
+      nav_features:"Features", nav_taxpack:"Tax Pack", nav_pricing:"Pricing", nav_contact:"Contact",
+      login:"Login", create_account:"Create Account", wa_cta:"WhatsApp",
+      eyebrow:"Built for Pakistani wholesalers & distributors",
+      hero_title:"Apni ghalati sudharein, staff ki chori rokein.",
+      hero_sub:"The wholesaler’s remote control: track every rupee, keep the “ghallah” matching the books, and generate audit-ready reports with proper double-entry — plus a Tax Pack for standardized exports & downloads.",
+      proof_1:"✅ Owner controls edits (staff enters)",
+      proof_2:"📊 Double-entry reports (Trial Balance, P&L, Balance Sheet)",
+      proof_3:"🧾 Standardized Annex-C style exports",
+      cta_primary:"Create Account",
+      cta_secondary:"Start on WhatsApp",
+      hero_note:"Polished but locally grounded. Hamari team WhatsApp par aapki madad ke liye hazir hai.",
+      panel_why_title:"The 3-Layered Shield",
+      panel_why_text:"Control (Security) → Protection (Compliance workflows) → Growth (Bank-ready reporting). Roznamcha is the professional upgrade from “khata notes” to real accounting.",
+      bullet_1:"Control: activity logs + owner-level permissions (no silent edits).",
+      bullet_2:"Protection: standardized exports for Pakistan compliance workflows.",
+      bullet_3:"Growth: audit-ready reports banks and partners respect.",
+      panel_btn:"See Pricing",
+      panel_for_title:"Made for real markets",
+      panel_for_text:"Fertilizers, pesticides, tools, general trade — with staff entry + owner oversight.",
+      for_1:"Multi-device access (phone + laptop)", for_2:"Fast daily entry: minimal clicks", for_3:"Exports you can hand to a consultant",
+      hook_title:"What keeps owners worried",
+      fear_k1:"🔒 CONTROL (Security)",
+      fear_1_title:"Stop worrying about the counter",
+      fear_1_text:"Staff can enter sales/purchases — but owner controls edits and sensitive actions. Know who did what, and when.",
+      fear_k2:"🧾 PROTECTION (Compliance workflows)",
+      fear_2_title:"No more “surprise notice” fear",
+      fear_2_text:"Standardized exports & downloads (Level 1/2, per-file, full ZIP) so your data is prepared for professional portal workflows.",
+      fear_k3:"☁️ SAFETY (Data)",
+      fear_3_title:"Your data is never hostage",
+      fear_3_text:"Controlled backups + multi-device access so business continues even if a phone is lost or replaced.",
+      fear_k4:"📉 CLARITY (Cash & Profit)",
+      fear_4_title:"Fix the “ghallah mismatch”",
+      fear_4_text:"Real-time Profit & Loss and ledgers help you find leaks: expenses, bad debt, or pricing issues — early.",
+      features_title:"Core capabilities",
+      f1_title:"Sales & Purchases", f1_text:"Fast entry, clean lists, and proper posting that affects ledgers automatically.",
+      f2_title:"Customer & Supplier Ledgers", f2_text:"Running balances, statements, and party-wise history — always updated.",
+      f4_title:"Stock & Product Reports", f4_text:"Know what’s in stock and what moved today — with product ledger support.",
+      f5_title:"Audit-Ready Double-Entry Reports", f5_text:"Trial Balance, Profit & Loss, Balance Sheet — built from real entries.", f5_note:"Built for professional review",
+      f6_title:"Owner + Staff Controls", f6_text:"Granular roles: staff enters, owner approves/controls sensitive actions.", f6_note:"Activity log support",
+      f8_title:"Tax Pack", f8_text:"Standardized exports + downloads (Level 1 & 2, per-file, and full ZIP).", f8_note:"Annex-C style structure",
+      cmp_left_title:"Simple “khata apps”", cmp_l1:"Single-entry notes (easy to miss/fake)", cmp_l2:"Weak stock + weak reporting", cmp_l3:"No audit-ready statements", cmp_l4:"Everyone sees everything",
+      cmp_right_title:"Roznamcha (Professional Upgrade)", cmp_r1:"Proper posting → ledgers & reports", cmp_r2:"Owner + staff permissions", cmp_r3:"Audit-ready Trial Balance / P&L / Balance Sheet", cmp_r4:"Standardized exports + downloads (Tax Pack)",
+      step1_title:"1) Entry (Staff)", step1_text:"Staff records sale/purchase. System posts it correctly so ledgers stay clean.",
+      step2_title:"2) Control (Owner)", step2_text:"Owner reviews summaries and makes sure the “ghallah” matches the books.",
+      step3_title:"3) Export (Tax Pack)", step3_text:"Download standardized files/ZIP for your consultant — no manual retyping.",
+      step4_title:"4) Growth (Bank-ready)", step4_text:"Double-entry reporting supports financing and professional supplier/bank relationships.",
+      pricing_title:"Pricing (Fixed fee, no surprises)",
+      plan_monthly_badge:"Wholesaler Plan (Monthly)", per_month:"/ month", plan_monthly_desc:"No hidden charges. Owner + up to 3 Staff. Cancel anytime.",
+      p1:"Sales, Purchases, Stock, Ledgers", p2:"Audit-ready Double-Entry Reports", p3:"Tax Pack exports + downloads (Level 1/2 + ZIP)", p4:"Owner + Staff controls",
+      founder_note:"Why Rs 500? We keep costs low so Pakistani SMEs can go digital without “enterprise” pricing — no fancy offices, just solid workflows.",
+      pricing_cta:"Create Account",
+      plan_yearly_badge:"Yearly (Best Value)", per_year:"/ year", plan_yearly_desc:"25% discount — predictable cost for the full year.",
+      y1:"Save 25% vs monthly", y2:"Best for compliance season peace of mind", y3:"Same full features as monthly", y4:"WhatsApp support available",
+      pricing_cta2:"Start", pricing_wa:"Chat on WhatsApp",
+      anchor_note:"Optional future “Professional” plan (multi-branch / 10 staff) will be higher priced. Today’s plan is focused for wholesalers: control + reporting + exports.",
+      legal_note:"Roznamcha provides tools to facilitate record-keeping and standardized exports for Pakistan compliance workflows. Final filing and compliance remain the responsibility of the business owner and their tax consultant.",
+      bottom_title:"Start in minutes", bottom_text:"Create your company and begin entering sales/purchases today.", bottom_btn:"Create Account",
+      contact_title:"About & Contact",
+      about_title:"Built in Quetta, for the bazaars of Pakistan",
+      about_text:"Polished but locally grounded. We understand bazaar terms and accounting terms — both. Roznamcha is designed for wholesalers who want control, clean reporting, and professional exports without slow “enterprise” complexity.",
+      about_addr:"Office No. 7, 2nd Floor, Shaheen View, Model Town, Quetta Cantt",
+      support_title:"Support", support_text:"Hamari team WhatsApp par aapki madad ke liye hazir hai. Get help with setup, daily workflow, and exports.",
+      support_wa:"WhatsApp",
+      footer_title:"Roznamcha — Smart Khata & Hisab System",
+      footer_addr:"Office No. 7, 2nd Floor, Shaheen View,<br>Model Town, Quetta Cantt",
+      privacy:"Privacy Policy", terms:"Terms & Conditions", refund:"Refund Policy", service:"Service Policy",
+      sticky_wa:"WhatsApp", sticky_start:"Create Account"
+    },
+    ur: {
+      nav_features:"فیچرز", nav_taxpack:"ٹیکس پیک", nav_pricing:"قیمت", nav_contact:"رابطہ",
+      login:"لاگ اِن", create_account:"اکاؤنٹ بنائیں", wa_cta:"واٹس ایپ",
+      eyebrow:"پاکستان کے ہول سیلرز اور ڈسٹری بیوٹرز کے لیے",
+      hero_title:"اپنی غلطی سدھاریں، اسٹاف کی چوری روکیں۔",
+      hero_sub:"ہول سیلر کا ریموٹ کنٹرول: ہر روپیہ ٹریک کریں، “گلہ” میچ رکھیں، اور درست ڈبل انٹری سے آڈٹ-ریڈی رپورٹس بنائیں — ساتھ میں ٹیکس پیک کے اسٹینڈرڈ ایکسپورٹس اور ڈاؤن لوڈز۔",
+      proof_1:"✅ ایڈٹس کا کنٹرول اونر کے پاس (اسٹاف انٹری کرے)",
+      proof_2:"📊 ڈبل انٹری رپورٹس (ٹرائل بیلنس، P&L، بیلنس شیٹ)",
+      proof_3:"🧾 Annex-C اسٹائل اسٹینڈرڈ ایکسپورٹس",
+      cta_primary:"اکاؤنٹ بنائیں",
+      cta_secondary:"واٹس ایپ سے شروع کریں",
+      hero_note:"پروفیشنل مگر لوکل۔ ہماری ٹیم واٹس ایپ پر آپ کی مدد کے لیے حاضر ہے۔",
+      panel_why_title:"3-لیئرڈ شیلڈ",
+      panel_why_text:"کنٹرول (سیکیورٹی) → پروٹیکشن (کمپلائنس ورک فلو) → گروتھ (بینک-ریڈی رپورٹس)۔ Roznamcha کھاتا نوٹس سے پروفیشنل اکاؤنٹنگ کی طرف اپ گریڈ ہے۔",
+      bullet_1:"کنٹرول: ایکٹیویٹی لاگز + اونر لیول پرمیشنز (خاموش ایڈٹس نہیں)۔",
+      bullet_2:"پروٹیکشن: پاکستان کمپلائنس ورک فلو کے لیے اسٹینڈرڈ ایکسپورٹس۔",
+      bullet_3:"گروتھ: آڈٹ-ریڈی رپورٹس جو بینک اور پارٹنرز پسند کرتے ہیں۔",
+      panel_btn:"قیمت دیکھیں",
+      panel_for_title:"اصل مارکیٹس کے لیے",
+      panel_for_text:"کھاد، زرعی ادویات، ٹولز، جنرل ٹریڈ — اسٹاف انٹری + اونر اوور سائیٹ کے ساتھ۔",
+      for_1:"ملٹی ڈیوائس (موبائل + لیپ ٹاپ)", for_2:"تیز روزمرہ انٹری: کم کلکس", for_3:"ایکسپورٹس جو کنسلٹنٹ کو دیں",
+      hook_title:"اونر کی اصل ٹینشن کیا ہے؟",
+      fear_k1:"🔒 کنٹرول (سیکیورٹی)",
+      fear_1_title:"کاؤنٹر کی فکر ختم",
+      fear_1_text:"اسٹاف سیلز/پرچیز درج کرے — مگر ایڈٹس اور حساس کنٹرول اونر کے پاس۔ کون، کب، کیا کرے — سب واضح۔",
+      fear_k2:"🧾 پروٹیکشن (کمپلائنس ورک فلو)",
+      fear_2_title:"“نوٹس” والی گھبراہٹ کم کریں",
+      fear_2_text:"اسٹینڈرڈ ایکسپورٹس/ڈاؤن لوڈز (لیول 1/2، فی فائل، فل ZIP) — تاکہ آپ کا ڈیٹا پروفیشنل پورٹل ورک فلو کے لیے تیار ہو۔",
+      fear_k3:"☁️ سیفٹی (ڈیٹا)",
+      fear_3_title:"آپ کا ڈیٹا یرغمال نہیں",
+      fear_3_text:"کنٹرولڈ بیک اپس + ملٹی ڈیوائس، موبائل گم ہو جائے تو بھی کاروبار رکے نہیں۔",
+      fear_k4:"📉 وضاحت (کیش اور منافع)",
+      fear_4_title:"“گلہ” میچ کریں",
+      fear_4_text:"ریئل ٹائم منافع و نقصان اور لیجرز سے لیکس جلد پکڑیں: اخراجات، بیڈ ڈیٹ، یا پرائسنگ مسئلہ۔",
+      features_title:"بنیادی صلاحیتیں",
+      f1_title:"سیلز اور پرچیز", f1_text:"تیز انٹری، صاف لسٹس، اور درست پوسٹنگ جو لیجرز میں خود بخود اثر کرے۔",
+      f2_title:"کسٹمر/سپلائر لیجرز", f2_text:"رننگ بیلنس، اسٹیٹمنٹس، اور پارٹی وائز ہسٹری — ہمیشہ اپ ڈیٹ۔",
+      f4_title:"اسٹاک/پروڈکٹ رپورٹس", f4_text:"اسٹاک کیا ہے اور آج کیا موو ہوا — پروڈکٹ لیجر کے ساتھ۔",
+      f5_title:"آڈٹ-ریڈی ڈبل انٹری رپورٹس", f5_text:"ٹرائل بیلنس، P&L، بیلنس شیٹ — حقیقی انٹریز سے۔", f5_note:"پروفیشنل ریویو کے لیے",
+      f6_title:"اونر + اسٹاف کنٹرول", f6_text:"گرینولر رولز: اسٹاف انٹری کرے، حساس کنٹرول اونر کے پاس۔", f6_note:"ایکٹیویٹی لاگ سپورٹ",
+      f8_title:"ٹیکس پیک", f8_text:"اسٹینڈرڈ ایکسپورٹس + ڈاؤن لوڈز (لیول 1/2، فی فائل، فل ZIP)۔", f8_note:"Annex-C اسٹائل اسٹرکچر",
+      cmp_left_title:"سادہ کھاتا ایپس", cmp_l1:"سنگل انٹری نوٹس (غلطی/فیک آسان)", cmp_l2:"کمزور اسٹاک + کمزور رپورٹس", cmp_l3:"آڈٹ-ریڈی اسٹیٹمنٹس نہیں", cmp_l4:"سب کچھ سب کو نظر آتا ہے",
+      cmp_right_title:"Roznamcha (پروفیشنل اپ گریڈ)", cmp_r1:"درست پوسٹنگ → لیجرز/رپورٹس", cmp_r2:"اونر + اسٹاف پرمیشنز", cmp_r3:"آڈٹ-ریڈی ٹرائل بیلنس / P&L / بیلنس شیٹ", cmp_r4:"اسٹینڈرڈ ایکسپورٹس + ڈاؤن لوڈز (ٹیکس پیک)",
+      step1_title:"1) انٹری (اسٹاف)", step1_text:"اسٹاف سیل/پرچیز درج کرے — سسٹم درست پوسٹنگ کرے۔",
+      step2_title:"2) کنٹرول (اونر)", step2_text:"اونر سمریز دیکھے اور “گلہ” میچ کرے۔",
+      step3_title:"3) ایکسپورٹ (ٹیکس پیک)", step3_text:"اسٹینڈرڈ فائلیں/ZIP ڈاؤن لوڈ — دوبارہ ٹائپنگ نہیں۔",
+      step4_title:"4) گروتھ (بینک-ریڈی)", step4_text:"ڈبل انٹری رپورٹس فنانسنگ اور پروفیشنل ریلیشنشپس میں مدد دیں۔",
+      pricing_title:"قیمت (فکس فیس، کوئی سرپرائز نہیں)",
+      plan_monthly_badge:"ہول سیلر پلان (ماہانہ)", per_month:"/ ماہ", plan_monthly_desc:"کوئی ہِڈن چارجز نہیں۔ اونر + 3 تک اسٹاف۔ کبھی بھی ختم کر سکتے ہیں۔",
+      p1:"سیلز، پرچیز، اسٹاک، لیجرز", p2:"آڈٹ-ریڈی ڈبل انٹری رپورٹس", p3:"ٹیکس پیک ایکسپورٹس + ڈاؤن لوڈز (لیول 1/2 + ZIP)", p4:"اونر + اسٹاف کنٹرول",
+      founder_note:"Rs 500 کیوں؟ ہم لاگت کم رکھتے ہیں تاکہ پاکستانی SMEs “انٹرپرائز” قیمت کے بغیر ڈیجیٹل ہو سکیں — فینسی آفیس نہیں، بس مضبوط ورک فلو۔",
+      pricing_cta:"اکاؤنٹ بنائیں",
+      plan_yearly_badge:"سالانہ (بہترین ویلیو)", per_year:"/ سال", plan_yearly_desc:"25% ڈسکاؤنٹ — سال بھر فکس قیمت۔",
+      y1:"ماہانہ کے مقابلے 25% بچت", y2:"کمپلائنس سیزن میں سکون", y3:"وہی مکمل فیچرز", y4:"واٹس ایپ سپورٹ دستیاب",
+      pricing_cta2:"شروع کریں", pricing_wa:"واٹس ایپ پر بات کریں",
+      anchor_note:"مستقبل میں “پروفیشنل” پلان (ملٹی برانچ / 10 اسٹاف) کی قیمت زیادہ ہو سکتی ہے۔ آج کا پلان ہول سیلرز کے لیے فوکس ہے: کنٹرول + رپورٹس + ایکسپورٹس۔",
+      legal_note:"Roznamcha ریکارڈ کیپنگ اور اسٹینڈرڈ ایکسپورٹس کے لیے ٹولز فراہم کرتا ہے۔ حتمی فائلنگ اور کمپلائنس کاروبار کے مالک اور ٹیکس کنسلٹنٹ کی ذمہ داری ہے۔",
+      bottom_title:"منٹوں میں شروع کریں", bottom_text:"کمپنی بنائیں اور آج ہی سیلز/پرچیز درج کریں۔", bottom_btn:"اکاؤنٹ بنائیں",
+      contact_title:"تعرف اور رابطہ",
+      about_title:"کوئٹہ میں بنایا گیا، پاکستان کی مارکیٹس کے لیے",
+      about_text:"پروفیشنل مگر لوکل۔ ہم بازار اور اکاؤنٹنگ دونوں زبان سمجھتے ہیں۔ Roznamcha ہول سیلرز کے لیے کنٹرول، صاف رپورٹس، اور پروفیشنل ایکسپورٹس — بغیر سلو انٹرپرائز پیچیدگی کے۔",
+      about_addr:"آفس نمبر 7، دوسری منزل، شاہین ویو، ماڈل ٹاؤن، کوئٹہ کینٹ",
+      support_title:"سپورٹ", support_text:"ہماری ٹیم واٹس ایپ پر آپ کی مدد کے لیے حاضر ہے۔ سیٹ اپ، روزمرہ ورک فلو اور ایکسپورٹس میں مدد ملتی ہے۔",
+      support_wa:"واٹس ایپ",
+      footer_title:"Roznamcha — اسمارٹ کھاتا اور حساب سسٹم",
+      footer_addr:"آفس نمبر 7، دوسری منزل، شاہین ویو,<br>ماڈل ٹاؤن، کوئٹہ کینٹ",
+      privacy:"پرائیویسی پالیسی", terms:"شرائط و ضوابط", refund:"ریفنڈ پالیسی", service:"سروس پالیسی",
+      sticky_wa:"واٹس ایپ", sticky_start:"اکاؤنٹ بنائیں"
+    }
+  };
+
+  function applyLang(lang){
+    localStorage.setItem("roz_pub_lang", lang);
+    document.documentElement.lang = (lang === "ur") ? "ur" : "en";
+    document.documentElement.dir  = (lang === "ur") ? "rtl" : "ltr";
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[lang] && dict[lang][key]){
+        if (key === "footer_addr") el.innerHTML = dict[lang][key];
+        else el.textContent = dict[lang][key];
+      }
+    });
+
+    const enBtn = document.getElementById("btnEN");
+    const urBtn = document.getElementById("btnUR");
+    if (enBtn && urBtn){
+      enBtn.classList.toggle("active", lang === "en");
+      urBtn.classList.toggle("active", lang === "ur");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const enBtn = document.getElementById("btnEN");
+    const urBtn = document.getElementById("btnUR");
+    if (enBtn) enBtn.addEventListener("click", () => applyLang("en"));
+    if (urBtn) urBtn.addEventListener("click", () => applyLang("ur"));
+    applyLang(localStorage.getItem("roz_pub_lang") || "en");
+  });
+</script>
 
 </body>
 </html>
