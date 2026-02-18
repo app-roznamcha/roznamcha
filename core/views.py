@@ -109,6 +109,10 @@ from .tax_pack import (
 )
 from django.db.models.functions import Cast
 from django.db.models import IntegerField
+import asyncio
+from urllib.parse import urlencode
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 
 class TenantAwareLoginView(auth_views.LoginView):
@@ -176,8 +180,6 @@ class TenantAwareLoginView(auth_views.LoginView):
         next_url = self.get_success_url()
         return redirect(f"{self.request.scheme}://{correct_host}{next_url}")
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 
 def landing_page(request):
     if request.user.is_authenticated:
@@ -400,6 +402,34 @@ def _wipe_tenant_data(owner):
 
     # CompanyProfile is NOT deleted here (keep tenant identity)
 
+
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@staff_allowed
+@subscription_required
+def sales_invoice_share_png(request, pk):
+    """
+    One-click PNG download of Sales Invoice Share page.
+    - Staff allowed (to share invoices)
+    - If not posted => will show DRAFT watermark (your HTML already handles it)
+    """
+    invoice = tenant_get_object_or_404(request, SalesInvoice, pk=pk)
+
+    # 🔒 SaaS safety: invoice must belong to tenant owner (tenant_get_object_or_404 already ensures owner safety)
+
+    # Build absolute URL to the HTML share page with png_mode=1
+    share_url = reverse("sales_invoice_share", args=[invoice.id])
+    qs = urlencode({"png": "1"})
+    absolute_url = request.build_absolute_uri(f"{share_url}?{qs}")
+
+    # Render to PNG
+    png_bytes = asyncio.run(_render_url_to_png(absolute_url))
+
+    filename = f"sales-invoice-{invoice.invoice_number or invoice.id}.png"
+    resp = HttpResponse(png_bytes, content_type="image/png")
+    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return resp
 
 @login_required
 @owner_required
@@ -1250,16 +1280,23 @@ def payment_new(request):
 # ---------- SALES: LIST ----------
 
 @login_required
+@resolve_tenant_context(require_company=True)
 @owner_required
-@staff_blocked
+@subscription_required
 def sales_list(request):
+    """
+    Sales list page:
+    - Owner sees: Edit/Delete/Post/Share
+    - Staff sees: Share only (no edit/delete/post)
+    """
     invoices = (
         SalesInvoice.objects.filter(owner=request.owner)
         .select_related("customer")
-        .prefetch_related("items__product")   # ✅ because related_name is items
+        .prefetch_related("items__product")
         .order_by("-invoice_date", "-id")
     )
-
+    profile = getattr(request.user, "profile", None)
+    is_staff_user = bool(profile and getattr(profile, "role", None) == "STAFF")
     from_date = request.GET.get("from") or ""
     to_date = request.GET.get("to") or ""
     customer_id = request.GET.get("customer") or ""
@@ -1282,6 +1319,12 @@ def sales_list(request):
         .order_by("name")
     )
 
+    # ✅ Role flags for template
+    prof = getattr(request.user, "profile", None)
+    role = getattr(prof, "role", None)
+    is_staff_user = (role == "STAFF")
+    is_owner_user = (role == "OWNER") or getattr(request.user, "is_superuser", False)
+
     context = {
         "invoices": invoices,
         "customers": customers,
@@ -1289,6 +1332,11 @@ def sales_list(request):
         "to_date": to_date,
         "customer_id": customer_id,
         "posted_filter": posted_filter,
+
+        # ✅ used by sales_list.html to hide/show buttons
+        "is_staff_user": is_staff_user,
+        "is_owner_user": is_owner_user,
+
     }
     return render(request, "core/sales_list.html", context)
 
@@ -1496,7 +1544,7 @@ def sales_new(request):
 
 @login_required
 @resolve_tenant_context(require_company=True)
-@staff_allowed
+@staff_blocked
 @subscription_required
 @transaction.atomic
 def sales_post(request, pk):
@@ -3657,7 +3705,7 @@ def purchase_return_new(request):
 @transaction.atomic
 @subscription_required
 def sales_edit(request, pk):
-    invoice = tenant_get_object_or_404(request, sales_edit, pk=pk)
+    invoice = tenant_get_object_or_404(request, SalesInvoice, pk=pk)
 
     # 🔒 No edit after post
     if getattr(invoice, "posted", False):
@@ -5868,3 +5916,88 @@ def sitemap_xml(request):
 </urlset>
 """
     return HttpResponse(xml, content_type="application/xml")
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@owner_required
+@subscription_required
+def sales_invoice_share(request, pk):
+    """
+    Shareable invoice preview:
+    - visible to OWNER + STAFF
+    - shows watermark if not posted
+    """
+    invoice = tenant_get_object_or_404(
+        request,
+        SalesInvoice.objects.select_related("customer").prefetch_related("items__product"),
+        pk=pk,
+    )
+
+    # ✅ Draft logic
+    is_draft = not bool(invoice.posted)
+
+    # Totals (use your model function)
+    total = invoice.calculate_total()
+
+    # Useful flags for template
+    prof = getattr(request.user, "profile", None)
+    role = getattr(prof, "role", None)
+    is_staff_user = (role == "STAFF")
+
+    context = {
+        "invoice": invoice,
+        "items": invoice.items.all(),
+        "customer": invoice.customer,
+        "total": total,
+        "is_draft": is_draft,
+        "is_staff_user": is_staff_user,
+    }
+    return render(request, "core/sales_invoice_share.html", context)
+
+async def _render_url_to_png(url: str, viewport_width: int = 950) -> bytes:
+    """
+    Uses Playwright to render a URL and return a PNG screenshot.
+    """
+    from playwright.async_api import async_playwright
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(args=["--no-sandbox"])
+        page = await browser.new_page(viewport={"width": viewport_width, "height": 900})
+
+        # Load and wait
+        await page.goto(url, wait_until="networkidle")
+        await page.wait_for_timeout(300)  # small settle time for fonts/layout
+
+        # Full page screenshot
+        png_bytes = await page.screenshot(full_page=True, type="png")
+
+        await browser.close()
+        return png_bytes
+
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@staff_allowed
+@subscription_required
+def sales_invoice_share_png(request, pk):
+    """
+    One-click PNG download of Sales Invoice Share page.
+    - Staff allowed (to share invoices)
+    - If not posted => will show DRAFT watermark (your HTML already handles it)
+    """
+    invoice = tenant_get_object_or_404(request, SalesInvoice, pk=pk)
+
+    # 🔒 SaaS safety: invoice must belong to tenant owner (tenant_get_object_or_404 already ensures owner safety)
+
+    # Build absolute URL to the HTML share page with png_mode=1
+    share_url = reverse("sales_invoice_share", args=[invoice.id])
+    qs = urlencode({"png": "1"})
+    absolute_url = request.build_absolute_uri(f"{share_url}?{qs}")
+
+    # Render to PNG
+    png_bytes = asyncio.run(_render_url_to_png(absolute_url))
+
+    filename = f"sales-invoice-{invoice.invoice_number or invoice.id}.png"
+    resp = HttpResponse(png_bytes, content_type="image/png")
+    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return resp

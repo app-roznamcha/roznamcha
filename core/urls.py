@@ -66,11 +66,13 @@ urlpatterns = [
     # =========================
     # Sales
     # =========================
-    path("sales/", staff_blocked(views.sales_list), name="sales_list"),
+    path("sales/", staff_allowed(views.sales_list), name="sales_list"),
     path("sales/new/", staff_allowed(views.sales_new), name="sales_new"),
-    path("sales/<int:pk>/post/", staff_allowed(views.sales_post), name="sales_post"),
+    path("sales/<int:pk>/post/", staff_blocked(views.sales_post), name="sales_post"),
     path("sales/<int:pk>/edit/", staff_blocked(views.sales_edit), name="sales_edit"),
     path("sales/<int:pk>/delete/", staff_blocked(views.sales_delete), name="sales_delete"),
+    path("sales/<int:pk>/share/", staff_allowed(views.sales_invoice_share), name="sales_invoice_share"),
+    path("sales/<int:pk>/share.png", staff_allowed(views.sales_invoice_share_png), name="sales_invoice_share_png"),
 
     # =========================
     # Purchases

@@ -202,20 +202,33 @@
               </td>
     
               <td class="center nowrap">
-                {% if not inv.posted %}
-                  <a href="{% url 'sales_edit' inv.id %}" class="action-pill" style="margin-right:6px;">Edit</a>
-    
-                  <form action="{% url 'sales_delete' inv.id %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="action-pill" style="margin-right:6px;"
-                            onclick="return confirm('Delete this invoice?');">
-                      Delete
-                    </button>
-                  </form>
-    
-                  <a href="{% url 'sales_post' inv.id %}" class="action-pill">Post</a>
-                {% else %}
-                  —
+
+                {# ✅ Share always visible for both Owner + Staff #}
+                <a href="{% url 'sales_invoice_share' inv.id %}"
+                   class="action-pill"
+                   style="margin-right:6px;">
+                  Share
+                </a>
+              
+                {# ✅ Only OWNER should see Edit/Delete/Post actions #}
+                {% if not is_staff_user %}
+              
+                  {% if not inv.posted %}
+                    <a href="{% url 'sales_edit' inv.id %}" class="action-pill" style="margin-right:6px;">Edit</a>
+              
+                    <form action="{% url 'sales_delete' inv.id %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="action-pill" style="margin-right:6px;"
+                              onclick="return confirm('Delete this invoice?');">
+                        Delete
+                      </button>
+                    </form>
+              
+                    <a href="{% url 'sales_post' inv.id %}" class="action-pill">Post</a>
+                  {% else %}
+                    —
+                  {% endif %}
+              
                 {% endif %}
               </td>
             </tr>

@@ -1,0 +1,401 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sales Invoice #{{ invoice.invoice_number }} — Roznamcha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .wrap{
+      max-width: 900px;
+      margin: 18px auto 28px;
+      padding: 0 14px;
+    }
+
+    .card{
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      border-radius:16px;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+      overflow:hidden;
+      position: relative;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding: 16px 18px;
+      border-bottom:1px solid #e5e7eb;
+      background:#ffffff;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .logo{
+      height:44px;
+      width:auto;
+      border-radius:10px;
+    }
+    .title{
+      min-width:0;
+    }
+    .title h1{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      line-height:1.1;
+    }
+    .title .sub{
+      margin-top:3px;
+      font-size:12px;
+      color:#6b7280;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 520px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 12px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      font-weight:700;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .pill.ok{ background:#ecfdf5; border-color:#10b981; color:#065f46; }
+    .pill.warn{ background:#fffbeb; border-color:#f59e0b; color:#92400e; }
+
+    /* Draft watermark */
+    .watermark{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      opacity:0.11;
+      transform: rotate(-18deg);
+      font-size: 84px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color:#ef4444;
+      user-select:none;
+    }
+
+    .section{
+      padding: 16px 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+
+    .box{
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:12px 12px;
+      background:#ffffff;
+    }
+    .box .label{
+      font-size:12px;
+      color:#6b7280;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    .box .value{
+      font-size:14px;
+      font-weight:800;
+      color:#111827;
+      word-break: break-word;
+    }
+    .box .muted{
+      font-weight:600;
+      color:#374151;
+      font-size:13px;
+      margin-top:4px;
+      line-height:1.35;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout: fixed;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      overflow:hidden;
+      background:#ffffff;
+    }
+    th, td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:13px;
+      vertical-align:middle;
+    }
+    th{
+      background:#f9fafb;
+      text-align:left;
+      font-weight:800;
+      color:#111827;
+    }
+    td.right, th.right{ text-align:right; }
+    td.center, th.center{ text-align:center; }
+    .truncate{
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .totals{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:12px;
+    }
+    .totals .sum{
+      width: 320px;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:12px;
+      background:#f9fafb;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:6px 0;
+      font-size:13px;
+      font-weight:800;
+    }
+    .row .k{ color:#374151; font-weight:800; }
+    .row .v{ color:#111827; }
+    .row.total{
+      border-top:1px dashed #d1d5db;
+      padding-top:8px;
+      margin-top:8px;
+      font-size:15px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      padding: 14px 18px 18px;
+      border-top:1px solid #e5e7eb;
+      background:#ffffff;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:13px;
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      color:#111827;
+      text-decoration:none;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn:hover{ background:#f3f4f6; }
+    .btn-primary{
+      background:#2563eb;
+      border-color:#2563eb;
+      color:#ffffff;
+    }
+    .btn-primary:hover{
+      background:#1d4ed8;
+      border-color:#1d4ed8;
+    }
+
+    .footer{
+      padding: 0 18px 18px;
+      color:#6b7280;
+      font-size:12px;
+      text-align:center;
+    }
+
+    /* When generating PNG, we may hide interactive elements */
+    {% if png_mode %}
+      .actions{ display:none !important; }
+      body{ background:#ffffff; }  /* cleaner png */
+      .wrap{ margin:0 auto; padding:0; }
+      .card{ box-shadow:none; border-radius:0; border:0; }
+    {% endif %}
+
+    @media (max-width: 720px){
+      .grid{ grid-template-columns: 1fr; }
+      .watermark{ font-size: 62px; }
+      .totals .sum{ width:100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+
+      {% if is_draft %}
+        <div class="watermark">DRAFT</div>
+      {% endif %}
+
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="brand">
+          <img class="logo" src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
+          <div class="title">
+            <h1>Sales Invoice</h1>
+            <div class="sub">
+              Invoice #{{ invoice.invoice_number }} • {{ invoice.invoice_date|date:"M j, Y" }}
+            </div>
+          </div>
+        </div>
+
+        {% if is_draft %}
+          <div class="pill warn">UNPOSTED / DRAFT</div>
+        {% else %}
+          <div class="pill ok">POSTED</div>
+        {% endif %}
+      </div>
+
+      <!-- Party + Invoice Details -->
+      <div class="section">
+        <div class="grid">
+          <div class="box">
+            <div class="label">Customer</div>
+            <div class="value">{{ customer.name }}</div>
+            {% if customer.phone or customer.city or customer.address %}
+              <div class="muted">
+                {% if customer.phone %}📞 {{ customer.phone }}{% endif %}
+                {% if customer.phone and customer.city %} • {% endif %}
+                {% if customer.city %}🏙️ {{ customer.city }}{% endif %}
+                {% if customer.address %}<br>📍 {{ customer.address }}{% endif %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="box">
+            <div class="label">Invoice Details</div>
+            <div class="muted">
+              <b>Invoice #:</b> {{ invoice.invoice_number }}<br>
+              <b>Date:</b> {{ invoice.invoice_date|date:"M j, Y" }}<br>
+              <b>Payment:</b>
+              {% if invoice.payment_type == "CREDIT" %}Credit{% endif %}
+              {% if invoice.payment_type == "FULL" %}Full Payment{% endif %}
+              {% if invoice.payment_type == "PARTIAL" %}Partial Payment{% endif %}
+              {% if invoice.payment_type != "CREDIT" %}
+                <br><b>Paid:</b> {{ invoice.payment_amount|floatformat:2 }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if invoice.notes %}
+          <div style="margin-top:12px;" class="box">
+            <div class="label">Notes</div>
+            <div class="muted">{{ invoice.notes }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Items table -->
+      <div class="section" style="padding-top:0;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:42%;">Product</th>
+              <th class="center" style="width:16%;">Unit</th>
+              <th class="right" style="width:14%;">Qty</th>
+              <th class="right" style="width:14%;">Rate</th>
+              <th class="right" style="width:14%;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for it in items %}
+              <tr>
+                <td class="truncate" title="{{ it.product.name }}">{{ it.product.name }}</td>
+                <td class="center">{{ it.unit_type }}</td>
+                <td class="right">{{ it.quantity_units|floatformat:3 }}</td>
+                <td class="right">{{ it.unit_price|floatformat:2 }}</td>
+                <td class="right">{{ it.line_total|floatformat:2 }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" style="text-align:center;color:#6b7280;padding:14px;">
+                  No items found.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="sum">
+            <div class="row total">
+              <div class="k">Total</div>
+              <div class="v">PKR {{ total|floatformat:2 }}</div>
+            </div>
+
+            {% if invoice.payment_type != "CREDIT" %}
+              <div class="row">
+                <div class="k">Paid</div>
+                <div class="v">PKR {{ invoice.payment_amount|floatformat:2 }}</div>
+              </div>
+              <div class="row">
+                <div class="k">Balance</div>
+                <div class="v">
+                  PKR {{ total|add:"-invoice.payment_amount"|floatformat:2 }}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a class="btn" href="{% url 'sales_list' %}">← Back</a>
+
+        <!-- Download PNG (one-click) -->
+        <a class="btn btn-primary" href="{% url 'sales_invoice_share_png' invoice.id %}">
+          ⬇️ Download PNG
+        </a>
+
+        <!-- Optional note for staff/owner -->
+        {% if is_draft %}
+          <span class="pill warn">Draft invoice (not posted)</span>
+        {% endif %}
+      </div>
+
+      <div class="footer">
+        Generated by Roznamcha • https://roznamcha.app
+      </div>
+    </div>
+  </div>
+</body>
+</html>
