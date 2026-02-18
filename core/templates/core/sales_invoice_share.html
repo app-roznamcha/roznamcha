@@ -296,7 +296,7 @@
           {% endif %}
         </div>
       </div>
-
+    </div>
       <div class="section">
         <div class="grid">
           <div class="box">
@@ -327,13 +327,6 @@
             </div>
           </div>
         </div>
-
-        {% if invoice.notes %}
-          <div style="margin-top:12px;" class="box">
-            <div class="label">Notes</div>
-            <div class="muted">{{ invoice.notes }}</div>
-          </div>
-        {% endif %}
       </div>
 
       <div class="section" style="padding-top:0;">
@@ -406,14 +399,18 @@
         <a class="btn" href="{% url 'sales_list' %}">← Back</a>
 
         <div id="shareControls" style="display:flex;gap:10px;align-items:center;">
-          <button type="button" class="btn btn-primary" onclick="downloadInvoicePNG()">
-            ⬇️ Download PNG
-          </button>
-
-          <button type="button" class="btn btn-wa" onclick="shareOnWhatsApp()">
-            🟢 Share WhatsApp
-          </button>
-        </div>
+            <button type="button" class="btn btn-primary" onclick="downloadInvoicePNG()">
+              ⬇️ Download PNG
+            </button>
+          
+            <button type="button" class="btn btn-wa" onclick="shareOnWhatsApp()">
+              🟢 Share WhatsApp
+            </button>
+          
+            <span id="waHint" style="display:none;font-size:12px;color:#6b7280;font-weight:700;">
+              Tip: On desktop WhatsApp can’t auto-attach images. Download PNG, then attach it in chat.
+            </span>
+          </div>
 
         {% if is_draft %}
           <span class="pill warn">Draft invoice (not posted)</span>
@@ -435,43 +432,47 @@
     const IS_DRAFT = {{ is_draft|yesno:"true,false" }};
     const TOTAL = "{{ total|floatformat:2 }}";
     const CURRENT_DUE = "{{ current_due|floatformat:2 }}";
-
+  
     function normalizePkPhone(raw) {
       if (!raw) return "";
       let p = String(raw).replace(/[^\d]/g, ""); // digits only
-
-      // if starts with 0 and length 11 => convert to 92xxxxxxxxxx
+  
+      // 03xxxxxxxxx (11 digits) -> 92xxxxxxxxxx
       if (p.length === 11 && p.startsWith("0")) p = "92" + p.slice(1);
-
-      // if starts with 92 already ok
-      if (p.startsWith("92") && p.length >= 12) return p;
-
-      // otherwise return as-is (user might have international)
+  
+      // If already has country code like 92...
+      if (p.startsWith("92")) return p;
+  
+      // If user typed without 0 (e.g. 333...) you may decide policy; for now return digits as-is
       return p;
     }
-
+  
     function buildWhatsappText() {
       const status = IS_DRAFT ? "DRAFT (Unposted)" : "POSTED";
-      return `Roznamcha Sales Invoice\nInvoice #${INVOICE_NO}\nDate: ${INVOICE_DATE}\nStatus: ${status}\nTotal: PKR ${TOTAL}\nCurrent Due: PKR ${CURRENT_DUE}\n\nPNG attached.`;
+      return `Roznamcha Sales Invoice%0AInvoice #${INVOICE_NO}%0ADate: ${INVOICE_DATE}%0AStatus: ${status}%0ATotal: PKR ${TOTAL}%0ACurrent Due: PKR ${CURRENT_DUE}%0A%0A(Invoice image attached separately)`;
     }
-
+  
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+  
     async function makeInvoicePngFile() {
       const node = document.getElementById("invoiceCanvas");
       if (!node) throw new Error("Invoice container not found.");
-
+  
       const controls = document.getElementById("shareControls");
       if (controls) controls.style.display = "none";
-
+  
       try {
         const canvas = await html2canvas(node, {
           scale: 2,
           useCORS: true,
           backgroundColor: "#ffffff",
         });
-
+  
         const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
         if (!blob) throw new Error("Failed to create PNG blob.");
-
+  
         const fileName = `${INVOICE_NO}-invoice.png`;
         return new File([blob], fileName, { type: "image/png" });
       } finally {
@@ -479,7 +480,7 @@
         if (controls) controls.style.display = "";
       }
     }
-
+  
     async function downloadInvoicePNG() {
       try {
         const file = await makeInvoicePngFile();
@@ -496,35 +497,49 @@
         alert("Failed to generate PNG. Try again.");
       }
     }
-
+  
     async function shareOnWhatsApp() {
       const phone = normalizePkPhone(CUSTOMER_PHONE_RAW);
       const text = buildWhatsappText();
-
-      // ✅ Try native share (best UX on mobile)
+  
+      // ✅ Best: native share with file (mostly mobile)
       try {
         const file = await makeInvoicePngFile();
-
         if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
           await navigator.share({
             title: `Invoice #${INVOICE_NO}`,
-            text,
+            text: decodeURIComponent(text.replace(/\+/g, "%20")),
             files: [file],
           });
           return;
         }
       } catch (e) {
-        // ignore and fall back
-        console.warn("Native share failed, falling back:", e);
+        console.warn("Native share not available:", e);
       }
-
-      // ✅ Fallback: download PNG, then open WhatsApp with message
-      await downloadInvoicePNG();
-
-      const waBase = phone ? `https://wa.me/${phone}` : `https://wa.me/`;
-      const waUrl = `${waBase}?text=${encodeURIComponent(text)}`;
-      window.open(waUrl, "_blank");
+  
+      // ✅ Desktop/unsupported: open WhatsApp with TEXT only (no auto-download)
+      const waHint = document.getElementById("waHint");
+      if (waHint) waHint.style.display = "inline";
+  
+      const base = isMobile()
+        ? "https://wa.me/"
+        : "https://web.whatsapp.com/send";
+  
+      let url = "";
+      if (isMobile()) {
+        // wa.me/<phone>?text=...
+        url = phone
+          ? `https://wa.me/${phone}?text=${text}`
+          : `https://wa.me/?text=${text}`;
+      } else {
+        // web.whatsapp.com/send?phone=<phone>&text=...
+        url = phone
+          ? `https://web.whatsapp.com/send?phone=${phone}&text=${text}`
+          : `https://web.whatsapp.com/`;
+      }
+  
+      window.open(url, "_blank", "noopener");
     }
   </script>
-</body>
+  </body>
 </html>
