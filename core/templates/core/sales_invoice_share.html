@@ -382,9 +382,13 @@
         <a class="btn" href="{% url 'sales_list' %}">← Back</a>
 
         <!-- Download PNG (one-click) -->
-        <a class="btn btn-primary" href="{% url 'sales_invoice_share_png' invoice.id %}">
-          ⬇️ Download PNG
-        </a>
+        <div id="shareControls" style="display:flex;gap:12px;margin-top:18px;">
+            <a href="{% url 'sales_list' %}" class="btn btn-secondary">← Back</a>
+          
+            <button type="button" class="btn btn-primary" onclick="downloadInvoicePNG()">
+              ⬇️ Download PNG
+            </button>
+          </div>
 
         <!-- Optional note for staff/owner -->
         {% if is_draft %}
@@ -397,5 +401,39 @@
       </div>
     </div>
   </div>
+  <!-- html2canvas CDN -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+  async function downloadInvoicePNG() {
+    const node = document.getElementById("invoiceCanvas");
+    if (!node) return alert("Invoice container not found.");
+
+    // Hide buttons before capture (optional)
+    const controls = document.getElementById("shareControls");
+    if (controls) controls.style.display = "none";
+
+    try {
+      const canvas = await html2canvas(node, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "{{ invoice.invoice_number|default:invoice.id }}-invoice.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate PNG. Try again.");
+    } finally {
+      if (controls) controls.style.display = "";
+    }
+  }
+</script>
 </body>
 </html>

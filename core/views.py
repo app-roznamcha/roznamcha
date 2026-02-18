@@ -5954,50 +5954,14 @@ def sales_invoice_share(request, pk):
     }
     return render(request, "core/sales_invoice_share.html", context)
 
-async def _render_url_to_png(url: str, viewport_width: int = 950) -> bytes:
-    """
-    Uses Playwright to render a URL and return a PNG screenshot.
-    """
-    from playwright.async_api import async_playwright
-
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(args=["--no-sandbox"])
-        page = await browser.new_page(viewport={"width": viewport_width, "height": 900})
-
-        # Load and wait
-        await page.goto(url, wait_until="networkidle")
-        await page.wait_for_timeout(300)  # small settle time for fonts/layout
-
-        # Full page screenshot
-        png_bytes = await page.screenshot(full_page=True, type="png")
-
-        await browser.close()
-        return png_bytes
-
 
 @login_required
 @resolve_tenant_context(require_company=True)
 @staff_allowed
 @subscription_required
 def sales_invoice_share_png(request, pk):
-    """
-    One-click PNG download of Sales Invoice Share page.
-    - Staff allowed (to share invoices)
-    - If not posted => will show DRAFT watermark (your HTML already handles it)
-    """
-    invoice = tenant_get_object_or_404(request, SalesInvoice, pk=pk)
-
-    # 🔒 SaaS safety: invoice must belong to tenant owner (tenant_get_object_or_404 already ensures owner safety)
-
-    # Build absolute URL to the HTML share page with png_mode=1
-    share_url = reverse("sales_invoice_share", args=[invoice.id])
-    qs = urlencode({"png": "1"})
-    absolute_url = request.build_absolute_uri(f"{share_url}?{qs}")
-
-    # Render to PNG
-    png_bytes = asyncio.run(_render_url_to_png(absolute_url))
-
-    filename = f"sales-invoice-{invoice.invoice_number or invoice.id}.png"
-    resp = HttpResponse(png_bytes, content_type="image/png")
-    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return resp
+    return HttpResponse(
+        "PNG download is available on the Share page. Open /sales/<id>/share/ and click Download PNG.",
+        status=501,
+        content_type="text/plain",
+    )
