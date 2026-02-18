@@ -175,7 +175,7 @@
       margin-top:12px;
     }
     .totals .sum{
-      width: 320px;
+      width: 340px;
       border:1px solid #e5e7eb;
       border-radius:12px;
       padding:12px;
@@ -232,6 +232,15 @@
       background:#1d4ed8;
       border-color:#1d4ed8;
     }
+    .btn-wa{
+      background:#16a34a;
+      border-color:#16a34a;
+      color:#ffffff;
+    }
+    .btn-wa:hover{
+      background:#15803d;
+      border-color:#15803d;
+    }
 
     .footer{
       padding: 0 18px 18px;
@@ -240,10 +249,9 @@
       text-align:center;
     }
 
-    /* When generating PNG, we may hide interactive elements */
     {% if png_mode %}
       .actions{ display:none !important; }
-      body{ background:#ffffff; }  /* cleaner png */
+      body{ background:#ffffff; }
       .wrap{ margin:0 auto; padding:0; }
       .card{ box-shadow:none; border-radius:0; border:0; }
     {% endif %}
@@ -258,14 +266,12 @@
 
 <body>
   <div class="wrap">
-    <!-- ✅ This ID is REQUIRED for html2canvas -->
     <div class="card" id="invoiceCanvas">
 
       {% if is_draft %}
         <div class="watermark">DRAFT</div>
       {% endif %}
 
-      <!-- Top bar -->
       <div class="topbar">
         <div class="brand">
           <img class="logo" src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
@@ -284,7 +290,6 @@
         {% endif %}
       </div>
 
-      <!-- Party + Invoice Details -->
       <div class="section">
         <div class="grid">
           <div class="box">
@@ -310,7 +315,7 @@
               {% if invoice.payment_type == "FULL" %}Full Payment{% endif %}
               {% if invoice.payment_type == "PARTIAL" %}Partial Payment{% endif %}
               {% if invoice.payment_type != "CREDIT" %}
-                <br><b>Paid:</b> {{ invoice.payment_amount|floatformat:2 }}
+                <br><b>Paid:</b> {{ paid|floatformat:2 }}
               {% endif %}
             </div>
           </div>
@@ -324,7 +329,6 @@
         {% endif %}
       </div>
 
-      <!-- Items table -->
       <div class="section" style="padding-top:0;">
         <table>
           <thead>
@@ -357,37 +361,50 @@
 
         <div class="totals">
           <div class="sum">
-            <div class="row total">
-              <div class="k">Total</div>
+
+            <!-- ✅ Vyapar-like balances -->
+            <div class="row">
+              <div class="k">Previous Due</div>
+              <div class="v">PKR {{ previous_due|floatformat:2 }}</div>
+            </div>
+
+            <div class="row">
+              <div class="k">Invoice Total</div>
               <div class="v">PKR {{ total|floatformat:2 }}</div>
             </div>
 
             {% if invoice.payment_type != "CREDIT" %}
               <div class="row">
                 <div class="k">Paid</div>
-                <div class="v">PKR {{ invoice.payment_amount|floatformat:2 }}</div>
-              </div>
-              <div class="row">
-                <div class="k">Balance</div>
-                <div class="v">
-                  PKR {{ total|add:"-invoice.payment_amount"|floatformat:2 }}
-                </div>
+                <div class="v">PKR {{ paid|floatformat:2 }}</div>
               </div>
             {% endif %}
+
+            <div class="row">
+              <div class="k">This Invoice Due</div>
+              <div class="v">PKR {{ invoice_due|floatformat:2 }}</div>
+            </div>
+
+            <div class="row total">
+              <div class="k">Current Due</div>
+              <div class="v">PKR {{ current_due|floatformat:2 }}</div>
+            </div>
+
           </div>
         </div>
 
       </div>
 
-      <!-- Actions -->
       <div class="actions">
-        <!-- ✅ only ONE back button now -->
         <a class="btn" href="{% url 'sales_list' %}">← Back</a>
 
-        <!-- ✅ keep only download controls here -->
         <div id="shareControls" style="display:flex;gap:10px;align-items:center;">
           <button type="button" class="btn btn-primary" onclick="downloadInvoicePNG()">
             ⬇️ Download PNG
+          </button>
+
+          <button type="button" class="btn btn-wa" onclick="shareOnWhatsApp()">
+            🟢 Share WhatsApp
           </button>
         </div>
 
@@ -402,13 +419,38 @@
     </div>
   </div>
 
-  <!-- html2canvas CDN -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
-    async function downloadInvoicePNG() {
+    const CUSTOMER_PHONE_RAW = "{{ customer.phone|default:'' }}";
+    const INVOICE_NO = "{{ invoice.invoice_number|default:invoice.id }}";
+    const INVOICE_DATE = "{{ invoice.invoice_date|date:'M j, Y' }}";
+    const IS_DRAFT = {{ is_draft|yesno:"true,false" }};
+    const TOTAL = "{{ total|floatformat:2 }}";
+    const CURRENT_DUE = "{{ current_due|floatformat:2 }}";
+
+    function normalizePkPhone(raw) {
+      if (!raw) return "";
+      let p = String(raw).replace(/[^\d]/g, ""); // digits only
+
+      // if starts with 0 and length 11 => convert to 92xxxxxxxxxx
+      if (p.length === 11 && p.startsWith("0")) p = "92" + p.slice(1);
+
+      // if starts with 92 already ok
+      if (p.startsWith("92") && p.length >= 12) return p;
+
+      // otherwise return as-is (user might have international)
+      return p;
+    }
+
+    function buildWhatsappText() {
+      const status = IS_DRAFT ? "DRAFT (Unposted)" : "POSTED";
+      return `Roznamcha Sales Invoice\nInvoice #${INVOICE_NO}\nDate: ${INVOICE_DATE}\nStatus: ${status}\nTotal: PKR ${TOTAL}\nCurrent Due: PKR ${CURRENT_DUE}\n\nPNG attached.`;
+    }
+
+    async function makeInvoicePngFile() {
       const node = document.getElementById("invoiceCanvas");
-      if (!node) return alert("Invoice container not found.");
+      if (!node) throw new Error("Invoice container not found.");
 
       const controls = document.getElementById("shareControls");
       if (controls) controls.style.display = "none";
@@ -420,19 +462,61 @@
           backgroundColor: "#ffffff",
         });
 
-        const dataUrl = canvas.toDataURL("image/png");
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) throw new Error("Failed to create PNG blob.");
+
+        const fileName = `${INVOICE_NO}-invoice.png`;
+        return new File([blob], fileName, { type: "image/png" });
+      } finally {
+        const controls = document.getElementById("shareControls");
+        if (controls) controls.style.display = "";
+      }
+    }
+
+    async function downloadInvoicePNG() {
+      try {
+        const file = await makeInvoicePngFile();
+        const url = URL.createObjectURL(file);
         const a = document.createElement("a");
-        a.href = dataUrl;
-        a.download = "{{ invoice.invoice_number|default:invoice.id }}-invoice.png";
+        a.href = url;
+        a.download = file.name;
         document.body.appendChild(a);
         a.click();
         a.remove();
+        URL.revokeObjectURL(url);
       } catch (e) {
         console.error(e);
         alert("Failed to generate PNG. Try again.");
-      } finally {
-        if (controls) controls.style.display = "";
       }
+    }
+
+    async function shareOnWhatsApp() {
+      const phone = normalizePkPhone(CUSTOMER_PHONE_RAW);
+      const text = buildWhatsappText();
+
+      // ✅ Try native share (best UX on mobile)
+      try {
+        const file = await makeInvoicePngFile();
+
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+          await navigator.share({
+            title: `Invoice #${INVOICE_NO}`,
+            text,
+            files: [file],
+          });
+          return;
+        }
+      } catch (e) {
+        // ignore and fall back
+        console.warn("Native share failed, falling back:", e);
+      }
+
+      // ✅ Fallback: download PNG, then open WhatsApp with message
+      await downloadInvoicePNG();
+
+      const waBase = phone ? `https://wa.me/${phone}` : `https://wa.me/`;
+      const waUrl = `${waBase}?text=${encodeURIComponent(text)}`;
+      window.open(waUrl, "_blank");
     }
   </script>
 </body>

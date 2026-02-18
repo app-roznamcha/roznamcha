@@ -5944,11 +5944,39 @@ def sales_invoice_share(request, pk):
     role = getattr(prof, "role", None)
     is_staff_user = (role == "STAFF")
 
+    total = invoice.calculate_total()
+    paid = Decimal(str(getattr(invoice, "payment_amount", 0) or 0))
+
+    # ✅ This invoice due
+    invoice_due = total - paid
+    if invoice_due < 0:
+        invoice_due = Decimal("0")
+
+    # ✅ Previous due (BEFORE this invoice)
+    previous_due = Decimal("0")
+    try:
+        # If you already have a helper like customer.balance() or customer.current_balance, use it
+        if hasattr(invoice.customer, "current_balance"):
+            previous_due = Decimal(str(invoice.customer.current_balance or 0))
+        elif hasattr(invoice.customer, "get_balance"):
+            previous_due = Decimal(str(invoice.customer.get_balance() or 0))
+        else:
+            previous_due = Decimal("0")
+    except Exception:
+        previous_due = Decimal("0")
+
+    # ✅ Current due (after adding this invoice due)
+    current_due = previous_due + invoice_due
+
     context = {
         "invoice": invoice,
         "items": invoice.items.all(),
         "customer": invoice.customer,
         "total": total,
+        "paid": paid,
+        "invoice_due": invoice_due,
+        "previous_due": previous_due,
+        "current_due": current_due,
         "is_draft": is_draft,
         "is_staff_user": is_staff_user,
     }
