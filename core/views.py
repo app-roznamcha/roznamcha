@@ -5917,9 +5917,11 @@ def sitemap_xml(request):
 """
     return HttpResponse(xml, content_type="application/xml")
 
+from decimal import Decimal  # ensure this exists at top of file
+
 @login_required
 @resolve_tenant_context(require_company=True)
-@owner_required
+@staff_allowed  # ✅ because your doc says OWNER + STAFF
 @subscription_required
 def sales_invoice_share(request, pk):
     """
@@ -5933,40 +5935,65 @@ def sales_invoice_share(request, pk):
         pk=pk,
     )
 
-    # ✅ Draft logic
-    is_draft = not bool(invoice.posted)
+    is_draft = not bool(getattr(invoice, "posted", False))
 
-    # Totals (use your model function)
-    total = invoice.calculate_total()
+    # Totals
+    total = Decimal(str(invoice.calculate_total() or 0))
+    paid = Decimal(str(getattr(invoice, "payment_amount", 0) or 0))
+
+    # This invoice due
+    invoice_due = total - paid
+    if invoice_due < 0:
+        invoice_due = Decimal("0")
+
+    # Previous due (BEFORE this invoice)
+    #
+    # IMPORTANT:
+    # If customer.current_balance already INCLUDES this invoice, then we must subtract invoice_due.
+    previous_due = Decimal("0")
+    try:
+        if hasattr(invoice.customer, "current_balance"):
+            current_bal = Decimal(str(invoice.customer.current_balance or 0))
+            previous_due = current_bal - invoice_due
+        elif hasattr(invoice.customer, "get_balance"):
+            current_bal = Decimal(str(invoice.customer.get_balance() or 0))
+            previous_due = current_bal - invoice_due
+        else:
+            previous_due = Decimal("0")
+    except Exception:
+        previous_due = Decimal("0")
+
+    if previous_due < 0:
+        previous_due = Decimal("0")
+
+    # Current due (after adding this invoice due)
+    current_due = previous_due + invoice_due
 
     # Useful flags for template
     prof = getattr(request.user, "profile", None)
     role = getattr(prof, "role", None)
     is_staff_user = (role == "STAFF")
 
-    total = invoice.calculate_total()
-    paid = Decimal(str(getattr(invoice, "payment_amount", 0) or 0))
+    # Company branding (safe fallbacks)
+    company = getattr(request, "company", None)
+    if company is None:
+        company = getattr(request.owner, "company", None)
 
-    # ✅ This invoice due
-    invoice_due = total - paid
-    if invoice_due < 0:
-        invoice_due = Decimal("0")
+    company_name = (
+        getattr(company, "name", None)
+        or getattr(company, "company_name", None)
+        or getattr(request.owner, "name", None)
+        or getattr(request.owner, "username", None)
+        or "Roznamcha"
+    )
 
-    # ✅ Previous due (BEFORE this invoice)
-    previous_due = Decimal("0")
-    try:
-        # If you already have a helper like customer.balance() or customer.current_balance, use it
-        if hasattr(invoice.customer, "current_balance"):
-            previous_due = Decimal(str(invoice.customer.current_balance or 0))
-        elif hasattr(invoice.customer, "get_balance"):
-            previous_due = Decimal(str(invoice.customer.get_balance() or 0))
-        else:
-            previous_due = Decimal("0")
-    except Exception:
-        previous_due = Decimal("0")
-
-    # ✅ Current due (after adding this invoice due)
-    current_due = previous_due + invoice_due
+    company_phone = (
+        getattr(company, "phone", None)
+        or getattr(company, "phone_number", None)
+        or getattr(request.owner, "phone", None)
+        or getattr(request.owner, "phone_number", None)
+        or ""
+    )
 
     context = {
         "invoice": invoice,
@@ -5979,6 +6006,8 @@ def sales_invoice_share(request, pk):
         "current_due": current_due,
         "is_draft": is_draft,
         "is_staff_user": is_staff_user,
+        "company_name": company_name,
+        "company_phone": company_phone,
     }
     return render(request, "core/sales_invoice_share.html", context)
 
@@ -5988,8 +6017,6 @@ def sales_invoice_share(request, pk):
 @staff_allowed
 @subscription_required
 def sales_invoice_share_png(request, pk):
-    return HttpResponse(
-        "PNG download is available on the Share page. Open /sales/<id>/share/ and click Download PNG.",
-        status=501,
-        content_type="text/plain",
-    )
+    # We intentionally generate PNG client-side (html2canvas) for Render compatibility.
+    # Redirect users to the share page.
+    return redirect(reverse("sales_invoice_share", args=[pk]))

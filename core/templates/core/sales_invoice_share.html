@@ -280,14 +280,21 @@
             <div class="sub">
               Invoice #{{ invoice.invoice_number }} • {{ invoice.invoice_date|date:"M j, Y" }}
             </div>
+            {% if company_name %}
+              <div class="sub">
+                {{ company_name }}{% if company_phone %} • {{ company_phone }}{% endif %}
+              </div>
+            {% endif %}
           </div>
         </div>
-
-        {% if is_draft %}
-          <div class="pill warn">UNPOSTED / DRAFT</div>
-        {% else %}
-          <div class="pill ok">POSTED</div>
-        {% endif %}
+      
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+          {% if is_draft %}
+            <div class="pill warn">UNPOSTED / DRAFT</div>
+          {% else %}
+            <div class="pill ok">POSTED</div>
+          {% endif %}
+        </div>
       </div>
 
       <div class="section">
