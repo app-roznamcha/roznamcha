@@ -98,9 +98,9 @@
 
           <select name="side" id="pa_side"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <!-- labels will be updated by JS based on Customer/Supplier -->
-            <option value="DR" selected data-i18n="increase_adds">Increase (adds to balance)</option>
-            <option value="CR" data-i18n="decrease_reduces">Decrease (reduces balance)</option>
+            <!-- Default text will be replaced by JS once party type is known -->
+            <option value="DR" selected data-i18n="effect_opt_1">Option 1</option>
+            <option value="CR" data-i18n="effect_opt_2">Option 2</option>
           </select>
 
           <div id="pa_effect_line" style="margin-top:8px;font-size:13px;color:#0f172a;font-weight:700;" data-i18n="after_adjustment_dash">
@@ -160,7 +160,15 @@
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.date }}</td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.party.name }}</td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.party.get_party_type_display }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.adjustment_side }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">
+                {% if a.party.party_type == "CUSTOMER" %}
+                  {% if a.adjustment_side == "DR" %}Customer owes MORE{% else %}Customer owes LESS{% endif %}
+                {% elif a.party.party_type == "SUPPLIER" %}
+                  {% if a.adjustment_side == "DR" %}You owe LESS{% else %}You owe MORE{% endif %}
+                {% else %}
+                  {{ a.adjustment_side }}
+                {% endif %}
+              </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ a.amount }}</td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;color:#475569;">{{ a.description|default:"—" }}</td>
             </tr>
@@ -353,8 +361,8 @@
           sideEl.options[0].text = tr("dr_supplier_less", "DR — You will owe supplier LESS");
           sideEl.options[1].text = tr("cr_supplier_more", "CR — You will owe supplier MORE");
         } else {
-          sideEl.options[0].text = tr("dr_increase_adds", "DR — Increase (adds to balance)");
-          sideEl.options[1].text = tr("cr_decrease_reduces", "CR — Decrease (reduces balance)");
+          sideEl.options[0].text = tr("effect_choose_party", "Select a party to see the correct effect");
+          sideEl.options[1].text = tr("effect_choose_party_2", "Select a party to see the correct effect");
         }
 
         // Build the clear sentence you want
@@ -506,7 +514,11 @@
     after_customer_less: "After this adjustment, customer will owe you Rs {money} less.",
     after_supplier_less: "After this adjustment, you will owe the supplier Rs {money} less.",
     after_supplier_more: "After this adjustment, you will owe the supplier Rs {money} more.",
-    after_balance_change: "After this adjustment, balance will change by Rs {money}."
+    after_balance_change: "After this adjustment, balance will change by Rs {money}.",
+    effect_opt_1: "Option 1",
+    effect_opt_2: "Option 2",
+    effect_choose_party: "Select a party to see the correct effect",
+    effect_choose_party_2: "Select a party to see the correct effect",
   });
 
   Object.assign(window.ROZ_I18N.ur, {
@@ -570,7 +582,11 @@
     after_customer_less: "اس ایڈجسٹمنٹ کے بعد کسٹمر آپ کو Rs {money} کم دے گا۔",
     after_supplier_less: "اس ایڈجسٹمنٹ کے بعد آپ سپلائر کو Rs {money} کم دیں گے۔",
     after_supplier_more: "اس ایڈجسٹمنٹ کے بعد آپ سپلائر کو Rs {money} زیادہ دیں گے۔",
-    after_balance_change: "اس ایڈجسٹمنٹ کے بعد بیلنس میں Rs {money} کی تبدیلی ہوگی۔"
+    after_balance_change: "اس ایڈجسٹمنٹ کے بعد بیلنس میں Rs {money} کی تبدیلی ہوگی۔",
+    effect_opt_1: "آپشن 1",
+    effect_opt_2: "آپشن 2",
+    effect_choose_party: "درست اثر دیکھنے کیلئے پارٹی منتخب کریں",
+    effect_choose_party_2: "درست اثر دیکھنے کیلئے پارٹی منتخب کریں",
   });
 
   // Apply current language to this page after dict is loaded
