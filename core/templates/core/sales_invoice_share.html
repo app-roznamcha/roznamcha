@@ -487,40 +487,74 @@
         return new File([blob], fileName, { type: "image/png" });
       } finally {
         const controls = document.getElementById("shareControls");
-        if (controls) controls.style.display = "";
+        if (controls) controls.style.display = "flex";
       }
     }
 
     // ✅ unchanged behavior (still downloads PNG)
     async function downloadInvoicePNG() {
-      try {
-        const file = await makeInvoicePngFile();
-        const url = URL.createObjectURL(file);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.name;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      } catch (e) {
-        console.error(e);
-        alert("Failed to generate PNG. Try again.");
-      }
+    const controls = document.getElementById("shareControls");
+    const oldDisplay = controls ? controls.style.display : "";
+
+    if (controls) controls.style.display = "none";
+
+    try {
+      const node = document.getElementById("invoiceCanvas");
+      if (!node) return alert("Invoice container not found.");
+
+      const canvas = await html2canvas(node, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      if (!blob) return alert("Failed to generate PNG. Try again.");
+
+      const fileName = "{{ invoice.invoice_number|default:invoice.id }}-invoice.png";
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate PNG. Try again.");
+    } finally {
+      if (controls) controls.style.display = oldDisplay; // ✅ restore exactly
     }
+  }
 
     // ✅ WhatsApp button: ONLY open WhatsApp Web chat (no message, no download, no app prompts)
-    function shareOnWhatsApp() {
-      const phone = normalizePkPhone(CUSTOMER_PHONE_RAW);
+    let waWindowRef = null;
 
-      if (!phone) {
+    function shareOnWhatsApp() {
+        const phone = normalizePkPhone(CUSTOMER_PHONE_RAW);
+
+        if (!phone) {
         alert("Customer phone number not found. Please add phone number for this customer.");
         return;
-      }
+        }
 
-      // Desktop: WhatsApp Web
-      const waUrl = `https://web.whatsapp.com/send?phone=${encodeURIComponent(phone)}`;
-      window.open(waUrl, "_blank", "noopener");
+        // ✅ WhatsApp Web only (PC decision)
+        const waUrl = `https://web.whatsapp.com/send?phone=${encodeURIComponent(phone)}`;
+
+        // ✅ Reuse the same tab if we opened it before
+        try {
+        if (waWindowRef && !waWindowRef.closed) {
+            waWindowRef.location.href = waUrl;
+            waWindowRef.focus();
+        } else {
+            waWindowRef = window.open(waUrl, "roznamcha_whatsapp", "noopener");
+        }
+        } catch (e) {
+        // fallback: normal new tab
+        window.open(waUrl, "_blank", "noopener");
+        }
     }
   </script>
 </body>
