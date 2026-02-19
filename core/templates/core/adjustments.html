@@ -6,19 +6,22 @@
 
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 6px;font-size:34px;font-weight:700;">Adjustments</h1>
+      <h1 style="margin:0 0 6px;font-size:34px;font-weight:700;" data-i18n="adj_title">Adjustments</h1>
       <p style="margin:0 0 20px;font-size:16px;color:#475569;">
-        Customer/Supplier opening balance corrections (no cash/bank involved). Posts against <strong>3000 Opening Balances</strong>.
+        <span data-i18n="adj_subtitle">
+          Customer/Supplier opening balance corrections (no cash/bank involved). Posts against
+        </span>
+        <strong>3000 <span data-i18n="opening_balances">Opening Balances</span></strong>.
       </p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
       <a href="{% url 'dashboard' %}"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:140px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;">
-        ← Dashboard
+        <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
       <a href="{% url 'payments_list' %}"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;">
-        Payments
+        <span data-i18n="payments">Payments</span>
       </a>
     </div>
   </div>
@@ -59,7 +62,7 @@
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:18px 16px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
 
-    <h2 style="margin:0 0 14px;font-size:20px;font-weight:700;">New Adjustment</h2>
+    <h2 style="margin:0 0 14px;font-size:20px;font-weight:700;" data-i18n="new_adj">New Adjustment</h2>
 
     <form method="post">
       {% csrf_token %}
@@ -68,42 +71,49 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Date</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
           <input type="date" name="date" value="{{ today }}"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Party</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="party">Party</label>
           <select name="party" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="">-- Select Party --</option>
+            <option value="" data-i18n="select_party">-- Select Party --</option>
             {% for p in parties %}
-              <option value="{{ p.id }}">{{ p.name }} ({{ p.get_party_type_display }})</option>
+              <option value="{{ p.id }}" data-ptype="{{ p.party_type }}">{{ p.name }} ({{ p.get_party_type_display }})</option>
             {% endfor %}
           </select>
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Amount (Rs)</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="amount_rs">Amount (Rs)</label>
           <input type="number" name="amount" step="0.01" min="0" required
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Side</label>
-          <select name="side"
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="effect">Effect</label>
+
+          <select name="side" id="pa_side"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="DR" selected>DR — Add balance (customer owes more / you owe supplier less)</option>
-            <option value="CR">CR — Reduce balance (customer owes less / you owe supplier more)</option>
+            <!-- labels will be updated by JS based on Customer/Supplier -->
+            <option value="DR" selected data-i18n="increase_adds">Increase (adds to balance)</option>
+            <option value="CR" data-i18n="decrease_reduces">Decrease (reduces balance)</option>
           </select>
-          <div style="margin-top:6px;font-size:13px;color:#6b7280;">
-            Easy rule: <strong>DR adds</strong> to the party balance, <strong>CR reduces</strong> it.
+
+          <div id="pa_effect_line" style="margin-top:8px;font-size:13px;color:#0f172a;font-weight:700;" data-i18n="after_adjustment_dash">
+            After this adjustment, —
+          </div>
+
+          <div style="margin-top:6px;font-size:13px;color:#6b7280;" data-i18n="tip_opening_only">
+            Tip: This is only an opening balance correction (no cash/bank).
           </div>
         </div>
 
         <div style="grid-column:1/-1;">
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Note / Reason (optional)</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="note_reason_opt">Note / Reason (optional)</label>
           <input type="text" name="note" maxlength="255"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
@@ -113,7 +123,7 @@
       <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
         <button type="submit"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          💾 Save &amp; Post Adjustment
+          <span data-i18n="save_post_adj">💾 Save &amp; Post Adjustment</span>
         </button>
       </div>
     </form>
@@ -125,9 +135,10 @@
   <div style="margin-top:22px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:14px 12px 16px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-      <h2 style="margin:0;font-size:20px;font-weight:700;">Adjustment History</h2>
+      <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="adj_history">Adjustment History</h2>
       <div style="font-size:14px;color:#475569;">
-        Total (amount sum): <strong>{{ total_adjustments }}</strong>
+        <span data-i18n="total_amount_sum">Total (amount sum):</span>
+        <strong>{{ total_adjustments }}</strong>
       </div>
     </div>
 
@@ -135,12 +146,12 @@
       <table style="border-collapse:collapse;width:100%;min-width:860px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Party</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Type</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Side</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Note</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="date">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="party">Party</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="type">Type</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="side">Side</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="amount">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="note">Note</th>
           </tr>
         </thead>
         <tbody>
@@ -155,7 +166,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="6" style="padding:14px 9px;text-align:center;color:#6b7280;">
+              <td colspan="6" style="padding:14px 9px;text-align:center;color:#6b7280;" data-i18n="no_adjustments_yet">
                 No adjustments yet.
               </td>
             </tr>
@@ -165,36 +176,38 @@
     </div>
 
     <p style="margin:12px 0 0;font-size:13px;color:#6b7280;">
-      Posting rule: hits <strong>Customer Control (1300)</strong> or <strong>Supplier Control (2100)</strong> vs <strong>Opening Balances (3000)</strong>.
+      <span data-i18n="posting_rule_party">
+        Posting rule: hits Customer Control (1300) or Supplier Control (2100) vs Opening Balances (3000).
+      </span>
     </p>
   </div>
 
   {# ===================== STOCK ADJUSTMENT CARD ===================== #}
   <div style="margin-top:26px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:18px 16px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-  
-    <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;">Stock Adjustment</h2>
-    <p style="margin:0 0 18px;font-size:15px;color:#475569;">
+
+    <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;" data-i18n="stock_adj">Stock Adjustment</h2>
+    <p style="margin:0 0 18px;font-size:15px;color:#475569;" data-i18n="stock_adj_desc">
       Damage/expiry or correction of stock with accounting impact.
     </p>
-  
+
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="form_type" value="stock_adjust">
-  
+
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
-  
+
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Date</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
           <input type="date" name="date" value="{{ today }}"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
-  
+
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Product</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="product">Product</label>
           <select name="product" id="sa_product" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="">-- Select Product --</option>
+            <option value="" data-i18n="select_product">-- Select Product --</option>
             {% for p in products %}
               <option value="{{ p.id }}"
                       data-cost="{{ p.purchase_price_per_unit|default_if_none:0|floatformat:2 }}">
@@ -203,114 +216,198 @@
             {% endfor %}
           </select>
         </div>
-  
+
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Direction</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="direction">Direction</label>
           <select name="direction" id="sa_direction"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="DOWN" selected>DOWN (Damage / Expiry / Loss)</option>
-            <option value="UP">UP (Extra / Found / Correction)</option>
+            <option value="DOWN" selected data-i18n="down_damage">DOWN (Damage / Expiry / Loss)</option>
+            <option value="UP" data-i18n="up_correction">UP (Extra / Found / Correction)</option>
           </select>
         </div>
-  
+
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Quantity</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="quantity">Quantity</label>
           <input type="number" name="qty" id="sa_qty" step="0.001" min="0"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
-  
+
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Unit Cost (Rs)</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="unit_cost_rs">Unit Cost (Rs)</label>
           <input type="number" name="unit_cost" id="sa_unit_cost" step="0.01" min="0"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-          <div style="margin-top:6px;font-size:13px;color:#6b7280;">
+          <div style="margin-top:6px;font-size:13px;color:#6b7280;" data-i18n="autofill_cost">
             Auto-fills from product purchase price.
           </div>
         </div>
-  
+
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Total (Rs)</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="total_rs">Total (Rs)</label>
           <input type="text" id="sa_total" readonly
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;background:#f9fafb;">
         </div>
-  
+
         <div style="grid-column:1/-1;">
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Reason (optional)</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="reason_opt">Reason (optional)</label>
           <input type="text" name="reason" maxlength="255"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
-  
+
       </div>
-  
+
       <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
         <button type="submit"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          💾 Save &amp; Post Stock Adjustment
+          <span data-i18n="save_post_stock">💾 Save &amp; Post Stock Adjustment</span>
         </button>
       </div>
     </form>
   </div>
-  
+
   <script>
   (function () {
     const productEl = document.getElementById("sa_product");
     const qtyEl = document.getElementById("sa_qty");
     const unitEl = document.getElementById("sa_unit_cost");
     const totalEl = document.getElementById("sa_total");
-  
+
     if (!productEl || !qtyEl || !unitEl || !totalEl) return;
-  
+
     function toNumber(val) {
       const n = parseFloat(val);
       return isNaN(n) ? 0 : n;
     }
-  
+
     function fmt(n) {
       return (toNumber(n)).toFixed(2);
     }
-  
+
     function recalc() {
       const qty = toNumber(qtyEl.value);
       const unit = toNumber(unitEl.value);
       totalEl.value = fmt(qty * unit);
     }
-  
-    // ✅ Match your sale template style: opt.dataset.cost
+
     productEl.addEventListener("change", function () {
       const opt = productEl.selectedOptions[0];
       if (!opt) return;
-  
-      const cost = opt.dataset.cost;  // <-- like opt.dataset.price in Sale page
+
+      const cost = opt.dataset.cost;
       if (cost !== undefined && cost !== null && cost !== "") {
         unitEl.value = cost;
       }
       recalc();
     });
-  
+
     qtyEl.addEventListener("input", recalc);
     unitEl.addEventListener("input", recalc);
-  
+
     recalc();
   })();
   </script>
+
+  <script>
+    (function () {
+      const partyEl = document.querySelector('select[name="party"]');
+      const amountEl = document.querySelector('input[name="amount"]');
+      const sideEl = document.getElementById('pa_side');
+      const lineEl = document.getElementById('pa_effect_line');
+
+      if (!partyEl || !amountEl || !sideEl || !lineEl) return;
+
+      function fmtMoney(n) {
+        const num = Number(n || 0);
+        if (!isFinite(num)) return "0";
+        return num.toLocaleString("en-PK", { maximumFractionDigits: 2 });
+      }
+
+      function getPartyType() {
+        const opt = partyEl.selectedOptions && partyEl.selectedOptions[0];
+        const t = (opt && opt.dataset && opt.dataset.ptype) ? String(opt.dataset.ptype).toUpperCase() : "";
+
+        if (t.includes("SUPPLIER")) return "SUPPLIER";
+        if (t.includes("CUSTOMER")) return "CUSTOMER";
+
+        if (t === "S") return "SUPPLIER";
+        if (t === "C") return "CUSTOMER";
+
+        return "";
+      }
+
+      function tr(key, fallback){
+        const lang = localStorage.getItem("roz_lang") || "en";
+        const pack = (window.ROZ_I18N && window.ROZ_I18N[lang]) ? window.ROZ_I18N[lang] : {};
+        return pack[key] || fallback || key;
+      }
+
+      function updateLabelsAndLine() {
+        const ptype = getPartyType();
+        const side = sideEl.value; // DR or CR
+        const amt = Number(amountEl.value || 0);
+
+        // Update dropdown labels based on party type
+        if (ptype === "CUSTOMER") {
+          sideEl.options[0].text = tr("dr_customer_more", "DR — Customer will owe you MORE");
+          sideEl.options[1].text = tr("cr_customer_less", "CR — Customer will owe you LESS");
+        } else if (ptype === "SUPPLIER") {
+          sideEl.options[0].text = tr("dr_supplier_less", "DR — You will owe supplier LESS");
+          sideEl.options[1].text = tr("cr_supplier_more", "CR — You will owe supplier MORE");
+        } else {
+          sideEl.options[0].text = tr("dr_increase_adds", "DR — Increase (adds to balance)");
+          sideEl.options[1].text = tr("cr_decrease_reduces", "CR — Decrease (reduces balance)");
+        }
+
+        // Build the clear sentence you want
+        if (!ptype || !amt || amt <= 0) {
+          lineEl.textContent = tr("after_adjustment_dash", "After this adjustment, —");
+          return;
+        }
+
+        const money = fmtMoney(amt);
+
+        if (ptype === "CUSTOMER") {
+          if (side === "DR") lineEl.textContent = tr("after_customer_more", `After this adjustment, customer will owe you Rs ${money} more.`).replace("{money}", money);
+          else lineEl.textContent = tr("after_customer_less", `After this adjustment, customer will owe you Rs ${money} less.`).replace("{money}", money);
+        } else if (ptype === "SUPPLIER") {
+          if (side === "DR") lineEl.textContent = tr("after_supplier_less", `After this adjustment, you will owe the supplier Rs ${money} less.`).replace("{money}", money);
+          else lineEl.textContent = tr("after_supplier_more", `After this adjustment, you will owe the supplier Rs ${money} more.`).replace("{money}", money);
+        } else {
+          lineEl.textContent = tr("after_balance_change", `After this adjustment, balance will change by Rs ${money}.`).replace("{money}", money);
+        }
+      }
+
+      partyEl.addEventListener("change", updateLabelsAndLine);
+      sideEl.addEventListener("change", updateLabelsAndLine);
+      amountEl.addEventListener("input", updateLabelsAndLine);
+
+      document.addEventListener("roz:lang-changed", () => updateLabelsAndLine());
+
+      window.addEventListener("storage", (e) => {
+        if (e.key === "roz_lang") updateLabelsAndLine();
+      });
+
+      updateLabelsAndLine();
+    })();
+  </script>
+
   <!-- =========================
        STOCK ADJUSTMENT (HISTORY)
        ========================= -->
   <div style="margin-top:22px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:14px 12px 16px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <h2 style="margin:0;font-size:20px;font-weight:700;">Stock Adjustment History</h2>
+    <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="stock_history">Stock Adjustment History</h2>
 
     <div style="margin-top:12px;overflow-x:auto;">
       <table style="border-collapse:collapse;width:100%;min-width:900px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Product</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Direction</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Qty</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Unit Cost</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;">Reason</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="date">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="product">Product</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="direction">Direction</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="qty">Qty</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="unit_cost">Unit Cost</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="amount">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="reason">Reason</th>
           </tr>
         </thead>
         <tbody>
@@ -328,7 +425,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" style="padding:14px 9px;text-align:center;color:#6b7280;">
+              <td colspan="7" style="padding:14px 9px;text-align:center;color:#6b7280;" data-i18n="no_stock_adjustments">
                 No stock adjustments yet.
               </td>
             </tr>
@@ -337,11 +434,147 @@
       </table>
     </div>
 
-    <p style="margin:12px 0 0;font-size:13px;color:#6b7280;">
-      Posting rule: <strong>DOWN</strong> → Dr Inventory Write-off (5100) / Cr Inventory (1400),
-      <strong>UP</strong> → Dr Inventory (1400) / Cr Opening Balances (3000).
+    <p style="margin:12px 0 0;font-size:13px;color:#6b7280;" data-i18n="posting_rule_stock">
+      Posting rule: DOWN → Dr Inventory Write-off (5100) / Cr Inventory (1400), UP → Dr Inventory (1400) / Cr Opening Balances (3000).
     </p>
   </div>
 
 </div>
+
+<script>
+  // Page dictionary: extend global ROZ_I18N without touching base
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+  Object.assign(window.ROZ_I18N.en, {
+    adj_title: "Adjustments",
+    adj_subtitle: "Customer/Supplier opening balance corrections (no cash/bank involved). Posts against",
+    opening_balances: "Opening Balances",
+    back_dashboard: "← Dashboard",
+    payments: "Payments",
+
+    new_adj: "New Adjustment",
+    date: "Date",
+    party: "Party",
+    select_party: "-- Select Party --",
+    amount_rs: "Amount (Rs)",
+    effect: "Effect",
+    increase_adds: "Increase (adds to balance)",
+    decrease_reduces: "Decrease (reduces balance)",
+    after_adjustment_dash: "After this adjustment, —",
+    tip_opening_only: "Tip: This is only an opening balance correction (no cash/bank).",
+    note_reason_opt: "Note / Reason (optional)",
+    save_post_adj: "💾 Save & Post Adjustment",
+
+    adj_history: "Adjustment History",
+    total_amount_sum: "Total (amount sum):",
+    type: "Type",
+    side: "Side",
+    amount: "Amount",
+    note: "Note",
+    no_adjustments_yet: "No adjustments yet.",
+    posting_rule_party: "Posting rule: hits Customer Control (1300) or Supplier Control (2100) vs Opening Balances (3000).",
+
+    stock_adj: "Stock Adjustment",
+    stock_adj_desc: "Damage/expiry or correction of stock with accounting impact.",
+    product: "Product",
+    select_product: "-- Select Product --",
+    direction: "Direction",
+    down_damage: "DOWN (Damage / Expiry / Loss)",
+    up_correction: "UP (Extra / Found / Correction)",
+    quantity: "Quantity",
+    unit_cost_rs: "Unit Cost (Rs)",
+    autofill_cost: "Auto-fills from product purchase price.",
+    total_rs: "Total (Rs)",
+    reason_opt: "Reason (optional)",
+    save_post_stock: "💾 Save & Post Stock Adjustment",
+
+    stock_history: "Stock Adjustment History",
+    qty: "Qty",
+    unit_cost: "Unit Cost",
+    reason: "Reason",
+    no_stock_adjustments: "No stock adjustments yet.",
+    posting_rule_stock: "Posting rule: DOWN → Dr Inventory Write-off (5100) / Cr Inventory (1400), UP → Dr Inventory (1400) / Cr Opening Balances (3000).",
+
+    // JS dynamic labels/sentences
+    dr_customer_more: "DR — Customer will owe you MORE",
+    cr_customer_less: "CR — Customer will owe you LESS",
+    dr_supplier_less: "DR — You will owe supplier LESS",
+    cr_supplier_more: "CR — You will owe supplier MORE",
+    dr_increase_adds: "DR — Increase (adds to balance)",
+    cr_decrease_reduces: "CR — Decrease (reduces balance)",
+    after_customer_more: "After this adjustment, customer will owe you Rs {money} more.",
+    after_customer_less: "After this adjustment, customer will owe you Rs {money} less.",
+    after_supplier_less: "After this adjustment, you will owe the supplier Rs {money} less.",
+    after_supplier_more: "After this adjustment, you will owe the supplier Rs {money} more.",
+    after_balance_change: "After this adjustment, balance will change by Rs {money}."
+  });
+
+  Object.assign(window.ROZ_I18N.ur, {
+    adj_title: "ایڈجسٹمنٹس",
+    adj_subtitle: "کسٹمر/سپلائر کی اوپننگ بیلنس کی درستگی (کیش/بینک شامل نہیں)۔ یہ پوسٹ ہوتا ہے",
+    opening_balances: "اوپننگ بیلنس",
+    back_dashboard: "← ڈیش بورڈ",
+    payments: "ادائیگیاں",
+
+    new_adj: "نئی ایڈجسٹمنٹ",
+    date: "تاریخ",
+    party: "پارٹی",
+    select_party: "-- پارٹی منتخب کریں --",
+    amount_rs: "رقم (روپے)",
+    effect: "اثر",
+    increase_adds: "اضافہ (بیلنس بڑھتا ہے)",
+    decrease_reduces: "کمی (بیلنس گھٹتا ہے)",
+    after_adjustment_dash: "اس ایڈجسٹمنٹ کے بعد —",
+    tip_opening_only: "ٹِپ: یہ صرف اوپننگ بیلنس کی درستگی ہے (کیش/بینک شامل نہیں)۔",
+    note_reason_opt: "نوٹ / وجہ (اختیاری)",
+    save_post_adj: "💾 محفوظ کریں اور پوسٹ کریں",
+
+    adj_history: "ایڈجسٹمنٹ ہسٹری",
+    total_amount_sum: "کل (رقم کا مجموعہ):",
+    type: "قسم",
+    side: "سائیڈ",
+    amount: "رقم",
+    note: "نوٹ",
+    no_adjustments_yet: "ابھی تک کوئی ایڈجسٹمنٹ نہیں۔",
+    posting_rule_party: "پوسٹنگ رول: کسٹمر کنٹرول (1300) یا سپلائر کنٹرول (2100) بمقابلہ اوپننگ بیلنس (3000)۔",
+
+    stock_adj: "اسٹاک ایڈجسٹمنٹ",
+    stock_adj_desc: "نقصان/ایکسپائری یا اسٹاک کی درستگی (اکاؤنٹنگ اثر کے ساتھ)۔",
+    product: "پروڈکٹ",
+    select_product: "-- پروڈکٹ منتخب کریں --",
+    direction: "ڈائریکشن",
+    down_damage: "DOWN (نقصان / ایکسپائری / کمی)",
+    up_correction: "UP (اضافی / ملا / درستگی)",
+    quantity: "مقدار",
+    unit_cost_rs: "فی یونٹ قیمت (روپے)",
+    autofill_cost: "یہ پروڈکٹ کی پرچیز پرائس سے خودکار بھر جائے گی۔",
+    total_rs: "کل (روپے)",
+    reason_opt: "وجہ (اختیاری)",
+    save_post_stock: "💾 محفوظ کریں اور اسٹاک ایڈجسٹمنٹ پوسٹ کریں",
+
+    stock_history: "اسٹاک ایڈجسٹمنٹ ہسٹری",
+    qty: "مقدار",
+    unit_cost: "فی یونٹ قیمت",
+    reason: "وجہ",
+    no_stock_adjustments: "ابھی تک کوئی اسٹاک ایڈجسٹمنٹ نہیں۔",
+    posting_rule_stock: "پوسٹنگ رول: DOWN → Dr Inventory Write-off (5100) / Cr Inventory (1400)، UP → Dr Inventory (1400) / Cr Opening Balances (3000)۔",
+
+    // JS dynamic labels/sentences
+    dr_customer_more: "DR — کسٹمر آپ کو زیادہ دے گا",
+    cr_customer_less: "CR — کسٹمر آپ کو کم دے گا",
+    dr_supplier_less: "DR — آپ سپلائر کو کم دیں گے",
+    cr_supplier_more: "CR — آپ سپلائر کو زیادہ دیں گے",
+    dr_increase_adds: "DR — اضافہ (بیلنس بڑھتا ہے)",
+    cr_decrease_reduces: "CR — کمی (بیلنس گھٹتا ہے)",
+    after_customer_more: "اس ایڈجسٹمنٹ کے بعد کسٹمر آپ کو Rs {money} زیادہ دے گا۔",
+    after_customer_less: "اس ایڈجسٹمنٹ کے بعد کسٹمر آپ کو Rs {money} کم دے گا۔",
+    after_supplier_less: "اس ایڈجسٹمنٹ کے بعد آپ سپلائر کو Rs {money} کم دیں گے۔",
+    after_supplier_more: "اس ایڈجسٹمنٹ کے بعد آپ سپلائر کو Rs {money} زیادہ دیں گے۔",
+    after_balance_change: "اس ایڈجسٹمنٹ کے بعد بیلنس میں Rs {money} کی تبدیلی ہوگی۔"
+  });
+
+  // Apply current language to this page after dict is loaded
+  if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+</script>
+
 {% endblock %}

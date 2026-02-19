@@ -289,6 +289,42 @@
         color:#92400e;
         border-color:#f59e0b;
       }
+
+      /* Language toggle */
+      .lang-toggle{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        padding:6px 8px;
+        border-radius:999px;
+        border:1px solid #e5e7eb;
+        background:#fff;
+        font-weight:800;
+        font-size:13px;
+      }
+
+      .lang-toggle button{
+        border:none;
+        background:transparent;
+        cursor:pointer;
+        font-weight:900;
+        padding:4px 8px;
+        border-radius:999px;
+      }
+
+      .lang-toggle button.active{
+        background:#eff6ff;
+        color:#1d4ed8;
+      }
+
+      /* RTL support */
+      html[dir="rtl"]{
+        direction: rtl;
+      }
+
+      html[dir="rtl"] body{
+        text-align: right;
+      }
     </style>
 
     <!-- PWA -->
@@ -322,6 +358,12 @@
             </div>
 
             <div class="header-actions">
+              
+              <div class="lang-toggle" style="margin-right:6px;">
+                <button type="button" id="btnEN" class="active">EN</button>
+                <button type="button" id="btnUR">اردو</button>
+              </div>
+
               <button id="installBtn" class="btn-secondary" type="button" style="display:none;">
                 ⬇️ Install App
               </button>
@@ -334,6 +376,7 @@
               {% else %}
                 <a href="{% url 'login' %}" class="btn-primary">Login</a>
               {% endif %}
+
             </div>
             
         </div>
@@ -480,6 +523,39 @@
     
         const btn = document.getElementById("installBtn");
         if (btn) btn.style.display = "none";
+      });
+    </script>
+
+    <script>
+      window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+      window.applyLang = function(lang){
+        localStorage.setItem("roz_lang", lang);
+        document.documentElement.lang = (lang === "ur") ? "ur" : "en";
+        document.documentElement.dir  = (lang === "ur") ? "rtl" : "ltr";
+
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+          const key = el.getAttribute("data-i18n");
+          const val = (window.ROZ_I18N[lang] || {})[key];
+          if (val) el.textContent = val;
+        });
+
+        const enBtn = document.getElementById("btnEN");
+        const urBtn = document.getElementById("btnUR");
+        if (enBtn && urBtn) {
+          enBtn.classList.toggle("active", lang === "en");
+          urBtn.classList.toggle("active", lang === "ur");
+        }
+        document.dispatchEvent(new CustomEvent("roz:lang-changed", { detail: { lang } }));
+
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const enBtn = document.getElementById("btnEN");
+        const urBtn = document.getElementById("btnUR");
+        if (enBtn) enBtn.addEventListener("click", () => window.applyLang("en"));
+        if (urBtn) urBtn.addEventListener("click", () => window.applyLang("ur"));
+        window.applyLang(localStorage.getItem("roz_lang") || "en");
       });
     </script>
 </body>
