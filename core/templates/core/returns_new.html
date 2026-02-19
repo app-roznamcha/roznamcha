@@ -1,9 +1,5 @@
 {% extends "core/base.html" %}
 
-{% block title %}
-  {% if mode == "sales" %}New Sales Return{% else %}New Purchase Return{% endif %}
-{% endblock %}
-
 {% block content %}
 <div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
 
@@ -11,21 +7,32 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
       <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
-        {% if mode == "sales" %}New Sales Return{% else %}New Purchase Return{% endif %}
+        {% if mode == "sales" %}
+          <span data-i18n="new_sales_return_title">New Sales Return</span>
+        {% else %}
+          <span data-i18n="new_purchase_return_title">New Purchase Return</span>
+        {% endif %}
       </h1>
       <p style="margin:0 0 20px;font-size:15px;color:#475569;">
-        Record returned goods and update stock & balances. Cash refunds are entered separately from the
-        <strong>New Payment / Receipt</strong> page.
+        <span data-i18n="returns_intro_1">
+          Record returned goods and update stock & balances. Cash refunds are entered separately from the
+        </span>
+        <strong data-i18n="new_payment_receipt">New Payment / Receipt</strong>
+        <span data-i18n="returns_intro_2">page.</span>
       </p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <a href="{% url 'dashboard' %}"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
+        <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
       <a href="{% url back_url_name %}"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-        {% if mode == "sales" %}← Back to Sales{% else %}← Back to Purchases{% endif %}
+        {% if mode == "sales" %}
+          <span data-i18n="back_to_sales">← Back to Sales</span>
+        {% else %}
+          <span data-i18n="back_to_purchases">← Back to Purchases</span>
+        {% endif %}
       </a>
     </div>
   </div>
@@ -46,7 +53,11 @@
                 padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
                 margin-bottom:20px;">
       <div style="font-size:18px;font-weight:600;margin-bottom:10px;">
-        {% if mode == "sales" %}Sales Return Details{% else %}Purchase Return Details{% endif %}
+        {% if mode == "sales" %}
+          <span data-i18n="sales_return_details">Sales Return Details</span>
+        {% else %}
+          <span data-i18n="purchase_return_details">Purchase Return Details</span>
+        {% endif %}
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
@@ -54,7 +65,11 @@
           <span>{{ party_label }}</span>
           <select name="party" required
                   style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-            <option value="">-- Select {{ party_label }} --</option>
+            <option value=""
+                    data-i18n="select_party_option"
+                    data-i18n-args='{"party":"{{ party_label|escapejs }}"}'>
+              -- Select {{ party_label }} --
+            </option>
             {% for p in parties %}
               <option value="{{ p.id }}">{{ p.name }}</option>
             {% endfor %}
@@ -62,7 +77,7 @@
         </label>
 
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
-          <span>Return Date</span>
+          <span data-i18n="return_date">Return Date</span>
           <input type="date"
                  name="return_date"
                  value="{{ today }}"
@@ -72,14 +87,14 @@
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
           <span>
             {% if mode == "sales" %}
-              Related Sales Invoice (optional)
+              <span data-i18n="related_sales_invoice_optional">Related Sales Invoice (optional)</span>
             {% else %}
-              Related Purchase Invoice (optional)
+              <span data-i18n="related_purchase_invoice_optional">Related Purchase Invoice (optional)</span>
             {% endif %}
           </span>
           <select name="original_invoice"
                   style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-            <option value="">-- None --</option>
+            <option value="" data-i18n="none_option">-- None --</option>
             {% for inv in invoices %}
               {% if mode == "sales" %}
                 <option value="{{ inv.id }}">Inv {{ inv.id }} – {{ inv.customer.name }} ({{ inv.invoice_date }})</option>
@@ -92,7 +107,7 @@
       </div>
 
       <label style="margin-top:12px;display:block;font-size:14px;">
-        <span style="display:block;margin-bottom:4px;">Notes (optional)</span>
+        <span style="display:block;margin-bottom:4px;" data-i18n="notes_optional">Notes (optional)</span>
         <textarea name="notes"
                   rows="2"
                   style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;resize:vertical;"></textarea>
@@ -104,9 +119,11 @@
                 padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
                 margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
-        <div style="font-size:18px;font-weight:600;">Returned Items</div>
+        <div style="font-size:18px;font-weight:600;" data-i18n="returned_items">Returned Items</div>
         <div id="items-total-display" style="font-weight:600;font-size:15px;">
-          Total Return Value: Rs <span id="items-total-amount">0.00</span>
+          <span data-i18n="total_return_value">Total Return Value:</span>
+          <span data-i18n="rs_prefix">Rs</span>
+          <span id="items-total-amount">0.00</span>
         </div>
       </div>
 
@@ -115,11 +132,16 @@
                style="border-collapse:collapse;width:100%;min-width:860px;">
           <thead>
             <tr>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Product</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Unit</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Unit Price</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Quantity Returned</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Line Total</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;"
+                  data-i18n="col_product">Product</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;"
+                  data-i18n="col_unit">Unit</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;"
+                  data-i18n="col_unit_price">Unit Price</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;"
+                  data-i18n="col_qty_returned">Quantity Returned</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;"
+                  data-i18n="col_line_total">Line Total</th>
               <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;"></th>
             </tr>
           </thead>
@@ -139,7 +161,7 @@
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="product_{{ idx }}" class="product-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Select --</option>
+                      <option value="" data-i18n="select_option">-- Select --</option>
                       {% for p in products %}
                         <option value="{{ p.id }}"
                                 data-unit="{{ p.unit }}"
@@ -159,7 +181,7 @@
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
                       <option value="UNIT"
                         {% if item.unit_mode|default:"UNIT" == "UNIT" %}selected{% endif %}>
-                        Base {{ item.product.get_unit_display }}
+                        <span data-i18n="base_prefix">Base</span> {{ item.product.get_unit_display }}
                       </option>
                       {% if item.product.packing_type != "NONE" and item.product.pieces_per_pack > 1 %}
                         <option value="PACK"
@@ -193,7 +215,7 @@
                   </td>
           
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                    Rs <span class="line-total">0.00</span>
+                    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
                   </td>
           
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
@@ -220,7 +242,7 @@
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="product_{{ idx }}" class="product-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Select --</option>
+                      <option value="" data-i18n="select_option">-- Select --</option>
                       {% for p in products %}
                         <option value="{{ p.id }}"
                                 data-unit="{{ p.unit }}"
@@ -237,7 +259,7 @@
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="unit_{{ idx }}" class="unit-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Unit --</option>
+                      <option value="" data-i18n="unit_option">-- Unit --</option>
                     </select>
                   </td>
           
@@ -254,6 +276,7 @@
                            step="0.001"
                            class="qty-display-input"
                            placeholder="Qty"
+                           data-i18n-placeholder="qty_placeholder"
                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
                     <input type="hidden"
                            name="quantity_{{ idx }}"
@@ -261,7 +284,7 @@
                   </td>
           
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                    Rs <span class="line-total">0.00</span>
+                    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
                   </td>
           
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
@@ -290,7 +313,7 @@
                     <select name="product_{{ idx }}"
                             class="product-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Select --</option>
+                      <option value="" data-i18n="select_option">-- Select --</option>
                       {% for p in products %}
                         <option value="{{ p.id }}"
                                 data-unit="{{ p.unit }}"
@@ -308,7 +331,7 @@
                     <select name="unit_{{ idx }}"
                             class="unit-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Unit --</option>
+                      <option value="" data-i18n="unit_option">-- Unit --</option>
                     </select>
                   </td>
           
@@ -325,6 +348,7 @@
                            step="0.001"
                            class="qty-display-input"
                            placeholder="Qty"
+                           data-i18n-placeholder="qty_placeholder"
                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
                     <input type="hidden"
                            name="quantity_{{ idx }}"
@@ -332,7 +356,7 @@
                   </td>
           
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                    Rs <span class="line-total">0.00</span>
+                    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
                   </td>
           
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
@@ -355,7 +379,8 @@
       <button type="button"
               class="btn btn-sm btn-secondary"
               onclick="addRow()"
-              style="padding:7px 14px;border-radius:999px;font-size:14px;">
+              style="padding:7px 14px;border-radius:999px;font-size:14px;"
+              data-i18n="add_item_row">
         + Add Item Row
       </button>
     </div>
@@ -363,11 +388,13 @@
     {# ---------- Actions ---------- #}
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button type="submit"
-              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;"
+              data-i18n="save_post_return">
         💾 Save &amp; Post Return
       </button>
       <a href="{% url back_url_name %}"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;color:#0d6efd;cursor:pointer;white-space:nowrap;">
+         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;color:#0d6efd;cursor:pointer;white-space:nowrap;"
+         data-i18n="cancel">
         Cancel
       </a>
     </div>
@@ -532,69 +559,74 @@ function addRow() {
   row.dataset.packingLabel = "";
 
   row.innerHTML = `
-    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-      <select name="product_${nextIndex}" class="product-select"
-              style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-        <option value="">-- Select --</option>
-        {% for p in products %}
-          <option
-            value="{{ p.id }}"
-            data-unit="{{ p.unit }}"
-            data-price="{% if mode == 'sales' %}{{ p.sale_price_per_unit|floatformat:2 }}{% else %}{{ p.purchase_price_per_unit|floatformat:2 }}{% endif %}"
-            data-packing-type="{{ p.packing_type|default:'NONE' }}"
-            data-pieces-per-pack="{{ p.pieces_per_pack|default:1 }}"
-            data-packing-label="{{ p.get_packing_type_display|default:'' }}"
-          >
-            {{ p.code }} - {{ p.name }}
-          </option>
-        {% endfor %}
-      </select>
-    </td>
+  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+    <select name="product_${nextIndex}" class="product-select"
+            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <option value="" data-i18n="select_option">-- Select --</option>
+      {% for p in products %}
+        <option
+          value="{{ p.id }}"
+          data-unit="{{ p.unit }}"
+          data-price="{% if mode == 'sales' %}{{ p.sale_price_per_unit|floatformat:2 }}{% else %}{{ p.purchase_price_per_unit|floatformat:2 }}{% endif %}"
+          data-packing-type="{{ p.packing_type|default:'NONE' }}"
+          data-pieces-per-pack="{{ p.pieces_per_pack|default:1 }}"
+          data-packing-label="{{ p.get_packing_type_display|default:'' }}"
+        >
+          {{ p.code }} - {{ p.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </td>
 
-    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-      <select name="unit_${nextIndex}" class="unit-select"
-              style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-        <option value="">-- Unit --</option>
-      </select>
-    </td>
+  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
+    <select name="unit_${nextIndex}" class="unit-select"
+            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <option value="" data-i18n="unit_option">-- Unit --</option>
+    </select>
+  </td>
 
-    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-      <input type="number"
-             step="0.01"
-             name="unit_price_${nextIndex}"
-             class="price-input"
-             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
-    </td>
+  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+    <input type="number"
+           step="0.01"
+           name="unit_price_${nextIndex}"
+           class="price-input"
+           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+  </td>
 
-    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-      <input type="number"
-             step="0.001"
-             class="qty-display-input"
-             placeholder="Qty"
-             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
-      <input type="hidden"
-             name="quantity_${nextIndex}"
-             class="qty-hidden-input">
-    </td>
+  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+    <input type="number"
+           step="0.001"
+           class="qty-display-input"
+           placeholder="Qty"
+           data-i18n-placeholder="qty_placeholder"
+           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+    <input type="hidden"
+           name="quantity_${nextIndex}"
+           class="qty-hidden-input">
+  </td>
 
-    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-      Rs <span class="line-total">0.00</span>
-    </td>
+  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
+    Rs <span class="line-total">0.00</span>
+  </td>
 
-    <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
-      <button type="button"
-              class="btn btn-sm btn-danger"
-              onclick="removeRow(this)"
-              style="padding:4px 9px;border-radius:999px;font-size:13px;">
-        ✕
-      </button>
-    </td>
-  `;
-
+  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+    <button type="button"
+            class="btn btn-sm btn-danger"
+            onclick="removeRow(this)"
+            style="padding:4px 9px;border-radius:999px;font-size:13px;">
+      ✕
+    </button>
+  </td>
+`;
   tbody.appendChild(row);
   attachRowEvents(row);
   syncRow(row);
   recalcGrandTotal();
+
+  // ✅ apply language to newly added row if Urdu system exists
+  if (window.applyLang) {
+    window.applyLang(localStorage.getItem("roz_lang") || "en");
+  }
 }
 
 function removeRow(btn) {
@@ -639,7 +671,127 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 3) Now compute grand total
   recalcGrandTotal();
+
+  // ✅ Apply saved language on page load (if Urdu system exists)
+  if (window.applyLang) {
+    window.applyLang(localStorage.getItem("roz_lang") || "en");
+  }
 });
+</script>
+
+{# ==========================
+   Urdu/English i18n (NO logic changes)
+   ========================== #}
+<script>
+(function() {
+  const translations = {
+    en: {
+      new_sales_return_title: "New Sales Return",
+      new_purchase_return_title: "New Purchase Return",
+      returns_intro_1: "Record returned goods and update stock & balances. Cash refunds are entered separately from the",
+      new_payment_receipt: "New Payment / Receipt",
+      returns_intro_2: "page.",
+      back_dashboard: "← Dashboard",
+      back_to_sales: "← Back to Sales",
+      back_to_purchases: "← Back to Purchases",
+      sales_return_details: "Sales Return Details",
+      purchase_return_details: "Purchase Return Details",
+      select_party_option: "-- Select {party} --",
+      return_date: "Return Date",
+      related_sales_invoice_optional: "Related Sales Invoice (optional)",
+      related_purchase_invoice_optional: "Related Purchase Invoice (optional)",
+      none_option: "-- None --",
+      notes_optional: "Notes (optional)",
+      returned_items: "Returned Items",
+      total_return_value: "Total Return Value:",
+      rs_prefix: "Rs",
+      col_product: "Product",
+      col_unit: "Unit",
+      col_unit_price: "Unit Price",
+      col_qty_returned: "Quantity Returned",
+      col_line_total: "Line Total",
+      select_option: "-- Select --",
+      unit_option: "-- Unit --",
+      qty_placeholder: "Qty",
+      add_item_row: "+ Add Item Row",
+      save_post_return: "💾 Save & Post Return",
+      cancel: "Cancel",
+      base_prefix: "Base"
+    },
+    ur: {
+      new_sales_return_title: "نیا سیلز ریٹرن",
+      new_purchase_return_title: "نیا پرچیز ریٹرن",
+      returns_intro_1: "واپس آنے والا مال ریکارڈ کریں اور اسٹاک اور بیلنس اپڈیٹ کریں۔ کیش ریفنڈ الگ سے",
+      new_payment_receipt: "نئی ادائیگی / رسید",
+      returns_intro_2: "صفحہ سے درج کیا جاتا ہے۔",
+      back_dashboard: "← ڈیش بورڈ",
+      back_to_sales: "← سیلز پر واپس",
+      back_to_purchases: "← پرچیز پر واپس",
+      sales_return_details: "سیلز ریٹرن کی تفصیلات",
+      purchase_return_details: "پرچیز ریٹرن کی تفصیلات",
+      select_party_option: "-- {party} منتخب کریں --",
+      return_date: "ریٹرن کی تاریخ",
+      related_sales_invoice_optional: "متعلقہ سیلز انوائس (اختیاری)",
+      related_purchase_invoice_optional: "متعلقہ پرچیز انوائس (اختیاری)",
+      none_option: "-- کوئی نہیں --",
+      notes_optional: "نوٹس (اختیاری)",
+      returned_items: "واپس کی گئی اشیاء",
+      total_return_value: "کل ریٹرن ویلیو:",
+      rs_prefix: "روپے",
+      col_product: "پروڈکٹ",
+      col_unit: "یونٹ",
+      col_unit_price: "فی یونٹ قیمت",
+      col_qty_returned: "واپس کی گئی مقدار",
+      col_line_total: "لائن ٹوٹل",
+      select_option: "-- منتخب کریں --",
+      unit_option: "-- یونٹ --",
+      qty_placeholder: "مقدار",
+      add_item_row: "+ نئی لائن شامل کریں",
+      save_post_return: "💾 محفوظ کریں اور پوسٹ کریں",
+      cancel: "منسوخ کریں",
+      base_prefix: "بنیادی"
+    }
+  };
+
+  function interpolate(str, args) {
+    if (!str) return str;
+    return str.replace(/\{(\w+)\}/g, (_, k) => (args && args[k] != null ? args[k] : `{${k}}`));
+  }
+
+  function applyLang(lang) {
+    const dict = translations[lang] || translations.en;
+
+    // data-i18n text replacements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const raw = dict[key];
+      if (!raw) return;
+
+      let args = null;
+      const argsAttr = el.getAttribute('data-i18n-args');
+      if (argsAttr) {
+        try { args = JSON.parse(argsAttr); } catch(e) { args = null; }
+      }
+
+      el.textContent = interpolate(raw, args);
+    });
+
+    // placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (dict[key]) el.setAttribute('placeholder', dict[key]);
+    });
+
+    // special: some options are created by JS as plain text like "-- Unit --"
+    // We already tagged the default options in templates with data-i18n, so this is enough.
+
+    // optional RTL feel (ONLY for this page, safe)
+    document.documentElement.dir = (lang === "ur") ? "rtl" : "ltr";
+    document.documentElement.lang = (lang === "ur") ? "ur" : "en";
+  }
+
+  window.applyLang = applyLang;
+})();
 </script>
 
 {% endblock %}
