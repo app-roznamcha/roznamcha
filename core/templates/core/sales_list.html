@@ -51,8 +51,8 @@
   {# ---------- Top Bar (Title + Buttons) ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Sales Invoices</h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="sales_invoices_title">Sales Invoices</h1>
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;" data-i18n="sales_invoices_subtitle">
         View, filter, and post sales invoices to customers.
       </p>
     </div>
@@ -60,12 +60,12 @@
       <a href="{% url 'dashboard' %}"
          class="btn btn-secondary"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
+        <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
       <a href="{% url 'sales_new' %}"
          class="btn btn-primary"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-        ➕ New Sale
+        <span data-i18n="new_sale_btn">➕ New Sale</span>
       </a>
     </div>
   </div>
@@ -74,30 +74,30 @@
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
               margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">Filters</div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="filters">Filters</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;" data-i18n="filters_help">
       Narrow down sales invoices by date range, customer, and posting status.
     </p>
 
     <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
 
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from">From</label>
         <input type="date" name="from" value="{{ from_date|date:'Y-m-d' }}"
                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
       </div>
 
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to">To</label>
         <input type="date" name="to" value="{{ to_date|date:'Y-m-d' }}"
                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
       </div>
 
       <div style="min-width:220px;flex:1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">Customer</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="customer">Customer</label>
         <select name="customer"
                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-          <option value="">All customers</option>
+          <option value="" data-i18n="all_customers">All customers</option>
           {% for c in customers %}
             <option value="{{ c.id }}"
                     {% if c.id|stringformat:"s" == customer_id %}selected{% endif %}>
@@ -108,12 +108,12 @@
       </div>
 
       <div style="min-width:160px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">Posted?</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="posted_q">Posted?</label>
         <select name="posted"
                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-          <option value="all" {% if posted_filter == "all" %}selected{% endif %}>All</option>
-          <option value="yes" {% if posted_filter == "yes" %}selected{% endif %}>Yes</option>
-          <option value="no" {% if posted_filter == "no" %}selected{% endif %}>No</option>
+          <option value="all" {% if posted_filter == "all" %}selected{% endif %} data-i18n="all">All</option>
+          <option value="yes" {% if posted_filter == "yes" %}selected{% endif %} data-i18n="yes">Yes</option>
+          <option value="no" {% if posted_filter == "no" %}selected{% endif %} data-i18n="no">No</option>
         </select>
       </div>
 
@@ -121,12 +121,12 @@
         <button type="submit"
                 class="btn btn-primary"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
+          <span data-i18n="apply">Apply</span>
         </button>
         <a href="{% url 'sales_list' %}"
            class="btn btn-secondary"
            style="display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;margin-left:4px;">
-          Reset
+          <span data-i18n="reset">Reset</span>
         </a>
       </div>
 
@@ -136,7 +136,7 @@
   {# ---------- Sales Invoices Table Card ---------- #}
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
     <div style="padding:14px 20px 8px;border-bottom:1px solid #e5e7eb;">
-      <div style="font-size:18px;font-weight:600;">Sales Invoices</div>
+      <div style="font-size:18px;font-weight:600;" data-i18n="sales_invoices_title">Sales Invoices</div>
     </div>
 
     <div class="table-wrap">
@@ -151,20 +151,20 @@
           <col style="width:7%;">   {# Posted #}
           <col style="width:20%;">  {# Action #}
         </colgroup>
-    
+
         <thead>
           <tr>
-            <th class="nowrap">#</th>
-            <th class="nowrap">Date</th>
-            <th class="nowrap">Invoice #</th>
-            <th>Customer</th>
-            <th>Products</th>
-            <th class="right nowrap">Amount</th>
-            <th class="center nowrap">Posted?</th>
-            <th class="center nowrap">Action</th>
+            <th class="nowrap" data-i18n="col_hash">#</th>
+            <th class="nowrap" data-i18n="col_date">Date</th>
+            <th class="nowrap" data-i18n="col_invoice">Invoice #</th>
+            <th data-i18n="col_customer">Customer</th>
+            <th data-i18n="col_products">Products</th>
+            <th class="right nowrap" data-i18n="col_amount">Amount</th>
+            <th class="center nowrap" data-i18n="col_posted">Posted?</th>
+            <th class="center nowrap" data-i18n="col_action">Action</th>
           </tr>
         </thead>
-    
+
         <tbody>
         {% if invoices %}
           {% for inv in invoices %}
@@ -172,70 +172,72 @@
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
               <td class="nowrap">{{ inv.invoice_number }}</td>
-    
+
               <td class="truncate" title="{{ inv.customer.name }}">
                 {{ inv.customer.name }}
               </td>
-    
+
               <td class="truncate"
                   title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
                 {% with first_item=inv.items.first %}
                   {% if first_item %}
                     {{ first_item.product.name }}
                     {% if inv.items.count > 1 %}
-                      + {{ inv.items.count|add:"-1" }} more
+                      <span data-i18n="plus_more_prefix">+ </span>{{ inv.items.count|add:"-1" }} <span data-i18n="more_suffix">more</span>
                     {% endif %}
                   {% else %}
                     —
                   {% endif %}
                 {% endwith %}
               </td>
-    
+
               <td class="right nowrap">{{ inv.calculate_total|floatformat:2 }}</td>
-    
+
               <td class="center nowrap">
                 {% if inv.posted %}
-                  <span class="badge badge-success">Yes</span>
+                  <span class="badge badge-success" data-i18n="yes">Yes</span>
                 {% else %}
-                  <span class="badge badge-warning">No</span>
+                  <span class="badge badge-warning" data-i18n="no">No</span>
                 {% endif %}
               </td>
-    
+
               <td class="center nowrap">
 
                 {# ✅ Share always visible for both Owner + Staff #}
                 <a href="{% url 'sales_invoice_share' inv.id %}"
                    class="action-pill"
-                   style="margin-right:6px;">
+                   style="margin-right:6px;"
+                   data-i18n="share">
                   Share
                 </a>
-              
+
                 {# ✅ Only OWNER should see Edit/Delete/Post actions #}
                 {% if not is_staff_user %}
-              
+
                   {% if not inv.posted %}
-                    <a href="{% url 'sales_edit' inv.id %}" class="action-pill" style="margin-right:6px;">Edit</a>
-              
+                    <a href="{% url 'sales_edit' inv.id %}" class="action-pill" style="margin-right:6px;" data-i18n="edit">Edit</a>
+
                     <form action="{% url 'sales_delete' inv.id %}" method="post" style="display:inline;">
                       {% csrf_token %}
                       <button type="submit" class="action-pill" style="margin-right:6px;"
-                              onclick="return confirm('Delete this invoice?');">
-                        Delete
+                              onclick="return confirm('Delete this invoice?');"
+                              data-confirm-i18n="confirm_delete_invoice">
+                        <span data-i18n="delete">Delete</span>
                       </button>
                     </form>
-              
-                    <a href="{% url 'sales_post' inv.id %}" class="action-pill">Post</a>
+
+                    <a href="{% url 'sales_post' inv.id %}" class="action-pill" data-i18n="post">Post</a>
                   {% else %}
                     —
                   {% endif %}
-              
+
                 {% endif %}
               </td>
             </tr>
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="8" style="text-align:center;padding:12px;font-size:15px;color:#6b7280;">
+            <td colspan="8" style="text-align:center;padding:12px;font-size:15px;color:#6b7280;" data-i18n="no_sales_invoices_found">
               No sales invoices found.
             </td>
           </tr>
@@ -246,4 +248,114 @@
   </div>
 
 </div>
+
+<script>
+  // Page dictionary: extend global ROZ_I18N without touching base
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+  Object.assign(window.ROZ_I18N.en, {
+    sales_invoices_title: "Sales Invoices",
+    sales_invoices_subtitle: "View, filter, and post sales invoices to customers.",
+    back_dashboard: "← Dashboard",
+    new_sale_btn: "➕ New Sale",
+
+    filters: "Filters",
+    filters_help: "Narrow down sales invoices by date range, customer, and posting status.",
+    from: "From",
+    to: "To",
+    customer: "Customer",
+    all_customers: "All customers",
+    posted_q: "Posted?",
+    all: "All",
+    yes: "Yes",
+    no: "No",
+    apply: "Apply",
+    reset: "Reset",
+
+    col_hash: "#",
+    col_date: "Date",
+    col_invoice: "Invoice #",
+    col_customer: "Customer",
+    col_products: "Products",
+    col_amount: "Amount",
+    col_posted: "Posted?",
+    col_action: "Action",
+
+    share: "Share",
+    edit: "Edit",
+    delete: "Delete",
+    post: "Post",
+
+    plus_more_prefix: "+ ",
+    more_suffix: "more",
+
+    no_sales_invoices_found: "No sales invoices found.",
+    confirm_delete_invoice: "Delete this invoice?"
+  });
+
+  Object.assign(window.ROZ_I18N.ur, {
+    sales_invoices_title: "سیلز انوائسز",
+    sales_invoices_subtitle: "سیلز انوائسز دیکھیں، فلٹر کریں اور کسٹمر کو پوسٹ کریں۔",
+    back_dashboard: "← ڈیش بورڈ",
+    new_sale_btn: "➕ نئی سیل",
+
+    filters: "فلٹرز",
+    filters_help: "تاریخ، کسٹمر اور پوسٹڈ اسٹیٹس کے ذریعے سیلز انوائسز فلٹر کریں۔",
+    from: "سے",
+    to: "تک",
+    customer: "کسٹمر",
+    all_customers: "تمام کسٹمرز",
+    posted_q: "پوسٹڈ؟",
+    all: "تمام",
+    yes: "ہاں",
+    no: "نہیں",
+    apply: "لاگو کریں",
+    reset: "ری سیٹ",
+
+    col_hash: "#",
+    col_date: "تاریخ",
+    col_invoice: "انوائس #",
+    col_customer: "کسٹمر",
+    col_products: "پروڈکٹس",
+    col_amount: "رقم",
+    col_posted: "پوسٹڈ؟",
+    col_action: "ایکشن",
+
+    share: "شیئر",
+    edit: "ایڈٹ",
+    delete: "ڈیلیٹ",
+    post: "پوسٹ",
+
+    plus_more_prefix: "+ ",
+    more_suffix: "مزید",
+
+    no_sales_invoices_found: "کوئی سیلز انوائس نہیں ملی۔",
+    confirm_delete_invoice: "کیا آپ یہ انوائس ڈیلیٹ کرنا چاہتے ہیں؟"
+  });
+
+  // Apply current language to this page after dict is loaded
+  if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+
+  // Translate confirm() safely without changing existing delete logic
+  (function () {
+    document.querySelectorAll("[data-confirm-i18n]").forEach(btn => {
+      const key = btn.getAttribute("data-confirm-i18n");
+      btn.addEventListener("click", function (e) {
+        // only intercept if it's actually a submit button inside the form
+        if (btn.type !== "submit") return;
+
+        const lang = localStorage.getItem("roz_lang") || "en";
+        const pack = (window.ROZ_I18N && window.ROZ_I18N[lang]) ? window.ROZ_I18N[lang] : {};
+        const msg = pack[key] || "Are you sure?";
+
+        if (!confirm(msg)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }, true);
+    });
+  })();
+</script>
+
 {% endblock %}

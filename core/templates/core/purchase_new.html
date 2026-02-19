@@ -1,6 +1,6 @@
 {% extends "core/base.html" %}
 {% block title %}
-  {% if edit_mode %}Edit Purchase{% else %}New Purchase{% endif %}
+  {% if edit_mode %}<span data-i18n="edit_purchase_title">Edit Purchase</span>{% else %}<span data-i18n="new_purchase_title">New Purchase</span>{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -11,16 +11,16 @@
   <div>
     <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
       {% if edit_mode %}
-        Edit Purchase #{{ invoice.id }}
+        <span data-i18n="edit_purchase_prefix">Edit Purchase #</span>{{ invoice.id }}
       {% else %}
-        New Purchase
+        <span data-i18n="new_purchase_title">New Purchase</span>
       {% endif %}
     </h1>
     <p style="margin:0 0 20px;font-size:15px;color:#475569;">
       {% if edit_mode %}
-        Update this purchase invoice, adjust items, and payment details.
+        <span data-i18n="edit_purchase_subtitle">Update this purchase invoice, adjust items, and payment details.</span>
       {% else %}
-        Create a new purchase invoice, add items, and record payment details.
+        <span data-i18n="new_purchase_subtitle">Create a new purchase invoice, add items, and record payment details.</span>
       {% endif %}
     </p>
   </div>
@@ -28,11 +28,11 @@
   <div style="display:flex;gap:10px;flex-wrap:wrap;">
     <a href="{% url 'dashboard' %}" class="btn btn-secondary"
        style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-      ← Dashboard
+      <span data-i18n="back_dashboard">← Dashboard</span>
     </a>
     <a href="{% url 'purchase_list' %}" class="btn btn-primary"
        style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-      📄 Purchase List
+      <span data-i18n="purchase_list_btn">📄 Purchase List</span>
     </a>
   </div>
 </div>
@@ -51,16 +51,16 @@
     <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
                 padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
                 margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:10px;" data-i18n="supplier_invoice_details">
         Supplier &amp; Invoice Details
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
-          <span>Supplier</span>
+          <span data-i18n="supplier">Supplier</span>
           <select name="supplier" required
           style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-            <option value="">-- Select Supplier --</option>
+            <option value="" data-i18n="select_supplier">-- Select Supplier --</option>
             {% for s in suppliers %}
               <option value="{{ s.id }}"
                       {% if edit_mode and invoice.supplier_id|stringformat:"s" == s.id|stringformat:"s" %}
@@ -73,7 +73,7 @@
         </label>
 
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
-          <span>Invoice Date</span>
+          <span data-i18n="invoice_date">Invoice Date</span>
           <input type="date"
             name="invoice_date"
             value="{% if edit_mode %}{{ invoice.invoice_date|date:'Y-m-d' }}{% else %}{{ today }}{% endif %}"
@@ -81,7 +81,7 @@
         </label>
 
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
-          <span>Supplier Invoice #</span>
+          <span data-i18n="supplier_invoice_no">Supplier Invoice #</span>
           <input type="text"
             name="invoice_number"
             value="{% if edit_mode %}{{ invoice.invoice_number }}{% endif %}"
@@ -96,13 +96,13 @@
     <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
                 padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
                 margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:10px;" data-i18n="charges">
         Charges
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
-          <span>Freight Charges</span>
+          <span data-i18n="freight_charges">Freight Charges</span>
           <input type="number"
                 step="0.01"
                 name="freight_charges"
@@ -112,7 +112,7 @@
         </label>
 
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
-          <span>Other Charges</span>
+          <span data-i18n="other_charges">Other Charges</span>
           <input type="number"
           step="0.01"
           name="other_charges"
@@ -123,7 +123,7 @@
       </div>
 
       <label style="margin-top:12px;display:block;font-size:14px;">
-        <span style="display:block;margin-bottom:4px;">Notes</span>
+        <span style="display:block;margin-bottom:4px;" data-i18n="notes">Notes</span>
         <textarea name="notes"
         rows="2"
         style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;resize:vertical;">{% if edit_mode %}{{ invoice.notes }}{% endif %}</textarea>
@@ -135,9 +135,9 @@
                 padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
                 margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
-        <div style="font-size:18px;font-weight:600;">Items</div>
+        <div style="font-size:18px;font-weight:600;" data-i18n="items">Items</div>
         <div id="items-total-display" style="font-weight:600;font-size:15px;">
-          Total Purchase: Rs <span id="items-total-amount">0.00</span>
+          <span data-i18n="total_purchase_prefix">Total Purchase: Rs</span> <span id="items-total-amount">0.00</span>
         </div>
       </div>
 
@@ -146,21 +146,21 @@
                 style="border-collapse:collapse;width:100%;min-width:980px;">
           <thead>
             <tr>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Product</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Unit</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_product">Product</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_unit">Unit</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_available_stock">
                 Available Stock
               </th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Unit Price</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Quantity</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Total Price</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_unit_price">Unit Price</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_quantity">Quantity</th>
+              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_total_price">Total Price</th>
               <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;"></th>
             </tr>
           </thead>
           <tbody>
             {# --- If editing: show existing items --- #}
             {% if edit_mode %}
-          
+
               {% for item in items %}
                 {% with forloop.counter as idx %}
                 <tr data-row-index="{{ idx }}"
@@ -168,12 +168,12 @@
                     data-packing-type="{{ item.product.packing_type|default:'NONE' }}"
                     data-pieces-per-pack="{{ item.product.pieces_per_pack|default:1 }}"
                     data-packing-label="{{ item.product.get_packing_type_display|default:'' }}">
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="product_{{ idx }}"
                             class="product-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Select --</option>
+                      <option value="" data-i18n="select">-- Select --</option>
                       {% for p in products %}
                         <option
                           value="{{ p.id }}"
@@ -190,14 +190,14 @@
                       {% endfor %}
                     </select>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="unit_{{ idx }}"
                             class="unit-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
                       <option value="UNIT"
                               {% if item.unit_mode|default:"UNIT" == "UNIT" %}selected{% endif %}>
-                        Base {{ item.product.get_unit_display }}
+                        <span data-i18n="base_prefix">Base</span> {{ item.product.get_unit_display }}
                       </option>
                       {% if item.product.packing_type != "NONE" and item.product.pieces_per_pack > 1 %}
                         <option value="PACK"
@@ -207,14 +207,14 @@
                       {% endif %}
                     </select>
                   </td>
-          
+
                   {# ✅ Available Stock column #}
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
                     <span class="stock-display" style="font-weight:600;color:#0f172a;">
                       {{ item.product.current_stock|floatformat:3 }} {{ item.product.get_unit_display }}
                     </span>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
                     <input type="number"
                            step="0.01"
@@ -223,7 +223,7 @@
                            value="{{ item.unit_price|floatformat:2 }}"
                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
                     <input type="number"
                           step="0.001"
@@ -235,11 +235,11 @@
                           class="qty-hidden-input"
                           value="{{ item.quantity_units|floatformat:3 }}">
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                    Rs <span class="line-total">0.00</span>
+                    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
                     <button type="button"
                             class="btn btn-sm btn-danger"
@@ -251,7 +251,7 @@
                 </tr>
                 {% endwith %}
               {% endfor %}
-          
+
               {# ✅ add extra blank rows for new items (EDIT MODE) #}
               {% for _ in "12" %}
                 {% with items|length|add:forloop.counter as idx %}
@@ -264,7 +264,7 @@
                     <select name="product_{{ idx }}"
                             class="product-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Select --</option>
+                      <option value="" data-i18n="select">-- Select --</option>
                       {% for p in products %}
                         <option
                           value="{{ p.id }}"
@@ -280,20 +280,20 @@
                       {% endfor %}
                     </select>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="unit_{{ idx }}"
                             class="unit-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Unit --</option>
+                      <option value="" data-i18n="select_unit">-- Unit --</option>
                     </select>
                   </td>
-          
+
                   {# ✅ Stock cell exists (JS will fill it when product selected) #}
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
                     <span class="stock-display" style="font-weight:600;color:#0f172a;">—</span>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
                     <input type="number"
                            step="0.01"
@@ -301,22 +301,23 @@
                            class="price-input"
                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
                     <input type="number"
                            step="0.001"
                            class="qty-display-input"
                            placeholder="Qty"
-                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;"
+                           data-i18n-placeholder="qty_ph">
                     <input type="hidden"
                            name="quantity_{{ idx }}"
                            class="qty-hidden-input">
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                    Rs <span class="line-total">0.00</span>
+                    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
                     <button type="button"
                             class="btn btn-sm btn-danger"
@@ -328,9 +329,9 @@
                 </tr>
                 {% endwith %}
               {% endfor %}
-          
+
             {% else %}
-          
+
               {# ✅ NEW SALE: 5 blank rows #}
               {% for _ in "12345" %}
                 {% with forloop.counter as idx %}
@@ -343,7 +344,7 @@
                     <select name="product_{{ idx }}"
                             class="product-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Select --</option>
+                      <option value="" data-i18n="select">-- Select --</option>
                       {% for p in products %}
                         <option
                           value="{{ p.id }}"
@@ -359,20 +360,20 @@
                       {% endfor %}
                     </select>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                     <select name="unit_{{ idx }}"
                             class="unit-select"
                             style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-                      <option value="">-- Unit --</option>
+                      <option value="" data-i18n="select_unit">-- Unit --</option>
                     </select>
                   </td>
-          
+
                   {# ✅ Stock column #}
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;white-space:nowrap;">
                     <span class="stock-display" style="font-weight:600;color:#0f172a;">—</span>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
                     <input type="number"
                            step="0.01"
@@ -380,22 +381,23 @@
                            class="price-input"
                            style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
                     <input type="number"
                            step="0.001"
                            class="qty-display-input"
                            placeholder="Qty"
-                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
+                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;"
+                           data-i18n-placeholder="qty_ph">
                     <input type="hidden"
                            name="quantity_{{ idx }}"
                            class="qty-hidden-input">
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                    Rs <span class="line-total">0.00</span>
+                    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
                   </td>
-          
+
                   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
                     <button type="button"
                             class="btn btn-sm btn-danger"
@@ -407,7 +409,7 @@
                 </tr>
                 {% endwith %}
               {% endfor %}
-          
+
             {% endif %}
           </tbody>
         </table>
@@ -416,7 +418,8 @@
       <button type="button"
               class="btn btn-sm btn-secondary"
               onclick="addRow()"
-              style="padding:7px 14px;border-radius:999px;font-size:14px;">
+              style="padding:7px 14px;border-radius:999px;font-size:14px;"
+              data-i18n="add_item_row_btn">
         + Add Item Row
       </button>
     </div>
@@ -426,12 +429,12 @@
     <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
                 padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
                 margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;" data-i18n="payment">
         Payment
       </div>
 
       <p style="margin-bottom:8px;font-weight:500;font-size:15px;">
-        Total Purchase: Rs <span id="payment-total-amount">0.00</span>
+        <span data-i18n="total_purchase_prefix">Total Purchase: Rs</span> <span id="payment-total-amount">0.00</span>
       </p>
 
       <div class="field-group"
@@ -439,23 +442,23 @@
    <label>
      <input type="radio" name="payment_type" value="FULL"
             {% if not edit_mode or invoice.payment_type == "FULL" %}checked{% endif %}>
-     Full Payment (Cash/Bank)
+     <span data-i18n="full_payment">Full Payment (Cash/Bank)</span>
    </label>
    <label>
      <input type="radio" name="payment_type" value="PARTIAL"
             {% if edit_mode and invoice.payment_type == "PARTIAL" %}checked{% endif %}>
-     Partial Payment
+     <span data-i18n="partial_payment">Partial Payment</span>
    </label>
    <label>
      <input type="radio" name="payment_type" value="CREDIT"
             {% if edit_mode and invoice.payment_type == "CREDIT" %}checked{% endif %}>
-     Credit (Supplier will be paid later)
+     <span data-i18n="credit_payment">Credit (Supplier will be paid later)</span>
    </label>
  </div>
 
       <div id="payment-extra-fields" style="margin-top:4px;">
         <label style="display:flex;flex-direction:column;gap:4px;font-size:14px;">
-          <span>Amount Paid</span>
+          <span data-i18n="amount_paid">Amount Paid</span>
           <input type="number"
           step="0.01"
           name="payment_amount"
@@ -464,16 +467,18 @@
           style="max-width:260px;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
         </label>
         <p class="text-muted" style="margin:4px 0 10px;font-size:13px;color:#6b7280;">
-          For <strong>Full Payment</strong> this will be auto-filled from Total Purchase and locked.
-          For <strong>Partial</strong>, you can type a smaller amount.
+          <span data-i18n="payment_hint_1">For</span> <strong data-i18n="full_payment_strong">Full Payment</strong>
+          <span data-i18n="payment_hint_2">this will be auto-filled from Total Purchase and locked.</span>
+          <span data-i18n="payment_hint_3">For</span> <strong data-i18n="partial_payment_strong">Partial</strong><span>,</span>
+          <span data-i18n="payment_hint_4">you can type a smaller amount.</span>
         </p>
 
         <label style="display:flex;flex-direction:column;gap:4px;font-size:14px;max-width:320px;">
-          <span>Payment Account</span>
+          <span data-i18n="payment_account">Payment Account</span>
           <select name="payment_account"
           id="payment-account-select"
           style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-    <option value="">-- Select Cash/Bank Account --</option>
+    <option value="" data-i18n="select_cash_bank">-- Select Cash/Bank Account --</option>
     {% for acc in accounts %}
       <option value="{{ acc.id }}"
               {% if edit_mode and invoice.payment_account_id|stringformat:"s" == acc.id|stringformat:"s" %}
@@ -484,7 +489,7 @@
     {% endfor %}
   </select>
         </label>
-        <p class="text-muted" style="margin-top:4px;font-size:13px;color:#6b7280;">
+        <p class="text-muted" style="margin-top:4px;font-size:13px;color:#6b7280;" data-i18n="payment_account_required">
           Required for full or partial cash/bank payments.
         </p>
       </div>
@@ -492,8 +497,9 @@
       <p id="credit-note"
          class="text-muted"
          style="margin-top:8px;font-size:13px;display:none;color:#6b7280;">
-        For <strong>CREDIT</strong> purchases, no payment is recorded now and the full amount
-        will appear as payable to the supplier.
+        <span data-i18n="credit_note_1">For</span> <strong data-i18n="credit_strong">CREDIT</strong>
+        <span data-i18n="credit_note_2">purchases, no payment is recorded now and the full amount</span>
+        <span data-i18n="credit_note_3">will appear as payable to the supplier.</span>
       </p>
     </div>
 
@@ -503,15 +509,15 @@
       class="btn btn-primary"
       style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
 {% if edit_mode %}
-  💾 Update Purchase
+  <span data-i18n="update_purchase_btn">💾 Update Purchase</span>
 {% else %}
-  💾 Save Purchase (Unposted)
+  <span data-i18n="save_purchase_unposted_btn">💾 Save Purchase (Unposted)</span>
 {% endif %}
 </button>
       <a href="{% url 'purchase_list' %}"
          class="btn btn-link"
          style="display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;color:#0d6efd;cursor:pointer;white-space:nowrap;">
-        Cancel
+        <span data-i18n="cancel">Cancel</span>
       </a>
     </div>
 
@@ -888,6 +894,151 @@ document.addEventListener('DOMContentLoaded', function() {
   recalcGrandTotal();
   updatePaymentVisibility();
 });
+</script>
+
+<script>
+  // Page dictionary: extend global ROZ_I18N without touching base
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+  Object.assign(window.ROZ_I18N.en, {
+    new_purchase_title: "New Purchase",
+    edit_purchase_title: "Edit Purchase",
+    edit_purchase_prefix: "Edit Purchase #",
+    new_purchase_subtitle: "Create a new purchase invoice, add items, and record payment details.",
+    edit_purchase_subtitle: "Update this purchase invoice, adjust items, and payment details.",
+
+    back_dashboard: "← Dashboard",
+    purchase_list_btn: "📄 Purchase List",
+
+    supplier_invoice_details: "Supplier & Invoice Details",
+    supplier: "Supplier",
+    select_supplier: "-- Select Supplier --",
+    invoice_date: "Invoice Date",
+    supplier_invoice_no: "Supplier Invoice #",
+
+    charges: "Charges",
+    freight_charges: "Freight Charges",
+    other_charges: "Other Charges",
+    notes: "Notes",
+
+    items: "Items",
+    total_purchase_prefix: "Total Purchase: Rs",
+    col_product: "Product",
+    col_unit: "Unit",
+    col_available_stock: "Available Stock",
+    col_unit_price: "Unit Price",
+    col_quantity: "Quantity",
+    col_total_price: "Total Price",
+
+    select: "-- Select --",
+    select_unit: "-- Unit --",
+    add_item_row_btn: "+ Add Item Row",
+    qty_ph: "Qty",
+    rs_prefix: "Rs",
+    base_prefix: "Base",
+
+    payment: "Payment",
+    full_payment: "Full Payment (Cash/Bank)",
+    partial_payment: "Partial Payment",
+    credit_payment: "Credit (Supplier will be paid later)",
+    amount_paid: "Amount Paid",
+    payment_hint_1: "For",
+    full_payment_strong: "Full Payment",
+    payment_hint_2: "this will be auto-filled from Total Purchase and locked.",
+    payment_hint_3: "For",
+    partial_payment_strong: "Partial",
+    payment_hint_4: "you can type a smaller amount.",
+    payment_account: "Payment Account",
+    select_cash_bank: "-- Select Cash/Bank Account --",
+    payment_account_required: "Required for full or partial cash/bank payments.",
+    credit_strong: "CREDIT",
+    credit_note_1: "For",
+    credit_note_2: "purchases, no payment is recorded now and the full amount",
+    credit_note_3: "will appear as payable to the supplier.",
+
+    update_purchase_btn: "💾 Update Purchase",
+    save_purchase_unposted_btn: "💾 Save Purchase (Unposted)",
+    cancel: "Cancel"
+  });
+
+  Object.assign(window.ROZ_I18N.ur, {
+    new_purchase_title: "نئی خرید",
+    edit_purchase_title: "خرید میں ترمیم",
+    edit_purchase_prefix: "خرید #",
+    new_purchase_subtitle: "نئی خرید انوائس بنائیں، آئٹمز شامل کریں اور ادائیگی کی تفصیل درج کریں۔",
+    edit_purchase_subtitle: "اس خرید انوائس کو اپڈیٹ کریں، آئٹمز اور ادائیگی کی تفصیل درست کریں۔",
+
+    back_dashboard: "← ڈیش بورڈ",
+    purchase_list_btn: "📄 خرید کی فہرست",
+
+    supplier_invoice_details: "سپلائر اور انوائس کی تفصیل",
+    supplier: "سپلائر",
+    select_supplier: "-- سپلائر منتخب کریں --",
+    invoice_date: "انوائس کی تاریخ",
+    supplier_invoice_no: "سپلائر انوائس #",
+
+    charges: "چارجز",
+    freight_charges: "فریٹ چارجز",
+    other_charges: "دیگر چارجز",
+    notes: "نوٹس",
+
+    items: "آئٹمز",
+    total_purchase_prefix: "کل خرید: Rs",
+    col_product: "پروڈکٹ",
+    col_unit: "یونٹ",
+    col_available_stock: "موجودہ اسٹاک",
+    col_unit_price: "فی یونٹ قیمت",
+    col_quantity: "مقدار",
+    col_total_price: "کل قیمت",
+
+    select: "-- منتخب کریں --",
+    select_unit: "-- یونٹ --",
+    add_item_row_btn: "+ آئٹم رو شامل کریں",
+    qty_ph: "مقدار",
+    rs_prefix: "Rs",
+    base_prefix: "بیس",
+
+    payment: "ادائیگی",
+    full_payment: "مکمل ادائیگی (کیش/بینک)",
+    partial_payment: "جزوی ادائیگی",
+    credit_payment: "ادھار (سپلائر کو بعد میں ادائیگی ہوگی)",
+    amount_paid: "ادا شدہ رقم",
+    payment_hint_1: "",
+    full_payment_strong: "مکمل ادائیگی",
+    payment_hint_2: "میں یہ کل خرید سے خودکار بھر جائے گی اور لاک ہوگی۔",
+    payment_hint_3: "",
+    partial_payment_strong: "جزوی",
+    payment_hint_4: "میں آپ کم رقم درج کر سکتے ہیں۔",
+    payment_account: "ادائیگی اکاؤنٹ",
+    select_cash_bank: "-- کیش/بینک اکاؤنٹ منتخب کریں --",
+    payment_account_required: "مکمل یا جزوی کیش/بینک ادائیگی کیلئے ضروری ہے۔",
+    credit_strong: "ادھار",
+    credit_note_1: "",
+    credit_note_2: "خرید میں ابھی ادائیگی ریکارڈ نہیں ہوتی اور پوری رقم",
+    credit_note_3: "سپلائر کے قابلِ ادائیگی میں شامل ہوگی۔",
+
+    update_purchase_btn: "💾 خرید اپڈیٹ کریں",
+    save_purchase_unposted_btn: "💾 خرید محفوظ کریں (ان پوسٹڈ)",
+    cancel: "منسوخ کریں"
+  });
+
+  // Apply current language to this page after dict is loaded
+  if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+
+  // Optional: translate placeholders on this page (keeps existing logic untouched)
+  (function () {
+    function applyPlaceholders() {
+      const lang = localStorage.getItem("roz_lang") || "en";
+      const pack = (window.ROZ_I18N && window.ROZ_I18N[lang]) ? window.ROZ_I18N[lang] : {};
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (pack[key]) el.setAttribute("placeholder", pack[key]);
+      });
+    }
+    applyPlaceholders();
+    document.addEventListener("roz:lang-changed", applyPlaceholders);
+    window.addEventListener("storage", (e) => { if (e.key === "roz_lang") applyPlaceholders(); });
+  })();
 </script>
 
 {% endblock %}
