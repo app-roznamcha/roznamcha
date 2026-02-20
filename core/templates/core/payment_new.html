@@ -27,20 +27,23 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
     <div>
       <h1 class="np-title" style="margin:0 0 6px;font-size:34px;font-weight:700;">
-        <p class="np-sub" style="margin:0 0 20px;font-size:16px;color:#475569;">
+        <span data-i18n="new_payment_title">New Payment</span>
+      </h1>
+      <p class="np-sub" style="margin:0 0 20px;font-size:16px;color:#475569;" data-i18n="new_payment_sub">
         Record money received from customers or paid to suppliers using a cash or bank account.
       </p>
     </div>
+
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
       <a href="{% url 'dashboard' %}"
         class="btn btn-secondary np-btn"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
+        <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
       <a href="{% url 'payment_list' %}"
         class="btn btn-secondary np-btn"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
-        ← Back to Payments
+        <span data-i18n="back_to_payments">← Back to Payments</span>
       </a>
     </div>
   </div>
@@ -63,7 +66,7 @@
       <div class="np-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Date</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_date">Date</label>
           <input type="date"
                  name="date"
                  value="{{ today }}"
@@ -71,26 +74,26 @@
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">Direction</label>
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_direction">Direction</label>
           <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;">
             <label>
               <input type="radio" name="direction" value="IN" checked>
-              Receipt (money coming IN)
+              <span data-i18n="direction_in">Receipt (money coming IN)</span>
             </label>
             <label>
               <input type="radio" name="direction" value="OUT">
-              Payment (money going OUT)
+              <span data-i18n="direction_out">Payment (money going OUT)</span>
             </label>
           </div>
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_party">
             Party (Customer / Supplier)
           </label>
           <select name="party" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="">-- Select Party --</option>
+            <option value="" data-i18n="opt_select_party">-- Select Party --</option>
             {% for p in parties %}
               <option value="{{ p.id }}">{{ p.name }} ({{ p.get_party_type_display }})</option>
             {% endfor %}
@@ -98,23 +101,23 @@
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_account">
             Cash / Bank Account
           </label>
           <select name="account" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
-            <option value="">-- Select Account --</option>
+            <option value="" data-i18n="opt_select_account">-- Select Account --</option>
             {% for acc in accounts %}
               <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
             {% endfor %}
           </select>
-          <p style="margin:6px 0 0;font-size:14px;color:#6b7280;">
+          <p style="margin:6px 0 0;font-size:14px;color:#6b7280;" data-i18n="account_help">
             Only accounts marked as Cash/Bank and allowed for payments are shown.
           </p>
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_amount">
             Amount (Rs)
           </label>
           <input type="number"
@@ -125,7 +128,7 @@
         </div>
 
         <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_description">
             Description (optional)
           </label>
           <input type="text"
@@ -140,12 +143,12 @@
         <button type="submit"
               class="btn btn-primary np-btn"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          💾 Save &amp; Post
+          <span data-i18n="save_post">💾 Save &amp; Post</span>
         </button>
         <a href="{% url 'payment_list' %}"
           class="btn btn-secondary np-btn"
            style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
-          Cancel
+          <span data-i18n="cancel">Cancel</span>
         </a>
       </div>
 
@@ -153,4 +156,51 @@
   </div>
 
 </div>
+
+{# ==========================
+   Urdu/English i18n (REGISTER ONLY; do not override base applyLang)
+   ========================== #}
+<script>
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+  Object.assign(window.ROZ_I18N.en, {
+    new_payment_title: "New Payment",
+    new_payment_sub: "Record money received from customers or paid to suppliers using a cash or bank account.",
+    back_dashboard: "← Dashboard",
+    back_to_payments: "← Back to Payments",
+    label_date: "Date",
+    label_direction: "Direction",
+    direction_in: "Receipt (money coming IN)",
+    direction_out: "Payment (money going OUT)",
+    label_party: "Party (Customer / Supplier)",
+    opt_select_party: "-- Select Party --",
+    label_account: "Cash / Bank Account",
+    opt_select_account: "-- Select Account --",
+    account_help: "Only accounts marked as Cash/Bank and allowed for payments are shown.",
+    label_amount: "Amount (Rs)",
+    label_description: "Description (optional)",
+    save_post: "💾 Save & Post",
+    cancel: "Cancel"
+  });
+
+  Object.assign(window.ROZ_I18N.ur, {
+    new_payment_title: "نئی ادائیگی / رسید",
+    new_payment_sub: "کیش یا بینک اکاؤنٹ کے ذریعے گاہک سے وصول شدہ یا سپلائر کو ادا کی گئی رقم ریکارڈ کریں۔",
+    back_dashboard: "← ڈیش بورڈ",
+    back_to_payments: "← ادائیگیوں پر واپس",
+    label_date: "تاریخ",
+    label_direction: "سمت",
+    direction_in: "رسید (رقم اندر آ رہی ہے)",
+    direction_out: "ادائیگی (رقم باہر جا رہی ہے)",
+    label_party: "فریق (گاہک / سپلائر)",
+    opt_select_party: "-- فریق منتخب کریں --",
+    label_account: "کیش / بینک اکاؤنٹ",
+    opt_select_account: "-- اکاؤنٹ منتخب کریں --",
+    account_help: "صرف وہ اکاؤنٹس دکھائے جاتے ہیں جو کیش/بینک مارک ہوں اور ادائیگی کے لیے اجازت یافتہ ہوں۔",
+    label_amount: "رقم (روپے)",
+    label_description: "تفصیل (اختیاری)",
+    save_post: "💾 محفوظ کریں اور پوسٹ کریں",
+    cancel: "منسوخ کریں"
+  });
+</script>
 {% endblock %}
