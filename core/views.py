@@ -404,34 +404,6 @@ def _wipe_tenant_data(owner):
     # CompanyProfile is NOT deleted here (keep tenant identity)
 
 
-
-@login_required
-@resolve_tenant_context(require_company=True)
-@staff_allowed
-@subscription_required
-def sales_invoice_share_png(request, pk):
-    """
-    One-click PNG download of Sales Invoice Share page.
-    - Staff allowed (to share invoices)
-    - If not posted => will show DRAFT watermark (your HTML already handles it)
-    """
-    invoice = tenant_get_object_or_404(request, SalesInvoice, pk=pk)
-
-    # 🔒 SaaS safety: invoice must belong to tenant owner (tenant_get_object_or_404 already ensures owner safety)
-
-    # Build absolute URL to the HTML share page with png_mode=1
-    share_url = reverse("sales_invoice_share", args=[invoice.id])
-    qs = urlencode({"png": "1"})
-    absolute_url = request.build_absolute_uri(f"{share_url}?{qs}")
-
-    # Render to PNG
-    png_bytes = asyncio.run(_render_url_to_png(absolute_url))
-
-    filename = f"sales-invoice-{invoice.invoice_number or invoice.id}.png"
-    resp = HttpResponse(png_bytes, content_type="image/png")
-    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
-    return resp
-
 @login_required
 @owner_required
 def dashboard(request):
