@@ -15,19 +15,18 @@
   {# ---------- Top Bar ---------- #}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="expenses_title">
         Daily Expenses
       </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:#475569;">
+      <p style="margin:0 0 16px;font-size:15px;color:#475569;" data-i18n="expenses_subtitle">
         Record daily spending like wages, food, guests, fuel, etc.
-        <span class="ur">روزانہ اخراجات درج کریں جیسے مزدوری، کھانا، مہمان، ایندھن وغیرہ</span>
       </p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
       <a href="{% url 'dashboard' %}"
          class="btn btn-secondary"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
+        <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
     </div>
   </div>
@@ -45,27 +44,26 @@
               padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
               margin-bottom:20px;">
 
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="record_expense">
       Record Expense
-      <span class="ur">اخراجات درج کریں</span>
     </div>
 
     <form method="post" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
       {% csrf_token %}
 
       <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;">Date <span class="ur">تاریخ</span></label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="date_label">Date</label>
         <input type="date" name="date" value="{{ today }}"
                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
       </div>
 
       <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Paid From (Cash/Bank) <span class="ur">اکاؤنٹ (کیش/بینک)</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="paid_from_label">
+          Paid From (Cash/Bank)
         </label>
         <select name="paid_from" required
                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
-          <option value="">-- Select Account --</option>
+          <option value="" data-i18n="select_account_opt">-- Select Account --</option>
           {% for acc in cash_bank_accounts %}
             <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
           {% endfor %}
@@ -73,12 +71,12 @@
       </div>
 
       <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Expense Head <span class="ur">اخراجات کی مد</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="expense_head_label">
+          Expense Head
         </label>
         <select name="expense_head" required
                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
-          <option value="">-- Select Head --</option>
+          <option value="" data-i18n="select_head_opt">-- Select Head --</option>
           {% for h in expense_heads %}
             <option value="{{ h.id }}">{{ h.code }} - {{ h.name }}</option>
           {% endfor %}
@@ -86,16 +84,16 @@
       </div>
 
       <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Amount (Rs) <span class="ur">رقم</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="amount_label">
+          Amount (Rs)
         </label>
         <input type="number" name="amount" step="0.01" min="0" required
                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
       </div>
 
       <div style="grid-column:1 / -1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Notes (optional) <span class="ur">تفصیل</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="notes_label">
+          Notes (optional)
         </label>
         <input type="text" name="notes" maxlength="255"
                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
@@ -105,7 +103,7 @@
         <button type="submit"
                 class="btn btn-primary"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          💾 Save (Posted)
+          <span data-i18n="save_posted_btn">💾 Save (Posted)</span>
         </button>
       </div>
     </form>
@@ -116,36 +114,35 @@
               padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
               margin-bottom:20px;">
 
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="filters">
       Filters
-      <span class="ur">فلٹر</span>
     </div>
 
     <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
       <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Period <span class="ur">مدت</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="period_label">
+          Period
         </label>
         <select name="period"
                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
-          <option value="day" {% if period == "day" %}selected{% endif %}>Today</option>
-          <option value="week" {% if period == "week" %}selected{% endif %}>Last 7 days</option>
-          <option value="month" {% if period == "month" %}selected{% endif %}>This month</option>
-          <option value="custom" {% if period == "custom" %}selected{% endif %}>Custom range</option>
+          <option value="day" {% if period == "day" %}selected{% endif %} data-i18n="period_today">Today</option>
+          <option value="week" {% if period == "week" %}selected{% endif %} data-i18n="period_week">Last 7 days</option>
+          <option value="month" {% if period == "month" %}selected{% endif %} data-i18n="period_month">This month</option>
+          <option value="custom" {% if period == "custom" %}selected{% endif %} data-i18n="period_custom">Custom range</option>
         </select>
       </div>
 
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          From date <span class="ur">شروع</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from_date">
+          From date
         </label>
         <input type="date" name="from_date" value="{{ from_date }}"
                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
       </div>
 
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          To date <span class="ur">اختتام</span>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to_date">
+          To date
         </label>
         <input type="date" name="to_date" value="{{ to_date }}"
                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
@@ -155,12 +152,12 @@
         <button type="submit"
                 class="btn btn-primary"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
+          <span data-i18n="apply">Apply</span>
         </button>
         <a href="{% url 'expenses_page' %}"
            class="btn btn-secondary"
            style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
-          Reset
+          <span data-i18n="reset">Reset</span>
         </a>
       </div>
     </form>
@@ -170,12 +167,11 @@
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:18px;font-weight:600;">
+      <div style="font-size:18px;font-weight:600;" data-i18n="expenses_list">
         Expenses List
-        <span class="ur">اخراجات کی فہرست</span>
       </div>
       <div style="font-size:14px;color:#6b7280;">
-        Total: <strong>{{ total_amount|floatformat:2 }}</strong>
+        <span data-i18n="total">Total</span>: <strong>{{ total_amount|floatformat:2 }}</strong>
       </div>
     </div>
 
@@ -183,13 +179,13 @@
       <table style="border-collapse:collapse;width:100%;min-width:860px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Paid From</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Expense Head</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Notes</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Posted?</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_hash">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_date">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_paid_from">Paid From</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_expense_head">Expense Head</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_amount">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_notes">Notes</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;" data-i18n="col_posted">Posted?</th>
           </tr>
         </thead>
         <tbody>
@@ -203,15 +199,15 @@
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.notes|default:"—" }}</td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
                 {% if e.posted %}
-                  <span class="badge badge-success">Yes</span>
+                  <span class="badge badge-success" data-i18n="yes">Yes</span>
                 {% else %}
-                  <span class="badge badge-warning">No</span>
+                  <span class="badge badge-warning" data-i18n="no">No</span>
                 {% endif %}
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;text-align:center;">
+              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;text-align:center;" data-i18n="no_expenses">
                 No expenses found.
               </td>
             </tr>
@@ -223,4 +219,95 @@
   </div>
 
 </div>
+
+<script>
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+  Object.assign(window.ROZ_I18N.en, {
+    expenses_title: "Daily Expenses",
+    expenses_subtitle: "Record daily spending like wages, food, guests, fuel, etc.",
+    back_dashboard: "← Dashboard",
+
+    record_expense: "Record Expense",
+    date_label: "Date",
+    paid_from_label: "Paid From (Cash/Bank)",
+    expense_head_label: "Expense Head",
+    amount_label: "Amount (Rs)",
+    notes_label: "Notes (optional)",
+    select_account_opt: "-- Select Account --",
+    select_head_opt: "-- Select Head --",
+    save_posted_btn: "💾 Save (Posted)",
+
+    filters: "Filters",
+    period_label: "Period",
+    period_today: "Today",
+    period_week: "Last 7 days",
+    period_month: "This month",
+    period_custom: "Custom range",
+    from_date: "From date",
+    to_date: "To date",
+    apply: "Apply",
+    reset: "Reset",
+
+    expenses_list: "Expenses List",
+    total: "Total",
+
+    col_hash: "#",
+    col_date: "Date",
+    col_paid_from: "Paid From",
+    col_expense_head: "Expense Head",
+    col_amount: "Amount",
+    col_notes: "Notes",
+    col_posted: "Posted?",
+
+    yes: "Yes",
+    no: "No",
+    no_expenses: "No expenses found.",
+  });
+
+  Object.assign(window.ROZ_I18N.ur, {
+    expenses_title: "روزانہ اخراجات",
+    expenses_subtitle: "روزانہ اخراجات درج کریں جیسے مزدوری، کھانا، مہمان، ایندھن وغیرہ۔",
+    back_dashboard: "← ڈیش بورڈ",
+
+    record_expense: "اخراجات درج کریں",
+    date_label: "تاریخ",
+    paid_from_label: "ادائیگی کس اکاؤنٹ سے (کیش/بینک)",
+    expense_head_label: "اخراجات کی مد",
+    amount_label: "رقم (روپے)",
+    notes_label: "تفصیل (اختیاری)",
+    select_account_opt: "-- اکاؤنٹ منتخب کریں --",
+    select_head_opt: "-- مد منتخب کریں --",
+    save_posted_btn: "💾 محفوظ کریں (پوسٹڈ)",
+
+    filters: "فلٹرز",
+    period_label: "مدت",
+    period_today: "آج",
+    period_week: "گزشتہ 7 دن",
+    period_month: "اس مہینے",
+    period_custom: "اپنی مدت",
+    from_date: "شروع",
+    to_date: "اختتام",
+    apply: "لاگو کریں",
+    reset: "ری سیٹ",
+
+    expenses_list: "اخراجات کی فہرست",
+    total: "کل",
+
+    col_hash: "#",
+    col_date: "تاریخ",
+    col_paid_from: "ادائیگی (اکاؤنٹ)",
+    col_expense_head: "مد",
+    col_amount: "رقم",
+    col_notes: "تفصیل",
+    col_posted: "پوسٹڈ؟",
+
+    yes: "ہاں",
+    no: "نہیں",
+    no_expenses: "کوئی اخراجات نہیں ملے۔",
+  });
+
+  if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+</script>
+
 {% endblock %}
