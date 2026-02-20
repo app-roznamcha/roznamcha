@@ -113,8 +113,7 @@ import asyncio
 from urllib.parse import urlencode
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import DailyExpense
-
+from .models import DailyExpense, CashBankTransfer
 
 class TenantAwareLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
