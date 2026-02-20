@@ -2005,6 +2005,13 @@ def seed_default_accounts_for_owner(owner: User) -> None:
         ("5100", "Inventory Write-off (Damage/Expiry)", "EXPENSE", False, False),
         ("1010", "Cash", "ASSET", True, True),
         ("1020", "Bank", "ASSET", True, True),
+        ("5200", "Wages / Staff Salaries", "EXPENSE", False, False),
+        ("5210", "Fuel / Diesel / Petrol", "EXPENSE", False, False),
+        ("5220", "Utilities (Electricity / Internet / Gas / Water)", "EXPENSE", False, False),
+        ("5230", "Guests / Entertainment", "EXPENSE", False, False),
+        ("5240", "Repair & Maintenance", "EXPENSE", False, False),
+        ("5250", "Office Supplies / Stationery", "EXPENSE", False, False),
+        ("5290", "Miscellaneous Expense", "EXPENSE", False, False),
     ]
 
     with transaction.atomic():

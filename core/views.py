@@ -298,6 +298,9 @@ def signup_submit(request):
     prof.is_active = True
     prof.save()
 
+    from .models import seed_default_accounts_for_owner
+    seed_default_accounts_for_owner(user)
+
     # If company existed (rare), ensure slug is set correctly
     if not created:
         # don’t overwrite existing slug if already set; only fill if missing
@@ -6005,7 +6008,8 @@ def expenses_page(request):
     - Filters: day / week / month or custom date range
     - Table: list existing expenses (latest first)
     """
-
+    DAILY_EXPENSE_CODES = ["5200", "5210", "5220", "5230", "5240", "5250", "5290"]
+    
     # Dropdowns
     cash_bank_accounts = (
         Account.objects.filter(
@@ -6020,10 +6024,10 @@ def expenses_page(request):
         Account.objects.filter(
             owner=request.owner,
             account_type="EXPENSE",
+            code__in=DAILY_EXPENSE_CODES,
         )
         .order_by("code")
     )
-
     # Filters
     today = timezone.now().date()
     period = (request.GET.get("period") or "day").lower()  # day/week/month/custom
@@ -6107,8 +6111,8 @@ def expenses_page(request):
                 Account,
                 pk=expense_head_id,
                 account_type="EXPENSE",
+                code__in=DAILY_EXPENSE_CODES,
             )
-
             kwargs = {
                 "owner": request.owner,
                 "date": exp_date,
