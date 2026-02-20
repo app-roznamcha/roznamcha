@@ -2044,4 +2044,85 @@ def seed_default_accounts_for_owner(owner: User) -> None:
             if needs_update:
                 acct.save(update_fields=["name", "account_type", "is_cash_or_bank", "allow_for_payments"])
 
+class CashBankTransfer(OwnerRequiredMixin, TimeStampedModel):
+    """
+    Transfer money between cash/bank accounts:
+      Dr to_account
+      Cr from_account
+    """
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="cash_bank_transfers",
+        help_text="Company owner (this user is the company).",
+    )
 
+    date = models.DateField(default=timezone.now)
+
+    from_account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name="cashbank_transfers_out",
+        limit_choices_to={"is_cash_or_bank": True, "allow_for_payments": True},
+    )
+
+    to_account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name="cashbank_transfers_in",
+        limit_choices_to={"is_cash_or_bank": True, "allow_for_payments": True},
+    )
+
+    amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    notes = models.CharField(max_length=255, blank=True, default="")
+    posted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.date} | {self.from_account} → {self.to_account} | {self.amount}"
+
+    def post(self):
+        """
+        Create JournalEntry (idempotent):
+          Dr to_account
+          Cr from_account
+        """
+        if self.posted or self.amount <= 0:
+            return
+
+        if self.owner is None:
+            raise PermissionDenied("Owner not resolved for CashBankTransfer")
+
+        # ✅ SaaS defense
+        if self.from_account and self.from_account.owner_id != self.owner_id:
+            raise PermissionDenied("Cross-owner from_account detected.")
+        if self.to_account and self.to_account.owner_id != self.owner_id:
+            raise PermissionDenied("Cross-owner to_account detected.")
+
+        if self.from_account_id == self.to_account_id:
+            raise PermissionDenied("From and To accounts cannot be the same.")
+
+        with transaction.atomic():
+            locked = CashBankTransfer.objects.select_for_update().get(pk=self.pk)
+            if locked.posted:
+                return
+
+            # 🔒 Idempotent JournalEntry (your unique constraint also enforces this)
+            if not JournalEntry.objects.filter(
+                owner=self.owner,
+                related_model="CashBankTransfer",
+                related_id=self.id,
+            ).exists():
+                JournalEntry.objects.create(
+                    owner=self.owner,
+                    date=self.date,
+                    description=self.notes or f"Transfer {self.id}",
+                    debit_account=self.to_account,
+                    credit_account=self.from_account,
+                    amount=self.amount,
+                    related_model="CashBankTransfer",
+                    related_id=self.id,
+                )
+
+            locked.posted = True
+            locked.save(update_fields=["posted"])
+            self.posted = True

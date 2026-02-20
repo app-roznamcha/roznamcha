@@ -185,6 +185,8 @@ urlpatterns = [
     path("tax-pack/parties/", staff_blocked(views.tax_parties_download), name="tax_parties_download"),
     path("tax-pack/accounts/", staff_blocked(views.tax_accounts_download), name="tax_accounts_download"),
     path("tax-pack/full-zip/", staff_blocked(views.tax_pack_zip_download), name="tax_pack_zip_download"),
+
+    path("transfer/", views.cash_bank_transfer_page, name="cash_bank_transfer_page"),
 ]
 urlpatterns += [
     path("internal/run-backup/", run_backup_job, name="run_backup_job"),

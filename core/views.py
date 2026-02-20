@@ -6142,3 +6142,127 @@ def expenses_page(request):
         "to_date": date_to.isoformat() if date_to else "",
     }
     return render(request, "core/expenses.html", context)
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@staff_allowed
+@subscription_required
+def cash_bank_transfer_page(request):
+    """
+    One-page Cash/Bank Transfer:
+    - Top: create transfer (auto-post)
+    - Filters: day/week/month/custom
+    - Table: list transfers (latest first)
+    """
+    today = timezone.now().date()
+    period = (request.GET.get("period") or "day").lower()
+    from_str = request.GET.get("from_date") or ""
+    to_str = request.GET.get("to_date") or ""
+
+    date_from = None
+    date_to = None
+
+    if period == "week":
+        date_from = today - timedelta(days=6)
+        date_to = today
+    elif period == "month":
+        date_from = today.replace(day=1)
+        date_to = today
+    elif period == "custom":
+        try:
+            date_from = date.fromisoformat(from_str) if from_str else None
+        except ValueError:
+            date_from = None
+        try:
+            date_to = date.fromisoformat(to_str) if to_str else None
+        except ValueError:
+            date_to = None
+    else:
+        date_from = today
+        date_to = today
+
+    cash_bank_accounts = Account.objects.filter(
+        owner=request.owner,
+        is_cash_or_bank=True,
+        allow_for_payments=True,
+    ).order_by("code")
+
+    qs = CashBankTransfer.objects.filter(owner=request.owner).order_by("-date", "-id")
+    if date_from:
+        qs = qs.filter(date__gte=date_from)
+    if date_to:
+        qs = qs.filter(date__lte=date_to)
+
+    total_amount = qs.aggregate(models.Sum("amount"))["amount__sum"] or Decimal("0")
+    error = None
+
+    if request.method == "POST":
+        date_str = request.POST.get("date") or ""
+        from_id = request.POST.get("from_account") or ""
+        to_id = request.POST.get("to_account") or ""
+        amount_str = (request.POST.get("amount") or "0").strip()
+        notes = (request.POST.get("notes") or "").strip()
+
+        try:
+            tx_date = date.fromisoformat(date_str) if date_str else today
+        except ValueError:
+            tx_date = today
+
+        try:
+            amount = Decimal(amount_str)
+        except (InvalidOperation, TypeError):
+            amount = Decimal("0")
+
+        if not from_id:
+            error = "Please select the From (Cash/Bank) account."
+        elif not to_id:
+            error = "Please select the To (Cash/Bank) account."
+        elif from_id == to_id:
+            error = "From and To accounts cannot be the same."
+        elif amount <= 0:
+            error = "Amount must be greater than zero."
+
+        if not error:
+            from_account = tenant_get_object_or_404(
+                request,
+                Account,
+                pk=from_id,
+                is_cash_or_bank=True,
+                allow_for_payments=True,
+            )
+            to_account = tenant_get_object_or_404(
+                request,
+                Account,
+                pk=to_id,
+                is_cash_or_bank=True,
+                allow_for_payments=True,
+            )
+
+            kwargs = {
+                "owner": request.owner,
+                "date": tx_date,
+                "from_account": from_account,
+                "to_account": to_account,
+                "amount": amount,
+                "notes": notes,
+                "posted": False,
+            }
+            kwargs = set_tenant_on_create_kwargs(request, kwargs, CashBankTransfer)
+
+            with transaction.atomic():
+                obj = CashBankTransfer.objects.create(**kwargs)
+                obj.post()
+
+            return redirect("cash_bank_transfer_page")
+
+    context = {
+        "cash_bank_accounts": cash_bank_accounts,
+        "transfers": qs,
+        "total_amount": total_amount,
+        "error": error,
+        "today": today.isoformat(),
+        "period": period,
+        "from_date": date_from.isoformat() if date_from else "",
+        "to_date": date_to.isoformat() if date_to else "",
+    }
+    return render(request, "core/cash_bank_transfer.html", context)
