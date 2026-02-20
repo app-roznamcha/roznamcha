@@ -2580,16 +2580,29 @@ def account_ledger(request):
     - Counter account is computed for display.
     """
 
-    SYSTEM_CODES = ["1000", "1010", "1020", "1200", "1300", "2100", "3000", "5100"]
+    SYSTEM_CODES = [
+        "1000", "1010", "1020", "1200", "1300", "2100", "3000", "5100",
+        # ✅ add ALL your system expense/category codes here too (example)
+        "5200", "5210", "5220", "5230", "5240", "5250", "5290",
+    ]
 
-    # ✅ Toggle: show system accounts?
     show_system = request.GET.get("show_system") == "1"
 
-    accounts_qs = Account.objects.filter(owner=request.owner)
-    if not show_system:
-        accounts_qs = accounts_qs.exclude(code__in=SYSTEM_CODES)
+    base_qs = Account.objects.filter(owner=request.owner)
 
-    accounts = accounts_qs.order_by("code")
+    if show_system:
+        # show everything
+        accounts = base_qs.order_by("code")
+    else:
+        # ✅ default: show owner-defined accounts + cash/bank
+        accounts = (
+            base_qs
+            .filter(
+                Q(is_cash_or_bank=True) |
+                ~Q(code__in=SYSTEM_CODES)
+            )
+            .order_by("code")
+        )
 
     account_id = request.GET.get("account")
     from_str = request.GET.get("from")
