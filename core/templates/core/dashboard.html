@@ -626,6 +626,10 @@ html[dir="rtl"] .dashboard-section{
                 {% if not is_staff %}
                 <a href="{% url 'payments_list' %}" class="btn-pill"><span data-i18n="payments_list">📃 Payments &amp; Receipts</span></a>
                 {% endif %}
+
+                <a href="{% url 'expenses_page' %}" class="btn-pill">
+                  <span data-i18n="daily_expenses">🧾 Daily Expenses</span>
+                </a>
             </div>
     
             <div class="button-row">

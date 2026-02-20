@@ -1,0 +1,226 @@
+{% extends "core/base.html" %}
+
+{% block title %}Daily Expenses{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  <style>
+    .ur{display:block;font-size:12px;color:#64748b;margin-top:2px;direction:rtl;text-align:right;}
+    @media (max-width:640px){
+      .page{padding:0 16px !important;}
+    }
+  </style>
+
+  {# ---------- Top Bar ---------- #}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
+        Daily Expenses
+      </h1>
+      <p style="margin:0 0 16px;font-size:15px;color:#475569;">
+        Record daily spending like wages, food, guests, fuel, etc.
+        <span class="ur">روزانہ اخراجات درج کریں جیسے مزدوری، کھانا، مہمان، ایندھن وغیرہ</span>
+      </p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <a href="{% url 'dashboard' %}"
+         class="btn btn-secondary"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        ← Dashboard
+      </a>
+    </div>
+  </div>
+
+  {# ---------- Error ---------- #}
+  {% if error %}
+    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
+                font-size:15px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  {# ---------- Create Expense Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Record Expense
+      <span class="ur">اخراجات درج کریں</span>
+    </div>
+
+    <form method="post" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
+      {% csrf_token %}
+
+      <div>
+        <label style="display:block;font-size:14px;margin-bottom:4px;">Date <span class="ur">تاریخ</span></label>
+        <input type="date" name="date" value="{{ today }}"
+               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          Paid From (Cash/Bank) <span class="ur">اکاؤنٹ (کیش/بینک)</span>
+        </label>
+        <select name="paid_from" required
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+          <option value="">-- Select Account --</option>
+          {% for acc in cash_bank_accounts %}
+            <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          Expense Head <span class="ur">اخراجات کی مد</span>
+        </label>
+        <select name="expense_head" required
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+          <option value="">-- Select Head --</option>
+          {% for h in expense_heads %}
+            <option value="{{ h.id }}">{{ h.code }} - {{ h.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          Amount (Rs) <span class="ur">رقم</span>
+        </label>
+        <input type="number" name="amount" step="0.01" min="0" required
+               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="grid-column:1 / -1;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          Notes (optional) <span class="ur">تفصیل</span>
+        </label>
+        <input type="text" name="notes" maxlength="255"
+               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          💾 Save (Posted)
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Filters Card ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+              margin-bottom:20px;">
+
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+      Filters
+      <span class="ur">فلٹر</span>
+    </div>
+
+    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div style="min-width:220px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          Period <span class="ur">مدت</span>
+        </label>
+        <select name="period"
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+          <option value="day" {% if period == "day" %}selected{% endif %}>Today</option>
+          <option value="week" {% if period == "week" %}selected{% endif %}>Last 7 days</option>
+          <option value="month" {% if period == "month" %}selected{% endif %}>This month</option>
+          <option value="custom" {% if period == "custom" %}selected{% endif %}>Custom range</option>
+        </select>
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          From date <span class="ur">شروع</span>
+        </label>
+        <input type="date" name="from_date" value="{{ from_date }}"
+               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="min-width:180px;">
+        <label style="display:block;font-size:14px;margin-bottom:4px;">
+          To date <span class="ur">اختتام</span>
+        </label>
+        <input type="date" name="to_date" value="{{ to_date }}"
+               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <button type="submit"
+                class="btn btn-primary"
+                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+          Apply
+        </button>
+        <a href="{% url 'expenses_page' %}"
+           class="btn btn-secondary"
+           style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+          Reset
+        </a>
+      </div>
+    </form>
+  </div>
+
+  {# ---------- Expenses List ---------- #}
+  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+              padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:18px;font-weight:600;">
+        Expenses List
+        <span class="ur">اخراجات کی فہرست</span>
+      </div>
+      <div style="font-size:14px;color:#6b7280;">
+        Total: <strong>{{ total_amount|floatformat:2 }}</strong>
+      </div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="border-collapse:collapse;width:100%;min-width:860px;">
+        <thead>
+          <tr>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Paid From</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Expense Head</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Notes</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Posted?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in expenses %}
+            <tr>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ forloop.counter }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.date|date:"M j, Y" }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.paid_from.name }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.expense_head.name }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">{{ e.amount|floatformat:2 }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.notes|default:"—" }}</td>
+              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+                {% if e.posted %}
+                  <span class="badge badge-success">Yes</span>
+                {% else %}
+                  <span class="badge badge-warning">No</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;text-align:center;">
+                No expenses found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

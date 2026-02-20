@@ -102,6 +102,11 @@ urlpatterns = [
     path("adjustments/", staff_allowed(views.adjustments_page), name="adjustments_page"),
 
     # =========================
+    # Expenses (staff allowed)
+    # =========================
+    path("expenses/", staff_allowed(views.expenses_page), name="expenses_page"),
+
+    # =========================
     # Reports & utilities (STAFF blocked)
     # =========================
     path("day-summary/", staff_blocked(views.day_summary), name="day_summary"),

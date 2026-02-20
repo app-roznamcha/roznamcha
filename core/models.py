@@ -790,6 +790,135 @@ class Payment(OwnerRequiredMixin, TimeStampedModel):
             models.Index(fields=["owner", "posted"]),
             models.Index(fields=["owner", "related_model", "related_id"]),
         ]
+
+
+# --------------------------
+# Daily Expenses
+# --------------------------
+
+class DailyExpense(OwnerRequiredMixin, TimeStampedModel):
+    """
+    Simple daily expense entry (company-scoped), posted immediately.
+
+    Journal when posted:
+      Dr Expense Head (EXPENSE)
+      Cr Cash/Bank account
+    """
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="daily_expenses",
+        help_text="Company owner (this user is the company).",
+    )
+
+    date = models.DateField(default=timezone.now)
+
+    paid_from = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name="expense_paid_from",
+        limit_choices_to={"is_cash_or_bank": True, "allow_for_payments": True},
+        help_text="Cash/Bank account used to pay the expense.",
+    )
+
+    expense_head = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name="expense_heads_used",
+        limit_choices_to={"account_type": "EXPENSE"},
+        help_text="Expense account head (e.g., Wages, Food, Fuel).",
+    )
+
+    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    notes = models.CharField(max_length=255, blank=True)
+    posted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.date} | Expense {self.amount} from {self.paid_from} ({'POSTED' if self.posted else 'DRAFT'})"
+
+    def clean(self):
+        super().clean()
+
+        if self.amount is not None and self.amount <= 0:
+            raise ValidationError("Amount must be greater than zero.")
+
+        # ✅ SaaS: paid_from & expense_head must belong to same owner
+        if self.owner_id and self.paid_from_id and self.paid_from.owner_id != self.owner_id:
+            raise ValidationError("Paid-from account does not belong to this owner.")
+        if self.owner_id and self.expense_head_id and self.expense_head.owner_id != self.owner_id:
+            raise ValidationError("Expense head does not belong to this owner.")
+
+        # ✅ Enforce types (defense-in-depth)
+        if self.paid_from_id:
+            if not self.paid_from.is_cash_or_bank or not self.paid_from.allow_for_payments:
+                raise ValidationError("Paid-from account must be a Cash/Bank account allowed for payments.")
+
+        if self.expense_head_id:
+            if self.expense_head.account_type != "EXPENSE":
+                raise ValidationError("Expense head must be an EXPENSE-type account.")
+
+        # 🔒 Prevent editing after posting (accounting safety)
+        if self.pk:
+            old = DailyExpense.objects.filter(pk=self.pk).first()
+            if old and old.posted:
+                raise ValidationError("Posted expenses cannot be modified.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def post(self):
+        """
+        Create JournalEntry (idempotent):
+          Dr expense_head
+          Cr paid_from
+        """
+        if self.posted or self.amount <= 0:
+            return
+
+        if self.owner is None:
+            raise PermissionDenied("Owner not resolved for DailyExpense")
+
+        # ✅ SaaS defense-in-depth at posting time
+        if self.paid_from and self.paid_from.owner_id != self.owner_id:
+            raise PermissionDenied("Cross-owner cash/bank account detected.")
+        if self.expense_head and self.expense_head.owner_id != self.owner_id:
+            raise PermissionDenied("Cross-owner expense head detected.")
+
+        with transaction.atomic():
+            locked = DailyExpense.objects.select_for_update().get(pk=self.pk)
+            if locked.posted:
+                return
+
+            # 🔒 Idempotent JournalEntry
+            if not JournalEntry.objects.filter(
+                owner=self.owner,
+                related_model="DailyExpense",
+                related_id=self.id,
+            ).exists():
+                JournalEntry.objects.create(
+                    owner=self.owner,
+                    date=self.date,
+                    description=self.notes or f"Daily Expense {self.id}",
+                    debit_account=self.expense_head,
+                    credit_account=self.paid_from,
+                    amount=self.amount,
+                    related_model="DailyExpense",
+                    related_id=self.id,
+                )
+
+            locked.posted = True
+            locked.save(update_fields=["posted"])
+            self.posted = True
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["owner", "date", "id"]),
+            models.Index(fields=["owner", "posted"]),
+            models.Index(fields=["owner", "expense_head"]),
+            models.Index(fields=["owner", "paid_from"]),
+        ]
 # --------------------------
 # Sales Invoice (Header only in Part-1)
 # --------------------------

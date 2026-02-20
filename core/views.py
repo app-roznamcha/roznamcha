@@ -6020,3 +6020,148 @@ def sales_invoice_share_png(request, pk):
     # We intentionally generate PNG client-side (html2canvas) for Render compatibility.
     # Redirect users to the share page.
     return redirect(reverse("sales_invoice_share", args=[pk]))
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@staff_allowed
+@subscription_required
+def expenses_page(request):
+    """
+    One-page Daily Expenses:
+    - Top: create expense (auto-post)
+    - Filters: day / week / month or custom date range
+    - Table: list existing expenses (latest first)
+    """
+
+    # Dropdowns
+    cash_bank_accounts = (
+        Account.objects.filter(
+            owner=request.owner,
+            is_cash_or_bank=True,
+            allow_for_payments=True,
+        )
+        .order_by("code")
+    )
+
+    expense_heads = (
+        Account.objects.filter(
+            owner=request.owner,
+            account_type="EXPENSE",
+        )
+        .order_by("code")
+    )
+
+    # Filters
+    today = timezone.now().date()
+    period = (request.GET.get("period") or "day").lower()  # day/week/month/custom
+    from_str = request.GET.get("from_date") or ""
+    to_str = request.GET.get("to_date") or ""
+
+    date_from = None
+    date_to = None
+
+    if period == "week":
+        date_from = today - timedelta(days=6)
+        date_to = today
+    elif period == "month":
+        date_from = today.replace(day=1)
+        date_to = today
+    elif period == "custom":
+        # custom range
+        try:
+            date_from = date.fromisoformat(from_str) if from_str else None
+        except ValueError:
+            date_from = None
+        try:
+            date_to = date.fromisoformat(to_str) if to_str else None
+        except ValueError:
+            date_to = None
+    else:
+        # day default
+        date_from = today
+        date_to = today
+
+    qs = DailyExpense.objects.filter(owner=request.owner).order_by("-date", "-id")
+    if date_from:
+        qs = qs.filter(date__gte=date_from)
+    if date_to:
+        qs = qs.filter(date__lte=date_to)
+
+    total_amount = qs.aggregate(models.Sum("amount"))["amount__sum"] or Decimal("0")
+
+    error = None
+
+    # Create expense
+    if request.method == "POST":
+        date_str = request.POST.get("date") or ""
+        paid_from_id = request.POST.get("paid_from") or ""
+        expense_head_id = request.POST.get("expense_head") or ""
+        amount_str = (request.POST.get("amount") or "0").strip()
+        notes = (request.POST.get("notes") or "").strip()
+
+        # date
+        if date_str:
+            try:
+                exp_date = date.fromisoformat(date_str)
+            except ValueError:
+                exp_date = today
+        else:
+            exp_date = today
+
+        # amount
+        try:
+            amount = Decimal(amount_str)
+        except (InvalidOperation, TypeError):
+            amount = Decimal("0")
+
+        if not paid_from_id:
+            error = "Please select the cash/bank account."
+        elif not expense_head_id:
+            error = "Please select the expense head."
+        elif amount <= 0:
+            error = "Amount must be greater than zero."
+
+        if not error:
+            paid_from = tenant_get_object_or_404(
+                request,
+                Account,
+                pk=paid_from_id,
+                is_cash_or_bank=True,
+                allow_for_payments=True,
+            )
+            expense_head = tenant_get_object_or_404(
+                request,
+                Account,
+                pk=expense_head_id,
+                account_type="EXPENSE",
+            )
+
+            kwargs = {
+                "owner": request.owner,
+                "date": exp_date,
+                "paid_from": paid_from,
+                "expense_head": expense_head,
+                "amount": amount,
+                "notes": notes,
+                "posted": False,
+            }
+            kwargs = set_tenant_on_create_kwargs(request, kwargs, DailyExpense)
+
+            with transaction.atomic():
+                obj = DailyExpense.objects.create(**kwargs)
+                obj.post()
+
+            return redirect("expenses_page")
+
+    context = {
+        "cash_bank_accounts": cash_bank_accounts,
+        "expense_heads": expense_heads,
+        "expenses": qs,
+        "total_amount": total_amount,
+        "error": error,
+        "today": today.isoformat(),
+        "period": period,
+        "from_date": date_from.isoformat() if date_from else "",
+        "to_date": date_to.isoformat() if date_to else "",
+    }
+    return render(request, "core/expenses.html", context)
