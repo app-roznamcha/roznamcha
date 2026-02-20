@@ -6293,3 +6293,12 @@ def cash_bank_transfer_page(request):
         "to_date": date_to.isoformat() if date_to else "",
     }
     return render(request, "core/cash_bank_transfer.html", context)
+
+@require_GET
+def run_backup_internal(request):
+    key = request.GET.get("key")
+    if key != settings.INTERNAL_BACKUP_KEY:
+        return HttpResponseForbidden("Forbidden")
+
+    call_command("backupdata", keep=3)
+    return JsonResponse({"status": "backup completed"})

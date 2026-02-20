@@ -208,3 +208,5 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 
 DEFAULT_FROM_EMAIL = "Roznamcha <app.roznamcha@gmail.com>"
 CRON_TOKEN = os.getenv("CRON_TOKEN", "")
+
+INTERNAL_BACKUP_KEY = os.environ.get("INTERNAL_BACKUP_KEY", "")
