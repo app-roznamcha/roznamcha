@@ -9,9 +9,9 @@
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
     <div>
       <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
-        Payments (Receipts &amp; Payments)
+        <span data-i18n="payments_title">Payments (Receipts &amp; Payments)</span>
       </h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;" data-i18n="payments_subtitle">
         View and filter all money received from customers or paid to suppliers.
       </p>
     </div>
@@ -19,12 +19,12 @@
       <a href="{% url 'dashboard' %}"
          class="btn btn-secondary"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
+        <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
       <a href="{% url 'payment_new' %}"
          class="btn btn-primary"
          style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:210px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #2563eb;cursor:pointer;white-space:nowrap;background:#2563eb;color:#ffffff;">
-        + New Payment / Receipt
+        <span data-i18n="new_payment_receipt_btn">+ New Payment / Receipt</span>
       </a>
     </div>
   </div>
@@ -33,10 +33,10 @@
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
               margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
+    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="filters_title">
       Filters
     </div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;" data-i18n="filters_help">
       Narrow down payments by date, direction, and party, then click <strong>Apply</strong>.
     </p>
 
@@ -44,7 +44,7 @@
           class="filters-form"
           style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">From date</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from_date">From date</label>
         <input type="date"
                name="from_date"
                value="{{ from_date }}"
@@ -52,7 +52,7 @@
       </div>
 
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">To date</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to_date">To date</label>
         <input type="date"
                name="to_date"
                value="{{ to_date }}"
@@ -60,20 +60,20 @@
       </div>
 
       <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">Direction</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="direction">Direction</label>
         <select name="direction"
                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-          <option value="">All</option>
-          <option value="IN" {% if selected_direction == "IN" %}selected{% endif %}>Receipt (IN)</option>
-          <option value="OUT" {% if selected_direction == "OUT" %}selected{% endif %}>Payment (OUT)</option>
+          <option value="" data-i18n="all">All</option>
+          <option value="IN" {% if selected_direction == "IN" %}selected{% endif %} data-i18n="receipt_in">Receipt (IN)</option>
+          <option value="OUT" {% if selected_direction == "OUT" %}selected{% endif %} data-i18n="payment_out">Payment (OUT)</option>
         </select>
       </div>
 
       <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">Party</label>
+        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="party">Party</label>
         <select name="party"
                 style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-          <option value="">All parties</option>
+          <option value="" data-i18n="all_parties">All parties</option>
           {% for p in parties %}
             <option value="{{ p.id }}"
               {% if p.id|stringformat:"s" == selected_party_id %}selected{% endif %}>
@@ -87,12 +87,12 @@
         <button type="submit"
                 class="btn btn-primary"
                 style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
+          <span data-i18n="apply">Apply</span>
         </button>
         <a href="{% url 'payment_list' %}"
            class="btn btn-secondary"
            style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
-          Reset
+          <span data-i18n="reset">Reset</span>
         </a>
       </div>
     </form>
@@ -102,11 +102,12 @@
   <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
               padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:18px;font-weight:600;">
+      <div style="font-size:18px;font-weight:600;" data-i18n="payments_list_title">
         Payments List
       </div>
       <div style="font-size:14px;color:#6b7280;">
-        Total for filtered payments: <strong>{{ total_amount|floatformat:2 }}</strong>
+        <span data-i18n="total_filtered">Total for filtered payments:</span>
+        <strong>{{ total_amount|floatformat:2 }}</strong>
       </div>
     </div>
 
@@ -114,14 +115,14 @@
       <table style="border-collapse:collapse;width:100%;min-width:780px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Direction</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Party</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Account</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Posted?</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_hash">#</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_date">Date</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_direction">Direction</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_party">Party</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_account">Account</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_amount">Amount</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_description">Description</th>
+            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;" data-i18n="col_posted">Posted?</th>
           </tr>
         </thead>
         <tbody>
@@ -135,9 +136,9 @@
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
                 {% if pay.direction == "IN" %}
-                  Receipt (IN)
+                  <span data-i18n="receipt_in">Receipt (IN)</span>
                 {% else %}
-                  Payment (OUT)
+                  <span data-i18n="payment_out">Payment (OUT)</span>
                 {% endif %}
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
@@ -147,18 +148,18 @@
                         style="color:#2563eb;text-decoration:none;font-weight:600;">
                       {{ pay.party.name }}
                     </a>
-                    <span style="color:#6b7280;">(Customer)</span>
+                    <span style="color:#6b7280;"><span data-i18n="party_customer">(Customer)</span></span>
                   {% elif pay.party.party_type == "SUPPLIER" %}
                     <a href="{% url 'supplier_ledger' %}?supplier={{ pay.party.id }}"
                         style="color:#2563eb;text-decoration:none;font-weight:600;">
                       {{ pay.party.name }}
                     </a>
-                    <span style="color:#6b7280;">(Supplier)</span>
+                    <span style="color:#6b7280;"><span data-i18n="party_supplier">(Supplier)</span></span>
                   {% else %}
                     {{ pay.party.name }} ({{ pay.party.get_party_type_display }})
                   {% endif %}
                 {% else %}
-                  —
+                  <span data-i18n="dash">—</span>
                 {% endif %}
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
@@ -172,16 +173,16 @@
               </td>
               <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
                 {% if pay.posted %}
-                  <span class="badge badge-success">Yes</span>
+                  <span class="badge badge-success" data-i18n="yes">Yes</span>
                 {% else %}
-                  <span class="badge badge-warning">No</span>
+                  <span class="badge badge-warning" data-i18n="no">No</span>
                 {% endif %}
               </td>
             </tr>
           {% empty %}
             <tr>
               <td colspan="8" style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;text-align:center;">
-                No payments found.
+                <span data-i18n="no_payments_found">No payments found.</span>
               </td>
             </tr>
           {% endfor %}
@@ -191,4 +192,81 @@
   </div>
 
 </div>
+
+{# ==========================
+   Urdu/English i18n (REGISTER ONLY; do not override base applyLang)
+   ========================== #}
+<script>
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
+
+  Object.assign(window.ROZ_I18N.en, {
+    payments_title: "Payments (Receipts & Payments)",
+    payments_subtitle: "View and filter all money received from customers or paid to suppliers.",
+    back_dashboard: "← Dashboard",
+    new_payment_receipt_btn: "+ New Payment / Receipt",
+    filters_title: "Filters",
+    filters_help: "Narrow down payments by date, direction, and party, then click Apply.",
+    from_date: "From date",
+    to_date: "To date",
+    direction: "Direction",
+    all: "All",
+    receipt_in: "Receipt (IN)",
+    payment_out: "Payment (OUT)",
+    party: "Party",
+    all_parties: "All parties",
+    apply: "Apply",
+    reset: "Reset",
+    payments_list_title: "Payments List",
+    total_filtered: "Total for filtered payments:",
+    col_hash: "#",
+    col_date: "Date",
+    col_direction: "Direction",
+    col_party: "Party",
+    col_account: "Account",
+    col_amount: "Amount",
+    col_description: "Description",
+    col_posted: "Posted?",
+    party_customer: "(Customer)",
+    party_supplier: "(Supplier)",
+    dash: "—",
+    yes: "Yes",
+    no: "No",
+    no_payments_found: "No payments found."
+  });
+
+  Object.assign(window.ROZ_I18N.ur, {
+    payments_title: "ادائیگیاں (رسیدیں اور ادائیگیاں)",
+    payments_subtitle: "گاہکوں سے موصول یا سپلائرز کو ادا کی گئی تمام رقوم دیکھیں اور فلٹر کریں۔",
+    back_dashboard: "← ڈیش بورڈ",
+    new_payment_receipt_btn: "+ نئی ادائیگی / رسید",
+    filters_title: "فلٹرز",
+    filters_help: "تاریخ، سمت اور فریق کے ذریعے ادائیگیاں محدود کریں، پھر اپلائی پر کلک کریں۔",
+    from_date: "شروع کی تاریخ",
+    to_date: "اختتام کی تاریخ",
+    direction: "سمت",
+    all: "تمام",
+    receipt_in: "رسید (IN)",
+    payment_out: "ادائیگی (OUT)",
+    party: "فریق",
+    all_parties: "تمام فریق",
+    apply: "اپلائی",
+    reset: "ری سیٹ",
+    payments_list_title: "ادائیگیوں کی فہرست",
+    total_filtered: "فلٹر شدہ ادائیگیوں کا کل:",
+    col_hash: "#",
+    col_date: "تاریخ",
+    col_direction: "سمت",
+    col_party: "فریق",
+    col_account: "اکاؤنٹ",
+    col_amount: "رقم",
+    col_description: "تفصیل",
+    col_posted: "پوسٹ ہوا؟",
+    party_customer: "(گاہک)",
+    party_supplier: "(سپلائر)",
+    dash: "—",
+    yes: "ہاں",
+    no: "نہیں",
+    no_payments_found: "کوئی ادائیگی نہیں ملی۔"
+  });
+</script>
 {% endblock %}
