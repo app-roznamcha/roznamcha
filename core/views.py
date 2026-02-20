@@ -2565,6 +2565,7 @@ def supplier_ledger(request):
     return render(request, "core/supplier_ledger.html", context)
 
 
+
 @login_required
 @resolve_tenant_context(require_company=True)
 @owner_required
@@ -2573,15 +2574,22 @@ def account_ledger(request):
     """
     Simple account ledger for a single account, with optional date range.
     Uses JournalEntry as the single source of truth.
+
+    Enhancement:
+    - Checkbox toggle to show/hide system accounts in the account dropdown.
+    - Counter account is computed for display.
     """
+
     SYSTEM_CODES = ["1000", "1010", "1020", "1200", "1300", "2100", "3000", "5100"]
 
-    accounts = (
-        Account.objects
-        .filter(owner=request.owner)
-        .exclude(code__in=SYSTEM_CODES)
-        .order_by("code")
-    )
+    # ✅ Toggle: show system accounts?
+    show_system = request.GET.get("show_system") == "1"
+
+    accounts_qs = Account.objects.filter(owner=request.owner)
+    if not show_system:
+        accounts_qs = accounts_qs.exclude(code__in=SYSTEM_CODES)
+
+    accounts = accounts_qs.order_by("code")
 
     account_id = request.GET.get("account")
     from_str = request.GET.get("from")
@@ -2599,14 +2607,14 @@ def account_ledger(request):
         selected_account = tenant_get_object_or_404(request, Account, pk=account_id)
 
         base_qs = (
-            JournalEntry.objects.filter(
-                owner=request.owner
-            )
-            .filter(
-                Q(debit_account=selected_account) | Q(credit_account=selected_account)
-            )
+            JournalEntry.objects
+            .filter(owner=request.owner)
+            .filter(Q(debit_account=selected_account) | Q(credit_account=selected_account))
+            .select_related("debit_account", "credit_account")
             .order_by("date", "id")
         )
+
+        # Opening balance = sum before date_from
         if date_from:
             before_qs = base_qs.filter(date__lt=date_from)
             bal = Decimal("0")
@@ -2624,19 +2632,25 @@ def account_ledger(request):
 
         balance = opening_balance
         for je in base_qs:
-            debit = je.amount if je.debit_account_id == selected_account.id else Decimal("0")
-            credit = je.amount if je.credit_account_id == selected_account.id else Decimal("0")
+            is_debit = (je.debit_account_id == selected_account.id)
+            debit = je.amount if is_debit else Decimal("0")
+            credit = je.amount if not is_debit else Decimal("0")
             balance += debit - credit
-            txn_type = je.related_model or "Journal"
+
+            # ✅ Counter account for UI column
+            counter_acc = je.credit_account if is_debit else je.debit_account
+            counter_label = f"{counter_acc.code} - {counter_acc.name}" if counter_acc else "—"
 
             rows.append({
                 "date": je.date,
-                "type": txn_type,
+                "type": je.related_model or "Journal",
+                "counter": counter_label,
                 "description": je.description,
                 "debit": debit,
                 "credit": credit,
                 "balance": balance,
             })
+
         closing_balance = balance
 
     context = {
@@ -2647,6 +2661,7 @@ def account_ledger(request):
         "closing_balance": closing_balance,
         "date_from": date_from,
         "date_to": date_to,
+        "show_system": show_system,  # ✅ pass to template
     }
     return render(request, "core/account_ledger.html", context)
 
