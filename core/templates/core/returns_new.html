@@ -679,119 +679,74 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{# ==========================
-   Urdu/English i18n (NO logic changes)
-   ========================== #}
 <script>
-(function() {
-  const translations = {
-    en: {
-      new_sales_return_title: "New Sales Return",
-      new_purchase_return_title: "New Purchase Return",
-      returns_intro_1: "Record returned goods and update stock & balances. Cash refunds are entered separately from the",
-      new_payment_receipt: "New Payment / Receipt",
-      returns_intro_2: "page.",
-      back_dashboard: "← Dashboard",
-      back_to_sales: "← Back to Sales",
-      back_to_purchases: "← Back to Purchases",
-      sales_return_details: "Sales Return Details",
-      purchase_return_details: "Purchase Return Details",
-      select_party_option: "-- Select {party} --",
-      return_date: "Return Date",
-      related_sales_invoice_optional: "Related Sales Invoice (optional)",
-      related_purchase_invoice_optional: "Related Purchase Invoice (optional)",
-      none_option: "-- None --",
-      notes_optional: "Notes (optional)",
-      returned_items: "Returned Items",
-      total_return_value: "Total Return Value:",
-      rs_prefix: "Rs",
-      col_product: "Product",
-      col_unit: "Unit",
-      col_unit_price: "Unit Price",
-      col_qty_returned: "Quantity Returned",
-      col_line_total: "Line Total",
-      select_option: "-- Select --",
-      unit_option: "-- Unit --",
-      qty_placeholder: "Qty",
-      add_item_row: "+ Add Item Row",
-      save_post_return: "💾 Save & Post Return",
-      cancel: "Cancel",
-      base_prefix: "Base"
-    },
-    ur: {
-      new_sales_return_title: "نیا سیلز ریٹرن",
-      new_purchase_return_title: "نیا پرچیز ریٹرن",
-      returns_intro_1: "واپس آنے والا مال ریکارڈ کریں اور اسٹاک اور بیلنس اپڈیٹ کریں۔ کیش ریفنڈ الگ سے",
-      new_payment_receipt: "نئی ادائیگی / رسید",
-      returns_intro_2: "صفحہ سے درج کیا جاتا ہے۔",
-      back_dashboard: "← ڈیش بورڈ",
-      back_to_sales: "← سیلز پر واپس",
-      back_to_purchases: "← پرچیز پر واپس",
-      sales_return_details: "سیلز ریٹرن کی تفصیلات",
-      purchase_return_details: "پرچیز ریٹرن کی تفصیلات",
-      select_party_option: "-- {party} منتخب کریں --",
-      return_date: "ریٹرن کی تاریخ",
-      related_sales_invoice_optional: "متعلقہ سیلز انوائس (اختیاری)",
-      related_purchase_invoice_optional: "متعلقہ پرچیز انوائس (اختیاری)",
-      none_option: "-- کوئی نہیں --",
-      notes_optional: "نوٹس (اختیاری)",
-      returned_items: "واپس کی گئی اشیاء",
-      total_return_value: "کل ریٹرن ویلیو:",
-      rs_prefix: "روپے",
-      col_product: "پروڈکٹ",
-      col_unit: "یونٹ",
-      col_unit_price: "فی یونٹ قیمت",
-      col_qty_returned: "واپس کی گئی مقدار",
-      col_line_total: "لائن ٹوٹل",
-      select_option: "-- منتخب کریں --",
-      unit_option: "-- یونٹ --",
-      qty_placeholder: "مقدار",
-      add_item_row: "+ نئی لائن شامل کریں",
-      save_post_return: "💾 محفوظ کریں اور پوسٹ کریں",
-      cancel: "منسوخ کریں",
-      base_prefix: "بنیادی"
-    }
-  };
+  window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
 
-  function interpolate(str, args) {
-    if (!str) return str;
-    return str.replace(/\{(\w+)\}/g, (_, k) => (args && args[k] != null ? args[k] : `{${k}}`));
-  }
+  Object.assign(window.ROZ_I18N.en, {
+    new_sales_return_title: "New Sales Return",
+    new_purchase_return_title: "New Purchase Return",
+    returns_intro_1: "Record returned goods and update stock & balances. Cash refunds are entered separately from the",
+    new_payment_receipt: "New Payment / Receipt",
+    returns_intro_2: "page.",
+    back_dashboard: "← Dashboard",
+    back_to_sales: "← Back to Sales",
+    back_to_purchases: "← Back to Purchases",
+    sales_return_details: "Sales Return Details",
+    purchase_return_details: "Purchase Return Details",
+    return_date: "Return Date",
+    related_sales_invoice_optional: "Related Sales Invoice (optional)",
+    related_purchase_invoice_optional: "Related Purchase Invoice (optional)",
+    none_option: "-- None --",
+    notes_optional: "Notes (optional)",
+    returned_items: "Returned Items",
+    total_return_value: "Total Return Value:",
+    rs_prefix: "Rs",
+    col_product: "Product",
+    col_unit: "Unit",
+    col_unit_price: "Unit Price",
+    col_qty_returned: "Quantity Returned",
+    col_line_total: "Line Total",
+    select_option: "-- Select --",
+    unit_option: "-- Unit --",
+    qty_placeholder: "Qty",
+    add_item_row: "+ Add Item Row",
+    save_post_return: "💾 Save & Post Return",
+    cancel: "Cancel",
+    base_prefix: "Base"
+  });
 
-  function applyLang(lang) {
-    const dict = translations[lang] || translations.en;
-
-    // data-i18n text replacements
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const raw = dict[key];
-      if (!raw) return;
-
-      let args = null;
-      const argsAttr = el.getAttribute('data-i18n-args');
-      if (argsAttr) {
-        try { args = JSON.parse(argsAttr); } catch(e) { args = null; }
-      }
-
-      el.textContent = interpolate(raw, args);
-    });
-
-    // placeholders
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-      const key = el.getAttribute('data-i18n-placeholder');
-      if (dict[key]) el.setAttribute('placeholder', dict[key]);
-    });
-
-    // special: some options are created by JS as plain text like "-- Unit --"
-    // We already tagged the default options in templates with data-i18n, so this is enough.
-
-    // optional RTL feel (ONLY for this page, safe)
-    document.documentElement.dir = (lang === "ur") ? "rtl" : "ltr";
-    document.documentElement.lang = (lang === "ur") ? "ur" : "en";
-  }
-
-  window.applyLang = applyLang;
-})();
+  Object.assign(window.ROZ_I18N.ur, {
+    new_sales_return_title: "نیا سیلز ریٹرن",
+    new_purchase_return_title: "نیا پرچیز ریٹرن",
+    returns_intro_1: "واپس آنے والا مال ریکارڈ کریں اور اسٹاک اور بیلنس اپڈیٹ کریں۔ کیش ریفنڈ الگ سے",
+    new_payment_receipt: "نئی ادائیگی / رسید",
+    returns_intro_2: "صفحہ سے درج کیا جاتا ہے۔",
+    back_dashboard: "← ڈیش بورڈ",
+    back_to_sales: "← سیلز پر واپس",
+    back_to_purchases: "← پرچیز پر واپس",
+    sales_return_details: "سیلز ریٹرن کی تفصیلات",
+    purchase_return_details: "پرچیز ریٹرن کی تفصیلات",
+    return_date: "ریٹرن کی تاریخ",
+    related_sales_invoice_optional: "متعلقہ سیلز انوائس (اختیاری)",
+    related_purchase_invoice_optional: "متعلقہ پرچیز انوائس (اختیاری)",
+    none_option: "-- کوئی نہیں --",
+    notes_optional: "نوٹس (اختیاری)",
+    returned_items: "واپس کی گئی اشیاء",
+    total_return_value: "کل ریٹرن ویلیو:",
+    rs_prefix: "روپے",
+    col_product: "پروڈکٹ",
+    col_unit: "یونٹ",
+    col_unit_price: "فی یونٹ قیمت",
+    col_qty_returned: "واپس کی گئی مقدار",
+    col_line_total: "لائن ٹوٹل",
+    select_option: "-- منتخب کریں --",
+    unit_option: "-- یونٹ --",
+    qty_placeholder: "مقدار",
+    add_item_row: "+ نئی لائن شامل کریں",
+    save_post_return: "💾 محفوظ کریں اور پوسٹ کریں",
+    cancel: "منسوخ کریں",
+    base_prefix: "بنیادی"
+  });
 </script>
 
 {% endblock %}
