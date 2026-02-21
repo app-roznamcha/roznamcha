@@ -1425,12 +1425,21 @@ def sales_new(request):
             if qty <= 0:
                 continue
 
+            # ✅ ADD THIS HERE
+            available = product.current_stock or Decimal("0")
+            if qty > available:
+                error = f"Not enough stock for {product.code} - {product.name}. Available: {available}, You entered: {qty}."
+                break
+
             try:
                 unit_price = Decimal(unit_price_str or product.sale_price_per_unit)
             except Exception:
                 unit_price = product.sale_price_per_unit
 
             line_items.append({"product": product, "qty": qty, "unit_price": unit_price})
+
+        if error:
+            line_items = []
 
         if not line_items and not error:
             error = "Please enter at least one product line."
