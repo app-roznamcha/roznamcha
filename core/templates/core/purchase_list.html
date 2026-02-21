@@ -177,13 +177,25 @@
               <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
               <td class="nowrap">{{ inv.invoice_number }}</td>
 
-              <td class="truncate" title="{{ inv.supplier.name }}">{{ inv.supplier.name }}</td>
+              <td class="truncate" title="{{ inv.supplier.name }}">
+                {% if inv.supplier %}
+                  <a href="{% url 'supplier_ledger' %}?supplier={{ inv.supplier.id }}"
+                     style="color:inherit;text-decoration:underline;text-underline-offset:2px;">
+                    {{ inv.supplier.name }}
+                  </a>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
 
               <td class="truncate"
                   title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
                 {% with first_item=inv.items.first %}
                   {% if first_item %}
-                    {{ first_item.product.name }}
+                    <a href="{% url 'product_ledger' %}?product={{ first_item.product.id }}"
+                      style="color:inherit;text-decoration:underline;text-underline-offset:2px;">
+                      {{ first_item.product.name }}
+                    </a>
                     {% if inv.items.count > 1 %}
                       + {{ inv.items.count|add:"-1" }} <span data-i18n="more_suffix">more</span>
                     {% endif %}
