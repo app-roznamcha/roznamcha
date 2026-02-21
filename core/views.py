@@ -1033,6 +1033,8 @@ def product_create(request):
     return render(request, "core/product_form.html", {
         "error": error,
         "product": None,
+        "UNIT_CHOICES": Product.UNIT_CHOICES,
+        "PACKING_CHOICES": Product.PACKING_CHOICES,
     })
 
 
@@ -1107,8 +1109,10 @@ def product_edit(request, pk):
     return render(request, "core/product_form.html", {
         "error": error,
         "product": product,
+        "UNIT_CHOICES": Product.UNIT_CHOICES,
+        "PACKING_CHOICES": Product.PACKING_CHOICES,
     })
-
+    
 @login_required
 @owner_required
 @staff_blocked
