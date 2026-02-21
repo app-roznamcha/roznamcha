@@ -315,7 +315,14 @@ class Product(OwnerRequiredMixin, TimeStampedModel):
     UNIT_CHOICES = [
         ("BAG", "Bag"),
         ("KG", "Kilogram"),
+        ("G", "Gram"),
+        ("TON", "Tonne"),
         ("LITRE", "Litre"),
+        ("ML", "Millilitre"),
+        ("M", "Meter"),
+        ("ROLL", "Roll"),
+        ("PAIR", "Pair"),
+        ("DOZEN", "Dozen"),
         ("UNIT", "Unit / Piece"),
     ]
 
@@ -325,6 +332,11 @@ class Product(OwnerRequiredMixin, TimeStampedModel):
         ("BAG", "Bag"),
         ("CONTAINER", "Container"),
         ("BUNDLE", "Bundle"),
+        ("BOX", "Box"),
+        ("BOTTLE", "Bottle"),
+        ("CAN", "Can"),
+        ("SACHET", "Sachet"),
+        ("PACKET", "Packet / Pack"),
     ]
 
     code = models.CharField(max_length=30, help_text="Short code like UREA50, DAP50, WHEAT50, etc.")
