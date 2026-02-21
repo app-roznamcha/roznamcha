@@ -2138,3 +2138,36 @@ class CashBankTransfer(OwnerRequiredMixin, TimeStampedModel):
             locked.posted = True
             locked.save(update_fields=["posted"])
             self.posted = True
+
+class OwnerSequence(models.Model):
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sequences",
+    )
+    key = models.CharField(max_length=50)  # e.g. "sales_invoice"
+    value = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("owner", "key")
+
+def get_next_sequence(owner, key):
+    with transaction.atomic():
+        seq, created = OwnerSequence.objects.select_for_update().get_or_create(
+            owner=owner,
+            key=key,
+            defaults={"value": 0},
+        )
+        seq.value += 1
+        seq.save(update_fields=["value"])
+        return seq.value
+    
+def peek_next_sequence(owner, key):
+    """
+    Returns the NEXT number WITHOUT incrementing in DB.
+    If sequence doesn't exist yet, next is 1.
+    """
+    seq = OwnerSequence.objects.filter(owner=owner, key=key).only("value").first()
+    if not seq:
+        return 1
+    return seq.value + 1

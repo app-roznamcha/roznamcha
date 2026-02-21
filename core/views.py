@@ -73,6 +73,8 @@ from .models import (
     StockAdjustment,
     UserProfile,
     get_company_owner,
+    peek_next_sequence,   # ✅ ADD THIS
+
 )
 from .permissions import staff_allowed, staff_blocked
 from .services.ledger import (
@@ -114,6 +116,8 @@ from urllib.parse import urlencode
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import DailyExpense, CashBankTransfer
+from core.models import get_next_sequence
+
 
 class TenantAwareLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
@@ -1349,18 +1353,8 @@ def sales_new(request):
     )
 
     today_str = timezone.now().date().isoformat()
-
-    # Get max numeric invoice_number for this owner (ignore non-numeric)
-    qs = SalesInvoice.objects.filter(owner=request.owner).exclude(invoice_number__isnull=True).exclude(invoice_number="")
-
-    max_num = qs.annotate(
-        inv_num_int=Cast("invoice_number", IntegerField())
-    ).aggregate(m=Max("inv_num_int"))["m"] or 0
-
-    next_invoice_number = max_num + 1
-
+    suggested_invoice_number = peek_next_sequence(request.owner, "sales_invoice")
     error = None
-
     if request.method == "POST":
         customer_id = request.POST.get("customer")
         invoice_number = (request.POST.get("invoice_number") or "").strip()
@@ -1368,7 +1362,8 @@ def sales_new(request):
         notes = (request.POST.get("notes") or "").strip()
 
         if not invoice_number:
-            invoice_number = str(next_invoice_number)
+            next_number = get_next_sequence(request.owner, "sales_invoice")
+            invoice_number = str(next_number)
 
         payment_type = (request.POST.get("payment_type") or "CREDIT").upper()
         if payment_type not in ("CREDIT", "FULL", "PARTIAL"):
@@ -1519,7 +1514,7 @@ def sales_new(request):
         "accounts": accounts,
         "error": error,
         "today": today_str,
-        "suggested_invoice_number": str(next_invoice_number),
+        "suggested_invoice_number": str(suggested_invoice_number),
     }
     return render(request, "core/sales_new.html", context)
 
@@ -1599,14 +1594,14 @@ def purchase_new(request):
         Account.objects.filter(owner=request.owner, is_cash_or_bank=True, allow_for_payments=True)
         .order_by("code")
     )
-
+    suggested_invoice_number = peek_next_sequence(request.owner, "purchase_invoice")
     error = None
 
     if request.method == "POST":
         supplier_id = request.POST.get("supplier")
         invoice_number = (request.POST.get("invoice_number") or "").strip()
         if not invoice_number:
-            invoice_number = f"AUTO-{timezone.now().strftime('%H:%M:%S')}"
+            invoice_number = str(get_next_sequence(request.owner, "purchase_invoice"))
         invoice_date_str = request.POST.get("invoice_date") or ""
         date_received_str = request.POST.get("date_received") or ""
         notes = (request.POST.get("notes") or "").strip()
@@ -1794,7 +1789,8 @@ def purchase_new(request):
         "products": products,
         "accounts": accounts,
         "error": error,
-        "today": date.today().isoformat(),
+        "today": timezone.now().date().isoformat(),
+        "suggested_invoice_number": str(suggested_invoice_number),
     }
     return render(request, "core/purchase_new.html", context)
 
