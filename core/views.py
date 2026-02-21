@@ -389,6 +389,10 @@ def _wipe_tenant_data(owner):
     SalesReturnItem.objects.filter(owner=owner).delete()
     PurchaseReturnItem.objects.filter(owner=owner).delete()
 
+    # ✅ NEW: models that reference Account with PROTECT
+    CashBankTransfer.objects.filter(owner=owner).delete()
+    DailyExpense.objects.filter(owner=owner).delete()
+
     # documents
     SalesInvoice.objects.filter(owner=owner).delete()
     PurchaseInvoice.objects.filter(owner=owner).delete()
@@ -3233,6 +3237,9 @@ def create_backup(request):
         Payment,
         JournalEntry,
         StockAdjustment,
+        # ✅ NEW
+        DailyExpense,
+        CashBankTransfer,
     ]
 
     all_objects = []
@@ -3300,6 +3307,8 @@ def restore_backup(request):
             SalesReturn, SalesReturnItem,
             PurchaseReturn, PurchaseReturnItem,
             Payment, JournalEntry, StockAdjustment,
+            DailyExpense,
+            CashBankTransfer,
         }
 
         for obj in objs:
@@ -3325,10 +3334,6 @@ def restore_backup(request):
                 instance.owner = owner
 
             obj.save()
-
-    except Exception as e:
-        messages.error(request, f"Restore failed: {e}")
-        return redirect("backup_dashboard")
 
     except Exception as e:
         messages.error(request, f"Restore failed: {e}")
