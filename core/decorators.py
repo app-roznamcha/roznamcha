@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from core.models import CompanyProfile, UserProfile
 from .models import get_company_owner
-
+from django.contrib.auth.views import redirect_to_login
 
 
 TRIAL_DAYS = 15
@@ -207,7 +207,8 @@ def subscription_required(view_func):
         user = getattr(request, "user", None)
 
         if not user or not user.is_authenticated:
-            raise PermissionDenied("Authentication required")
+            # ✅ Always redirect anonymous users to login with next=
+            return redirect_to_login(request.get_full_path())
 
         # Superadmin bypass
         if getattr(user, "is_superuser", False):
