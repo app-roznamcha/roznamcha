@@ -89,6 +89,10 @@ urlpatterns = [
     path("returns/sales/new/", staff_allowed(views.sales_return_new), name="sales_return_new"),
     path("returns/purchase/new/", staff_allowed(views.purchase_return_new), name="purchase_return_new"),
 
+    # ✅ Returns invoice prices (AJAX)
+    path("returns/sales/invoice-items/<int:invoice_id>/",staff_allowed(views.sales_invoice_item_prices_api),name="sales_invoice_item_prices_api",),
+    path("returns/purchase/invoice-items/<int:invoice_id>/",staff_allowed(views.purchase_invoice_item_prices_api),name="purchase_invoice_item_prices_api",),
+
     # =========================
     # Payments / Receipts
     # =========================

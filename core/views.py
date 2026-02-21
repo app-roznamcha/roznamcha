@@ -1112,7 +1112,7 @@ def product_edit(request, pk):
         "UNIT_CHOICES": Product.UNIT_CHOICES,
         "PACKING_CHOICES": Product.PACKING_CHOICES,
     })
-    
+
 @login_required
 @owner_required
 @staff_blocked
@@ -1817,6 +1817,73 @@ def purchase_post(request, pk):
 
     return redirect("purchase_list")
 
+
+@require_GET
+@login_required
+@resolve_tenant_context(require_company=True)
+@owner_required
+@subscription_required
+def sales_invoice_item_prices_api(request, invoice_id):
+    """
+    Returns a map of {product_id: unit_price} for a posted SalesInvoice.
+    Tenant-safe by owner + tenant_get_object_or_404.
+    """
+    owner = request.owner
+
+    inv = tenant_get_object_or_404(
+        request,
+        SalesInvoice,
+        pk=invoice_id,
+        owner=owner,
+        posted=True,
+    )
+
+    items = (
+        SalesInvoiceItem.objects
+        .filter(owner=owner, sales_invoice=inv)
+        .select_related("product")
+    )
+
+    data = {}
+    for it in items:
+        if it.product_id:
+            data[str(it.product_id)] = str(it.unit_price or "0")
+
+    return JsonResponse({"invoice_id": inv.id, "prices": data})
+
+
+@require_GET
+@login_required
+@resolve_tenant_context(require_company=True)
+@owner_required
+@subscription_required
+def purchase_invoice_item_prices_api(request, invoice_id):
+    """
+    Returns a map of {product_id: unit_price} for a posted PurchaseInvoice.
+    Tenant-safe by owner + tenant_get_object_or_404.
+    """
+    owner = request.owner
+
+    inv = tenant_get_object_or_404(
+        request,
+        PurchaseInvoice,
+        pk=invoice_id,
+        owner=owner,
+        posted=True,
+    )
+
+    items = (
+        PurchaseInvoiceItem.objects
+        .filter(owner=owner, purchase_invoice=inv)
+        .select_related("product")
+    )
+
+    data = {}
+    for it in items:
+        if it.product_id:
+            data[str(it.product_id)] = str(it.unit_price or "0")
+
+    return JsonResponse({"invoice_id": inv.id, "prices": data})
 
 @login_required
 @owner_required

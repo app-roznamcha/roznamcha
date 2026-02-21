@@ -405,6 +405,18 @@
 <script>
 let returnsRowCounter = 5;
 
+// ✅ Invoice pricing support
+let activeInvoiceId = "";
+let invoicePriceMap = {};   // { "product_id": "unit_price" }
+
+function getInvoicePricesUrl(invoiceId) {
+  if (!invoiceId) return null;
+
+  const base =
+    "{% if mode == 'sales' %}{% url 'sales_invoice_item_prices_api' 999999 %}{% else %}{% url 'purchase_invoice_item_prices_api' 999999 %}{% endif %}";
+  return base.replace("999999", invoiceId);
+}
+
 const UNIT_LABELS = {
   "BAG": "Bag",
   "KG": "Kilogram",
@@ -435,6 +447,45 @@ function recalcGrandTotal() {
   }
 }
 
+function applyInvoicePricesToAllRows() {
+  const rows = document.querySelectorAll('#items-table tbody tr');
+
+  rows.forEach(tr => {
+    const productSelect = tr.querySelector('.product-select');
+    const priceInput = tr.querySelector('.price-input');
+    if (!productSelect || !priceInput) return;
+
+    const pid = productSelect.value ? String(productSelect.value) : "";
+    if (!pid) return;
+
+    const wasAuto = priceInput.dataset.autofill === "1";
+
+    // ✅ If invoice removed, revert ONLY autofilled prices to product default price
+    if (!activeInvoiceId) {
+      if (wasAuto) {
+        const opt = productSelect.selectedOptions[0];
+        const basePrice = (opt && opt.dataset.price) ? opt.dataset.price : "";
+        priceInput.value = basePrice;
+        priceInput.dataset.autofill = "1";
+        syncRow(tr);
+      }
+      return;
+    }
+
+    // ✅ If invoice selected, apply invoice price when available
+    const invPrice = invoicePriceMap[pid];
+    if (!invPrice) return;
+
+    const isEmpty = !priceInput.value || String(priceInput.value).trim() === "";
+    if (isEmpty || wasAuto) {
+      priceInput.value = invPrice;
+      priceInput.dataset.autofill = "1";
+      syncRow(tr);
+    }
+  });
+
+  recalcGrandTotal();
+}
 // sync a single row (qty, unit, price, total)
 function syncRow(tr) {
   const productSelect = tr.querySelector('.product-select');
@@ -499,8 +550,17 @@ function handleProductChange(selectEl) {
     tr.dataset.piecesPerPack = piecesPerPack;
     tr.dataset.packingLabel = packingLabel;
 
-    // default unit price from product (user can edit if needed)
-    priceInput.value = basePrice;
+    // ✅ default unit price:
+    // 1) if invoice selected and invoice has this product -> use invoice price
+    // 2) else fallback to product price
+    const pid = opt ? String(opt.value || "") : "";
+    if (activeInvoiceId && pid && invoicePriceMap[pid]) {
+      priceInput.value = invoicePriceMap[pid];
+      priceInput.dataset.autofill = "1";
+    } else {
+      priceInput.value = basePrice;
+      priceInput.dataset.autofill = "1";
+    }
 
     if (unitCode) {
       const baseLabel = UNIT_LABELS[unitCode] || "Unit";
@@ -606,7 +666,7 @@ function addRow() {
   </td>
 
   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-    Rs <span class="line-total">0.00</span>
+    <span data-i18n="rs_prefix">Rs</span> <span class="line-total">0.00</span>
   </td>
 
   <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
@@ -622,6 +682,10 @@ function addRow() {
   attachRowEvents(row);
   syncRow(row);
   recalcGrandTotal();
+    // ✅ if invoice selected, apply invoice price to the new row too
+    if (activeInvoiceId && invoicePriceMap) {
+      applyInvoicePricesToAllRows();
+    }
 
   // ✅ apply language to newly added row if Urdu system exists
   if (window.applyLang) {
@@ -645,7 +709,10 @@ function attachRowEvents(tr) {
     productSelect.addEventListener('change', () => handleProductChange(productSelect));
   }
   if (priceInput) {
-    priceInput.addEventListener('input', () => handleQtyOrPriceChange(priceInput));
+    priceInput.addEventListener('input', () => {
+      priceInput.dataset.autofill = "0"; // ✅ user override
+      handleQtyOrPriceChange(priceInput);
+    });
   }
   if (qtyDisplayInput) {
     qtyDisplayInput.addEventListener('input', () => handleQtyOrPriceChange(qtyDisplayInput));
@@ -671,6 +738,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 3) Now compute grand total
   recalcGrandTotal();
+
+  // ✅ Invoice dropdown -> load invoice prices and auto-apply
+  const invSelect = document.querySelector('select[name="original_invoice"]');
+  if (invSelect) {
+    invSelect.addEventListener("change", async () => {
+      activeInvoiceId = invSelect.value ? String(invSelect.value) : "";
+      invoicePriceMap = {};
+
+      if (!activeInvoiceId) {
+        // no invoice selected
+        applyInvoicePricesToAllRows();
+        return;
+      }
+
+      const url = getInvoicePricesUrl(activeInvoiceId);
+      if (!url) return;
+
+      try {
+        const resp = await fetch(url, {
+          headers: { "X-Requested-With": "XMLHttpRequest" }
+        });
+        if (!resp.ok) throw new Error("Bad response");
+        const data = await resp.json();
+        invoicePriceMap = (data && data.prices) ? data.prices : {};
+        applyInvoicePricesToAllRows();
+      } catch (e) {
+        invoicePriceMap = {};
+        // fail silently (keep UX smooth)
+      }
+    });
+  }
 
   // ✅ Apply saved language on page load (if Urdu system exists)
   if (window.applyLang) {
