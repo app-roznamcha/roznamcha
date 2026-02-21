@@ -1357,13 +1357,12 @@ def sales_new(request):
     error = None
     if request.method == "POST":
         customer_id = request.POST.get("customer")
-        invoice_number = (request.POST.get("invoice_number") or "").strip()
+
+        # ✅ Don't read invoice_number from POST (pre-filled values cause duplicates)
+        invoice_number = None
+
         invoice_date_str = request.POST.get("invoice_date") or ""
         notes = (request.POST.get("notes") or "").strip()
-
-        if not invoice_number:
-            next_number = get_next_sequence(request.owner, "sales_invoice")
-            invoice_number = str(next_number)
 
         payment_type = (request.POST.get("payment_type") or "CREDIT").upper()
         if payment_type not in ("CREDIT", "FULL", "PARTIAL"):
@@ -1475,6 +1474,9 @@ def sales_new(request):
                             error = "For partial payment, amount must be > 0 and < invoice total."
 
         if not error:
+            # ✅ Generate invoice number only after all validations succeed
+            invoice_number = str(get_next_sequence(request.owner, "sales_invoice"))
+
             inv_kwargs = {
                 "customer": customer,
                 "invoice_number": invoice_number,
