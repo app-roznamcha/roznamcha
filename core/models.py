@@ -7,6 +7,8 @@ from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from datetime import timedelta
 import re
+from django.db.models import IntegerField, Max
+from django.db.models.functions import Cast
 
 # --------------------------
 # Helpers (Design 1: owner = company)
@@ -2153,11 +2155,12 @@ class OwnerSequence(models.Model):
 
 def get_next_sequence(owner, key):
     with transaction.atomic():
-        seq, created = OwnerSequence.objects.select_for_update().get_or_create(
-            owner=owner,
-            key=key,
-            defaults={"value": 0},
-        )
+        seq = OwnerSequence.objects.select_for_update().filter(owner=owner, key=key).first()
+
+        if not seq:
+            seeded_value = _seed_sequence_from_existing(owner, key)
+            seq = OwnerSequence.objects.create(owner=owner, key=key, value=seeded_value)
+
         seq.value += 1
         seq.save(update_fields=["value"])
         return seq.value
@@ -2165,9 +2168,30 @@ def get_next_sequence(owner, key):
 def peek_next_sequence(owner, key):
     """
     Returns the NEXT number WITHOUT incrementing in DB.
-    If sequence doesn't exist yet, next is 1.
+    If sequence doesn't exist yet, seed it from existing invoices.
     """
     seq = OwnerSequence.objects.filter(owner=owner, key=key).only("value").first()
     if not seq:
-        return 1
+        seeded_value = _seed_sequence_from_existing(owner, key)
+        return seeded_value + 1
     return seq.value + 1
+
+def _seed_sequence_from_existing(owner, key):
+    """
+    If sequence row doesn't exist for an owner+key, seed it from existing data.
+    Only numeric invoice_numbers are considered (e.g. "14"). Non-numeric like "INV-14"
+    are ignored to keep it safe.
+    """
+    if key == "sales_invoice":
+        from .models import SalesInvoice  # adjust import if this file is already models.py
+
+        qs = (
+            SalesInvoice.objects
+            .filter(owner=owner, invoice_number__regex=r"^\d+$")
+            .annotate(num=Cast("invoice_number", IntegerField()))
+        )
+        max_num = qs.aggregate(m=Max("num"))["m"] or 0
+        return int(max_num)
+
+    # Future keys can be added here (purchase_invoice, payment, etc.)
+    return 0
