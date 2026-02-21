@@ -85,10 +85,12 @@
           </label>
           <select name="unit"
                   style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
-            <option value="BAG"   {% if product and product.unit == "BAG" %}selected{% endif %}>Bag</option>
-            <option value="KG"    {% if product and product.unit == "KG" %}selected{% endif %}>Kilogram</option>
-            <option value="LITRE" {% if product and product.unit == "LITRE" %}selected{% endif %}>Litre</option>
-            <option value="UNIT"  {% if product and product.unit == "UNIT" %}selected{% endif %}>Unit / Piece</option>
+            {% for value,label in product._meta.get_field("unit").choices %}
+              <option value="{{ value }}"
+                {% if product and product.unit == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
           </select>
         </div>
       </div>
@@ -114,21 +116,12 @@
           </label>
           <select name="packing_type"
                   style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
-            <option value="NONE"      {% if product and product.packing_type == "NONE" %}selected{% endif %}>
-              No packing / loose
-            </option>
-            <option value="CARTON"    {% if product and product.packing_type == "CARTON" %}selected{% endif %}>
-              Carton
-            </option>
-            <option value="BAG"       {% if product and product.packing_type == "BAG" %}selected{% endif %}>
-              Bag
-            </option>
-            <option value="CONTAINER" {% if product and product.packing_type == "CONTAINER" %}selected{% endif %}>
-              Container
-            </option>
-            <option value="BUNDLE"    {% if product and product.packing_type == "BUNDLE" %}selected{% endif %}>
-              Bundle
-            </option>
+            {% for value,label in product._meta.get_field("packing_type").choices %}
+              <option value="{{ value }}"
+                {% if product and product.packing_type == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
           </select>
         </div>
 
