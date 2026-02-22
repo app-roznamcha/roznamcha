@@ -3641,20 +3641,25 @@ def purchase_return_new(request):
     owner = request.owner
 
     suppliers = (
-        tenant_qs(request, Party, strict=True)
-        .filter(party_type="SUPPLIER", is_active=True)
+        Party.objects.filter(
+            owner=owner,
+            party_type="SUPPLIER",
+            is_active=True,
+        )
         .order_by("name")
     )
-
     products = (
-        tenant_qs(request, Product, strict=True)
-        .filter(is_active=True)
+        Product.objects.filter(
+            owner=owner,
+            is_active=True,
+        )
         .order_by("code")
     )
-
     invoices = (
-        tenant_qs(request, PurchaseInvoice, strict=True)
-        .filter(posted=True)
+        PurchaseInvoice.objects.filter(
+            owner=owner,
+            posted=True,
+        )
         .select_related("supplier")
         .order_by("-invoice_date", "-id")
     )
@@ -3684,6 +3689,7 @@ def purchase_return_new(request):
                 request,
                 Party,
                 pk=supplier_id,
+                owner=owner,
                 party_type="SUPPLIER",
                 is_active=True,
             )
@@ -3692,6 +3698,7 @@ def purchase_return_new(request):
                     request,
                     PurchaseInvoice,
                     pk=original_invoice_id,
+                    owner=owner,
                     supplier=supplier,
                     posted=True,
                 )
@@ -3715,6 +3722,7 @@ def purchase_return_new(request):
                 request,
                 Product,
                 pk=product_id,
+                owner=owner,
                 is_active=True,
             )
 
