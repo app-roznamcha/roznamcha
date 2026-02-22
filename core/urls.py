@@ -192,7 +192,6 @@ urlpatterns = [
 
     path("transfer/", views.cash_bank_transfer_page, name="cash_bank_transfer_page"),
 
-    path("internal/run-backup/", views.run_backup_internal),
 ]
 urlpatterns += [
     path("internal/run-backup/", run_backup_job, name="run_backup_job"),
