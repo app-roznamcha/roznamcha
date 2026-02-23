@@ -6066,6 +6066,193 @@ def sales_invoice_share(request, pk):
     role = getattr(prof, "role", None)
     is_staff_user = (role == "STAFF")
 
+    # Ledger rows to keep screenshot practical
+    raw_limit = request.GET.get("ledger", "20")
+    try:
+        ledger_limit = int(raw_limit)
+    except (TypeError, ValueError):
+        ledger_limit = 20
+    ledger_limit = max(5, min(ledger_limit, 50))
+
+    # Pull some extra rows so we can safely sort and still keep last N.
+    # Keep bounded to avoid large payloads in screenshot page.
+    fetch_limit = min(max(ledger_limit * 4, 80), 200)
+
+    def _d(val):
+        try:
+            return Decimal(str(val or 0))
+        except Exception:
+            return Decimal("0")
+
+    customer = invoice.customer
+    owner = request.owner
+    ledger_rows_raw = []
+
+    # Sales (posted), plus current invoice explicitly marked as "this invoice"
+    sales_qs = (
+        SalesInvoice.objects.filter(owner=owner, customer=customer, posted=True)
+        .exclude(pk=invoice.pk)
+        .only("id", "invoice_date", "invoice_number")
+        .order_by("-invoice_date", "-id")[:fetch_limit]
+    )
+    for inv in sales_qs:
+        ledger_rows_raw.append(
+            {
+                "date": inv.invoice_date,
+                "type": "Sale",
+                "ref": inv.invoice_number or f"SI-{inv.id}",
+                "debit": _d(inv.calculate_total()),
+                "credit": Decimal("0"),
+                "note": "",
+                "is_this_invoice": False,
+                "sort_pk": inv.id,
+            }
+        )
+
+    ledger_rows_raw.append(
+        {
+            "date": invoice.invoice_date,
+            "type": "Sale",
+            "ref": invoice.invoice_number or f"SI-{invoice.id}",
+            "debit": total,
+            "credit": Decimal("0"),
+            "note": "This invoice",
+            "is_this_invoice": True,
+            "sort_pk": invoice.id,
+        }
+    )
+
+    # Customer payments / receipts (posted only)
+    pay_qs = (
+        Payment.objects.filter(owner=owner, party=customer, posted=True)
+        .only(
+            "id",
+            "date",
+            "direction",
+            "amount",
+            "description",
+            "is_adjustment",
+            "adjustment_side",
+            "related_model",
+            "related_id",
+        )
+        .order_by("-date", "-id")[:fetch_limit]
+    )
+    for p in pay_qs:
+        debit = Decimal("0")
+        credit = Decimal("0")
+
+        if p.is_adjustment:
+            side = (p.adjustment_side or "DR").upper()
+            if side == "DR":
+                debit = _d(p.amount)
+            else:
+                credit = _d(p.amount)
+            row_type = "Adjustment"
+            ref = f"ADJ-{p.id}"
+        else:
+            if p.direction == "IN":
+                credit = _d(p.amount)
+                row_type = "Receipt"
+            else:
+                debit = _d(p.amount)
+                row_type = "Payment"
+            ref = f"PAY-{p.id}"
+
+        ledger_rows_raw.append(
+            {
+                "date": p.date,
+                "type": row_type,
+                "ref": ref,
+                "debit": debit,
+                "credit": credit,
+                "note": p.description or "",
+                "is_this_invoice": bool(
+                    (not p.is_adjustment)
+                    and p.related_model == "SalesInvoice"
+                    and p.related_id == invoice.id
+                ),
+                "sort_pk": p.id,
+            }
+        )
+
+    # Sales returns (posted only) reduce customer balance (credit)
+    returns_qs = (
+        SalesReturn.objects.filter(owner=owner, customer=customer, posted=True)
+        .only("id", "return_date", "reference_invoice_id")
+        .order_by("-return_date", "-id")[:fetch_limit]
+    )
+    for ret in returns_qs:
+        ledger_rows_raw.append(
+            {
+                "date": ret.return_date,
+                "type": "Return",
+                "ref": f"SR-{ret.id}",
+                "debit": Decimal("0"),
+                "credit": _d(ret.calculate_total()),
+                "note": (
+                    f"Ref SI-{ret.reference_invoice_id}"
+                    if ret.reference_invoice_id
+                    else ""
+                ),
+                "is_this_invoice": bool(ret.reference_invoice_id == invoice.id),
+                "sort_pk": ret.id,
+            }
+        )
+
+    # Sort ascending and compute running balance from opening (previous due)
+    ledger_rows_raw.sort(
+        key=lambda r: (
+            r.get("date") or timezone.now().date(),
+            r.get("sort_pk") or 0,
+        )
+    )
+
+    running_balance = previous_due
+    for row in ledger_rows_raw:
+        running_balance += (row["debit"] - row["credit"])
+        row["running_balance"] = running_balance
+
+    # Keep screenshot practical while centering window around this invoice row.
+    total_rows = len(ledger_rows_raw)
+    if total_rows <= ledger_limit:
+        ledger_rows = ledger_rows_raw
+    else:
+        this_idx = None
+        for i, r in enumerate(ledger_rows_raw):
+            if r.get("type") == "Sale" and r.get("sort_pk") == invoice.id:
+                this_idx = i
+                break
+        if this_idx is None:
+            for i, r in enumerate(ledger_rows_raw):
+                if r.get("is_this_invoice"):
+                    this_idx = i
+                    break
+        if this_idx is None:
+            this_idx = total_rows - 1
+
+        half = ledger_limit // 2
+        start = max(0, this_idx - half)
+        end = start + ledger_limit
+        if end > total_rows:
+            end = total_rows
+            start = max(0, end - ledger_limit)
+        ledger_rows = ledger_rows_raw[start:end]
+
+    # Optional last receipt date
+    last_payment_date = (
+        Payment.objects.filter(
+            owner=owner,
+            party=customer,
+            posted=True,
+            is_adjustment=False,
+            direction="IN",
+        )
+        .order_by("-date", "-id")
+        .values_list("date", flat=True)
+        .first()
+    )
+
     # Company branding (safe fallbacks)
     company = getattr(request, "company", None)
     if company is None:
@@ -6100,6 +6287,11 @@ def sales_invoice_share(request, pk):
         "is_staff_user": is_staff_user,
         "company_name": company_name,
         "company_phone": company_phone,
+        "ledger_rows": ledger_rows,
+        "ledger_limit": ledger_limit,
+        "opening_balance": previous_due,
+        "show_ledger_note": True,
+        "last_payment_date": last_payment_date,
     }
     return render(request, "core/sales_invoice_share.html", context)
 

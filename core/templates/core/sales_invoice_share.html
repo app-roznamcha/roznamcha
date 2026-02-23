@@ -198,6 +198,59 @@
       font-size:15px;
     }
 
+    .ledger-title{
+      margin: 14px 0 6px;
+      font-size: 16px;
+      font-weight: 900;
+      color:#111827;
+    }
+    .ledger-note{
+      margin: 0 0 10px;
+      font-size:12px;
+      color:#6b7280;
+      font-weight:700;
+    }
+    .ledger-summary{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:10px;
+      margin: 10px 0 12px;
+    }
+    .ledger-summary .mini{
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:10px;
+      background:#f9fafb;
+    }
+    .ledger-summary .mini .k{
+      font-size:11px;
+      color:#6b7280;
+      font-weight:800;
+      margin-bottom:5px;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+    .ledger-summary .mini .v{
+      font-size:13px;
+      color:#111827;
+      font-weight:900;
+    }
+    .ledger-wrap{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ledger-table{
+      min-width: 760px;
+    }
+    .ledger-row-this{
+      background:#eff6ff;
+    }
+    .ledger-row-this td{
+      border-bottom-color:#bfdbfe;
+      font-weight:800;
+    }
+
     .actions{
       display:flex;
       gap:10px;
@@ -282,6 +335,7 @@
       .watermark{ font-size: 62px; }
       .totals .sum{ width:100%; }
       .marketing-strip{ flex-direction:column; align-items:flex-start; }
+      .ledger-summary{ grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -417,6 +471,81 @@
               <div class="v">PKR {{ current_due|floatformat:2 }}</div>
             </div>
           </div>
+        </div>
+
+        <div class="ledger-title">Customer Ledger (Recent)</div>
+        {% if show_ledger_note %}
+          <div class="ledger-note">
+            Showing last {{ ledger_limit }} entries. View full ledger in app.
+          </div>
+        {% endif %}
+
+        <div class="ledger-summary">
+          <div class="mini">
+            <div class="k">Opening / Previous Due</div>
+            <div class="v">PKR {{ opening_balance|floatformat:2 }}</div>
+          </div>
+          <div class="mini">
+            <div class="k">This Invoice Total</div>
+            <div class="v">PKR {{ total|floatformat:2 }}</div>
+          </div>
+          <div class="mini">
+            <div class="k">Paid</div>
+            <div class="v">PKR {{ paid|floatformat:2 }}</div>
+          </div>
+          <div class="mini">
+            <div class="k">This Invoice Due</div>
+            <div class="v">PKR {{ invoice_due|floatformat:2 }}</div>
+          </div>
+          <div class="mini">
+            <div class="k">Current Due</div>
+            <div class="v">PKR {{ current_due|floatformat:2 }}</div>
+          </div>
+          <div class="mini">
+            <div class="k">Last Payment Date</div>
+            <div class="v">
+              {% if last_payment_date %}
+                {{ last_payment_date|date:"M j, Y" }}
+              {% else %}
+                —
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="ledger-wrap">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th style="width:14%;">Date</th>
+                <th style="width:14%;">Type</th>
+                <th style="width:22%;">Ref</th>
+                <th class="right" style="width:16%;">Debit</th>
+                <th class="right" style="width:16%;">Credit</th>
+                <th class="right" style="width:18%;">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in ledger_rows %}
+                <tr class="{% if row.is_this_invoice %}ledger-row-this{% endif %}">
+                  <td>{{ row.date|date:"M j, Y" }}</td>
+                  <td>{{ row.type }}</td>
+                  <td class="truncate" title="{{ row.ref }}{% if row.note %} • {{ row.note }}{% endif %}">
+                    {{ row.ref }}{% if row.is_this_invoice %} (This invoice){% endif %}
+                  </td>
+                  <td class="right">{% if row.debit %}{{ row.debit|floatformat:2 }}{% else %}—{% endif %}</td>
+                  <td class="right">{% if row.credit %}{{ row.credit|floatformat:2 }}{% else %}—{% endif %}</td>
+                  <td class="right">{{ row.running_balance|floatformat:2 }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" style="text-align:center;color:#6b7280;padding:14px;">
+                    No recent ledger entries.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
 
