@@ -3,161 +3,377 @@
 {% block title %}Supplier Ledger{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page supplier-ledger-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+  <style>
+    .supplier-ledger-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --dr:#b91c1c;
+      --dr-soft:#fee2e2;
+      --cr:#047857;
+      --cr-soft:#d1fae5;
+    }
 
-  <!-- Top Bar -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    .sl-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .sl-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .sl-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:700px;
+    }
+    .sl-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .sl-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .sl-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:18px;
+    }
+
+    .sl-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .sl-filter .stack{min-width:180px;}
+    .sl-filter label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#4b5563;
+    }
+    .sl-filter select,
+    .sl-filter input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+      height:44px;
+    }
+    .sl-filter select:focus,
+    .sl-filter input:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+
+    .sl-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+      height:44px;
+      min-width:130px;
+    }
+
+    .meta-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:10px;
+      margin-top:4px;
+    }
+    .meta-pill{
+      border:1px solid var(--slate-200);
+      border-radius:12px;
+      padding:10px 12px;
+      background:#fff;
+    }
+    .meta-label{
+      font-size:12px;
+      color:var(--slate-500);
+      margin-bottom:2px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .meta-value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--slate-900);
+      line-height:1.4;
+    }
+
+    .sl-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .search-input,
+    .type-filter{
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .search-input{ width:300px; max-width:100%; }
+    .type-filter{ min-width:170px; }
+
+    .ledger-wrap{ width:100%; overflow-x:auto; }
+    .ledger-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:860px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .ledger-table th,
+    .ledger-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:7px 9px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .ledger-table th{
+      text-align:left;
+      font-weight:700;
+      color:var(--slate-700);
+      background:#f9fafb;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .ledger-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .ledger-table tbody tr:hover{ background:#f8fbff; }
+    .right{ text-align:right; }
+
+    .amt-dr{
+      color:var(--dr);
+      font-weight:800;
+      background:var(--dr-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+    .amt-cr{
+      color:var(--cr);
+      font-weight:800;
+      background:var(--cr-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+
+    .print-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 14px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--slate-300);
+      background:#f8fafc;
+      color:#111827;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    @media (max-width: 900px) {
+      .meta-grid{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .supplier-ledger-page { padding: 0 14px !important; margin: 24px auto 48px !important; }
+      .sl-title { font-size: 25px !important; }
+      .sl-sub { font-size: 14px !important; }
+      .sl-btn,
+      .sl-apply,
+      .print-btn { width:100% !important; min-width:0 !important; }
+      .sl-filter .stack { width:100% !important; min-width:0 !important; flex: 1 1 100% !important; }
+      .meta-grid{ grid-template-columns:1fr; }
+      .search-input,
+      .type-filter{ width:100%; }
+      .ledger-table { min-width: 720px !important; }
+    }
+
+    @media print {
+      .no-print { display:none !important; }
+      .sl-card { box-shadow:none; border-color:#d1d5db; }
+    }
+  </style>
+
+  <div class="sl-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:28px;font-weight:800;line-height:1.15;">
-        🧾 Supplier Ledger
-      </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:#475569;">
-        View detailed statement of a single supplier with running balance.
-      </p>
+      <h1 class="sl-title">Supplier Ledger</h1>
+      <p class="sl-sub">View detailed statement of a single supplier with running balance.</p>
     </div>
     <div>
-      <a href="{% url 'dashboard' %}"
-      style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:700;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
-        ← Dashboard
-      </a>
+      <a href="{% url 'dashboard' %}" class="sl-btn">← Dashboard</a>
     </div>
   </div>
 
-  <!-- Filter Card -->
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Filter
-    </div>
-    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">
-      Select a supplier and optional date range, then click <strong>Apply</strong>.
-    </p>
+  <div class="sl-card no-print">
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px;">Filter</div>
+    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">Select a supplier and optional date range, then click <strong>Apply</strong>.</p>
 
-    <form method="get"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:260px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Supplier
-        </label>
-        <select name="supplier"
-            style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+    <form method="get" class="sl-filter">
+      <div class="stack" style="min-width:260px;">
+        <label>Supplier</label>
+        <select name="supplier">
           <option value="">-- Select supplier --</option>
           {% for s in suppliers %}
-            <option value="{{ s.id }}"
-              {% if selected_supplier and s.id == selected_supplier.id %}selected{% endif %}>
+            <option value="{{ s.id }}" {% if selected_supplier and s.id == selected_supplier.id %}selected{% endif %}>
               {{ s.name }}
             </option>
           {% endfor %}
         </select>
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
-        <input type="date"
-               name="from"
-               value="{{ date_from|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <div class="stack" style="min-width:180px;">
+        <label>From</label>
+        <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
-        <input type="date"
-               name="to"
-               value="{{ date_to|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <div class="stack" style="min-width:180px;">
+        <label>To</label>
+        <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
       </div>
 
-      <div>
-        <button type="submit"
-        style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:140px;">
-          Apply
-        </button>
+      <div class="stack" style="min-width:160px;">
+        <button type="submit" class="sl-apply">Apply</button>
       </div>
     </form>
   </div>
 
   {% if selected_supplier %}
-    <!-- Summary Card -->
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:16px 18px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-        <div>
-          <div style="font-size:16px;font-weight:600;margin-bottom:4px;">
-            {{ selected_supplier.name }}
-          </div>
-          <div style="font-size:13px;color:#6b7280;">
-            As of:
-            {% if date_to %}
-              {{ date_to }}
-            {% else %}
-              All dates
-            {% endif %}
-          </div>
+    <div class="sl-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+        <div style="font-size:16px;font-weight:700;">{{ selected_supplier.name }}</div>
+        <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-pill">
+          <div class="meta-label">As Of</div>
+          <div class="meta-value">{% if date_to %}{{ date_to }}{% else %}All dates{% endif %}</div>
         </div>
-        <div style="text-align:right;font-size:14px;">
-          <div>
-            Opening balance:
-            <strong>
-              {{ opening_balance|floatformat:2 }}
-              {{ opening_is_debit|yesno:"Dr,Cr" }}
-            </strong>
-          </div>
-          <div>
-            Closing balance:
-            <strong>
-              {{ closing_balance|floatformat:2 }}
-              {{ closing_is_debit|yesno:"Dr,Cr" }}
-            </strong>
-          </div>
+        <div class="meta-pill">
+          <div class="meta-label">Opening Balance</div>
+          <div class="meta-value">{{ opening_balance|floatformat:2 }} {{ opening_is_debit|yesno:"Dr,Cr" }}</div>
+        </div>
+        <div class="meta-pill">
+          <div class="meta-label">Closing Balance</div>
+          <div class="meta-value">{{ closing_balance|floatformat:2 }} {{ closing_is_debit|yesno:"Dr,Cr" }}</div>
+        </div>
+        <div class="meta-pill">
+          <div class="meta-label">Rows</div>
+          <div class="meta-value">{{ rows|length }}</div>
         </div>
       </div>
     </div>
 
-    <!-- Ledger Table -->
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-        Ledger entries
+    <div class="sl-card">
+      <div class="sl-toolbar no-print">
+        <div style="font-size:18px;font-weight:700;color:#0f172a;">Ledger Entries</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input id="ledgerSearch" type="text" class="search-input" placeholder="Quick search in description...">
+          <select id="entryTypeFilter" class="type-filter">
+            <option value="ALL">All entries</option>
+            <option value="DEBIT">Debit only</option>
+            <option value="CREDIT">Credit only</option>
+            <option value="BOTH">Both non-zero</option>
+          </select>
+        </div>
       </div>
 
-      <div style="width:100%;overflow-x:auto;">
-        <table style="border-collapse:collapse;width:100%;min-width:860px;">
+      <div class="ledger-wrap">
+        <table class="ledger-table">
           <thead>
             <tr>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:12%;">Date</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:14%;">Debit</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:14%;">Credit</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:16%;">Balance</th>
+              <th style="width:12%;">Date</th>
+              <th>Description</th>
+              <th class="right" style="width:14%;">Debit</th>
+              <th class="right" style="width:14%;">Credit</th>
+              <th class="right" style="width:16%;">Balance</th>
             </tr>
           </thead>
           <tbody>
             {% if rows %}
               {% for r in rows %}
-                <tr>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                    {{ r.date }}
+                <tr class="ledger-row" data-debit="{{ r.debit|default:0 }}" data-credit="{{ r.credit|default:0 }}">
+                  <td>{{ r.date }}</td>
+                  <td class="desc-cell">{{ r.description }}</td>
+                  <td class="right">
+                    {% if r.debit and r.debit != 0 %}
+                      <span class="amt-dr">{{ r.debit|floatformat:2 }}</span>
+                    {% else %}
+                      {{ r.debit|floatformat:2 }}
+                    {% endif %}
                   </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                    {{ r.description }}
+                  <td class="right">
+                    {% if r.credit and r.credit != 0 %}
+                      <span class="amt-cr">{{ r.credit|floatformat:2 }}</span>
+                    {% else %}
+                      {{ r.credit|floatformat:2 }}
+                    {% endif %}
                   </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                    {{ r.debit|floatformat:2 }}
-                  </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                    {{ r.credit|floatformat:2 }}
-                  </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                    {{ r.balance|floatformat:2 }}
-                  </td>
+                  <td class="right">{{ r.balance|floatformat:2 }}</td>
                 </tr>
               {% endfor %}
             {% else %}
               <tr>
-                <td colspan="5"
-                    style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:14px;color:#6b7280;text-align:center;">
+                <td colspan="5" style="padding:10px 9px;color:#6b7280;text-align:center;">
                   No transactions found for this supplier in the selected period.
                 </td>
               </tr>
@@ -167,11 +383,48 @@
       </div>
     </div>
   {% else %}
-    <div style="background:#f9fafb;border-radius:12px;border:1px dashed #d1d5db;
-                padding:18px 20px;font-size:14px;color:#6b7280;">
+    <div class="sl-card" style="background:#f9fafb;border-style:dashed;color:#6b7280;">
       Please select a supplier above and click <strong>Apply</strong> to view the ledger.
     </div>
   {% endif %}
 
 </div>
+
+{% if selected_supplier %}
+<script>
+  (function () {
+    const search = document.getElementById("ledgerSearch");
+    const filter = document.getElementById("entryTypeFilter");
+    const rows = Array.from(document.querySelectorAll(".ledger-row"));
+
+    function toNum(v) {
+      const n = parseFloat(String(v || "0").replace(/,/g, ""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function applyFilters() {
+      const q = ((search && search.value) || "").trim().toLowerCase();
+      const mode = (filter && filter.value) || "ALL";
+
+      rows.forEach((row) => {
+        const desc = (row.querySelector(".desc-cell")?.textContent || "").toLowerCase();
+        const debit = toNum(row.getAttribute("data-debit"));
+        const credit = toNum(row.getAttribute("data-credit"));
+
+        const textMatch = !q || desc.includes(q);
+        let typeMatch = true;
+
+        if (mode === "DEBIT") typeMatch = debit > 0 && credit <= 0;
+        if (mode === "CREDIT") typeMatch = credit > 0 && debit <= 0;
+        if (mode === "BOTH") typeMatch = debit > 0 && credit > 0;
+
+        row.style.display = (textMatch && typeMatch) ? "" : "none";
+      });
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (filter) filter.addEventListener("change", applyFilters);
+  })();
+</script>
+{% endif %}
 {% endblock %}

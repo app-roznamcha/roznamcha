@@ -4,62 +4,276 @@
 
 {% block content %}
 <div class="page customer-ledger-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
-
   <style>
-    /* Mobile friendliness (only for this page) */
+    .customer-ledger-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --dr:#b91c1c;
+      --dr-soft:#fee2e2;
+      --cr:#047857;
+      --cr-soft:#d1fae5;
+    }
+
+    .cl-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .cl-title{
+      margin:0 0 4px;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .cl-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:700px;
+    }
+    .cl-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .cl-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .cl-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:18px;
+    }
+
+    .cl-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .cl-filter .stack{min-width:180px;}
+    .cl-filter label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#4b5563;
+    }
+    .cl-filter select,
+    .cl-filter input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+      height:44px;
+    }
+    .cl-filter select:focus,
+    .cl-filter input:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+
+    .cl-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+      height:44px;
+    }
+
+    .meta-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:10px;
+      margin-top:4px;
+    }
+    .meta-pill{
+      border:1px solid var(--slate-200);
+      border-radius:12px;
+      padding:10px 12px;
+      background:#fff;
+    }
+    .meta-label{
+      font-size:12px;
+      color:var(--slate-500);
+      margin-bottom:2px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .meta-value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--slate-900);
+      line-height:1.4;
+    }
+
+    .cl-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .search-input,
+    .type-filter{
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .search-input{ width:300px; max-width:100%; }
+    .type-filter{ min-width:170px; }
+
+    .ledger-wrap{ width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .ledger-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:760px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .ledger-table th,
+    .ledger-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 9px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .ledger-table th{
+      text-align:left;
+      font-weight:700;
+      color:var(--slate-700);
+      background:#f9fafb;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .ledger-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .ledger-table tbody tr:hover{ background:#f8fbff; }
+    .right{ text-align:right; white-space:nowrap; }
+
+    .amt-dr{
+      color:var(--dr);
+      font-weight:800;
+      background:var(--dr-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+    .amt-cr{
+      color:var(--cr);
+      font-weight:800;
+      background:var(--cr-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+
+    .print-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 14px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--slate-300);
+      background:#f8fafc;
+      color:#111827;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    @media (max-width: 900px) {
+      .meta-grid{ grid-template-columns:1fr 1fr; }
+    }
+
     @media (max-width: 640px) {
       .customer-ledger-page { padding: 0 14px !important; margin: 24px auto 48px !important; }
-      .customer-ledger-page h1 { font-size: 26px !important; }
-      .customer-ledger-page p { font-size: 14px !important; }
-      .customer-ledger-page .btn-wide { width: 100% !important; min-width: 0 !important; }
-      .customer-ledger-page .stack { width: 100% !important; min-width: 0 !important; flex: 1 1 100% !important; }
-      .customer-ledger-page .summary-right { text-align: left !important; }
-      .customer-ledger-page table { min-width: 720px !important; }
+      .cl-title { font-size: 26px !important; }
+      .cl-sub { font-size: 14px !important; }
+      .cl-btn,
+      .cl-apply,
+      .print-btn { width:100% !important; min-width:0 !important; }
+      .cl-filter .stack { width:100% !important; min-width:0 !important; flex: 1 1 100% !important; }
+      .summary-right { text-align: left !important; }
+      .meta-grid{ grid-template-columns:1fr; }
+      .search-input,
+      .type-filter{ width:100%; }
+      .ledger-table { min-width: 720px !important; }
+    }
+
+    @media print {
+      .no-print { display:none !important; }
+      .cl-card { box-shadow:none; border-color:#d1d5db; }
     }
   </style>
 
-  <!-- Top Bar -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="cl-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
-        👤 Customer Ledger
-      </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:#475569;">
-        View detailed statement of a single customer with running balance.
-      </p>
+      <h1 class="cl-title">Customer Ledger</h1>
+      <p class="cl-sub">View detailed statement of a single customer with running balance.</p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}"
-         class="btn-wide"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;">
-        ← Dashboard
-      </a>
+      <a href="{% url 'dashboard' %}" class="cl-btn">← Dashboard</a>
     </div>
   </div>
 
-  <!-- Filter Card -->
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Filter
-    </div>
-    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">
-      Select a customer and optional date range, then click <strong>Apply</strong>.
-    </p>
+  <div class="cl-card no-print">
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px;">Filter</div>
+    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">Select a customer and optional date range, then click <strong>Apply</strong>.</p>
 
-    <form method="get"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+    <form method="get" class="cl-filter">
       <div class="stack" style="min-width:260px;flex:1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          Customer
-        </label>
-        <select name="customer"
-                style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;">
+        <label>Customer</label>
+        <select name="customer">
           <option value="">-- Select customer --</option>
           {% for c in customers %}
-            <option value="{{ c.id }}"
-              {% if selected_customer and c.id == selected_customer.id %}selected{% endif %}>
+            <option value="{{ c.id }}" {% if selected_customer and c.id == selected_customer.id %}selected{% endif %}>
               {{ c.name }}
             </option>
           {% endfor %}
@@ -67,124 +281,99 @@
       </div>
 
       <div class="stack" style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
-        <input type="date"
-               name="from"
-               value="{{ date_from|date:'Y-m-d' }}"
-               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;">
+        <label>From</label>
+        <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
       </div>
 
       <div class="stack" style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
-        <input type="date"
-               name="to"
-               value="{{ date_to|date:'Y-m-d' }}"
-               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;">
+        <label>To</label>
+        <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
       </div>
 
       <div class="stack" style="min-width:160px;">
-        <button type="submit"
-                class="btn-wide"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;height:44px;">
-          Apply
-        </button>
+        <button type="submit" class="cl-apply">Apply</button>
       </div>
     </form>
   </div>
 
   {% if selected_customer %}
-    <!-- Summary Card -->
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:16px 18px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-        <div style="min-width:220px;flex:1;">
-          <div style="font-size:16px;font-weight:600;margin-bottom:4px;">
-            {{ selected_customer.name }}
-          </div>
-          <div style="font-size:13px;color:#6b7280;">
-            As of:
-            {% if date_to %}
-              {{ date_to }}
-            {% else %}
-              All dates
-            {% endif %}
-          </div>
+    <div class="cl-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+        <div style="font-size:16px;font-weight:700;">{{ selected_customer.name }}</div>
+        <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-pill">
+          <div class="meta-label">As Of</div>
+          <div class="meta-value">{% if date_to %}{{ date_to }}{% else %}All dates{% endif %}</div>
         </div>
-        <div class="summary-right" style="text-align:right;font-size:14px;min-width:220px;">
-          <div>
-            Opening balance:
-            <strong>
-              {{ opening_balance|floatformat:2 }}
-              {{ opening_is_debit|yesno:"Dr,Cr" }}
-            </strong>
-          </div>
-          <div>
-            Closing balance:
-            <strong>
-              {{ closing_balance|floatformat:2 }}
-              {{ closing_is_debit|yesno:"Dr,Cr" }}
-            </strong>
-          </div>
+        <div class="meta-pill">
+          <div class="meta-label">Opening Balance</div>
+          <div class="meta-value">{{ opening_balance|floatformat:2 }} {{ opening_is_debit|yesno:"Dr,Cr" }}</div>
+        </div>
+        <div class="meta-pill">
+          <div class="meta-label">Closing Balance</div>
+          <div class="meta-value">{{ closing_balance|floatformat:2 }} {{ closing_is_debit|yesno:"Dr,Cr" }}</div>
+        </div>
+        <div class="meta-pill">
+          <div class="meta-label">Rows</div>
+          <div class="meta-value">{{ rows|length }}</div>
         </div>
       </div>
     </div>
 
-    <!-- Print button for this customer's statement -->
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-      <button type="button"
-              class="btn-wide"
-              onclick="window.print()"
-              style="display:inline-flex;align-items:center;justify-content:center;
-                     padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;
-                     border:1px solid #e5e7eb;background:#f3f4f6;color:#111827;cursor:pointer;white-space:nowrap;">
-        🖨️ Print / Save as PDF
-      </button>
-    </div>
-
-    <!-- Ledger Table -->
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-        Ledger entries
+    <div class="cl-card">
+      <div class="cl-toolbar no-print">
+        <div style="font-size:18px;font-weight:700;color:#0f172a;">Ledger Entries</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input id="ledgerSearch" type="text" class="search-input" placeholder="Quick search in description...">
+          <select id="entryTypeFilter" class="type-filter">
+            <option value="ALL">All entries</option>
+            <option value="DEBIT">Debit only</option>
+            <option value="CREDIT">Credit only</option>
+            <option value="BOTH">Both non-zero</option>
+          </select>
+        </div>
       </div>
 
-      <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <table style="border-collapse:collapse;width:100%;min-width:760px;">
+      <div class="ledger-wrap">
+        <table class="ledger-table">
           <thead>
             <tr>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:12%;white-space:nowrap;">Date</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:14%;white-space:nowrap;">Debit</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:14%;white-space:nowrap;">Credit</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:16%;white-space:nowrap;">Balance</th>
+              <th style="width:12%;white-space:nowrap;">Date</th>
+              <th>Description</th>
+              <th class="right" style="width:14%;">Debit</th>
+              <th class="right" style="width:14%;">Credit</th>
+              <th class="right" style="width:16%;">Balance</th>
             </tr>
           </thead>
           <tbody>
             {% if rows %}
               {% for r in rows %}
-                <tr>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;white-space:nowrap;">
-                    {{ r.date }}
+                <tr class="ledger-row" data-debit="{{ r.debit|default:0 }}" data-credit="{{ r.credit|default:0 }}">
+                  <td style="white-space:nowrap;">{{ r.date }}</td>
+                  <td class="desc-cell">{{ r.description }}</td>
+                  <td class="right">
+                    {% if r.debit and r.debit != 0 %}
+                      <span class="amt-dr">{{ r.debit|floatformat:2 }}</span>
+                    {% else %}
+                      {{ r.debit|floatformat:2 }}
+                    {% endif %}
                   </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                    {{ r.description }}
+                  <td class="right">
+                    {% if r.credit and r.credit != 0 %}
+                      <span class="amt-cr">{{ r.credit|floatformat:2 }}</span>
+                    {% else %}
+                      {{ r.credit|floatformat:2 }}
+                    {% endif %}
                   </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;white-space:nowrap;">
-                    {{ r.debit|floatformat:2 }}
-                  </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;white-space:nowrap;">
-                    {{ r.credit|floatformat:2 }}
-                  </td>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;white-space:nowrap;">
-                    {{ r.balance|floatformat:2 }}
-                  </td>
+                  <td class="right">{{ r.balance|floatformat:2 }}</td>
                 </tr>
               {% endfor %}
             {% else %}
               <tr>
-                <td colspan="5"
-                    style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:14px;color:#6b7280;text-align:center;">
+                <td colspan="5" style="padding:10px 9px;color:#6b7280;text-align:center;">
                   No transactions found for this customer in the selected period.
                 </td>
               </tr>
@@ -194,11 +383,47 @@
       </div>
     </div>
   {% else %}
-    <div style="background:#f9fafb;border-radius:12px;border:1px dashed #d1d5db;
-                padding:18px 20px;font-size:14px;color:#6b7280;">
+    <div class="cl-card" style="background:#f9fafb;border-style:dashed;color:#6b7280;">
       Please select a customer above and click <strong>Apply</strong> to view the ledger.
     </div>
   {% endif %}
-
 </div>
+
+{% if selected_customer %}
+<script>
+  (function () {
+    const search = document.getElementById("ledgerSearch");
+    const filter = document.getElementById("entryTypeFilter");
+    const rows = Array.from(document.querySelectorAll(".ledger-row"));
+
+    function toNum(v) {
+      const n = parseFloat(String(v || "0").replace(/,/g, ""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function applyFilters() {
+      const q = ((search && search.value) || "").trim().toLowerCase();
+      const mode = (filter && filter.value) || "ALL";
+
+      rows.forEach((row) => {
+        const desc = (row.querySelector(".desc-cell")?.textContent || "").toLowerCase();
+        const debit = toNum(row.getAttribute("data-debit"));
+        const credit = toNum(row.getAttribute("data-credit"));
+
+        const textMatch = !q || desc.includes(q);
+        let typeMatch = true;
+
+        if (mode === "DEBIT") typeMatch = debit > 0 && credit <= 0;
+        if (mode === "CREDIT") typeMatch = credit > 0 && debit <= 0;
+        if (mode === "BOTH") typeMatch = debit > 0 && credit > 0;
+
+        row.style.display = (textMatch && typeMatch) ? "" : "none";
+      });
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (filter) filter.addEventListener("change", applyFilters);
+  })();
+</script>
+{% endif %}
 {% endblock %}
