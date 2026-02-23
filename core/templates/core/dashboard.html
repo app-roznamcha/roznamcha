@@ -22,18 +22,63 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
+      gap: 16px;
       margin-bottom: 20px;
       flex-wrap: wrap;
   }
 
+  .dashboard-hero{
+    width:100%;
+    background:#ffffff;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    padding:20px 20px 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+
+  .dashboard-brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+
+  .brand-avatar{
+    width:54px;
+    height:54px;
+    border-radius:14px;
+    border:1px solid #dbe3ee;
+    background:#ffffff;
+    object-fit:cover;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+
+  .brand-avatar-fallback{
+    width:54px;
+    height:54px;
+    border-radius:14px;
+    border:1px solid #dbe3ee;
+    background: linear-gradient(160deg, #eff6ff 0%, #f8fafc 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    color:#2563eb;
+    letter-spacing:0.02em;
+  }
+
   .dashboard-title {
     margin: 0;
-    font-size: 26px;
+    font-size: 23px;
     font-weight: 850;
     color: #0f172a;
     letter-spacing: -0.02em;
-    line-height: 1.15;
+    line-height: 1.2;
     }
 
   .dashboard-subtitle {
@@ -117,19 +162,32 @@
   .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 18px;
+      gap: 20px;
+      align-items: start;
   }
 
   .dashboard-section {
-      background: #ffffff;
-      border-radius: 18px;
-      border: 1px solid #e5e7eb;
-      padding: 18px 18px 16px;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+      border-radius: 22px;
+      border: 1px solid #dbe6f4;
+      padding: 20px 20px 18px;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+      position: relative;
+      overflow: hidden;
+  }
+
+  .dashboard-section::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:4px;
+      background:#e2e8f0;
   }
 
   .dashboard-section h2 {
-      margin: 0 0 6px;
+      margin: 0 0 8px;
       font-size: 20px;
       font-weight: 800;
       display: flex;
@@ -147,43 +205,45 @@
   }
 
   .dashboard-section p {
-      margin: 2px 0 14px;
-      color: #6b7280;
+      margin: 2px 0 16px;
+      color: #64748b;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.45;
+      font-weight: 500;
   }
 
   /* --- Button layout --- */
   .button-row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
   }
 
   .btn-pill {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       width: 100%;
-      max-width: 340px;
-      padding: 14px 22px;
-      border-radius: 999px;
-      font-size: 15px;
+      min-height: 48px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-size: 14px;
       font-weight: 700;
       text-decoration: none;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #d8e1ed;
       background: #ffffff;
-      color: #111827;
-      transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
+      color: #0f172a;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+      transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+      line-height: 1.25;
   }
 
   .btn-pill:hover {
-      background: #f3f4f6;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
-      transform: translateY(-0.5px);
-      border-color: #dbeafe;
+      background: #f8fafc;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
+      transform: translateY(-2px);
+      border-color: #b8c6d8;
   }
 
   .btn-pill:focus {
@@ -191,18 +251,23 @@
       outline-offset: 2px;
   }
 
+  .button-row .btn-pill:only-child {
+      grid-column: 1 / -1;
+  }
+
   /* ========= Column colour themes ========= */
 
   /* Column 1: Master Data – Blue */
   .section-master .dashboard-section-title-indicator { background: #2563eb; }
+  .section-master.dashboard-section::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
   .section-master .btn-pill {
       border-color: #bfdbfe;
-      color: #1d4ed8;
-      background: #eff6ff;
+      color: #1e40af;
+      background: linear-gradient(180deg, #eff6ff 0%, #e7f0ff 100%);
   }
   .section-master .btn-pill-primary {
-      background: #2563eb;
-      border-color: #2563eb;
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      border-color: #1d4ed8;
       color: #ffffff;
       font-weight: 800;
   }
@@ -213,14 +278,15 @@
 
   /* Column 2: Transactions – Green */
   .section-transactions .dashboard-section-title-indicator { background: #059669; }
+  .section-transactions.dashboard-section::before { background: linear-gradient(90deg, #059669, #34d399); }
   .section-transactions .btn-pill {
       border-color: #a7f3d0;
       color: #047857;
-      background: #ecfdf5;
+      background: linear-gradient(180deg, #ecfdf5 0%, #ddfaee 100%);
   }
   .section-transactions .btn-pill-primary {
-      background: #059669;
-      border-color: #059669;
+      background: linear-gradient(180deg, #059669 0%, #047857 100%);
+      border-color: #047857;
       color: #ffffff;
       font-weight: 800;
   }
@@ -231,14 +297,15 @@
 
   /* Column 3: Reports – Orange */
   .section-reports .dashboard-section-title-indicator { background: #f97316; }
+  .section-reports.dashboard-section::before { background: linear-gradient(90deg, #f97316, #fdba74); }
   .section-reports .btn-pill {
       border-color: #fed7aa;
       color: #c2410c;
-      background: #fff7ed;
+      background: linear-gradient(180deg, #fff7ed 0%, #ffedd8 100%);
   }
   .section-reports .btn-pill-primary {
-      background: #f97316;
-      border-color: #f97316;
+      background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+      border-color: #ea580c;
       color: #ffffff;
       font-weight: 800;
   }
@@ -251,6 +318,7 @@
   @media (max-width: 520px) {
     .dashboard-title { font-size: 24px; }
     .dashboard-shell { padding: 14px 10px 22px; }
+    .button-row { grid-template-columns: 1fr; }
     .btn-pill { max-width: 100%; }
   }
 
@@ -369,7 +437,7 @@ html[dir="rtl"] .dashboard-section{
   display:flex;
   flex-direction:column;
   gap:10px;              /* nicer separation */
-  padding-top:2px;
+  padding-top:4px;
 }
 
 .header-meta-top{
@@ -390,18 +458,36 @@ html[dir="rtl"] .dashboard-section{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  padding:7px 12px;
+  padding:8px 12px;
   border-radius:999px;
-  border:1px solid #e5e7eb;
-  background:#f8fafc;     /* soft pill background */
+  border:1px solid #dbe3ee;
+  background:#f8fafc;
   color:#64748b;
-  font-size:13px;
-  font-weight:700;
+  font-size:12.5px;
+  font-weight:800;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
 }
 
 .meta-pill strong{
   color:#0f172a;
   font-weight:850;
+}
+
+.summary-toggle-btn{
+  max-width:none;
+  width:auto;
+  padding:10px 16px;
+  border-radius:999px;
+  border:1px solid #cbd5e1;
+  background:#ffffff;
+  font-weight:800;
+  color:#0f172a;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.summary-toggle-btn:hover{
+  background:#f8fafc;
+  border-color:#94a3b8;
 }
 
 /* Mobile polish */
@@ -410,6 +496,8 @@ html[dir="rtl"] .dashboard-section{
   .header-meta{gap:8px;}
   .header-meta-bottom{gap:8px;}
   .meta-pill{font-size:12.5px;padding:7px 10px;}
+  .dashboard-hero{padding:14px 14px 12px;}
+  .brand-avatar,.brand-avatar-fallback{width:48px;height:48px;}
 }
 </style>
 {% endblock %}
@@ -419,15 +507,14 @@ html[dir="rtl"] .dashboard-section{
   <div class="dashboard-shell">
 
     <div class="dashboard-header">
-        <div>
-            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="dashboard-hero">
+            <div class="dashboard-brand">
                 {% if company and company.logo %}
                     <img src="{{ company.logo.url }}"
                         alt="{{ company.name }}"
-                        style="width:46px;height:46px;border-radius:12px;object-fit:cover;border:1px solid #e5e7eb;background:#fff;">
+                        class="brand-avatar">
                     {% else %}
-                    <div style="width:46px;height:46px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;
-                                display:flex;align-items:center;justify-content:center;font-weight:800;color:#2563eb;">
+                    <div class="brand-avatar-fallback">
                         SZ
                     </div>
                     {% endif %}
@@ -489,7 +576,7 @@ html[dir="rtl"] .dashboard-section{
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:4px;">
           
             {% if not is_staff %}
-              <button type="button" id="metricsToggle" class="btn-pill" style="max-width:none; width:auto; padding:10px 14px;">
+              <button type="button" id="metricsToggle" class="btn-pill summary-toggle-btn">
                 <span data-i18n="show_summary">👁️ Show Summary</span>
               </button>
             {% endif %}
