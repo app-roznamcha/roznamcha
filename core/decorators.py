@@ -2,10 +2,10 @@
 from functools import wraps
 from datetime import timedelta
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 from django.utils import timezone
 
 from core.models import CompanyProfile, UserProfile
@@ -213,7 +213,7 @@ def subscription_required(view_func):
             messages.warning(request, "Session expired. Please sign in again.")
             return redirect_to_login(
                 request.get_full_path(),
-                login_url=f"{settings.LOGIN_URL}?reason=session_expired",
+                login_url=f"{reverse('login')}?reason=session_expired",
             )
 
         # Superadmin bypass

@@ -1,6 +1,9 @@
 # core/permissions.py
 from functools import wraps
+from django.contrib import messages
+from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 
 # Reuse the single source of truth you already built
 from .decorators import _ensure_owner_and_tenant, _enforce_subscription
@@ -9,6 +12,14 @@ from .decorators import _ensure_owner_and_tenant, _enforce_subscription
 def _get_role(user):
     profile = getattr(user, "profile", None)
     return getattr(profile, "role", None)
+
+
+def _redirect_session_expired(request):
+    messages.warning(request, "Session expired. Please sign in again.")
+    return redirect_to_login(
+        request.get_full_path(),
+        login_url=f"{reverse('login')}?reason=session_expired",
+    )
 
 
 # =====================================================
@@ -31,7 +42,7 @@ def staff_allowed(view_func):
         user = getattr(request, "user", None)
 
         if not user or not user.is_authenticated:
-            raise PermissionDenied("Authentication required")
+            return _redirect_session_expired(request)
 
         # Django superuser: bypass subscription + role checks
         if getattr(user, "is_superuser", False):
@@ -70,7 +81,7 @@ def owner_only(view_func):
         user = getattr(request, "user", None)
 
         if not user or not user.is_authenticated:
-            raise PermissionDenied("Authentication required")
+            return _redirect_session_expired(request)
 
         # Django superuser bypass
         if getattr(user, "is_superuser", False):
