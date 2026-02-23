@@ -20,3 +20,6 @@ backups/
 # python junk
 __pycache__/
 *.pyc
+
+.npm-cache/
+android-twa/
