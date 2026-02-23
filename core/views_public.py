@@ -1,6 +1,9 @@
 # core/views_public.py (or wherever your public views are)
-from django.http import HttpResponse
+from django.conf import settings
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.templatetags.static import static
+from django.views.decorators.http import require_GET
 
 
 def robots_txt(request):
@@ -17,19 +20,79 @@ Sitemap: https://roznamcha.app/sitemap.xml
 def google_verify(request):
     return render(request, "googlea8d36177338cf4b5.html")
 
-def robots_txt(request):
-    content = """User-agent: *
-Disallow: /admin/
-Disallow: /login/
-Disallow: /signup/
-Allow: /
 
-Sitemap: https://roznamcha.app/sitemap.xml
-"""
-    return HttpResponse(content, content_type="text/plain")
+@require_GET
+def pwa_manifest(request):
+    manifest = {
+        "id": "/",
+        "name": "Roznamcha",
+        "short_name": "Roznamcha",
+        "description": "Smart Khata & Hisab System",
+        "start_url": "/?source=pwa",
+        "scope": "/",
+        "display": "standalone",
+        "display_override": ["standalone", "minimal-ui"],
+        "background_color": "#f3f4f6",
+        "theme_color": "#2563eb",
+        "orientation": "portrait",
+        "icons": [
+            {
+                "src": static("core/pwa/icons/icon-192.png"),
+                "sizes": "192x192",
+                "type": "image/png",
+                "purpose": "any",
+            },
+            {
+                "src": static("core/pwa/icons/icon-512.png"),
+                "sizes": "512x512",
+                "type": "image/png",
+                "purpose": "any",
+            },
+            {
+                "src": static("core/pwa/icons/maskable-192.png"),
+                "sizes": "192x192",
+                "type": "image/png",
+                "purpose": "maskable",
+            },
+            {
+                "src": static("core/pwa/icons/maskable-512.png"),
+                "sizes": "512x512",
+                "type": "image/png",
+                "purpose": "maskable",
+            },
+        ],
+    }
+    return JsonResponse(manifest, json_dumps_params={"ensure_ascii": False})
 
-def google_verify(request):
-    return render(request, "googlea8d36177338cf4b5.html")
+
+@require_GET
+def assetlinks_json(request):
+    app_id = getattr(settings, "ANDROID_APP_ID", "").strip()
+    fingerprints = [
+        item.strip()
+        for item in getattr(settings, "ANDROID_SHA256_CERT_FINGERPRINTS", [])
+        if item.strip()
+    ]
+
+    if not app_id or not fingerprints:
+        # Keep response valid JSON even before Android metadata is configured.
+        response = JsonResponse([], safe=False)
+        response["Cache-Control"] = "no-store, must-revalidate"
+        return response
+
+    payload = [
+        {
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+                "namespace": "android_app",
+                "package_name": app_id,
+                "sha256_cert_fingerprints": fingerprints,
+            },
+        }
+    ]
+    response = JsonResponse(payload, safe=False)
+    response["Cache-Control"] = "public, max-age=300"
+    return response
 
 
 # ✅ ADD THIS

@@ -210,3 +210,11 @@ DEFAULT_FROM_EMAIL = "Roznamcha <app.roznamcha@gmail.com>"
 CRON_TOKEN = os.getenv("CRON_TOKEN", "")
 
 INTERNAL_BACKUP_KEY = os.environ.get("INTERNAL_BACKUP_KEY", "")
+
+# Android app metadata for Trusted Web Activity verification
+ANDROID_APP_ID = os.environ.get("ANDROID_APP_ID", "")
+ANDROID_SHA256_CERT_FINGERPRINTS = [
+    item.strip()
+    for item in os.environ.get("ANDROID_SHA256_CERT_FINGERPRINTS", "").split(",")
+    if item.strip()
+]
