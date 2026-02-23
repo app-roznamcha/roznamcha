@@ -956,16 +956,22 @@ def _get_date_range(request):
     from_str = request.GET.get("from")
     to_str = request.GET.get("to")
 
-    if from_str:
-        date_from = parse_date(from_str)
-    else:
-        today = date.today()
-        date_from = today.replace(day=1)
+    today = date.today()
+    default_from = today.replace(day=1)
+    default_to = today
 
-    if to_str:
-        date_to = parse_date(to_str)
-    else:
-        date_to = date.today()
+    date_from = parse_date(from_str) if from_str else default_from
+    date_to = parse_date(to_str) if to_str else default_to
+
+    # Guard against invalid query values, e.g. ?from=invalid-date
+    if date_from is None:
+        date_from = default_from
+    if date_to is None:
+        date_to = default_to
+
+    # Normalize inverted ranges to avoid empty/misleading reports
+    if date_from > date_to:
+        date_from, date_to = date_to, date_from
 
     return date_from, date_to
 
@@ -2850,32 +2856,38 @@ def profit_loss(request):
     """
     date_from, date_to = _get_date_range(request)
 
-    entries = (
-        JournalEntry.objects.filter(
-            owner=request.owner,
-            date__range=(date_from, date_to),
-        )
+    entries = JournalEntry.objects.filter(
+        owner=request.owner,
+        date__range=(date_from, date_to),
     )
     income_rows = []
     expense_rows = []
     total_income = Decimal("0")
     total_expense = Decimal("0")
 
+    debit_totals = {
+        row["debit_account"]: (row["total"] or Decimal("0"))
+        for row in (
+            entries.values("debit_account")
+            .annotate(total=Sum("amount"))
+        )
+    }
+    credit_totals = {
+        row["credit_account"]: (row["total"] or Decimal("0"))
+        for row in (
+            entries.values("credit_account")
+            .annotate(total=Sum("amount"))
+        )
+    }
+
     for account in (
         Account.objects.filter(
             owner=request.owner,
             account_type__in=["INCOME", "EXPENSE"],
-        )
-        .order_by("code")
+        ).order_by("code")
     ):
-        debit_sum = (
-            entries.filter(debit_account=account)
-            .aggregate(total=Sum("amount"))["total"] or Decimal("0")
-        )
-        credit_sum = (
-            entries.filter(credit_account=account)
-            .aggregate(total=Sum("amount"))["total"] or Decimal("0")
-        )
+        debit_sum = debit_totals.get(account.id, Decimal("0"))
+        credit_sum = credit_totals.get(account.id, Decimal("0"))
 
         if account.account_type == "INCOME":
             net = credit_sum - debit_sum
