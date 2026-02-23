@@ -5,6 +5,199 @@
 {% block content %}
 <div class="page day-summary-page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
   <style>
+    .day-summary-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --ok:#047857;
+      --ok-soft:#d1fae5;
+      --out:#b91c1c;
+      --out-soft:#fee2e2;
+      --warn:#9a3412;
+      --warn-soft:#ffedd5;
+    }
+
+    .day-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .day-title{
+      margin:0 0 4px;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .day-sub{
+      margin:0 0 12px;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+    }
+    .day-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      min-width:170px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .day-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .ds-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:20px;
+    }
+    .ds-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .ds-card-title{
+      font-size:18px;
+      font-weight:800;
+      color:var(--slate-900);
+    }
+
+    .tbl{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      min-width:980px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:15px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      background:#f9fafb;
+      font-weight:600;
+      text-align:left;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
+
+    .right{ text-align:right; }
+    .center{ text-align:center; }
+    .nowrap{ white-space:nowrap; }
+    .truncate{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      background:#ffffff;
+      color:#111827;
+      white-space:nowrap;
+      font-weight:700;
+    }
+
+    .search-input{
+      width:290px;
+      max-width:100%;
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      color:var(--slate-900);
+      background:#fff;
+    }
+    .search-input:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+
+    .top-summary-grid .kpi{
+      background:#fff;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      padding:12px 14px;
+      box-shadow:0 6px 16px rgba(15,23,42,0.05);
+    }
+    .top-summary-grid .kpi .label{
+      font-size:13px;
+      color:var(--slate-500);
+      margin-bottom:6px;
+    }
+    .top-summary-grid .kpi .value{
+      font-size:21px;
+      font-weight:800;
+    }
+    .kpi.sales .value{ color:var(--ok); }
+    .kpi.purchase .value{ color:var(--warn); }
+    .kpi.in .value{ color:#1d4ed8; }
+    .kpi.out .value{ color:var(--out); }
+    .kpi.net{
+      background:linear-gradient(180deg,#111827,#0f172a);
+      border-color:#111827;
+      box-shadow:0 10px 20px rgba(15,23,42,0.22);
+    }
+    .kpi.net .label{ color:#9ca3af; }
+    .kpi.net .value{ color:#fff; }
+
+    .money-in{
+      color:var(--ok);
+      font-weight:800;
+      background:var(--ok-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+    .money-out{
+      color:var(--out);
+      font-weight:800;
+      background:var(--out-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+
     .mini-box{
       margin-top:12px;
       border-top:1px dashed #e5e7eb;
@@ -29,9 +222,10 @@
       font-size:14px;
     }
     .mini-right{ text-align:right; white-space:nowrap; }
+
     .net-strip{
       margin-top:14px;
-      background:#0f172a;
+      background:linear-gradient(180deg,#0f172a,#111827);
       color:#fff;
       border-radius:14px;
       padding:14px 16px;
@@ -43,86 +237,39 @@
     .net-strip small{ opacity:.75; font-size:13px; }
     .net-strip strong{ font-size:18px; }
 
-    /* ---------- Mobile tweaks (only this page) ---------- */
+    @media (max-width: 1024px) {
+      .top-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    }
+
     @media (max-width: 640px) {
       .day-summary-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
-      .day-summary-page h1 { font-size: 26px !important; }
-      .day-summary-page p { font-size: 14px !important; }
-      .day-summary-page .tbl { min-width: 820px !important; } /* still scrolls */
+      .day-title { font-size: 26px !important; }
+      .day-sub { font-size: 14px !important; }
+      .day-btn { width: 100%; min-width: unset; }
+      .day-summary-page .tbl { min-width: 820px !important; }
       .day-summary-page .mini-table { min-width: 100% !important; }
       .day-summary-page .mini-right { text-align: left !important; white-space: normal !important; }
       .day-summary-page .net-strip { flex-direction: column; align-items: flex-start; }
+      .top-summary-grid { grid-template-columns: 1fr !important; }
+      .tbl th, .tbl td { font-size: 14px; }
+      .search-input{ width:100%; }
     }
   </style>
-  {# ---------- Top Bar (Title + Back Button) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+
+  <div class="day-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Day Summary</h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <h1 class="day-title">Day Summary</h1>
+      <p class="day-sub">
         View all posted sales, purchases, and payments for a single day.
       </p>
     </div>
     <div>
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
-        ← Back to Dashboard
-      </a>
+      <a href="{% url 'dashboard' %}" class="day-btn">← Back to Dashboard</a>
     </div>
   </div>
 
-  <style>
-    .tbl{
-      width:100%;
-      border-collapse:collapse;
-      table-layout:fixed;
-      min-width:980px;
-    }
-    .tbl th, .tbl td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
-      font-size:15px;
-      vertical-align:middle;
-    }
-    .tbl th{
-      background:#f9fafb;
-      font-weight:600;
-      text-align:left;
-    }
-    .right{ text-align:right; }
-    .center{ text-align:center; }
-    .nowrap{ white-space:nowrap; }
-    .truncate{
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .pill{
-      display:inline-block;
-      padding:2px 10px;
-      border-radius:999px;
-      font-size:12px;
-      border:1px solid #e5e7eb;
-      background:#ffffff;
-      color:#111827;
-      white-space:nowrap;
-    }
-
-    /* Summary cards grid: 5 → 2 → 1 on small screens */
-    @media (max-width: 1024px) {
-      .top-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-    }
-    @media (max-width: 640px) {
-      .top-summary-grid { grid-template-columns: 1fr !important; }
-      .tbl th, .tbl td { font-size: 14px; }
-    }
-  </style>
-
-  {# ---------- Filter Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">Select date</div>
+  <div class="ds-card">
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Select date</div>
     <p style="font-size:15px;color:#475569;margin-bottom:12px;">
       Choose a date to see all activity for that day, then click <strong>Apply</strong>.
     </p>
@@ -130,84 +277,58 @@
     <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
       <div style="min-width:220px;">
         <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">Date</label>
-        <input type="date"
-               id="date"
-               name="date"
-               value="{{ selected_date|date:'Y-m-d' }}"
-               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;"
+        <input
+          type="date"
+          id="date"
+          name="date"
+          value="{{ selected_date|date:'Y-m-d' }}"
+          style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;"
+        >
       </div>
 
       <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        <button type="submit" class="btn btn-primary" style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:10px;font-size:14px;font-weight:700;border:1px solid #1d4ed8;background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
           Apply
         </button>
+      </div>
+
+      <div style="margin-left:auto;min-width:260px;">
+        <label for="daySearch" style="display:block;font-size:14px;margin-bottom:4px;">Quick Search (all sections)</label>
+        <input id="daySearch" type="text" class="search-input" placeholder="Search invoice, party, product, account...">
       </div>
     </form>
   </div>
 
-  {# ---------- Top Summary Strip ---------- #}
-  <div class="top-summary-grid" style="
-    display:grid;
-    grid-template-columns:repeat(5, minmax(0, 1fr));
-    gap:12px;
-    margin-bottom:22px;
-  ">
-  
-    {% comment %} Card style helper {% endcomment %}
-    {% for label,value,color in "" %}
-    {% endfor %}
-  
-    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
-                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Total Sales</div>
-      <div style="font-size:20px;font-weight:700;color:#065f46;">
-        {{ total_sales|floatformat:2 }}
-      </div>
+  <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(5, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+    <div class="kpi sales">
+      <div class="label">Total Sales</div>
+      <div class="value">{{ total_sales|floatformat:2 }}</div>
     </div>
-  
-    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
-                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Total Purchases</div>
-      <div style="font-size:20px;font-weight:700;color:#7c2d12;">
-        {{ total_purchases|floatformat:2 }}
-      </div>
+
+    <div class="kpi purchase">
+      <div class="label">Total Purchases</div>
+      <div class="value">{{ total_purchases|floatformat:2 }}</div>
     </div>
-  
-    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
-                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Money In</div>
-      <div style="font-size:20px;font-weight:700;color:#1d4ed8;">
-        {{ total_payments_in|floatformat:2 }}
-      </div>
+
+    <div class="kpi in">
+      <div class="label">Money In</div>
+      <div class="value">{{ total_payments_in|floatformat:2 }}</div>
     </div>
-  
-    <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:14px;
-                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-      <div style="font-size:13px;color:#6b7280;margin-bottom:6px;">Money Out</div>
-      <div style="font-size:20px;font-weight:700;color:#b91c1c;">
-        {{ total_payments_out|floatformat:2 }}
-      </div>
+
+    <div class="kpi out">
+      <div class="label">Money Out</div>
+      <div class="value">{{ total_payments_out|floatformat:2 }}</div>
     </div>
-  
-    <div style="background:#111827;border-radius:14px;
-                padding:12px 14px;box-shadow:0 6px 18px rgba(15,23,42,0.18);">
-      <div style="font-size:13px;color:#9ca3af;margin-bottom:6px;">Net Movement</div>
-      <div style="font-size:20px;font-weight:800;color:#ffffff;">
-        {{ net_cash_flow|floatformat:2 }}
-      </div>
+
+    <div class="kpi net">
+      <div class="label">Net Movement</div>
+      <div class="value">{{ net_cash_flow|floatformat:2 }}</div>
     </div>
-  
   </div>
 
-
-  {# ---------- Sales Invoices Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-      <div style="font-size:18px;font-weight:600;">Sales Invoices (Posted)</div>
+  <div class="ds-card">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Sales Invoices (Posted)</div>
       <div class="pill">Count: {{ sales_qs|length }}</div>
     </div>
 
@@ -235,7 +356,7 @@
         </thead>
         <tbody>
           {% for inv in sales_qs %}
-            <tr>
+            <tr class="searchable-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="nowrap">{{ inv.invoice_number|default:"—" }}</td>
               <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
@@ -243,8 +364,7 @@
 
               <td class="center nowrap">{{ inv.items.count }}</td>
 
-              <td class="truncate"
-                  title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
+              <td class="truncate" title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
                 {% with first_item=inv.items.first %}
                   {% if first_item %}
                     {{ first_item.product.name }}
@@ -257,7 +377,7 @@
                 {% endwith %}
               </td>
 
-              <td class="right nowrap">{{ inv.calculate_total|floatformat:2 }}</td>
+              <td class="right nowrap"><span class="money-in">{{ inv.calculate_total|floatformat:2 }}</span></td>
             </tr>
           {% empty %}
             <tr>
@@ -281,12 +401,9 @@
     </div>
   </div>
 
-  {# ---------- Purchase Invoices Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-      <div style="font-size:18px;font-weight:600;">Purchase Invoices (Posted)</div>
+  <div class="ds-card">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Purchase Invoices (Posted)</div>
       <div class="pill">Count: {{ purchase_qs|length }}</div>
     </div>
 
@@ -314,7 +431,7 @@
         </thead>
         <tbody>
           {% for inv in purchase_qs %}
-            <tr>
+            <tr class="searchable-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="nowrap">{{ inv.invoice_number|default:"—" }}</td>
               <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
@@ -322,8 +439,7 @@
 
               <td class="center nowrap">{{ inv.items.count }}</td>
 
-              <td class="truncate"
-                  title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
+              <td class="truncate" title="{% with first_item=inv.items.first %}{% if first_item %}{{ first_item.product.name }}{% endif %}{% endwith %}">
                 {% with first_item=inv.items.first %}
                   {% if first_item %}
                     {{ first_item.product.name }}
@@ -336,7 +452,7 @@
                 {% endwith %}
               </td>
 
-              <td class="right nowrap">{{ inv.calculate_total|floatformat:2 }}</td>
+              <td class="right nowrap"><span class="money-out">{{ inv.calculate_total|floatformat:2 }}</span></td>
             </tr>
           {% empty %}
             <tr>
@@ -360,12 +476,9 @@
     </div>
   </div>
 
-  {# ---------- Payments In Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-      <div style="font-size:18px;font-weight:600;">Payments (Money In)</div>
+  <div class="ds-card">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Payments (Money In)</div>
       <div class="pill">Count: {{ payments_in_qs|length }}</div>
     </div>
 
@@ -389,12 +502,12 @@
         </thead>
         <tbody>
           {% for p in payments_in_qs %}
-            <tr>
+            <tr class="searchable-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="truncate" title="{{ p.party }}">{{ p.party }}</td>
               <td class="truncate" title="{{ p.account }}">{{ p.account }}</td>
               <td class="truncate" title="{{ p.description }}">{{ p.description }}</td>
-              <td class="right nowrap">{{ p.amount|floatformat:2 }}</td>
+              <td class="right nowrap"><span class="money-in">{{ p.amount|floatformat:2 }}</span></td>
             </tr>
           {% empty %}
             <tr>
@@ -435,11 +548,9 @@
     </div>
   </div>
 
-  {# ---------- Payments Out Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-      <div style="font-size:18px;font-weight:600;">Payments (Money Out)</div>
+  <div class="ds-card" style="margin-bottom:10px;">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Payments (Money Out)</div>
       <div class="pill">Count: {{ payments_out_qs|length }}</div>
     </div>
 
@@ -463,12 +574,12 @@
         </thead>
         <tbody>
           {% for p in payments_out_qs %}
-            <tr>
+            <tr class="searchable-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="truncate" title="{{ p.party }}">{{ p.party }}</td>
               <td class="truncate" title="{{ p.account }}">{{ p.account }}</td>
               <td class="truncate" title="{{ p.description }}">{{ p.description }}</td>
-              <td class="right nowrap">{{ p.amount|floatformat:2 }}</td>
+              <td class="right nowrap"><span class="money-out">{{ p.amount|floatformat:2 }}</span></td>
             </tr>
           {% empty %}
             <tr>
@@ -508,6 +619,7 @@
       {% endif %}
     </div>
   </div>
+
   <div class="net-strip">
     <div>
       <div style="font-size:14px;font-weight:600;">Net Cash Flow (Today)</div>
@@ -516,4 +628,19 @@
     <strong>{{ net_cash_flow|floatformat:2 }}</strong>
   </div>
 </div>
+
+<script>
+  (function () {
+    const input = document.getElementById("daySearch");
+    if (!input) return;
+    const rows = Array.from(document.querySelectorAll(".searchable-row"));
+    input.addEventListener("input", function () {
+      const q = (input.value || "").trim().toLowerCase();
+      rows.forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = !q || text.includes(q) ? "" : "none";
+      });
+    });
+  })();
+</script>
 {% endblock %}
