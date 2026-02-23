@@ -3,161 +3,325 @@
 {% block title %}Supplier Balances{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page supplier-balances-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+  <style>
+    .supplier-balances-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --dr:#b91c1c;
+      --dr-soft:#fee2e2;
+      --cr:#047857;
+      --cr-soft:#d1fae5;
+    }
 
-  {# ---------- Top Bar (Title + Button) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    .sb-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .sb-title{
+      margin:0 0 4px;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .sb-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:740px;
+    }
+    .sb-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .sb-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .sb-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:20px;
+    }
+    .sb-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .sb-card-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--slate-900);
+    }
+    .sb-card-sub{
+      font-size:13px;
+      color:var(--slate-500);
+      max-width:560px;
+    }
+
+    .sb-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .sb-filter label{
+      display:block;
+      font-size:14px;
+      color:#4b5563;
+      margin-bottom:4px;
+    }
+    .sb-filter input,
+    .sb-filter select{
+      width:100%;
+      padding:9px 10px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .sb-filter input:focus,
+    .sb-filter select:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+
+    .sb-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+      min-width:130px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      background:#ffffff;
+      color:#111827;
+      white-space:nowrap;
+      font-weight:700;
+    }
+
+    .tbl-wrap{ width:100%; overflow-x:auto; }
+    .tbl{
+      border-collapse:collapse;
+      width:100%;
+      min-width:860px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      text-align:left;
+      font-weight:600;
+      background:#f9fafb;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
+
+    .right{text-align:right}
+    .center{text-align:center}
+
+    .bal-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:56px;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid var(--slate-200);
+      background:#fff;
+      color:var(--slate-700);
+    }
+    .bal-pill.dr{ border-color:#fca5a5; color:var(--dr); background:var(--dr-soft); }
+    .bal-pill.cr{ border-color:#86efac; color:var(--cr); background:var(--cr-soft); }
+
+    @media (max-width: 640px) {
+      .supplier-balances-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
+      .sb-title { font-size: 26px !important; }
+      .sb-sub { font-size: 14px !important; }
+      .sb-btn { width:100%; min-width:unset; }
+      .sb-filter .col, .sb-filter .col-sm { min-width:100% !important; }
+    }
+  </style>
+
+  <div class="sb-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:28px;font-weight:800;line-height:1.15;">
-        🏭 Supplier Balances
-      </h1>
-      <p style="margin:0 0 20px;font-size:14px;color:#475569;">
-        View supplier-wise opening balance, purchases, payments, and net payable/advance as of a specific date.
-      </p>
+      <h1 class="sb-title">Supplier Balances</h1>
+      <p class="sb-sub">View supplier-wise opening balance, purchases, payments, and net payable/advance as of a specific date.</p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
-      </a>
+      <a href="{% url 'dashboard' %}" class="sb-btn">← Dashboard</a>
     </div>
   </div>
 
-  {# ---------- Filter Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
-      Filter by date
-    </div>
-    <p style="font-size:14px;color:#475569;margin-bottom:12px;">
-      Select an <strong>“as of”</strong> date to recalculate balances for all suppliers.
-    </p>
+  <div class="sb-card">
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Filter by date</div>
+    <p style="font-size:14px;color:#475569;margin-bottom:12px;">Select an <strong>as of</strong> date to recalculate balances for all suppliers.</p>
 
-    <form method="get"
-          class="filter-form"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">
-          As of date
-        </label>
-        <input type="date"
-               id="date"
-               name="date"
-               value="{{ as_of|date:'Y-m-d' }}"
-               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+    <form method="get" class="sb-filter">
+      <div class="col" style="min-width:220px;">
+        <label for="date">As of date</label>
+        <input type="date" id="date" name="date" value="{{ as_of|date:'Y-m-d' }}">
+      </div>
+
+      <div class="col-sm" style="min-width:260px;">
+        <label for="quickSearch">Quick search</label>
+        <input type="text" id="quickSearch" placeholder="Search supplier name...">
+      </div>
+
+      <div class="col-sm" style="min-width:180px;">
+        <label for="typeFilter">Filter balance type</label>
+        <select id="typeFilter">
+          <option value="ALL">All</option>
+          <option value="DR">DR only</option>
+          <option value="CR">CR only</option>
+        </select>
       </div>
 
       <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:140px;">
-          Apply
-        </button>
+        <button type="submit" class="sb-apply">Apply</button>
       </div>
     </form>
   </div>
 
-  {# ---------- Supplier Balances Table Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-      <div style="font-size:18px;font-weight:600;">
-        Supplier-wise balances as of {{ as_of|date:"d M Y" }}
-      </div>
-      <div style="font-size:13px;color:#6b7280;">
-        Positive balance with <strong>Dr</strong> means advance paid to supplier; with <strong>Cr</strong> means amount payable.
-      </div>
+  <div class="sb-card">
+    <div class="sb-card-head">
+      <div class="sb-card-title">Supplier-wise balances as of {{ as_of|date:"d M Y" }}</div>
+      <div class="sb-card-sub">Positive balance with <strong>Dr</strong> means advance paid to supplier; with <strong>Cr</strong> means amount payable.</div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:860px;">
+    <div class="tbl-wrap">
+      <table class="tbl">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:5%;">
-              #
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">
-              Supplier
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
-              Opening (Dr/Cr)
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
-              Purchases
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
-              Payments
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;width:15%;">
-              Balance
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:center;font-weight:600;width:8%;">
-              Dr/Cr
-            </th>
+            <th style="width:5%;">#</th>
+            <th>Supplier</th>
+            <th class="right" style="width:15%;">Opening (Dr/Cr)</th>
+            <th class="right" style="width:15%;">Purchases</th>
+            <th class="right" style="width:15%;">Payments</th>
+            <th class="right" style="width:15%;">Balance</th>
+            <th class="center" style="width:8%;">Dr/Cr</th>
           </tr>
         </thead>
         <tbody>
           {% for row in rows %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                {{ forloop.counter }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                {{ row.party.name }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.opening|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.purchases|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.payments|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.net_abs|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
-                {{ row.net_type }}
+            <tr class="balance-row" data-type="{{ row.net_type }}">
+              <td>{{ forloop.counter }}</td>
+              <td class="supplier-name">{{ row.party.name }}</td>
+              <td class="right">{{ row.opening|floatformat:2 }}</td>
+              <td class="right">{{ row.purchases|floatformat:2 }}</td>
+              <td class="right">{{ row.payments|floatformat:2 }}</td>
+              <td class="right">{{ row.net_abs|floatformat:2 }}</td>
+              <td class="center">
+                <span class="bal-pill {% if row.net_type == 'DR' %}dr{% else %}cr{% endif %}">{{ row.net_type }}</span>
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7"
-                  style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:14px;color:#6b7280;">
-                No suppliers found.
-              </td>
+              <td colspan="7" style="padding:10px 9px;font-size:14px;color:#6b7280;">No suppliers found.</td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="2"
-                style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-              Grand Totals:
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-              {{ grand_opening|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-              {{ grand_purchases|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-              {{ grand_payments|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-              {{ grand_balance_abs|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
-              {{ grand_balance_type }}
-            </th>
+            <th colspan="2" class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">Grand Totals:</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_opening|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_purchases|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_payments|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_abs|floatformat:2 }}</th>
+            <th class="center" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_type }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
-
 </div>
+
+<script>
+  (function () {
+    const searchInput = document.getElementById("quickSearch");
+    const typeFilter = document.getElementById("typeFilter");
+    const rows = Array.from(document.querySelectorAll(".balance-row"));
+
+    function applyFilters() {
+      const q = ((searchInput && searchInput.value) || "").trim().toLowerCase();
+      const t = (typeFilter && typeFilter.value) || "ALL";
+
+      rows.forEach((row) => {
+        const name = (row.querySelector(".supplier-name")?.textContent || "").toLowerCase();
+        const rowType = (row.getAttribute("data-type") || "").toUpperCase();
+        const textMatch = !q || name.includes(q);
+        const typeMatch = (t === "ALL") || (rowType === t);
+        row.style.display = (textMatch && typeMatch) ? "" : "none";
+      });
+    }
+
+    if (searchInput) searchInput.addEventListener("input", applyFilters);
+    if (typeFilter) typeFilter.addEventListener("change", applyFilters);
+  })();
+</script>
 {% endblock %}
