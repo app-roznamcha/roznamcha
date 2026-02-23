@@ -4,71 +4,287 @@
 {% block content %}
 <div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
   <style>
+    .page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --brand-soft:#dbeafe;
+      --ok:#047857;
+      --ok-soft:#d1fae5;
+      --warn:#9a3412;
+      --warn-soft:#ffedd5;
+    }
+
     @media (max-width:640px){
       .ledger-title{font-size:24px !important;}
       .ledger-sub{font-size:14px !important;}
-      .ledger-btn{
-        padding:9px 14px !important;
-        font-size:14px !important;
-        min-width:auto !important;
-      }
-      .ledger-filter select,
-      .ledger-filter input{
+      .ledger-filter select,.ledger-filter input{
         min-width:100% !important;
       }
       .page{
         padding:0 16px !important;
       }
+      .ledger-actions .ledger-btn{
+        width:100%;
+        min-width:unset;
+      }
+      .search-input{
+        width:100% !important;
+      }
+    }
+
+    .ledger-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .ledger-title{
+      margin:0 0 6px;
+      font-size:31px;
+      font-weight:850;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .ledger-sub{
+      margin:0 0 12px;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:720px;
+    }
+    .ledger-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .meta-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      background:#fff;
+      color:var(--slate-900);
+      white-space:nowrap;
+    }
+    .ledger-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .ledger-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:160px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      white-space:nowrap;
+      border:1px solid var(--slate-300);
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .ledger-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.10);
+    }
+    .ledger-btn.primary{
+      border-color:var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+    }
+
+    .ledger-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:16px 18px 18px;
+      margin-bottom:20px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+    }
+    .ledger-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .ledger-filter label{
+      font-size:14px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .ledger-filter select,.ledger-filter input{
+      min-width:160px;
+      padding:8px 10px;
+      border-radius:9px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .ledger-filter button{
+      height:39px;
+      padding:0 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+    }
+
+    .ledger-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .ledger-head h3{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--slate-900);
+    }
+    .ledger-search-wrap{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-left:auto;
+    }
+    .search-input{
+      width:300px;
+      max-width:100%;
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      color:var(--slate-900);
+      background:#fff;
+    }
+    .search-input:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+
+    .ledger-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:900px;
+      font-size:14px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .ledger-table th,.ledger-table td{
+      border-bottom:1px solid #eef2f7;
+      padding:9px 10px;
+      vertical-align:middle;
+    }
+    .ledger-table th{
+      text-align:left;
+      background:#f8fafc;
+      font-weight:700;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .ledger-table .right{ text-align:right; }
+    .ledger-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .ledger-table tbody tr:hover{ background:#f8fbff; }
+    .src-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--slate-200);
+      background:#fff;
+      font-size:12px;
+      font-weight:700;
+      color:var(--slate-700);
+      white-space:nowrap;
+    }
+    .qty-in{
+      font-weight:800;
+      color:var(--ok);
+      background:var(--ok-soft);
+      border-radius:8px;
+      padding:2px 6px;
+    }
+    .qty-out{
+      font-weight:800;
+      color:var(--warn);
+      background:var(--warn-soft);
+      border-radius:8px;
+      padding:2px 6px;
     }
   </style>
 
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="ledger-hero">
     <div>
-      <h1 class="ledger-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">Product Ledger</h1>
-      <p class="ledger-sub" style="margin:0 0 12px;font-size:15px;color:#475569;">
+      <h1 class="ledger-title">Product Ledger</h1>
+      <p class="ledger-sub">
         View detailed stock movements and running balance for any product.
       </p>
       {% if selected_product %}
-        <p style="margin:0 0 4px;font-size:14px;color:#4b5563;">
-          <strong>Product:</strong> {{ selected_product.code }} – {{ selected_product.name }}
-        </p>
-        <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">
-          <strong>Opening Qty:</strong> {{ opening_qty }} &nbsp;&nbsp;
-          <strong>Closing Qty:</strong> {{ closing_qty }}
-        </p>
+      <div class="ledger-meta">
+        <div class="meta-pill"><span style="color:#6b7280;">Product:</span> <strong>{{ selected_product.code }} – {{ selected_product.name }}</strong></div>
+        <div class="meta-pill"><span style="color:#6b7280;">Opening Qty:</span> <strong>{{ opening_qty }}</strong></div>
+        <div class="meta-pill"><span style="color:#6b7280;">Closing Qty:</span> <strong>{{ closing_qty }}</strong></div>
         {% if date_from or date_to %}
-          <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">
-            Period:
-            {% if date_from %}From {{ date_from|date:"d M Y" }}{% endif %}
-            {% if date_from and date_to %} to {% endif %}
-            {% if date_to %}{{ date_to|date:"d M Y" }}{% endif %}
-          </p>
+        <div class="meta-pill">
+          <span style="color:#6b7280;">Period:</span>
+          <strong>{% if date_from %}{{ date_from|date:"d M Y" }}{% endif %}{% if date_from and date_to %} to {% endif %}{% if date_to %}{{ date_to|date:"d M Y" }}{% endif %}</strong>
+        </div>
         {% endif %}
+      </div>
       {% endif %}
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+    <div class="ledger-actions">
       <a href="{% url 'dashboard' %}"
-         class="ledger-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;white-space:nowrap;">
+         class="ledger-btn">
         ← Dashboard
       </a>
     
       <a href="{% url 'product_list' %}"
-         class="ledger-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;white-space:nowrap;">
+         class="ledger-btn primary">
         📦 Product List
       </a>
     </div>
   </div>
 
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:14px 16px 16px;margin-bottom:20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+  <div class="ledger-card">
     <form method="get"
-          class="ledger-filter"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+          class="ledger-filter">
+      <label>
         <span style="color:#4b5563;">Product</span>
         <select name="product"
-                style="min-width:260px;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;">
+                style="min-width:280px;">
           <option value="">-- Select Product --</option>
           {% for p in products %}
             <option value="{{ p.id }}"
@@ -79,73 +295,84 @@
         </select>
       </label>
 
-      <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+      <label>
         <span style="color:#4b5563;">From</span>
         <input type="date" name="from"
-               value="{{ date_from|date:'Y-m-d' }}"
-               style="padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;min-width:150px;">
+               value="{{ date_from|date:'Y-m-d' }}">
       </label>
 
-      <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
+      <label>
         <span style="color:#4b5563;">To</span>
         <input type="date" name="to"
-               value="{{ date_to|date:'Y-m-d' }}"
-               style="padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px;min-width:150px;">
+               value="{{ date_to|date:'Y-m-d' }}">
       </label>
 
-      <button type="submit"
-              style="height:38px;padding:0 18px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;">
+      <button type="submit">
         Show Ledger
       </button>
     </form>
   </div>
 
   {% if selected_product %}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+    <div class="ledger-card" style="padding:14px 14px 16px;">
+      <div class="ledger-head">
+        <h3>Movement Ledger</h3>
+        <div class="ledger-search-wrap">
+          <input type="text" id="ledgerSearch" class="search-input" placeholder="Quick search: source, ref, counterparty">
+        </div>
+      </div>
       <div style="width:100%;overflow-x:auto;">
-        <table style="border-collapse:collapse;width:100%;min-width:900px;font-size:14px;">
+        <table class="ledger-table">
           <thead>
             <tr>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Date</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Source</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Ref</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:left;background:#f9fafb;font-weight:600;">Counterparty</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">In Qty</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Out Qty</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Unit Price</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Value</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 9px;text-align:right;background:#f9fafb;font-weight:600;">Balance Qty</th>
+              <th>Date</th>
+              <th>Source</th>
+              <th>Ref</th>
+              <th>Counterparty</th>
+              <th class="right">In Qty</th>
+              <th class="right">Out Qty</th>
+              <th class="right">Unit Price</th>
+              <th class="right">Value</th>
+              <th class="right">Balance Qty</th>
             </tr>
           </thead>
           <tbody>
             {% if rows %}
               {% for r in rows %}
-                <tr>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                <tr class="ledger-row">
+                  <td>
                     {{ r.date|date:"Y-m-d" }}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
-                    {{ r.source }}
+                  <td>
+                    <span class="src-badge">{{ r.source }}</span>
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                  <td>
                     {{ r.ref }}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;">
+                  <td>
                     {{ r.counterparty }}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
-                    {{ r.in_qty }}
+                  <td class="right">
+                    {% if r.in_qty and r.in_qty != "0" and r.in_qty != "0.000" %}
+                      <span class="qty-in">{{ r.in_qty }}</span>
+                    {% else %}
+                      {{ r.in_qty }}
+                    {% endif %}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
-                    {{ r.out_qty }}
+                  <td class="right">
+                    {% if r.out_qty and r.out_qty != "0" and r.out_qty != "0.000" %}
+                      <span class="qty-out">{{ r.out_qty }}</span>
+                    {% else %}
+                      {{ r.out_qty }}
+                    {% endif %}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                  <td class="right">
                     {{ r.unit_price }}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                  <td class="right">
                     {{ r.value }}
                   </td>
-                  <td style="border-bottom:1px solid #f3f4f6;padding:7px 9px;text-align:right;">
+                  <td class="right" style="font-weight:800;color:#0f172a;">
                     {{ r.balance_qty }}
                   </td>
                 </tr>
@@ -164,4 +391,20 @@
   {% endif %}
 
 </div>
+{% if selected_product %}
+<script>
+  (function () {
+    const input = document.getElementById("ledgerSearch");
+    if (!input) return;
+    const rows = Array.from(document.querySelectorAll(".ledger-row"));
+    input.addEventListener("input", function () {
+      const q = (input.value || "").trim().toLowerCase();
+      rows.forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = !q || text.includes(q) ? "" : "none";
+      });
+    });
+  })();
+</script>
+{% endif %}
 {% endblock %}
