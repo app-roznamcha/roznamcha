@@ -6,6 +6,22 @@
 <div class="page stock-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
 
   <style>
+    .stock-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-soft:#dbeafe;
+      --ok:#047857;
+      --ok-soft:#d1fae5;
+      --warn:#b45309;
+      --warn-soft:#ffedd5;
+    }
+
     /* Mobile-friendly page padding */
     @media (max-width: 640px){
       .stock-page{ padding:0 14px !important; margin:24px auto 40px !important; }
@@ -19,18 +35,27 @@
       border-collapse:collapse;
       table-layout:fixed;
       min-width:980px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
     }
     .tbl th, .tbl td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
+      border-bottom:1px solid var(--slate-200);
+      padding:10px 12px;
       font-size:14px;
       vertical-align:middle;
     }
     .tbl th{
-      background:#f9fafb;
+      background:#f8fafc;
       font-weight:700;
       text-align:left;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
     }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
     .right{ text-align:right; }
     .nowrap{ white-space:nowrap; }
     .truncate{
@@ -70,56 +95,188 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:4px 10px;
+      padding:5px 10px;
       border-radius:999px;
       font-size:12px;
-      border:1px solid #e5e7eb;
+      border:1px solid var(--slate-200);
       background:#fff;
-      color:#111827;
+      color:var(--slate-900);
       white-space:nowrap;
+    }
+
+    .sr-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .sr-hero h1{
+      margin:0 0 6px;
+      font-size:30px;
+      font-weight:850;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .sr-hero p{
+      margin:0 0 14px;
+      font-size:14px;
+      line-height:1.6;
+      color:#475569;
+      max-width:680px;
+    }
+    .sr-meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .sr-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .btn-soft{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:148px;
+      border-radius:12px;
+      border:1px solid var(--slate-300);
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+    }
+    .btn-soft:hover{ box-shadow:0 8px 16px rgba(15,23,42,0.09); }
+    .btn-brand{
+      border-color:#1d4ed8;
+      background:linear-gradient(180deg,#2563eb,#1d4ed8);
+      color:#fff;
+    }
+
+    .sr-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 20px rgba(15,23,42,0.06);
+      margin-bottom:18px;
+    }
+    .sr-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .sr-card-title{
+      font-size:18px;
+      font-weight:800;
+      color:var(--slate-900);
+    }
+    .sr-card-sub{
+      font-size:13px;
+      color:var(--slate-500);
+    }
+    .stock-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:90px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      color:var(--slate-700);
+      background:#fff;
+    }
+    .stock-badge.pos{
+      border-color:#86efac;
+      color:var(--ok);
+      background:var(--ok-soft);
+    }
+    .stock-badge.zero{
+      border-color:#fdba74;
+      color:var(--warn);
+      background:var(--warn-soft);
+    }
+    .stock-search{
+      width:320px;
+      max-width:100%;
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      background:#fff;
+      font-size:14px;
+      color:var(--slate-900);
+    }
+    .stock-search:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+    .stock-filter{
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      background:#fff;
+      font-size:14px;
+      color:var(--slate-900);
     }
   </style>
 
   {# ---------- Top Bar (Title + Buttons) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="sr-hero">
     <div style="min-width:260px;">
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:800;">
+      <h1>
         📦 Stock Report
       </h1>
-      <p style="margin:0 0 18px;font-size:15px;color:#475569;line-height:1.5;">
+      <p>
         Current quantity in stock for each product, based on <strong>posted</strong> purchases and sales
         <strong>+ posted stock adjustments</strong>.
       </p>
-      <div class="pill">
+      <div class="sr-meta">
+        <div class="pill">
         <span style="color:#6b7280;">Products:</span>
         <strong>{{ rows|length }}</strong>
+        </div>
+        <div class="pill">
+          <span style="color:#6b7280;">Mode:</span>
+          <strong>Posted Entries</strong>
+        </div>
       </div>
     </div>
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="sr-actions">
       <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+         class="btn-soft">
         ← Dashboard
       </a>
       <a href="{% url 'product_list' %}"
-         class="btn btn-primary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+         class="btn-soft btn-brand">
         🧾 Products
       </a>
     </div>
   </div>
 
   {# ---------- Stock Chart Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:18px;" class="card-pad">
+  <div class="sr-card card-pad">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
-      <div style="font-size:18px;font-weight:800;">
+    <div class="sr-card-head">
+      <div class="sr-card-title">
         Current stock by product
       </div>
-      <div style="font-size:13px;color:#6b7280;">
+      <div class="sr-card-sub">
         Quantities in base units.
       </div>
     </div>
@@ -141,15 +298,22 @@
   </div>
 
   {# ---------- Stock Table Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);" class="card-pad">
+  <div class="sr-card card-pad">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-      <div style="font-size:18px;font-weight:800;">
+    <div class="sr-card-head">
+      <div class="sr-card-title">
         Product-wise stock position
       </div>
-      <div style="font-size:13px;color:#6b7280;">
+      <div class="sr-card-sub">
         Values shown in product’s base unit.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;">
+        <input type="text" id="stockSearch" class="stock-search" placeholder="Search by code or product name">
+        <select id="stockFilter" class="stock-filter" aria-label="Stock filter">
+          <option value="all">All stock</option>
+          <option value="positive">Positive stock only</option>
+          <option value="nonpositive">Zero/negative only</option>
+        </select>
       </div>
     </div>
 
@@ -180,7 +344,7 @@
 
         <tbody>
           {% for r in rows %}
-            <tr>
+            <tr class="stock-row" data-final-stock="{{ r.final_stock|floatformat:3 }}">
               <td class="nowrap">{{ r.product.code }}</td>
               <td class="truncate" title="{{ r.product.name }}">{{ r.product.name }}</td>
               <td class="nowrap">{{ r.product.get_unit_display }}</td>
@@ -191,8 +355,8 @@
               <td class="right nowrap">{{ r.base_stock|floatformat:3 }}</td>
               <td class="right nowrap">{{ r.net_adj|floatformat:3 }}</td>
 
-              <td class="right nowrap" style="font-weight:900;color:#111827;">
-                {{ r.final_stock|floatformat:3 }}
+              <td class="right nowrap">
+                <span class="stock-badge {% if r.final_stock > 0 %}pos{% else %}zero{% endif %}">{{ r.final_stock|floatformat:3 }}</span>
               </td>
             </tr>
           {% empty %}
@@ -231,6 +395,28 @@
 {# ---------- Stock Chart JS ---------- #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
+  (function () {
+    const input = document.getElementById("stockSearch");
+    const filter = document.getElementById("stockFilter");
+    if (!input || !filter) return;
+    const rows = Array.from(document.querySelectorAll(".stock-row"));
+    function applyFilters() {
+      const q = (input.value || "").trim().toLowerCase();
+      const mode = filter.value || "all";
+      rows.forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        const stockVal = Number(row.getAttribute("data-final-stock") || "0");
+        const matchesText = !q || text.includes(q);
+        let matchesStock = true;
+        if (mode === "positive") matchesStock = stockVal > 0;
+        if (mode === "nonpositive") matchesStock = stockVal <= 0;
+        row.style.display = (matchesText && matchesStock) ? "" : "none";
+      });
+    }
+    input.addEventListener("input", applyFilters);
+    filter.addEventListener("change", applyFilters);
+  })();
+
   (function () {
     const canvas = document.getElementById('stockChart');
     if (!canvas) return;
