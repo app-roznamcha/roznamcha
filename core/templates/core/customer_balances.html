@@ -3,70 +3,254 @@
 {% block title %}Customer Balances{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page customer-balances-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+  <style>
+    .customer-balances-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --dr:#b91c1c;
+      --dr-soft:#fee2e2;
+      --cr:#047857;
+      --cr-soft:#d1fae5;
+    }
 
-  {# ---------- Top Bar (Title + Back Button) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    .cb-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .cb-title{
+      margin:0 0 4px;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .cb-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:720px;
+    }
+    .cb-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      min-width:170px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .cb-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .cb-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:20px;
+    }
+    .cb-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .cb-card-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--slate-900);
+    }
+    .cb-card-sub{
+      font-size:13px;
+      color:var(--slate-500);
+    }
+
+    .cb-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .cb-filter label{
+      display:block;
+      font-size:14px;
+      color:#4b5563;
+      margin-bottom:4px;
+    }
+    .cb-filter input,
+    .cb-filter select{
+      width:100%;
+      padding:9px 10px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .cb-filter input:focus,
+    .cb-filter select:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+
+    .cb-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      background:#ffffff;
+      color:#111827;
+      white-space:nowrap;
+      font-weight:700;
+    }
+
+    .tbl-wrap{ width:100%; overflow-x:auto; }
+    .tbl{
+      border-collapse:collapse;
+      width:100%;
+      min-width:760px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      text-align:left;
+      font-weight:600;
+      background:#f9fafb;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
+    .right{text-align:right}
+    .center{text-align:center}
+
+    .bal-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:56px;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid var(--slate-200);
+      background:#fff;
+      color:var(--slate-700);
+    }
+    .bal-pill.dr{ border-color:#fca5a5; color:var(--dr); background:var(--dr-soft); }
+    .bal-pill.cr{ border-color:#86efac; color:var(--cr); background:var(--cr-soft); }
+
+    @media (max-width: 640px) {
+      .customer-balances-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
+      .cb-title { font-size: 26px !important; }
+      .cb-sub { font-size: 14px !important; }
+      .cb-btn { width:100%; min-width:unset; }
+      .cb-filter .col, .cb-filter .col-sm { min-width:100% !important; }
+    }
+  </style>
+
+  <div class="cb-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Customer Balances</h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
-        See opening balances, total sales, receipts, and net position (Dr/Cr) for each customer.
-      </p>
+      <h1 class="cb-title">Customer Balances</h1>
+      <p class="cb-sub">See opening balances, total sales, receipts, and net position (Dr/Cr) for each customer.</p>
     </div>
     <div>
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
-        ← Back to Dashboard
-      </a>
+      <a href="{% url 'dashboard' %}" class="cb-btn">← Back to Dashboard</a>
     </div>
   </div>
 
-  {# ---------- Filter Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
-      As-of date
-    </div>
+  <div class="cb-card">
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">As-of date</div>
     <p style="font-size:15px;color:#475569;margin-bottom:12px;">
       Choose a cut-off date to calculate balances up to that day, then click <strong>Apply</strong>.
     </p>
 
-    <form method="get"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">
-          As of date
-        </label>
-        <input type="date"
-               id="date"
-               name="date"
-               value="{{ as_of|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+    <form method="get" class="cb-filter">
+      <div class="col" style="min-width:220px;">
+        <label for="date">As of date</label>
+        <input type="date" id="date" name="date" value="{{ as_of|date:'Y-m-d' }}">
+      </div>
+
+      <div class="col-sm" style="min-width:260px;">
+        <label for="quickSearch">Quick search</label>
+        <input type="text" id="quickSearch" placeholder="Search customer name...">
+      </div>
+
+      <div class="col-sm" style="min-width:180px;">
+        <label for="typeFilter">Filter balance type</label>
+        <select id="typeFilter">
+          <option value="ALL">All</option>
+          <option value="DR">DR only</option>
+          <option value="CR">CR only</option>
+        </select>
       </div>
 
       <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
-        </button>
+        <button type="submit" class="cb-apply">Apply</button>
       </div>
     </form>
   </div>
 
-  {# ---------- Customer Balances Chart Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
-      <div style="font-size:18px;font-weight:600;">
-        Top customer balances
-      </div>
-      <div style="font-size:13px;color:#6b7280;">
-        Visual view of net receivable / payable (absolute amount).
-      </div>
+  <div class="cb-card">
+    <div class="cb-card-head">
+      <div class="cb-card-title">Top customer balances</div>
+      <div class="cb-card-sub">Visual view of net receivable / payable (absolute amount).</div>
     </div>
 
     <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">
@@ -80,49 +264,36 @@
     </div>
   </div>
 
-  {# ---------- Customer Balances Table Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Customer balances summary
+  <div class="cb-card">
+    <div class="cb-card-head">
+      <div class="cb-card-title">Customer balances summary</div>
+      <div class="pill">Rows: {{ rows|length }}</div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:760px;">
+    <div class="tbl-wrap">
+      <table class="tbl">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Customer</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Opening (Dr/Cr)</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Sales</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Receipts</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Balance</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Dr/Cr</th>
+            <th>#</th>
+            <th>Customer</th>
+            <th class="right">Opening (Dr/Cr)</th>
+            <th class="right">Sales</th>
+            <th class="right">Receipts</th>
+            <th class="right">Balance</th>
+            <th class="center">Dr/Cr</th>
           </tr>
         </thead>
         <tbody>
           {% for row in rows %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                {{ forloop.counter }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;">
-                {{ row.party.name }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.opening|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.sales|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.receipts|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;">
-                {{ row.net_abs|floatformat:2 }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
-                {{ row.net_type }}
+            <tr class="balance-row" data-type="{{ row.net_type }}">
+              <td>{{ forloop.counter }}</td>
+              <td class="customer-name">{{ row.party.name }}</td>
+              <td class="right">{{ row.opening|floatformat:2 }}</td>
+              <td class="right">{{ row.sales|floatformat:2 }}</td>
+              <td class="right">{{ row.receipts|floatformat:2 }}</td>
+              <td class="right">{{ row.net_abs|floatformat:2 }}</td>
+              <td class="center">
+                <span class="bal-pill {% if row.net_type == 'DR' %}dr{% else %}cr{% endif %}">{{ row.net_type }}</span>
               </td>
             </tr>
           {% empty %}
@@ -135,24 +306,12 @@
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="2" style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              Grand Totals:
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              {{ grand_opening|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              {{ grand_sales|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              {{ grand_receipts|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              {{ grand_balance_abs|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
-              {{ grand_balance_type }}
-            </th>
+            <th colspan="2" style="border-top:2px solid #e5e7eb;padding:7px 9px;text-align:right;">Grand Totals:</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_opening|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_sales|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_receipts|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_abs|floatformat:2 }}</th>
+            <th class="center" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_type }}</th>
           </tr>
         </tfoot>
       </table>
@@ -161,7 +320,6 @@
 
 </div>
 
-{# ---------- Data for Chart (kept same logic, just moved out of JS to avoid VSCode errors) ---------- #}
 <script id="customerBalanceData" type="application/json">
 {
   "labels": [
@@ -177,10 +335,28 @@
 }
 </script>
 
-{# ---------- Customer Balances Chart JS ---------- #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
   (function () {
+    const searchInput = document.getElementById("quickSearch");
+    const typeFilter = document.getElementById("typeFilter");
+    const rows = Array.from(document.querySelectorAll(".balance-row"));
+
+    function applyTableFilters() {
+      const q = ((searchInput && searchInput.value) || "").trim().toLowerCase();
+      const t = (typeFilter && typeFilter.value) || "ALL";
+      rows.forEach((row) => {
+        const name = (row.querySelector(".customer-name")?.textContent || "").toLowerCase();
+        const rowType = (row.getAttribute("data-type") || "").toUpperCase();
+        const textMatch = !q || name.includes(q);
+        const typeMatch = (t === "ALL") || (rowType === t);
+        row.style.display = (textMatch && typeMatch) ? "" : "none";
+      });
+    }
+
+    if (searchInput) searchInput.addEventListener("input", applyTableFilters);
+    if (typeFilter) typeFilter.addEventListener("change", applyTableFilters);
+
     const dataEl = document.getElementById('customerBalanceData');
     if (!dataEl) return;
 
@@ -201,8 +377,7 @@
     const canvas = document.getElementById('customerBalanceChart');
     if (!canvas || labels.length === 0 || typeof Chart === "undefined") return;
 
-    // Make the chart taller if there are many customers (same behavior)
-    const rowHeight = 20;  // px per bar
+    const rowHeight = 20;
     const baseHeight = 180;
     canvas.height = Math.max(baseHeight, labels.length * rowHeight);
 
@@ -215,11 +390,13 @@
         datasets: [{
           label: 'Net Balance (absolute)',
           data: balances,
-          borderWidth: 1
+          borderWidth: 1,
+          backgroundColor: '#60a5fa',
+          borderColor: '#2563eb'
         }]
       },
       options: {
-        indexAxis: 'y',  // horizontal bars
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
         scales: {
