@@ -2,6 +2,8 @@
 from functools import wraps
 from datetime import timedelta
 
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
@@ -208,7 +210,11 @@ def subscription_required(view_func):
 
         if not user or not user.is_authenticated:
             # ✅ Always redirect anonymous users to login with next=
-            return redirect_to_login(request.get_full_path())
+            messages.warning(request, "Session expired. Please sign in again.")
+            return redirect_to_login(
+                request.get_full_path(),
+                login_url=f"{settings.LOGIN_URL}?reason=session_expired",
+            )
 
         # Superadmin bypass
         if getattr(user, "is_superuser", False):

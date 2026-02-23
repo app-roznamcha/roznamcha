@@ -18,6 +18,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.management import call_command
 from django.db import models, transaction
@@ -4722,6 +4723,26 @@ def adjustments_page(request):
     return render(request, "core/adjustments.html", context)
 
 def subscription_forbidden(request, exception=None):
+    # Unauthenticated/session-expired users should always go to login.
+    message_text = str(exception) if exception else ""
+    if not getattr(request, "user", None) or not request.user.is_authenticated:
+        messages.warning(request, "Session expired. Please sign in again.")
+        return redirect_to_login(
+            request.get_full_path(),
+            login_url=f"{settings.LOGIN_URL}?reason=session_expired",
+        )
+
+    lower_message = message_text.lower()
+    if (
+        "not authenticated" in lower_message
+        or "authentication required" in lower_message
+    ):
+        messages.warning(request, "Session expired. Please sign in again.")
+        return redirect_to_login(
+            request.get_full_path(),
+            login_url=f"{settings.LOGIN_URL}?reason=session_expired",
+        )
+
     owner = getattr(request, "owner", None)
 
     profile = getattr(owner, "profile", None) if owner else None
