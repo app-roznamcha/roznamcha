@@ -3,29 +3,334 @@
 {% block title %}Daily Expenses{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page expenses-page">
 
   <style>
+    .expenses-page{
+      max-width:1200px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --line:#e2e8f0;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+    }
+
+    .exp-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 20px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 10px 24px rgba(15,23,42,.07);
+    }
+
+    .exp-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .exp-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:740px;
+    }
+
+    .exp-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
+    .exp-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cbd5e1;
+      background:#f8fafc;
+      color:#111827;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+
+    .exp-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .exp-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .exp-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid #d1d5db;
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      margin-bottom:18px;
+    }
+
+    .exp-card-title{
+      font-size:18px;
+      font-weight:800;
+      margin:0 0 6px;
+      color:#0f172a;
+    }
+
+    .exp-form-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
+      align-items:end;
+    }
+
+    .exp-field label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#334155;
+      font-weight:600;
+    }
+
+    .exp-field input,
+    .exp-field select{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .exp-field input:focus,
+    .exp-field select:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .exp-amount-tools{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .exp-chip{
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+
+    .exp-filter-form{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+
+    .exp-filter-form .field{
+      min-width:180px;
+      flex:1;
+    }
+
+    .exp-filter-form .field.small{
+      min-width:170px;
+      max-width:210px;
+      flex:0 0 auto;
+    }
+
+    .exp-mini-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .exp-stat-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .exp-stat-chip.total{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .exp-toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+
+    .exp-search{
+      min-width:260px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .exp-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .exp-search input{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+    }
+
+    .exp-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .exp-table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .exp-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:860px;
+    }
+
+    .exp-table th,
+    .exp-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:9px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .exp-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .exp-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .exp-table tbody tr:hover{ background:#f8fbff; }
+    .exp-table tbody tr.is-hidden{ display:none; }
+
+    .right{text-align:right;}
+    .center{text-align:center;}
+
+    .posted-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:58px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid;
+    }
+
+    .posted-yes{
+      color:#166534;
+      background:#ecfdf3;
+      border-color:#bbf7d0;
+    }
+
+    .posted-no{
+      color:#9a3412;
+      background:#fff7ed;
+      border-color:#fed7aa;
+    }
+
     .ur{display:block;font-size:12px;color:#64748b;margin-top:2px;direction:rtl;text-align:right;}
+
     @media (max-width:640px){
-      .page{padding:0 16px !important;}
+      .expenses-page{padding:0 14px !important;margin:22px auto 52px;}
+      .exp-header{padding:16px;}
+      .exp-title{font-size:25px;}
+      .exp-btn{width:100%;}
+      .exp-filter-form .field,
+      .exp-filter-form .field.small{min-width:100%;max-width:100%;}
+      .exp-search{min-width:100%;max-width:100%;}
     }
   </style>
 
   {# ---------- Top Bar ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="exp-header">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="expenses_title">
+      <h1 class="exp-title" data-i18n="expenses_title">
         Daily Expenses
       </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:#475569;" data-i18n="expenses_subtitle">
+      <p class="exp-sub" data-i18n="expenses_subtitle">
         Record daily spending like wages, food, guests, fuel, etc.
       </p>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+    <div class="exp-actions">
+      <a href="{% url 'dashboard' %}" class="exp-btn">
         <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
     </div>
@@ -40,29 +345,27 @@
   {% endif %}
 
   {# ---------- Create Expense Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
+  <div class="exp-card">
 
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="record_expense">
+    <h2 class="exp-card-title" data-i18n="record_expense">
       Record Expense
-    </div>
+    </h2>
 
-    <form method="post" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
+    <form method="post" class="exp-form-grid">
       {% csrf_token %}
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="date_label">Date</label>
+      <div class="exp-field">
+        <label data-i18n="date_label">Date</label>
         <input type="date" name="date" value="{{ today }}"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+               >
       </div>
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="paid_from_label">
+      <div class="exp-field">
+        <label data-i18n="paid_from_label">
           Paid From (Cash/Bank)
         </label>
         <select name="paid_from" required
-                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+                >
           <option value="" data-i18n="select_account_opt">-- Select Account --</option>
           {% for acc in cash_bank_accounts %}
             <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
@@ -70,12 +373,12 @@
         </select>
       </div>
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="expense_head_label">
+      <div class="exp-field">
+        <label data-i18n="expense_head_label">
           Expense Head
         </label>
         <select name="expense_head" required
-                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+                >
           <option value="" data-i18n="select_head_opt">-- Select Head --</option>
           {% for h in expense_heads %}
             <option value="{{ h.id }}">{{ h.code }} - {{ h.name }}</option>
@@ -83,48 +386,48 @@
         </select>
       </div>
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="amount_label">
+      <div class="exp-field">
+        <label data-i18n="amount_label">
           Amount (Rs)
         </label>
-        <input type="number" name="amount" step="0.01" min="0" required
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="number" id="expenseAmountInput" name="amount" step="0.01" min="0" required>
+        <div class="exp-amount-tools">
+          <button type="button" class="exp-chip" data-set-amount="500">+500</button>
+          <button type="button" class="exp-chip" data-set-amount="1000">+1000</button>
+          <button type="button" class="exp-chip" data-set-amount="5000">+5000</button>
+          <button type="button" class="exp-chip" data-set-amount="0">Clear</button>
+        </div>
       </div>
 
-      <div style="grid-column:1 / -1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="notes_label">
+      <div class="exp-field" style="grid-column:1 / -1;">
+        <label data-i18n="notes_label">
           Notes (optional)
         </label>
-        <input type="text" name="notes" maxlength="255"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="text" name="notes" maxlength="255">
       </div>
 
-      <div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+      <div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+        <button type="submit" class="exp-btn exp-btn-primary">
           <span data-i18n="save_posted_btn">💾 Save (Posted)</span>
         </button>
+        <span class="exp-stat-chip total"><span data-i18n="amount_preview">Amount Preview</span>: Rs <strong id="amountPreview">0.00</strong></span>
       </div>
     </form>
   </div>
 
   {# ---------- Filters Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
+  <div class="exp-card">
 
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="filters">
+    <h2 class="exp-card-title" data-i18n="filters">
       Filters
-    </div>
+    </h2>
 
-    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="period_label">
+    <form method="get" class="exp-filter-form">
+      <div class="field">
+        <label data-i18n="period_label">
           Period
         </label>
-        <select name="period"
-                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+        <select name="period">
           <option value="day" {% if period == "day" %}selected{% endif %} data-i18n="period_today">Today</option>
           <option value="week" {% if period == "week" %}selected{% endif %} data-i18n="period_week">Last 7 days</option>
           <option value="month" {% if period == "month" %}selected{% endif %} data-i18n="period_month">This month</option>
@@ -132,31 +435,26 @@
         </select>
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from_date">
+      <div class="field small">
+        <label data-i18n="from_date">
           From date
         </label>
-        <input type="date" name="from_date" value="{{ from_date }}"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="date" name="from_date" value="{{ from_date }}">
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to_date">
+      <div class="field small">
+        <label data-i18n="to_date">
           To date
         </label>
-        <input type="date" name="to_date" value="{{ to_date }}"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="date" name="to_date" value="{{ to_date }}">
       </div>
 
-      <div style="display:flex;gap:8px;align-items:flex-end;">
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+        <button type="submit" class="exp-btn exp-btn-primary">
           <span data-i18n="apply">Apply</span>
         </button>
         <a href="{% url 'expenses_page' %}"
-           class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+           class="exp-btn">
           <span data-i18n="reset">Reset</span>
         </a>
       </div>
@@ -164,44 +462,50 @@
   </div>
 
   {# ---------- Expenses List ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:18px;font-weight:600;" data-i18n="expenses_list">
+  <div class="exp-card">
+    <div class="exp-mini-stats">
+      <span class="exp-stat-chip">Server Rows: <span id="server-row-count">{{ expenses|length }}</span></span>
+      <span class="exp-stat-chip">Visible Rows: <span id="visible-row-count">{{ expenses|length }}</span></span>
+      <span class="exp-stat-chip total"><span data-i18n="total">Total</span>: <strong>{{ total_amount|floatformat:2 }}</strong></span>
+    </div>
+
+    <div class="exp-toolbar">
+      <h2 class="exp-card-title" data-i18n="expenses_list">
         Expenses List
-      </div>
-      <div style="font-size:14px;color:#6b7280;">
-        <span data-i18n="total">Total</span>: <strong>{{ total_amount|floatformat:2 }}</strong>
+      </h2>
+      <div class="exp-search">
+        <label data-i18n="quick_search">Quick Search (head / account / notes)</label>
+        <input type="text" id="quickSearchInput" placeholder="Type to filter visible rows...">
       </div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:860px;">
+    <div class="exp-table-wrap">
+      <table class="exp-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_hash">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_date">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_paid_from">Paid From</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_expense_head">Expense Head</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_amount">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_notes">Notes</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;" data-i18n="col_posted">Posted?</th>
+            <th data-i18n="col_hash">#</th>
+            <th data-i18n="col_date">Date</th>
+            <th data-i18n="col_paid_from">Paid From</th>
+            <th data-i18n="col_expense_head">Expense Head</th>
+            <th class="right" data-i18n="col_amount">Amount</th>
+            <th data-i18n="col_notes">Notes</th>
+            <th class="center" data-i18n="col_posted">Posted?</th>
           </tr>
         </thead>
         <tbody>
           {% for e in expenses %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ forloop.counter }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.date|date:"M j, Y" }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.paid_from.name }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.expense_head.name }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">{{ e.amount|floatformat:2 }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ e.notes|default:"—" }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+            <tr class="expense-row">
+              <td>{{ forloop.counter }}</td>
+              <td>{{ e.date|date:"M j, Y" }}</td>
+              <td>{{ e.paid_from.name }}</td>
+              <td>{{ e.expense_head.name }}</td>
+              <td class="right">{{ e.amount|floatformat:2 }}</td>
+              <td>{{ e.notes|default:"—" }}</td>
+              <td class="center">
                 {% if e.posted %}
-                  <span class="badge badge-success" data-i18n="yes">Yes</span>
+                  <span class="posted-badge posted-yes" data-i18n="yes">Yes</span>
                 {% else %}
-                  <span class="badge badge-warning" data-i18n="no">No</span>
+                  <span class="posted-badge posted-no" data-i18n="no">No</span>
                 {% endif %}
               </td>
             </tr>
@@ -248,6 +552,8 @@
     to_date: "To date",
     apply: "Apply",
     reset: "Reset",
+    amount_preview: "Amount Preview",
+    quick_search: "Quick Search (head / account / notes)",
 
     expenses_list: "Expenses List",
     total: "Total",
@@ -290,6 +596,8 @@
     to_date: "اختتام",
     apply: "لاگو کریں",
     reset: "ری سیٹ",
+    amount_preview: "رقم پیش نظارہ",
+    quick_search: "فوری تلاش (مد / اکاؤنٹ / نوٹس)",
 
     expenses_list: "اخراجات کی فہرست",
     total: "کل",
@@ -308,6 +616,52 @@
   });
 
   if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+
+  (function () {
+    const amountInput = document.getElementById("expenseAmountInput");
+    const amountPreview = document.getElementById("amountPreview");
+    const amountChips = document.querySelectorAll("[data-set-amount]");
+    const searchInput = document.getElementById("quickSearchInput");
+    const rows = Array.from(document.querySelectorAll("tr.expense-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+
+    function fmt(n) {
+      const v = parseFloat(n || 0) || 0;
+      return v.toFixed(2);
+    }
+
+    function updateAmountPreview() {
+      if (!amountPreview || !amountInput) return;
+      amountPreview.textContent = fmt(amountInput.value);
+    }
+
+    function applyQuickFilter() {
+      const q = ((searchInput && searchInput.value) || "").trim().toLowerCase();
+      let visible = 0;
+
+      rows.forEach((row) => {
+        const text = (row.textContent || "").toLowerCase();
+        const ok = !q || text.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    if (amountInput) amountInput.addEventListener("input", updateAmountPreview);
+    amountChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (!amountInput) return;
+        const val = parseFloat(chip.getAttribute("data-set-amount") || "0") || 0;
+        amountInput.value = val === 0 ? "" : String(val);
+        updateAmountPreview();
+      });
+    });
+    if (searchInput) searchInput.addEventListener("input", applyQuickFilter);
+
+    updateAmountPreview();
+  })();
 </script>
 
 {% endblock %}
