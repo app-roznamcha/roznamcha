@@ -3,29 +3,399 @@
 {% block title %}Cash/Bank Transfer{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page transfer-page">
 
   <style>
+    .transfer-page{
+      max-width:1200px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --line:#e2e8f0;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+      --surface-soft:#f8fbff;
+    }
+
+    .tf-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid #dbe3ee;
+      border-radius:18px;
+      padding:20px 22px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
+    }
+
+    .tf-title{
+      margin:0 0 4px;
+      font-size:30px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .tf-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:700px;
+    }
+
+    .tf-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
+    .tf-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #d0dae7;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+
+    .tf-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .tf-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .tf-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid #d9e2ef;
+      padding:18px 20px 20px;
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      margin-bottom:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .tf-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+      opacity:.75;
+    }
+
+    .tf-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .tf-card-title{
+      font-size:18px;
+      font-weight:800;
+      margin:0;
+      color:#0f172a;
+    }
+
+    .tf-card-sub{
+      margin:4px 0 0;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.45;
+    }
+
+    .tf-form-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
+      align-items:end;
+    }
+
+    .tf-field label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#334155;
+      font-weight:600;
+    }
+
+    .tf-field input,
+    .tf-field select{
+      width:100%;
+      padding:9px 11px;
+      min-height:42px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .tf-field input:focus,
+    .tf-field select:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .tf-amount-tools{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tf-chip{
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+
+    .tf-transfer-hint{
+      grid-column:1 / -1;
+      margin-top:4px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .tf-hint-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:var(--surface-soft);
+      color:#0f172a;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .tf-hint-chip.amount{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .tf-filter-form{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+
+    .tf-filter-form .field{
+      min-width:180px;
+      flex:1;
+    }
+
+    .tf-filter-form .field.small{
+      min-width:170px;
+      max-width:210px;
+      flex:0 0 auto;
+    }
+
+    .tf-mini-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .tf-stat-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .tf-stat-chip.total{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .tf-toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+
+    .tf-search{
+      min-width:260px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .tf-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .tf-search input{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+    }
+
+    .tf-search-hint{
+      display:block;
+      margin-top:4px;
+      font-size:12px;
+      color:#64748b;
+    }
+
+    .tf-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .tf-table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .tf-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:900px;
+    }
+
+    .tf-table th,
+    .tf-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .tf-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .tf-table tbody tr:nth-child(even){ background:#fbfdff; }
+    .tf-table tbody tr:hover{ background:#f8fbff; }
+    .tf-table tbody tr.is-hidden{ display:none; }
+
+    .right{text-align:right;}
+    .center{text-align:center;}
+
+    .posted-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:58px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid;
+    }
+
+    .posted-yes{
+      color:#166534;
+      background:#ecfdf3;
+      border-color:#bbf7d0;
+    }
+
+    .posted-no{
+      color:#9a3412;
+      background:#fff7ed;
+      border-color:#fed7aa;
+    }
+
     .ur{display:block;font-size:12px;color:#64748b;margin-top:2px;direction:rtl;text-align:right;}
     @media (max-width:640px){
-      .page{padding:0 16px !important;}
+      .transfer-page{padding:0 14px !important;margin:22px auto 52px;}
+      .tf-header{padding:16px;}
+      .tf-title{font-size:25px;}
+      .tf-btn{width:100%;}
+      .tf-filter-form .field,
+      .tf-filter-form .field.small{min-width:100%;max-width:100%;}
+      .tf-search{min-width:100%;max-width:100%;}
     }
   </style>
 
   {# ---------- Top Bar ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="tf-header">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="transfer_title">
+      <h1 class="tf-title" data-i18n="transfer_title">
         Cash/Bank Transfer
       </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:#475569;" data-i18n="transfer_subtitle">
+      <p class="tf-sub" data-i18n="transfer_subtitle">
         Transfer money between your cash and bank accounts.
       </p>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+    <div class="tf-actions">
+      <a href="{% url 'dashboard' %}" class="tf-btn">
         <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
     </div>
@@ -40,29 +410,33 @@
   {% endif %}
 
   {# ---------- Create Transfer Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
+  <div class="tf-card">
 
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="record_transfer">
-      Record Transfer
+    <div class="tf-card-head">
+      <div>
+        <h2 class="tf-card-title" data-i18n="record_transfer">
+          Record Transfer
+        </h2>
+        <p class="tf-card-sub" data-i18n="record_transfer_sub">
+          Post a verified movement between two internal cash/bank accounts.
+        </p>
+      </div>
     </div>
 
-    <form method="post" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
+    <form method="post" class="tf-form-grid">
       {% csrf_token %}
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="date_label">Date</label>
+      <div class="tf-field">
+        <label data-i18n="date_label">Date</label>
         <input type="date" name="date" value="{{ today }}"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+               >
       </div>
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from_account_label">
+      <div class="tf-field">
+        <label data-i18n="from_account_label">
           From (Cash/Bank)
         </label>
-        <select name="from_account" required
-                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+        <select name="from_account" id="fromAccountSelect" required>
           <option value="" data-i18n="select_from_opt">-- Select From Account --</option>
           {% for acc in cash_bank_accounts %}
             <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
@@ -70,12 +444,11 @@
         </select>
       </div>
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to_account_label">
+      <div class="tf-field">
+        <label data-i18n="to_account_label">
           To (Cash/Bank)
         </label>
-        <select name="to_account" required
-                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+        <select name="to_account" id="toAccountSelect" required>
           <option value="" data-i18n="select_to_opt">-- Select To Account --</option>
           {% for acc in cash_bank_accounts %}
             <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
@@ -83,26 +456,34 @@
         </select>
       </div>
 
-      <div>
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="amount_label">
+      <div class="tf-field">
+        <label data-i18n="amount_label">
           Amount (Rs)
         </label>
-        <input type="number" name="amount" step="0.01" min="0" required
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="number" id="transferAmountInput" name="amount" step="0.01" min="0" required>
+        <div class="tf-amount-tools">
+          <button type="button" class="tf-chip" data-set-amount="500">+500</button>
+          <button type="button" class="tf-chip" data-set-amount="1000">+1000</button>
+          <button type="button" class="tf-chip" data-set-amount="5000">+5000</button>
+          <button type="button" class="tf-chip" data-set-amount="0">Clear</button>
+        </div>
       </div>
 
-      <div style="grid-column:1 / -1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="notes_label">
+      <div class="tf-field" style="grid-column:1 / -1;">
+        <label data-i18n="notes_label">
           Notes (optional)
         </label>
-        <input type="text" name="notes" maxlength="255"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="text" name="notes" maxlength="255">
+      </div>
+
+      <div class="tf-transfer-hint">
+        <span class="tf-hint-chip"><span data-i18n="summary_from">From</span>: <strong id="fromPreview">—</strong></span>
+        <span class="tf-hint-chip"><span data-i18n="summary_to">To</span>: <strong id="toPreview">—</strong></span>
+        <span class="tf-hint-chip amount"><span data-i18n="amount_preview">Amount Preview</span>: Rs <strong id="amountPreview">0.00</strong></span>
       </div>
 
       <div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        <button type="submit" class="tf-btn tf-btn-primary">
           <span data-i18n="save_posted_btn">💾 Save (Posted)</span>
         </button>
       </div>
@@ -110,21 +491,25 @@
   </div>
 
   {# ---------- Filters Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
+  <div class="tf-card">
 
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="filters">
-      Filters
+    <div class="tf-card-head">
+      <div>
+        <h2 class="tf-card-title" data-i18n="filters">
+          Filters
+        </h2>
+        <p class="tf-card-sub" data-i18n="filters_sub">
+          Narrow transfer history by period and custom date range.
+        </p>
+      </div>
     </div>
 
-    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="period_label">
+    <form method="get" class="tf-filter-form">
+      <div class="field">
+        <label data-i18n="period_label">
           Period
         </label>
-        <select name="period"
-                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;height:40px;">
+        <select name="period">
           <option value="day" {% if period == "day" %}selected{% endif %} data-i18n="period_today">Today</option>
           <option value="week" {% if period == "week" %}selected{% endif %} data-i18n="period_week">Last 7 days</option>
           <option value="month" {% if period == "month" %}selected{% endif %} data-i18n="period_month">This month</option>
@@ -132,31 +517,26 @@
         </select>
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from_date">
+      <div class="field small">
+        <label data-i18n="from_date">
           From date
         </label>
-        <input type="date" name="from_date" value="{{ from_date }}"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="date" name="from_date" value="{{ from_date }}">
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to_date">
+      <div class="field small">
+        <label data-i18n="to_date">
           To date
         </label>
-        <input type="date" name="to_date" value="{{ to_date }}"
-               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+        <input type="date" name="to_date" value="{{ to_date }}">
       </div>
 
       <div style="display:flex;gap:8px;align-items:flex-end;">
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #2563eb; background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        <button type="submit" class="tf-btn tf-btn-primary">
           <span data-i18n="apply">Apply</span>
         </button>
         <a href="{% url 'cash_bank_transfer_page' %}"
-           class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+           class="tf-btn">
           <span data-i18n="reset">Reset</span>
         </a>
       </div>
@@ -164,44 +544,56 @@
   </div>
 
   {# ---------- Transfers List ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:18px;font-weight:600;" data-i18n="transfer_list">
-        Transfers List
+  <div class="tf-card">
+    <div class="tf-mini-stats">
+      <span class="tf-stat-chip">Server Rows: <span id="server-row-count">{{ transfers|length }}</span></span>
+      <span class="tf-stat-chip">Visible Rows: <span id="visible-row-count">{{ transfers|length }}</span></span>
+      <span class="tf-stat-chip total"><span data-i18n="total">Total</span>: <strong>{{ total_amount|floatformat:2 }}</strong></span>
+    </div>
+
+    <div class="tf-toolbar">
+      <div>
+        <h2 class="tf-card-title" data-i18n="transfer_list">
+          Transfers List
+        </h2>
+        <p class="tf-card-sub" data-i18n="transfer_list_sub">
+          Review posted movement logs with quick search.
+        </p>
       </div>
-      <div style="font-size:14px;color:#6b7280;">
-        <span data-i18n="total">Total</span>: <strong>{{ total_amount|floatformat:2 }}</strong>
+      <div class="tf-search">
+        <label data-i18n="quick_search">Quick Search (from / to / notes)</label>
+        <input type="text" id="quickSearchInput" placeholder="Type to filter visible rows...">
+        <span class="tf-search-hint" data-i18n="quick_search_hint">Tip: search by account name, note text, or date.</span>
       </div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:900px;">
+    <div class="tf-table-wrap">
+      <table class="tf-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_hash">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_date">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_from">From</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_to">To</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;" data-i18n="col_amount">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;" data-i18n="col_notes">Notes</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;" data-i18n="col_posted">Posted?</th>
+            <th data-i18n="col_hash">#</th>
+            <th data-i18n="col_date">Date</th>
+            <th data-i18n="col_from">From</th>
+            <th data-i18n="col_to">To</th>
+            <th class="right" data-i18n="col_amount">Amount</th>
+            <th data-i18n="col_notes">Notes</th>
+            <th class="center" data-i18n="col_posted">Posted?</th>
           </tr>
         </thead>
         <tbody>
           {% for t in transfers %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ forloop.counter }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ t.date|date:"M j, Y" }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ t.from_account.name }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ t.to_account.name }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">{{ t.amount|floatformat:2 }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">{{ t.notes|default:"—" }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+            <tr class="transfer-row">
+              <td>{{ forloop.counter }}</td>
+              <td>{{ t.date|date:"M j, Y" }}</td>
+              <td>{{ t.from_account.name }}</td>
+              <td>{{ t.to_account.name }}</td>
+              <td class="right">{{ t.amount|floatformat:2 }}</td>
+              <td>{{ t.notes|default:"—" }}</td>
+              <td class="center">
                 {% if t.posted %}
-                  <span class="badge badge-success" data-i18n="yes">Yes</span>
+                  <span class="posted-badge posted-yes" data-i18n="yes">Yes</span>
                 {% else %}
-                  <span class="badge badge-warning" data-i18n="no">No</span>
+                  <span class="posted-badge posted-no" data-i18n="no">No</span>
                 {% endif %}
               </td>
             </tr>
@@ -229,6 +621,7 @@
     back_dashboard: "← Dashboard",
 
     record_transfer: "Record Transfer",
+    record_transfer_sub: "Post a verified movement between two internal cash/bank accounts.",
     date_label: "Date",
     from_account_label: "From (Cash/Bank)",
     to_account_label: "To (Cash/Bank)",
@@ -237,8 +630,12 @@
     select_from_opt: "-- Select From Account --",
     select_to_opt: "-- Select To Account --",
     save_posted_btn: "💾 Save (Posted)",
+    summary_from: "From",
+    summary_to: "To",
+    amount_preview: "Amount Preview",
 
     filters: "Filters",
+    filters_sub: "Narrow transfer history by period and custom date range.",
     period_label: "Period",
     period_today: "Today",
     period_week: "Last 7 days",
@@ -248,8 +645,11 @@
     to_date: "To date",
     apply: "Apply",
     reset: "Reset",
+    quick_search: "Quick Search (from / to / notes)",
+    quick_search_hint: "Tip: search by account name, note text, or date.",
 
     transfer_list: "Transfers List",
+    transfer_list_sub: "Review posted movement logs with quick search.",
     total: "Total",
 
     col_hash: "#",
@@ -271,6 +671,7 @@
     back_dashboard: "← ڈیش بورڈ",
 
     record_transfer: "ٹرانسفر درج کریں",
+    record_transfer_sub: "دو اندرونی کیش/بینک اکاؤنٹس کے درمیان تصدیق شدہ ٹرانسفر پوسٹ کریں۔",
     date_label: "تاریخ",
     from_account_label: "کس اکاؤنٹ سے (کیش/بینک)",
     to_account_label: "کس اکاؤنٹ میں (کیش/بینک)",
@@ -279,8 +680,12 @@
     select_from_opt: "-- اکاؤنٹ منتخب کریں (From) --",
     select_to_opt: "-- اکاؤنٹ منتخب کریں (To) --",
     save_posted_btn: "💾 محفوظ کریں (پوسٹڈ)",
+    summary_from: "From",
+    summary_to: "To",
+    amount_preview: "رقم پیش نظارہ",
 
     filters: "فلٹرز",
+    filters_sub: "مدت اور اپنی تاریخ کے مطابق ٹرانسفر ہسٹری فلٹر کریں۔",
     period_label: "مدت",
     period_today: "آج",
     period_week: "گزشتہ 7 دن",
@@ -290,8 +695,11 @@
     to_date: "اختتام",
     apply: "لاگو کریں",
     reset: "ری سیٹ",
+    quick_search: "فوری تلاش (From / To / نوٹس)",
+    quick_search_hint: "اشارہ: اکاؤنٹ نام، نوٹس یا تاریخ سے تلاش کریں۔",
 
     transfer_list: "ٹرانسفر کی فہرست",
+    transfer_list_sub: "فوری تلاش کے ساتھ پوسٹڈ ٹرانسفر ریکارڈ دیکھیں۔",
     total: "کل",
 
     col_hash: "#",
@@ -308,6 +716,64 @@
   });
 
   if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+
+  (function () {
+    const amountInput = document.getElementById("transferAmountInput");
+    const amountPreview = document.getElementById("amountPreview");
+    const fromSelect = document.getElementById("fromAccountSelect");
+    const toSelect = document.getElementById("toAccountSelect");
+    const fromPreview = document.getElementById("fromPreview");
+    const toPreview = document.getElementById("toPreview");
+    const amountChips = document.querySelectorAll("[data-set-amount]");
+    const searchInput = document.getElementById("quickSearchInput");
+    const rows = Array.from(document.querySelectorAll("tr.transfer-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+
+    function fmt(n) {
+      const v = parseFloat(n || 0) || 0;
+      return v.toFixed(2);
+    }
+
+    function selectedText(el) {
+      if (!el) return "—";
+      const opt = el.selectedOptions && el.selectedOptions[0];
+      if (!opt || !opt.value) return "—";
+      return opt.textContent.trim();
+    }
+
+    function updateTransferPreview() {
+      if (amountPreview && amountInput) amountPreview.textContent = fmt(amountInput.value);
+      if (fromPreview) fromPreview.textContent = selectedText(fromSelect);
+      if (toPreview) toPreview.textContent = selectedText(toSelect);
+    }
+
+    function applyQuickFilter() {
+      const q = ((searchInput && searchInput.value) || "").trim().toLowerCase();
+      let visible = 0;
+      rows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    if (amountInput) amountInput.addEventListener("input", updateTransferPreview);
+    if (fromSelect) fromSelect.addEventListener("change", updateTransferPreview);
+    if (toSelect) toSelect.addEventListener("change", updateTransferPreview);
+    amountChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (!amountInput) return;
+        const val = parseFloat(chip.getAttribute("data-set-amount") || "0") || 0;
+        amountInput.value = val === 0 ? "" : String(val);
+        updateTransferPreview();
+      });
+    });
+    if (searchInput) searchInput.addEventListener("input", applyQuickFilter);
+
+    updateTransferPreview();
+  })();
 </script>
 
 {% endblock %}
