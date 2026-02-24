@@ -3,218 +3,586 @@
 {% block title %}Balance Sheet{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page bs-page">
+  <style>
+    .bs-page{
+      max-width:1120px;
+      margin:34px auto 64px;
+      padding:0 16px;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --line:#e2e8f0;
+      --panel:#ffffff;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --asset:#1d4ed8;
+      --asset-soft:#dbeafe;
+      --liability:#b42318;
+      --liability-soft:#fee4e2;
+      --equity:#047857;
+      --equity-soft:#d1fae5;
+      --neutral-soft:#f1f5f9;
+      --shadow:0 10px 24px rgba(15,23,42,.07);
+    }
 
-  {# ---------- Top Bar (Title + Back Button) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
-    <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Balance Sheet</h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
-        Snapshot of assets, liabilities, and equity for your business as of a specific date.
-      </p>
+    .bs-topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+      padding:18px 20px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(900px 340px at -20% -120%, #dbeafe 0%, transparent 56%),
+        radial-gradient(700px 280px at 115% -90%, #dcfce7 0%, transparent 55%),
+        var(--panel);
+      box-shadow:var(--shadow);
+    }
+
+    .bs-title-wrap{
+      min-width:280px;
+      flex:1 1 auto;
+    }
+
+    .bs-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#155eef;
+      background:#eff6ff;
+      border:1px solid #dbeafe;
+      margin-bottom:10px;
+    }
+
+    .bs-title{
+      margin:0 0 4px;
+      font-size:30px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--ink-900);
+    }
+
+    .bs-sub{
+      margin:0;
+      font-size:15px;
+      color:var(--ink-700);
+      line-height:1.6;
+      max-width:740px;
+    }
+
+    .bs-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .bs-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:140px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    }
+    .bs-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 20px rgba(29,78,216,.24);
+      filter:brightness(1.02);
+    }
+
+    .bs-card{
+      background:var(--panel);
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      margin-bottom:20px;
+    }
+    .bs-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .bs-card-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--ink-900);
+    }
+    .bs-card-sub{
+      font-size:13px;
+      color:var(--ink-500);
+    }
+
+    .bs-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .bs-filter .col{min-width:220px;flex:1 1 220px;}
+    .bs-filter label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#475569;
+      font-weight:600;
+    }
+    .bs-filter input,
+    .bs-filter select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+      height:44px;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+    .bs-filter input:focus,
+    .bs-filter select:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+    .bs-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+      height:44px;
+      min-width:130px;
+    }
+
+    .bs-reset{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      background:#f8fafc;
+      color:#0f172a;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      white-space:nowrap;
+      height:44px;
+    }
+
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:20px;
+    }
+    .kpi{
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      padding:12px 14px;
+      background:var(--panel);
+      box-shadow:0 6px 16px rgba(15,23,42,0.05);
+      position:relative;
+      overflow:hidden;
+    }
+    .kpi::before{
+      content:"";
+      position:absolute;
+      inset:0 0 auto 0;
+      height:3px;
+      opacity:.85;
+    }
+    .kpi .label{
+      font-size:13px;
+      color:var(--ink-500);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-weight:700;
+    }
+    .kpi .value{
+      font-size:24px;
+      font-weight:800;
+      letter-spacing:-0.01em;
+      line-height:1.2;
+      color:var(--ink-900);
+    }
+    .kpi.asset::before{ background:var(--asset); }
+    .kpi.liability::before{ background:var(--liability); }
+    .kpi.equity::before{ background:var(--equity); }
+    .kpi.total::before{ background:#0f172a; }
+    .kpi.asset .value{ color:var(--asset); }
+    .kpi.liability .value{ color:var(--liability); }
+    .kpi.equity .value{ color:var(--equity); }
+    .kpi.total .value{ color:#0f172a; }
+
+    .bs-tools{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-left:auto;
+    }
+
+    .tbl-wrap{ width:100%; overflow-x:auto; }
+    .bs-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:620px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .bs-table th,
+    .bs-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 12px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .bs-table th{
+      background:#f9fafb;
+      text-align:left;
+      font-weight:700;
+      color:var(--ink-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .bs-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .bs-table tbody tr:hover{ background:#f8fbff; }
+    .right{ text-align:right; }
+
+    .amount-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-end;
+      min-width:110px;
+      padding:3px 9px;
+      border-radius:8px;
+      font-weight:800;
+      font-size:13px;
+    }
+    .amount-chip.asset{ color:var(--asset); background:var(--asset-soft); }
+    .amount-chip.liability{ color:var(--liability); background:var(--liability-soft); }
+    .amount-chip.equity{ color:var(--equity); background:var(--equity-soft); }
+
+    .print-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 14px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--slate-300);
+      background:#f8fafc;
+      color:#111827;
+      cursor:pointer;
+      white-space:nowrap;
+      height:44px;
+      transition:transform .12s ease, border-color .12s ease;
+    }
+    .print-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+    }
+
+    .section-empty{
+      color:#94a3b8;
+      text-align:center;
+      font-style:italic;
+    }
+
+    .balance-status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--neutral-soft);
+      border:1px solid var(--line);
+      font-size:13px;
+      font-weight:700;
+      color:#0f172a;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#16a34a;
+    }
+
+    @media (max-width: 900px) {
+      .kpi-grid{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .bs-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
+      .bs-topbar { padding:16px; border-radius:16px; }
+      .bs-title { font-size: 25px !important; }
+      .bs-sub { font-size: 14px !important; }
+      .bs-btn,
+      .bs-apply,
+      .print-btn,
+      .bs-reset{ width:100%; min-width:unset; }
+      .bs-filter .col{ min-width:100% !important; }
+      .kpi-grid{ grid-template-columns:1fr !important; }
+    }
+
+    @media print {
+      .no-print { display:none !important; }
+      .bs-card { box-shadow:none; border-color:#d1d5db; }
+      .bs-topbar { box-shadow:none; border-color:#d1d5db; background:#fff; }
+    }
+  </style>
+
+  {% with total_le=total_liabilities|add:total_equity %}
+  <div class="bs-topbar">
+    <div class="bs-title-wrap">
+      <div class="bs-kicker">Financial Statement</div>
+      <h1 class="bs-title">Balance Sheet</h1>
+      <p class="bs-sub">Snapshot of assets, liabilities, and equity for your business as of a specific date.</p>
     </div>
-    <div>
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:140px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
-        ← Back to Dashboard
-      </a>
+    <div class="bs-actions">
+      <div class="balance-status">
+        <span class="dot"></span>
+        Balance Check: Assets (Rs {{ total_assets|floatformat:2 }}) | L+E (Rs {{ total_le|floatformat:2 }})
+      </div>
+      <a href="{% url 'dashboard' %}" class="bs-btn">← Back to Dashboard</a>
+      <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
     </div>
   </div>
 
-  {# ---------- Filter Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
-      As-of date
-    </div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
-      Select a date to see balances up to that point in time, then click <strong>Apply</strong>.
-    </p>
+  <div class="bs-card no-print">
+    <div class="bs-card-title" style="margin-bottom:6px;">As-of date</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">Select a date to see balances up to that point in time, then click <strong>Apply</strong>.</p>
 
-    <form method="get"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">As of</label>
-        <input type="date"
-               name="to"
-               value="{{ as_of|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+    <form method="get" class="bs-filter">
+      <div class="col">
+        <label>As of</label>
+        <input type="date" name="to" value="{{ as_of|date:'Y-m-d' }}">
+      </div>
+
+      <div class="col">
+        <label>Quick search (all sections)</label>
+        <input type="text" id="bsSearch" class="search-input" placeholder="Search by account code or name...">
+      </div>
+
+      <div class="col" style="max-width:210px;">
+        <label>Section filter</label>
+        <select id="bsTypeFilter" class="type-filter">
+          <option value="ALL">All sections</option>
+          <option value="ASSET">Assets only</option>
+          <option value="LIABILITY">Liabilities only</option>
+          <option value="EQUITY">Equity only</option>
+        </select>
       </div>
 
       <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
-        </button>
+        <button type="submit" class="bs-apply">Apply</button>
+      </div>
+      <div>
+        <button type="button" class="bs-reset" id="bsResetFilters">Reset Filters</button>
       </div>
     </form>
   </div>
 
-  {# ---------- Assets Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Assets
+  <div class="kpi-grid">
+    <div class="kpi asset">
+      <div class="label">Total Assets</div>
+      <div class="value">Rs {{ total_assets|floatformat:2 }}</div>
+    </div>
+    <div class="kpi liability">
+      <div class="label">Total Liabilities</div>
+      <div class="value">Rs {{ total_liabilities|floatformat:2 }}</div>
+    </div>
+    <div class="kpi equity">
+      <div class="label">Total Equity</div>
+      <div class="value">Rs {{ total_equity|floatformat:2 }}</div>
+    </div>
+    <div class="kpi total">
+      <div class="label">Liabilities + Equity</div>
+      <div class="value">Rs {{ total_le|floatformat:2 }}</div>
+    </div>
+  </div>
+
+  <div class="bs-card section-card" data-section="ASSET">
+    <div class="bs-card-head">
+      <div class="bs-card-title">Assets</div>
+      <div class="bs-card-sub">Current assets and non-current assets</div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:520px;">
+    <div class="tbl-wrap">
+      <table class="bs-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
-              Account
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
-              Amount
-            </th>
+            <th>Account</th>
+            <th class="right">Amount</th>
           </tr>
         </thead>
         <tbody>
-            {% for row in assets %}
-              <tr>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                  {{ row.account.code }} – {{ row.account.name }}
-                </td>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-                  {{ row.amount|floatformat:2 }}
-                </td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                  No asset balances.
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
+          {% for row in assets %}
+            <tr class="bs-row" data-type="ASSET">
+              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
+              <td class="right"><span class="amount-chip asset">Rs {{ row.amount|floatformat:2 }}</span></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="2" class="section-empty">No asset balances.</td></tr>
+          {% endfor %}
+        </tbody>
         <tfoot>
           <tr>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              Total Assets
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              {{ total_assets|floatformat:2 }}
-            </th>
+            <th class="right">Total Assets</th>
+            <th class="right">Rs {{ total_assets|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
 
-  {# ---------- Liabilities Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Liabilities
+  <div class="bs-card section-card" data-section="LIABILITY">
+    <div class="bs-card-head">
+      <div class="bs-card-title">Liabilities</div>
+      <div class="bs-card-sub">Amounts owed to suppliers, lenders, and others</div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+    <div class="tbl-wrap">
+      <table class="bs-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
-              Account
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
-              Amount
-            </th>
+            <th>Account</th>
+            <th class="right">Amount</th>
           </tr>
         </thead>
         <tbody>
-            {% for row in liabilities %}
-              <tr>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                  {{ row.account.code }} – {{ row.account.name }}
-                </td>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-                  {{ row.amount|floatformat:2 }}
-                </td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                  No liability balances.
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
+          {% for row in liabilities %}
+            <tr class="bs-row" data-type="LIABILITY">
+              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
+              <td class="right"><span class="amount-chip liability">Rs {{ row.amount|floatformat:2 }}</span></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="2" class="section-empty">No liability balances.</td></tr>
+          {% endfor %}
+        </tbody>
         <tfoot>
           <tr>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              Total Liabilities
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              {{ total_liabilities|floatformat:2 }}
-            </th>
+            <th class="right">Total Liabilities</th>
+            <th class="right">Rs {{ total_liabilities|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
 
-  {# ---------- Equity Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Equity
+  <div class="bs-card section-card" data-section="EQUITY">
+    <div class="bs-card-head">
+      <div class="bs-card-title">Equity</div>
+      <div class="bs-card-sub">Liabilities + Equity: <strong>Rs {{ total_le|floatformat:2 }}</strong></div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+    <div class="tbl-wrap">
+      <table class="bs-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
-              Account
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
-              Amount
-            </th>
+            <th>Account</th>
+            <th class="right">Amount</th>
           </tr>
         </thead>
         <tbody>
-            {% for row in equity %}
-              <tr>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                  {{ row.account.code }} – {{ row.account.name }}
-                </td>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-                  {{ row.amount|floatformat:2 }}
-                </td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                  No equity balances.
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
+          {% for row in equity %}
+            <tr class="bs-row" data-type="EQUITY">
+              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
+              <td class="right"><span class="amount-chip equity">Rs {{ row.amount|floatformat:2 }}</span></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="2" class="section-empty">No equity balances.</td></tr>
+          {% endfor %}
+        </tbody>
         <tfoot>
           <tr>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              Total Equity
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              {{ total_equity|floatformat:2 }}
-            </th>
+            <th class="right">Total Equity</th>
+            <th class="right">Rs {{ total_equity|floatformat:2 }}</th>
           </tr>
           <tr>
-            <th style="padding:7px 9px;font-size:16px;text-align:right;">
-              Liabilities + Equity
-            </th>
-            <th style="padding:7px 9px;font-size:16px;text-align:right;">
-              {{ total_liabilities|add:total_equity|floatformat:2 }}
-            </th>
+            <th class="right">Liabilities + Equity</th>
+            <th class="right">Rs {{ total_le|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
+  {% endwith %}
 
 </div>
+
+<script>
+  (function () {
+    const search = document.getElementById("bsSearch");
+    const filter = document.getElementById("bsTypeFilter");
+    const resetBtn = document.getElementById("bsResetFilters");
+    const rows = Array.from(document.querySelectorAll(".bs-row"));
+    const sections = Array.from(document.querySelectorAll(".section-card"));
+
+    function applyFilters() {
+      const q = ((search && search.value) || "").trim().toLowerCase();
+      const mode = (filter && filter.value) || "ALL";
+
+      rows.forEach((row) => {
+        const type = (row.getAttribute("data-type") || "").toUpperCase();
+        const text = (row.querySelector(".acct-cell")?.textContent || "").toLowerCase();
+        const textMatch = !q || text.includes(q);
+        const typeMatch = mode === "ALL" || type === mode;
+        row.hidden = !(textMatch && typeMatch);
+      });
+
+      sections.forEach((section) => {
+        const secType = (section.getAttribute("data-section") || "").toUpperCase();
+        const sectionTypeMatch = mode === "ALL" || secType === mode;
+        const visibleRows = section.querySelectorAll("tbody tr.bs-row:not([hidden])").length;
+        section.style.display = (sectionTypeMatch && (visibleRows > 0 || !q)) ? "" : "none";
+      });
+    }
+
+    function resetFilters() {
+      if (search) search.value = "";
+      if (filter) filter.value = "ALL";
+      applyFilters();
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (filter) filter.addEventListener("change", applyFilters);
+    if (resetBtn) resetBtn.addEventListener("click", resetFilters);
+  })();
+</script>
 {% endblock %}

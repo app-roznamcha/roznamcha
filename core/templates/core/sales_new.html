@@ -2,29 +2,296 @@
 {% block title %}New Sale{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page sale-new-page">
+  <style>
+    .sale-new-page{
+      max-width:1120px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --line:#e2e8f0;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+    }
+
+    .sale-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 20px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 10px 24px rgba(15,23,42,.07);
+    }
+
+    .sale-head-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .sale-head-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:720px;
+    }
+
+    .sale-head-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .sale-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:146px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cbd5e1;
+      background:#f8fafc;
+      color:#111827;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+
+    .sale-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .sale-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .sale-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      margin-bottom:18px;
+    }
+
+    .sale-card-title{
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+      margin-bottom:10px;
+    }
+
+    .sale-field-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:12px;
+    }
+
+    .sale-card label{
+      font-size:14px;
+      color:var(--ink-700);
+    }
+
+    .sale-card input,
+    .sale-card select,
+    .sale-card textarea{
+      border:1px solid #cbd5e1 !important;
+      border-radius:10px !important;
+      padding:8px 10px !important;
+      font-size:14px !important;
+      background:#fff !important;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .sale-card input:focus,
+    .sale-card select:focus,
+    .sale-card textarea:focus{
+      border-color:#93c5fd !important;
+      box-shadow:0 0 0 3px rgba(37,99,235,.15);
+      outline:none;
+    }
+
+    .sale-card input[readonly]{
+      background:#f8fafc !important;
+      color:#475569;
+    }
+
+    .items-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .items-stats{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .items-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      color:#0f172a;
+      font-size:13px;
+      font-weight:700;
+      border-radius:999px;
+      padding:6px 10px;
+    }
+
+    .items-total{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .table-wrap{
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      overflow:auto;
+      margin-bottom:10px;
+      background:#fff;
+    }
+
+    #items-table th{
+      position:sticky;
+      top:0;
+      z-index:1;
+      background:#f8fafc !important;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px !important;
+      font-weight:700 !important;
+    }
+
+    #items-table tbody tr:hover{
+      background:#f8fbff;
+    }
+
+    .items-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+    }
+
+    .items-note{
+      color:#64748b;
+      font-size:12px;
+      margin-left:auto;
+    }
+
+    .pay-radios{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      margin-bottom:12px;
+      font-size:14px;
+      padding:10px 12px;
+      border:1px solid #e2e8f0;
+      border-radius:10px;
+      background:#f8fafc;
+    }
+
+    .pay-total{
+      margin-bottom:10px;
+      font-weight:700;
+      font-size:15px;
+      color:#0f172a;
+    }
+
+    .sale-form-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .sale-link-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 14px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      color:#1d4ed8;
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+    }
+
+    @media (max-width: 700px){
+      .sale-new-page{
+        margin:22px auto 52px;
+        padding:0 14px;
+      }
+      .sale-header{
+        padding:16px;
+      }
+      .sale-head-title{
+        font-size:25px;
+      }
+      .sale-btn,
+      .sale-link-btn{
+        width:100%;
+      }
+      .items-note{
+        margin-left:0;
+        width:100%;
+      }
+    }
+  </style>
 
   {# ---------- Top Bar (Title + Buttons) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="sale-header">
     <div>
       {% if edit_mode %}
-        <h1 id="pageTitle" data-mode="edit" style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="sale_edit_title">Edit Sale</h1>
+        <h1 id="pageTitle" data-mode="edit" class="sale-head-title" data-i18n="sale_edit_title">Edit Sale</h1>
       {% else %}
-        <h1 id="pageTitle" data-mode="new" style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="sale_new_title">New Sale</h1>
+        <h1 id="pageTitle" data-mode="new" class="sale-head-title" data-i18n="sale_new_title">New Sale</h1>
       {% endif %}
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;" data-i18n="sale_subtitle">
+      <p class="sale-head-sub" data-i18n="sale_subtitle">
         Create a new sales invoice, add items, and record payment from the customer.
       </p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="sale-head-actions">
       <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+         class="sale-btn">
         <span data-i18n="go_dashboard">← Dashboard</span>
       </a>
       <a href="{% url 'sales_list' %}"
-         class="btn btn-primary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+         class="sale-btn sale-btn-primary">
         <span data-i18n="sales_list_btn">📄 Sales List</span>
       </a>
     </div>
@@ -42,14 +309,12 @@
     {% csrf_token %}
 
     {# ---------- Customer & Invoice Details Card ---------- #}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:10px;" data-i18n="customer_invoice_details">
+    <div class="sale-card">
+      <div class="sale-card-title" data-i18n="customer_invoice_details">
         Customer &amp; Invoice Details
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+      <div class="sale-field-grid">
         <label style="font-size:14px;display:flex;flex-direction:column;gap:4px;">
           <span data-i18n="customer_label">Customer</span>
           <select name="customer" required
@@ -93,17 +358,19 @@
     </div>
 
     {# ---------- Items Card ---------- #}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
-        <div style="font-size:18px;font-weight:600;" data-i18n="items_title">Items</div>
-        <div id="items-total-display" style="font-weight:600;font-size:15px;">
+    <div class="sale-card">
+      <div class="items-top">
+        <div class="sale-card-title" style="margin-bottom:0;" data-i18n="items_title">Items</div>
+        <div class="items-stats">
+          <div class="items-chip"><span>Lines</span>: <span id="items-line-count">0</span></div>
+          <div class="items-chip"><span>Total Qty</span>: <span id="items-total-qty">0.000</span></div>
+          <div id="items-total-display" class="items-chip items-total">
           <span data-i18n="total_sale">Total Sale</span>: <span data-i18n="rs">Rs</span> <span id="items-total-amount">0.00</span>
+          </div>
         </div>
       </div>
 
-      <div class="table-wrap" style="margin-bottom:10px;">
+      <div class="table-wrap">
         <table id="items-table"
                 style="border-collapse:collapse;width:100%;min-width:980px;">
           <thead>
@@ -375,28 +642,28 @@
         </table>
       </div>
 
-      <button type="button"
-              class="btn btn-sm btn-secondary"
-              onclick="addRow()"
-              style="padding:7px 14px;border-radius:999px;font-size:14px;">
-        <span data-i18n="add_item_row">+ Add Item Row</span>
-      </button>
+      <div class="items-actions">
+        <button type="button" class="sale-btn" onclick="addRow()">
+          <span data-i18n="add_item_row">+ Add Item Row</span>
+        </button>
+        <button type="button" class="sale-btn" onclick="removeEmptyRows()">
+          Remove Empty Rows
+        </button>
+        <div class="items-note">Shortcut: <strong>Alt + =</strong> adds a row quickly</div>
+      </div>
     </div>
 
     {# ---------- Payment Card ---------- #}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px;" data-i18n="payment_title">
+    <div class="sale-card">
+      <div class="sale-card-title" style="margin-bottom:8px;" data-i18n="payment_title">
         Payment
       </div>
 
-      <p style="margin-bottom:8px;font-weight:500;font-size:15px;">
+      <p class="pay-total">
         <span data-i18n="total_sale">Total Sale</span>: <span data-i18n="rs">Rs</span> <span id="payment-total-amount">0.00</span>
       </p>
 
-      <div class="field-group"
-           style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px;font-size:14px;">
+      <div class="field-group pay-radios">
         <label>
           <input type="radio" name="payment_type" value="FULL"
                  {% if edit_mode and invoice.payment_type == 'FULL' %}checked{% endif %}>
@@ -459,10 +726,9 @@
     </div>
 
     {# ---------- Form Actions ---------- #}
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="sale-form-actions">
       <button type="submit"
-              class="btn btn-primary"
-              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+              class="sale-btn sale-btn-primary">
         {% if edit_mode %}
           <span data-i18n="update_invoice">💾 Update Invoice</span>
         {% else %}
@@ -470,8 +736,7 @@
         {% endif %}
       </button>
       <a href="{% url 'sales_list' %}"
-         class="btn btn-link"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;color:#0d6efd;cursor:pointer;white-space:nowrap;">
+         class="sale-link-btn">
         <span data-i18n="cancel_btn">Cancel</span>
       </a>
     </div>
@@ -635,17 +900,31 @@ function fmt(amount) {
 function recalcGrandTotal() {
   const rows = document.querySelectorAll('#items-table tbody tr');
   let itemsTotal = 0;
+  let totalQty = 0;
+  let lineCount = 0;
 
   rows.forEach(tr => {
     const totalSpan = tr.querySelector('.line-total');
     const lineVal = parseFloat(totalSpan && totalSpan.textContent || 0) || 0;
     itemsTotal += lineVal;
+
+    const product = tr.querySelector('.product-select');
+    const qtyHidden = tr.querySelector('.qty-hidden-input');
+    const qtyVal = parseFloat(qtyHidden && qtyHidden.value || 0) || 0;
+    if (product && product.value) {
+      lineCount += 1;
+      totalQty += qtyVal;
+    }
   });
 
   const grandTotal = itemsTotal;
 
   document.getElementById('items-total-amount').textContent = fmt(grandTotal);
   document.getElementById('payment-total-amount').textContent = fmt(grandTotal);
+  const linesNode = document.getElementById('items-line-count');
+  const qtyNode = document.getElementById('items-total-qty');
+  if (linesNode) linesNode.textContent = String(lineCount);
+  if (qtyNode) qtyNode.textContent = (totalQty || 0).toFixed(3);
 
   updatePaymentAmount(grandTotal);
 }
@@ -879,6 +1158,22 @@ function removeRow(btn) {
   recalcGrandTotal();
 }
 
+function removeEmptyRows() {
+  const rows = Array.from(document.querySelectorAll('#items-table tbody tr'));
+  rows.forEach((tr) => {
+    const product = tr.querySelector('.product-select');
+    const qtyDisplay = tr.querySelector('.qty-display-input');
+    const priceInput = tr.querySelector('.price-input');
+    const hasProduct = !!(product && product.value);
+    const qty = parseFloat(qtyDisplay && qtyDisplay.value || 0) || 0;
+    const price = parseFloat(priceInput && priceInput.value || 0) || 0;
+    if (!hasProduct && qty <= 0 && price <= 0) {
+      tr.remove();
+    }
+  });
+  recalcGrandTotal();
+}
+
 // ---- Payment section behaviour ----
 function updatePaymentVisibility() {
   const type = getSelectedPaymentType();
@@ -968,6 +1263,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   recalcGrandTotal();
   updatePaymentVisibility();
+
+  document.addEventListener('keydown', function(e) {
+    if (e.altKey && e.key === '=') {
+      e.preventDefault();
+      addRow();
+    }
+  });
 });
 </script>
 

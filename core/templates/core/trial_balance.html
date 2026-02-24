@@ -3,145 +3,385 @@
 {% block title %}Trial Balance{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page trial-balance-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+  <style>
+    .trial-balance-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --ok:#047857;
+      --ok-soft:#d1fae5;
+      --warn:#b91c1c;
+      --warn-soft:#fee2e2;
+    }
 
-  {# ---------- Top Bar (Title) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    .tb-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .tb-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .tb-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:700px;
+    }
+    .tb-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .tb-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .tb-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:20px;
+    }
+
+    .tb-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .tb-filter .col{min-width:220px;}
+    .tb-filter label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#4b5563;
+    }
+    .tb-filter input,
+    .tb-filter select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+      height:44px;
+    }
+    .tb-filter input:focus,
+    .tb-filter select:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+    .tb-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+      min-width:130px;
+      height:44px;
+    }
+
+    .tb-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .tb-head-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--slate-900);
+    }
+    .tb-head-sub{
+      font-size:13px;
+      color:var(--slate-500);
+      max-width:560px;
+    }
+
+    .tb-tools{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-left:auto;
+    }
+    .search-input,
+    .side-filter{
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .search-input{ width:290px; max-width:100%; }
+    .side-filter{ min-width:170px; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      background:#ffffff;
+      color:#111827;
+      white-space:nowrap;
+      font-weight:700;
+    }
+
+    .tbl-wrap{ width:100%; overflow-x:auto; }
+    .tbl{
+      border-collapse:collapse;
+      width:100%;
+      min-width:820px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      text-align:left;
+      font-weight:700;
+      color:var(--slate-700);
+      background:#f9fafb;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
+    .right{ text-align:right; }
+
+    .amt-dr{
+      color:var(--ok);
+      font-weight:800;
+      background:var(--ok-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+    .amt-cr{
+      color:var(--warn);
+      font-weight:800;
+      background:var(--warn-soft);
+      border-radius:8px;
+      padding:2px 7px;
+    }
+
+    .totals-strip{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--slate-200);
+      background:#f8fafc;
+      font-size:14px;
+    }
+    .totals-strip .eq{ font-weight:800; color:#0f172a; }
+
+    @media (max-width: 640px) {
+      .trial-balance-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
+      .tb-title { font-size: 25px !important; }
+      .tb-sub { font-size: 14px !important; }
+      .tb-btn,
+      .tb-apply{ width:100%; min-width:unset; }
+      .tb-filter .col{ min-width:100% !important; }
+      .search-input,
+      .side-filter{ width:100%; }
+    }
+
+    @media print {
+      .no-print { display:none !important; }
+      .tb-card { box-shadow:none; border-color:#d1d5db; }
+    }
+  </style>
+
+  <div class="tb-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:28px;font-weight:800;line-height:1.15;">
-        📊 Trial Balance
-      </h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;">
-        Summary of debit and credit balances for all ledger accounts in the selected period.
-      </p>
+      <h1 class="tb-title">Trial Balance</h1>
+      <p class="tb-sub">Summary of debit and credit balances for all ledger accounts in the selected period.</p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:700;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
-      </a>
+      <a href="{% url 'dashboard' %}" class="tb-btn">← Dashboard</a>
+      <button type="button" class="tb-btn no-print" style="background:#0f172a;border-color:#0f172a;" onclick="window.print()">🖨️ Print</button>
     </div>
   </div>
 
-  {# ---------- Filter Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
-      Filter by date
-    </div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
-      Select a date range to view the trial balance for that period.
-    </p>
+  <div class="tb-card no-print">
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Filter by date</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">Select a date range to view the trial balance for that period.</p>
 
-    <form method="get"
-          class="filter-form"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          From
-        </label>
-        <input type="date"
-               name="from"
-               value="{{ date_from|date:'Y-m-d' }}"
-               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+    <form method="get" class="tb-filter">
+      <div class="col">
+        <label>From</label>
+        <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
       </div>
 
-      <div style="min-width:220px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">
-          To
-        </label>
-        <input type="date"
-               name="to"
-               value="{{ date_to|date:'Y-m-d' }}"
-               style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+      <div class="col">
+        <label>To</label>
+        <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
       </div>
 
       <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:700;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:140px;">
-          Apply
-        </button>
+        <button type="submit" class="tb-apply">Apply</button>
       </div>
     </form>
   </div>
 
-  {# ---------- Trial Balance Table Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-      <div style="font-size:18px;font-weight:600;">
-        Trial balance from {{ date_from|date:"d M Y" }} to {{ date_to|date:"d M Y" }}
+  <div class="tb-card">
+    <div class="tb-head">
+      <div>
+        <div class="tb-head-title">Trial balance from {{ date_from|date:"d M Y" }} to {{ date_to|date:"d M Y" }}</div>
+        <div class="tb-head-sub">Total debits should equal total credits for a balanced ledger.</div>
       </div>
-      <div style="font-size:13px;color:#6b7280;">
-        Total debits should be equal to total credits for a balanced ledger.
+      <div class="tb-tools no-print">
+        <input type="text" id="tbSearch" class="search-input" placeholder="Search by code or account name...">
+        <select id="tbSideFilter" class="side-filter">
+          <option value="ALL">All rows</option>
+          <option value="DEBIT">Debit only</option>
+          <option value="CREDIT">Credit only</option>
+        </select>
       </div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:820px;">
+    <div class="tbl-wrap">
+      <table class="tbl">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:12%;">
-              Code
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">
-              Account
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:18%;">
-              Debit
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;width:18%;">
-              Credit
-            </th>
+            <th style="width:12%;">Code</th>
+            <th>Account</th>
+            <th class="right" style="width:18%;">Debit</th>
+            <th class="right" style="width:18%;">Credit</th>
           </tr>
         </thead>
         <tbody>
           {% if rows %}
             {% for r in rows %}
-              <tr>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-                  {{ r.account.code }}
+              <tr class="tb-row" data-debit="{{ r.debit|default:0 }}" data-credit="{{ r.credit|default:0 }}">
+                <td class="code-cell">{{ r.account.code }}</td>
+                <td class="name-cell">{{ r.account.name }}</td>
+                <td class="right">
+                  {% if r.debit %}
+                    <span class="amt-dr">{{ r.debit|floatformat:2 }}</span>
+                  {% endif %}
                 </td>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-                  {{ r.account.name }}
-                </td>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                  {% if r.debit %}{{ r.debit|floatformat:2 }}{% endif %}
-                </td>
-                <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-                  {% if r.credit %}{{ r.credit|floatformat:2 }}{% endif %}
+                <td class="right">
+                  {% if r.credit %}
+                    <span class="amt-cr">{{ r.credit|floatformat:2 }}</span>
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="4"
-                  style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;color:#6b7280;">
-                No journal entries for this period.
-              </td>
+              <td colspan="4" style="padding:10px 9px;font-size:15px;color:#6b7280;">No journal entries for this period.</td>
             </tr>
           {% endif %}
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="2"
-                style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              Totals
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              {{ total_debits|floatformat:2 }}
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:right;">
-              {{ total_credits|floatformat:2 }}
-            </th>
+            <th colspan="2" class="right" style="border-top:2px solid #e5e7eb;padding:8px 10px;">Totals</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:8px 10px;">{{ total_debits|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:8px 10px;">{{ total_credits|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
+
+    <div class="totals-strip">
+      <span>Debit Total: <strong>{{ total_debits|floatformat:2 }}</strong></span>
+      <span>Credit Total: <strong>{{ total_credits|floatformat:2 }}</strong></span>
+      <span class="eq">Expected: Debit = Credit</span>
+    </div>
   </div>
 
 </div>
+
+<script>
+  (function () {
+    const search = document.getElementById("tbSearch");
+    const filter = document.getElementById("tbSideFilter");
+    const rows = Array.from(document.querySelectorAll(".tb-row"));
+
+    function toNum(v) {
+      const n = parseFloat(String(v || "0").replace(/,/g, ""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function applyFilters() {
+      const q = ((search && search.value) || "").trim().toLowerCase();
+      const mode = (filter && filter.value) || "ALL";
+
+      rows.forEach((row) => {
+        const code = (row.querySelector(".code-cell")?.textContent || "").toLowerCase();
+        const name = (row.querySelector(".name-cell")?.textContent || "").toLowerCase();
+        const debit = toNum(row.getAttribute("data-debit"));
+        const credit = toNum(row.getAttribute("data-credit"));
+
+        const textMatch = !q || code.includes(q) || name.includes(q);
+        let sideMatch = true;
+
+        if (mode === "DEBIT") sideMatch = debit > 0 && credit <= 0;
+        if (mode === "CREDIT") sideMatch = credit > 0 && debit <= 0;
+
+        row.style.display = (textMatch && sideMatch) ? "" : "none";
+      });
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (filter) filter.addEventListener("change", applyFilters);
+  })();
+</script>
 {% endblock %}

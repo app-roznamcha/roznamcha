@@ -2,9 +2,224 @@
 {% block title %}Sales Invoices{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
+<div class="page sales-list-page">
 
   <style>
+    .sales-list-page{
+      max-width:1280px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --line:#e2e8f0;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+    }
+
+    .sl-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 20px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 10px 24px rgba(15,23,42,.07);
+    }
+
+    .sl-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .sl-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:720px;
+    }
+
+    .sl-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .sl-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cbd5e1;
+      background:#f8fafc;
+      color:#111827;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+
+    .sl-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .sl-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .sl-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid #d1d5db;
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      margin-bottom:18px;
+    }
+
+    .sl-card-title{
+      font-size:18px;
+      font-weight:800;
+      margin:0 0 6px;
+      color:#0f172a;
+    }
+
+    .sl-card-sub{
+      font-size:14px;
+      color:#475569;
+      margin:0 0 12px;
+    }
+
+    .sl-form{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+
+    .sl-form .field{
+      min-width:180px;
+      flex:1;
+    }
+
+    .sl-form .field.small{
+      min-width:160px;
+      max-width:190px;
+      flex:0 0 auto;
+    }
+
+    .sl-form label{
+      display:block;
+      font-size:14px;
+      color:#334155;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .sl-form input,
+    .sl-form select{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .sl-form input:focus,
+    .sl-form select:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .sl-form-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .sl-mini-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .sl-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .sl-toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+
+    .sl-quick-search{
+      min-width:260px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .sl-quick-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .sl-quick-search input{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+    }
+
+    .sl-quick-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
     .action-pill {
       display:inline-flex;
       align-items:center;
@@ -24,8 +239,11 @@
     .tbl{
       width:100%;
       border-collapse:collapse;
-      table-layout:fixed; /* respects colgroup widths */
-      min-width:1040px;  /* supplier removed, so less needed */
+      table-layout:fixed;
+      min-width:1040px;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      overflow:hidden;
     }
     .tbl th, .tbl td{
       border-bottom:1px solid #e5e7eb;
@@ -35,8 +253,40 @@
     }
     .tbl th{
       background:#f9fafb;
-      font-weight:600;
+      font-weight:700;
       text-align:left;
+      color:#334155;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
+    .tbl tbody tr.is-hidden{ display:none; }
+
+    .posted-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:58px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid;
+    }
+    .posted-yes{
+      color:#166534;
+      background:#ecfdf3;
+      border-color:#bbf7d0;
+    }
+    .posted-no{
+      color:#9a3412;
+      background:#fff7ed;
+      border-color:#fed7aa;
     }
     .right{ text-align:right; }
     .center{ text-align:center; }
@@ -46,57 +296,71 @@
       text-overflow:ellipsis;
       white-space:nowrap;
     }
+
+    @media (max-width: 740px){
+      .sales-list-page{
+        margin:22px auto 52px;
+        padding:0 14px;
+      }
+      .sl-header{
+        padding:16px;
+      }
+      .sl-title{ font-size:25px; }
+      .sl-btn{ width:100%; }
+      .sl-form .field,
+      .sl-form .field.small{
+        min-width:100%;
+        max-width:100%;
+      }
+      .sl-quick-search{
+        min-width:100%;
+        max-width:100%;
+      }
+    }
   </style>
 
   {# ---------- Top Bar (Title + Buttons) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="sl-header">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;" data-i18n="sales_invoices_title">Sales Invoices</h1>
-      <p style="margin:0 0 20px;font-size:15px;color:#475569;" data-i18n="sales_invoices_subtitle">
+      <h1 class="sl-title" data-i18n="sales_invoices_title">Sales Invoices</h1>
+      <p class="sl-sub" data-i18n="sales_invoices_subtitle">
         View, filter, and post sales invoices to customers.
       </p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+    <div class="sl-actions">
+      <a href="{% url 'dashboard' %}" class="sl-btn">
         <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
-      <a href="{% url 'sales_new' %}"
-         class="btn btn-primary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+      <a href="{% url 'sales_new' %}" class="sl-btn sl-btn-primary">
         <span data-i18n="new_sale_btn">➕ New Sale</span>
       </a>
     </div>
   </div>
 
   {# ---------- Filters Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;" data-i18n="filters">Filters</div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;" data-i18n="filters_help">
+  <div class="sl-card">
+    <h2 class="sl-card-title" data-i18n="filters">Filters</h2>
+    <p class="sl-card-sub" data-i18n="filters_help">
       Narrow down sales invoices by date range, customer, and posting status.
     </p>
 
-    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+    <form method="get" class="sl-form">
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="from">From</label>
+      <div class="field small">
+        <label data-i18n="from">From</label>
         <input type="date" name="from" value="{{ from_date|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+        >
       </div>
 
-      <div style="min-width:180px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="to">To</label>
+      <div class="field small">
+        <label data-i18n="to">To</label>
         <input type="date" name="to" value="{{ to_date|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+        >
       </div>
 
-      <div style="min-width:220px;flex:1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="customer">Customer</label>
-        <select name="customer"
-                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <div class="field">
+        <label data-i18n="customer">Customer</label>
+        <select name="customer">
           <option value="" data-i18n="all_customers">All customers</option>
           {% for c in customers %}
             <option value="{{ c.id }}"
@@ -107,25 +371,20 @@
         </select>
       </div>
 
-      <div style="min-width:160px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;" data-i18n="posted_q">Posted?</label>
-        <select name="posted"
-                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <div class="field small">
+        <label data-i18n="posted_q">Posted?</label>
+        <select name="posted">
           <option value="all" {% if posted_filter == "all" %}selected{% endif %} data-i18n="all">All</option>
           <option value="yes" {% if posted_filter == "yes" %}selected{% endif %} data-i18n="yes">Yes</option>
           <option value="no" {% if posted_filter == "no" %}selected{% endif %} data-i18n="no">No</option>
         </select>
       </div>
 
-      <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+      <div class="sl-form-actions">
+        <button type="submit" class="sl-btn sl-btn-primary">
           <span data-i18n="apply">Apply</span>
         </button>
-        <a href="{% url 'sales_list' %}"
-           class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;margin-left:4px;">
+        <a href="{% url 'sales_list' %}" class="sl-btn">
           <span data-i18n="reset">Reset</span>
         </a>
       </div>
@@ -134,9 +393,19 @@
   </div>
 
   {# ---------- Sales Invoices Table Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+  <div class="sl-card" style="padding:0;">
     <div style="padding:14px 20px 8px;border-bottom:1px solid #e5e7eb;">
-      <div style="font-size:18px;font-weight:600;" data-i18n="sales_invoices_title">Sales Invoices</div>
+      <div class="sl-mini-stats">
+        <span class="sl-chip">Server Rows: <span id="server-row-count">{{ invoices|length }}</span></span>
+        <span class="sl-chip">Visible Rows: <span id="visible-row-count">{{ invoices|length }}</span></span>
+      </div>
+      <div class="sl-toolbar">
+        <h2 class="sl-card-title" style="margin:0;" data-i18n="sales_invoices_title">Sales Invoices</h2>
+        <div class="sl-quick-search">
+          <label data-i18n="quick_search">Quick Search (invoice / customer / product)</label>
+          <input type="text" id="quickSearchInput" placeholder="Type to filter visible rows...">
+        </div>
+      </div>
     </div>
 
     <div class="table-wrap">
@@ -168,7 +437,7 @@
         <tbody>
         {% if invoices %}
           {% for inv in invoices %}
-            <tr>
+            <tr class="invoice-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
               <td class="nowrap">{{ inv.invoice_number }}</td>
@@ -209,9 +478,9 @@
 
               <td class="center nowrap">
                 {% if inv.posted %}
-                  <span class="badge badge-success" data-i18n="yes">Yes</span>
+                  <span class="posted-badge posted-yes" data-i18n="yes">Yes</span>
                 {% else %}
-                  <span class="badge badge-warning" data-i18n="no">No</span>
+                  <span class="posted-badge posted-no" data-i18n="no">No</span>
                 {% endif %}
               </td>
 
@@ -304,7 +573,8 @@
     more_suffix: "more",
 
     no_sales_invoices_found: "No sales invoices found.",
-    confirm_delete_invoice: "Delete this invoice?"
+    confirm_delete_invoice: "Delete this invoice?",
+    quick_search: "Quick Search (invoice / customer / product)"
   });
 
   Object.assign(window.ROZ_I18N.ur, {
@@ -344,7 +614,8 @@
     more_suffix: "مزید",
 
     no_sales_invoices_found: "کوئی سیلز انوائس نہیں ملی۔",
-    confirm_delete_invoice: "کیا آپ یہ انوائس ڈیلیٹ کرنا چاہتے ہیں؟"
+    confirm_delete_invoice: "کیا آپ یہ انوائس ڈیلیٹ کرنا چاہتے ہیں؟",
+    quick_search: "فوری تلاش (انوائس / کسٹمر / پروڈکٹ)"
   });
 
   // Apply current language to this page after dict is loaded
@@ -369,6 +640,29 @@
         }
       }, true);
     });
+  })();
+
+  // Frontend quick filter on already loaded rows
+  (function () {
+    const input = document.getElementById("quickSearchInput");
+    const rows = Array.from(document.querySelectorAll("tr.invoice-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+
+    function applyQuickFilter() {
+      const q = ((input && input.value) || "").trim().toLowerCase();
+      let visible = 0;
+
+      rows.forEach((row) => {
+        const text = (row.textContent || "").toLowerCase();
+        const ok = !q || text.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    if (input) input.addEventListener("input", applyQuickFilter);
   })();
 </script>
 

@@ -3,214 +3,404 @@
 {% block title %}Profit &amp; Loss{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page pl-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
   <style>
+    .pl-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --income:#047857;
+      --income-soft:#d1fae5;
+      --expense:#b91c1c;
+      --expense-soft:#fee2e2;
+      --profit:#166534;
+      --profit-soft:#dcfce7;
+      --loss:#991b1b;
+      --loss-soft:#fee2e2;
+    }
+
+    .pl-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .pl-title{
+      margin:0 0 4px;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .pl-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:700px;
+    }
+    .pl-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:160px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .pl-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,42,.12);
+    }
+
+    .pl-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      margin-bottom:20px;
+    }
+    .pl-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pl-card-title{
+      font-size:18px;
+      font-weight:700;
+      color:var(--slate-900);
+    }
+    .pl-card-sub{
+      font-size:13px;
+      color:var(--slate-500);
+    }
+
+    .pl-filter-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    .pl-filter-row .col{min-width:200px;}
+    .pl-filter-row label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#4b5563;
+    }
+    .pl-filter-row input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+      height:44px;
+    }
+    .pl-filter-row input:focus{
+      outline:3px solid rgba(37,99,235,0.15);
+      border-color:#93c5fd;
+    }
+    .pl-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
+      cursor:pointer;
+      white-space:nowrap;
+      height:44px;
+      min-width:130px;
+    }
+
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:20px;
+    }
+    .kpi{
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      padding:12px 14px;
+      background:#fff;
+      box-shadow:0 6px 16px rgba(15,23,42,0.05);
+    }
+    .kpi .label{
+      font-size:13px;
+      color:var(--slate-500);
+      margin-bottom:6px;
+    }
+    .kpi .value{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:-0.01em;
+    }
+    .kpi.income .value{ color:var(--income); }
+    .kpi.expense .value{ color:var(--expense); }
+    .kpi.net.profit{ background:var(--profit-soft); border-color:#86efac; }
+    .kpi.net.loss{ background:var(--loss-soft); border-color:#fca5a5; }
+    .kpi.net.profit .value{ color:var(--profit); }
+    .kpi.net.loss .value{ color:var(--loss); }
+
+    .pl-tools{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-left:auto;
+    }
+    .search-input,
+    .section-filter{
+      padding:9px 12px;
+      border-radius:10px;
+      border:1px solid var(--slate-300);
+      font-size:14px;
+      background:#fff;
+    }
+    .search-input{ width:280px; max-width:100%; }
+    .section-filter{ min-width:160px; }
+
+    .tbl-wrap{ width:100%; overflow-x:auto; }
+    .pl-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:620px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .pl-table th,
+    .pl-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:15px;
+      vertical-align:middle;
+    }
+    .pl-table th{
+      background:#f9fafb;
+      text-align:left;
+      font-weight:700;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .pl-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .pl-table tbody tr:hover{ background:#f8fbff; }
+    .right{ text-align:right; }
+
+    .amount-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-end;
+      min-width:90px;
+      padding:2px 8px;
+      border-radius:8px;
+      font-weight:800;
+      font-size:13px;
+    }
+    .amount-chip.income{ color:var(--income); background:var(--income-soft); }
+    .amount-chip.expense{ color:var(--expense); background:var(--expense-soft); }
+
+    .print-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 14px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--slate-300);
+      background:#f8fafc;
+      color:#111827;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
     @media (max-width:640px){
+      .pl-page{ padding:0 16px !important; }
       .pl-title{font-size:24px !important;}
-      .pl-sub{font-size:14px !important;margin-bottom:12px !important;}
-      .pl-btn{
-        padding:9px 14px !important;
-        font-size:14px !important;
-        min-width:auto !important;
-      }
-      .pl-filter-row > div{ min-width:160px !important; }
-      .pl-chart-wrap{ max-width:100% !important; }
-      .pl-chart-wrap canvas{ height:180px !important; } /* better touch view */
-      .page{ padding:0 16px !important; }
-      .pl-table{ min-width:560px !important; } /* still scrolls, but less */
-      .pl-th, .pl-td{ font-size:14px !important; }
+      .pl-sub{font-size:14px !important;}
+      .pl-btn,
+      .pl-apply,
+      .print-btn{ width:100%; min-width:0 !important; }
+      .pl-filter-row .col{ min-width:100% !important; }
+      .kpi-grid{ grid-template-columns:1fr !important; }
+      .search-input,
+      .section-filter{ width:100%; }
+      .pl-table{ min-width:560px !important; }
+      .pl-table th,.pl-table td{ font-size:14px !important; }
+    }
+
+    @media print {
+      .no-print { display:none !important; }
+      .pl-card{ box-shadow:none; border-color:#d1d5db; }
     }
   </style>
 
-  {# ---------- Top Bar (Title + Back Button) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="pl-hero">
     <div>
-      <h1 class="pl-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">Profit &amp; Loss</h1>
-      <p class="pl-sub" style="margin:0 0 20px;font-size:15px;color:#475569;">
-        View total income, expenses, and net profit (or loss) for a selected date range.
-      </p>
+      <h1 class="pl-title">Profit &amp; Loss</h1>
+      <p class="pl-sub">View total income, expenses, and net profit (or loss) for a selected date range.</p>
     </div>
-    <div>
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary pl-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Back to Dashboard
-      </a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'dashboard' %}" class="pl-btn">← Back to Dashboard</a>
+      <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
     </div>
   </div>
 
-  {# ---------- Filter Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:6px;">
-      Filter by date range
-    </div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
-      Choose a start and end date, then click <strong>Apply</strong> to recalculate the report.
-    </p>
+  <div class="pl-card no-print">
+    <div class="pl-card-title" style="margin-bottom:6px;">Filter by date range</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">Choose a start and end date, then click <strong>Apply</strong> to recalculate the report.</p>
 
-    <form method="get"
-          class="pl-filter-row"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:200px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
-        <input type="date"
-               name="from"
-               value="{{ date_from|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+    <form method="get" class="pl-filter-row">
+      <div class="col">
+        <label>From</label>
+        <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
       </div>
 
-      <div style="min-width:200px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
-        <input type="date"
-               name="to"
-               value="{{ date_to|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+      <div class="col">
+        <label>To</label>
+        <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
       </div>
 
       <div>
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
-        </button>
+        <button type="submit" class="pl-apply">Apply</button>
       </div>
     </form>
   </div>
 
-  {# ---------- Summary Chart Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
-      <div style="font-size:18px;font-weight:600;">
-        Summary – Income vs Expenses
-      </div>
-      <div style="font-size:14px;color:#6b7280;">
-        Period: 
-        <strong>
-          {{ date_from|date:"d M Y" }} – {{ date_to|date:"d M Y" }}
-        </strong>
-      </div>
+  <div class="kpi-grid">
+    <div class="kpi income">
+      <div class="label">Total Income</div>
+      <div class="value">{{ total_income|floatformat:2 }}</div>
+    </div>
+    <div class="kpi expense">
+      <div class="label">Total Expenses</div>
+      <div class="value">{{ total_expense|floatformat:2 }}</div>
+    </div>
+    <div class="kpi net {% if net_profit >= 0 %}profit{% else %}loss{% endif %}">
+      <div class="label">Net Profit / (Loss)</div>
+      <div class="value">{{ net_profit|floatformat:2 }}</div>
+    </div>
+  </div>
+
+  <div class="pl-card">
+    <div class="pl-card-head">
+      <div class="pl-card-title">Summary Chart</div>
+      <div class="pl-card-sub">Period: <strong>{{ date_from|date:"d M Y" }} – {{ date_to|date:"d M Y" }}</strong></div>
     </div>
 
-    <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">
-      Quick visual comparison of <strong>Total Income</strong>, 
-      <strong>Total Expenses</strong> and <strong>Net Profit / (Loss)</strong>.
-    </p>
+    <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">Quick comparison of income, expenses, and net result.</p>
 
-    <div class="pl-chart-wrap" style="width:100%;max-width:680px;">
+    <div class="pl-chart-wrap" style="width:100%;max-width:760px;">
       <canvas id="plSummaryChart" height="120"></canvas>
     </div>
   </div>
 
-
-  {# ---------- Income Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:20px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Income
+  <div class="pl-card">
+    <div class="pl-card-head">
+      <div class="pl-card-title">Income Accounts</div>
+      <div class="pl-tools no-print">
+        <input type="text" id="incomeSearch" class="search-input" placeholder="Search account...">
+      </div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table class="pl-table" style="border-collapse:collapse;width:100%;min-width:620px;">
+    <div class="tbl-wrap">
+      <table class="pl-table" id="incomeTable">
         <thead>
           <tr>
-            <th class="pl-th" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
-              Account
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
-              Amount
-            </th>
+            <th>Account</th>
+            <th class="right">Amount</th>
           </tr>
         </thead>
         <tbody>
           {% for row in income_rows %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                {{ row.account.code }} – {{ row.account.name }}
-              </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-                {{ row.amount|floatformat:2 }}
-              </td>
+            <tr class="income-row">
+              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
+              <td class="right"><span class="amount-chip income">{{ row.amount|floatformat:2 }}</span></td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                No income accounts for this period.
-              </td>
+              <td colspan="2">No income accounts for this period.</td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              Total Income
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              {{ total_income|floatformat:2 }}
-            </th>
+            <th class="right">Total Income</th>
+            <th class="right">{{ total_income|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
 
-  {# ---------- Expenses Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Expenses
+  <div class="pl-card">
+    <div class="pl-card-head">
+      <div class="pl-card-title">Expense Accounts</div>
+      <div class="pl-tools no-print">
+        <input type="text" id="expenseSearch" class="search-input" placeholder="Search account...">
+      </div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:620px;">
+    <div class="tbl-wrap">
+      <table class="pl-table" id="expenseTable">
         <thead>
           <tr>
-            <th class="pl-th" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:left;font-weight:600;">
-              Account
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;background:#f9fafb;text-align:right;font-weight:600;">
-              Amount
-            </th>
+            <th>Account</th>
+            <th class="right">Amount</th>
           </tr>
         </thead>
         <tbody>
           {% for row in expense_rows %}
-            <tr>
-              <td class="pl-td" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                {{ row.account.code }} – {{ row.account.name }}
-              </td>
-              <td class="pl-td" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-                {{ row.amount|floatformat:2 }}
-              </td>
+            <tr class="expense-row">
+              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
+              <td class="right"><span class="amount-chip expense">{{ row.amount|floatformat:2 }}</span></td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="2" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:16px;">
-                No expense accounts for this period.
-              </td>
+              <td colspan="2">No expense accounts for this period.</td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              Total Expenses
-            </th>
-            <th style="border-top:2px solid #e5e7eb;padding:7px 9px;font-size:16px;text-align:right;">
-              {{ total_expense|floatformat:2 }}
-            </th>
+            <th class="right">Total Expenses</th>
+            <th class="right">{{ total_expense|floatformat:2 }}</th>
           </tr>
           <tr>
-            <th style="padding:7px 9px;font-size:16px;text-align:right;">
-              Net Profit / (Loss)
-            </th>
-            <th style="padding:7px 9px;font-size:16px;text-align:right;">
-              {{ net_profit|floatformat:2 }}
-            </th>
+            <th class="right">Net Profit / (Loss)</th>
+            <th class="right">{{ net_profit|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
@@ -218,11 +408,30 @@
   </div>
 
 </div>
-{# ---------- P&L Summary Chart JS ---------- #}
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
   (function () {
-    // Safely read Django numbers into JS
+    const incomeSearch = document.getElementById("incomeSearch");
+    const expenseSearch = document.getElementById("expenseSearch");
+
+    function bindSearch(input, rowSelector) {
+      if (!input) return;
+      const rows = Array.from(document.querySelectorAll(rowSelector));
+      input.addEventListener("input", function () {
+        const q = (input.value || "").trim().toLowerCase();
+        rows.forEach((row) => {
+          const text = (row.querySelector(".acct-cell")?.textContent || "").toLowerCase();
+          row.style.display = !q || text.includes(q) ? "" : "none";
+        });
+      });
+    }
+
+    bindSearch(incomeSearch, ".income-row");
+    bindSearch(expenseSearch, ".expense-row");
+  })();
+
+  (function () {
     const totalIncome  = parseFloat("{{ total_income|default_if_none:0|floatformat:2|cut:','|escapejs }}")  || 0;
     const totalExpense = parseFloat("{{ total_expense|default_if_none:0|floatformat:2|cut:','|escapejs }}") || 0;
     const netProfit    = parseFloat("{{ net_profit|default_if_none:0|floatformat:2|cut:','|escapejs }}")    || 0;
@@ -237,7 +446,9 @@
         datasets: [{
           label: 'Amount (Rs)',
           data: [totalIncome, totalExpense, netProfit],
-          borderWidth: 1
+          borderWidth: 1,
+          backgroundColor: ['#34d399', '#fca5a5', netProfit >= 0 ? '#86efac' : '#fecaca'],
+          borderColor: ['#10b981', '#ef4444', netProfit >= 0 ? '#22c55e' : '#ef4444']
         }]
       },
       options: {
@@ -248,16 +459,13 @@
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                // Format as 1,234,567
                 return value.toLocaleString('en-PK');
               }
             }
           }
         },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: function(context) {
@@ -269,9 +477,7 @@
               }
             }
           },
-          title: {
-            display: false
-          }
+          title: { display: false }
         }
       }
     });

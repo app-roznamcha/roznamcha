@@ -5,17 +5,61 @@
 {% block extra_head %}
 <style>
   .tp-wrap{
-    max-width: 980px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 24px 16px 44px;
+    padding: 28px 16px 56px;
+    color:#0f172a;
+  }
+
+  .tp-page-head{
+    margin-bottom:16px;
+    padding:16px 18px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:
+      radial-gradient(900px 260px at -20% -140%, #dbeafe 0%, transparent 60%),
+      radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 58%),
+      #ffffff;
+    box-shadow:0 10px 24px rgba(15,23,42,.06);
+  }
+
+  .tp-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid #dbeafe;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+
+  .tp-page-title{
+    margin:0;
+    font-size:30px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    color:#0f172a;
+  }
+
+  .tp-page-sub{
+    margin:8px 0 0;
+    color:#475569;
+    line-height:1.55;
+    max-width:860px;
   }
 
   .tp-card{
     background:#ffffff;
-    border:1px solid #e5e7eb;
+    border:1px solid #e2e8f0;
     border-radius:18px;
     box-shadow:0 10px 26px rgba(15,23,42,.06);
-    padding:18px;
+    padding:20px;
   }
 
   .tp-head{
@@ -28,8 +72,8 @@
 
   .tp-title{
     margin:0 0 6px;
-    font-size:26px;
-    font-weight:700;
+    font-size:24px;
+    font-weight:800;
     color:#0f172a;
     letter-spacing:-0.02em;
   }
@@ -46,48 +90,48 @@
     display:flex;
     gap:10px;
     flex-wrap:wrap;
-    margin:14px 0 18px;
+    margin:14px 0 16px;
   }
 
-  /* Match platform button style (base.html look) */
   .tp-btn{
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    gap:10px;
-    padding:10px 16px;
-    border-radius:999px;
-    font-weight:600;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:12px;
+    font-weight:700;
     text-decoration:none;
     border:1px solid #e5e7eb;
-    background:#ffffff;
+    background:#f8fafc;
     color:#111827;
     white-space:nowrap;
     transition: background .12s ease, border-color .12s ease, transform .12s ease, box-shadow .12s ease;
   }
   .tp-btn:hover{
-    background:#f3f4f6;
-    transform: translateY(-0.5px);
+    background:#ffffff;
+    transform: translateY(-1px);
+    border-color:#cbd5e1;
     box-shadow:0 6px 14px rgba(15,23,42,.08);
   }
 
   .tp-btn-primary{
-    background:#2563eb;
-    border-color:#2563eb;
+    background:linear-gradient(180deg,#2563eb,#1d4ed8);
+    border-color:#1d4ed8;
     color:#ffffff;
   }
   .tp-btn-primary:hover{
-    background:#1d4ed8;
+    background:linear-gradient(180deg,#1d4ed8,#1e40af);
     border-color:#1d4ed8;
   }
 
   .tp-sep{
-    border-top:1px solid #e5e7eb;
-    margin:16px 0;
+    border-top:1px solid #e2e8f0;
+    margin:16px 0 14px;
   }
 
   .tp-label{
-    margin:0 0 10px;
+    margin:0 0 12px;
     font-size:13px;
     letter-spacing:.12em;
     text-transform:uppercase;
@@ -95,25 +139,30 @@
     font-weight:700;
   }
 
-  /* Standard “download cards” */
   .tp-grid{
     display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:12px;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap:14px;
   }
   @media (max-width: 740px){
     .tp-grid{ grid-template-columns: 1fr; }
   }
 
   .tp-item{
-    border:1px solid #e5e7eb;
+    border:1px solid #dbe5f0;
     border-radius:16px;
-    padding:14px 14px;
-    background:#f8fafc;
+    padding:14px;
+    background:linear-gradient(180deg,#ffffff,#f8fbff);
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:12px;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .tp-item:hover{
+    transform:translateY(-1px);
+    border-color:#bfdbfe;
+    box-shadow:0 8px 18px rgba(15,23,42,.08);
   }
 
   .tp-item-left{
@@ -124,7 +173,8 @@
   }
 
   .tp-item-title{
-    font-weight:600;
+    font-weight:700;
+    font-size:15px;
     color:#0f172a;
     text-decoration:none;
     overflow:hidden;
@@ -134,8 +184,8 @@
   .tp-item-title:hover{ text-decoration:underline; }
 
   .tp-item-hint{
-    font-size:12.5px;
-    color:#6b7280;
+    font-size:13px;
+    color:#64748b;
     font-weight:400;
   }
 
@@ -143,8 +193,8 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    padding:9px 12px;
-    border-radius:999px;
+    padding:8px 12px;
+    border-radius:10px;
     border:1px solid #e5e7eb;
     background:#ffffff;
     color:#111827;
@@ -152,32 +202,76 @@
     text-decoration:none;
     white-space:nowrap;
     flex: 0 0 auto;
+    transition:background .12s ease, border-color .12s ease;
   }
-  .tp-dl:hover{ background:#f3f4f6; }
+  .tp-dl:hover{ background:#f8fafc; border-color:#cbd5e1; }
+
+  .tp-utility{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .tp-util{
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:10px 12px;
+    background:#ffffff;
+  }
+
+  .tp-util-label{
+    color:#64748b;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-weight:700;
+    margin-bottom:2px;
+  }
+
+  .tp-util-value{
+    color:#0f172a;
+    font-size:14px;
+    font-weight:700;
+  }
 
   .tp-foot{
     margin:16px 0 0;
-    color:#6b7280;
+    color:#64748b;
     font-size:13px;
     font-weight:400;
+    border-top:1px dashed #e2e8f0;
+    padding-top:10px;
   }
 
-  /* Mobile polish */
   @media (max-width: 520px){
-    .tp-title{ font-size:24px; }
+    .tp-wrap{ padding-top:20px; }
+    .tp-page-title{ font-size:24px; }
+    .tp-title{ font-size:21px; }
+    .tp-page-head{ padding:14px; border-radius:14px; }
     .tp-card{ padding:16px; }
     .tp-actions{ margin-top:12px; }
+    .tp-btn{ width:100%; justify-content:center; }
+    .tp-utility{ grid-template-columns:1fr; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="tp-wrap">
+  <div class="tp-page-head">
+    <div class="tp-kicker">Compliance</div>
+    <h1 class="tp-page-title">Tax Pack</h1>
+    <p class="tp-page-sub">
+      Export ready-to-share ledgers and reference lists for accountant, auditor, or legal filing workflows.
+    </p>
+  </div>
+
   <div class="tp-card">
 
     <div class="tp-head">
       <div>
-        <h1 class="tp-title">🧾 Tax Pack</h1>
+        <h2 class="tp-title">Tax Pack Downloads</h2>
         <p class="tp-sub">
           Download Excel templates/ledgers for tax preparation. (For owner/lawyer use — not FBR API integrated.)
         </p>
@@ -191,6 +285,21 @@
       <a href="{% url 'dashboard' %}" class="tp-btn">
         ← Back to Dashboard
       </a>
+    </div>
+
+    <div class="tp-utility">
+      <div class="tp-util">
+        <div class="tp-util-label">Formats</div>
+        <div class="tp-util-value">Excel + ZIP</div>
+      </div>
+      <div class="tp-util">
+        <div class="tp-util-label">Scope</div>
+        <div class="tp-util-value">Current tenant data only</div>
+      </div>
+      <div class="tp-util">
+        <div class="tp-util-label">Generated On</div>
+        <div class="tp-util-value">{{ today }}</div>
+      </div>
     </div>
 
     <div class="tp-sep"></div>
@@ -249,7 +358,7 @@
 
     </div>
 
-    <p class="tp-foot">Generated on: {{ today }}</p>
+    <p class="tp-foot">Tip: Start with Full ZIP for submission, then share individual ledgers only when requested.</p>
 
   </div>
 </div>
