@@ -3,51 +3,398 @@
 {% block title %}Bank & Cash Accounts{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:900px;margin:40px auto 60px;padding:0 16px;">
+<div class="ua-page">
+  <style>
+    .ua-page{
+      max-width:980px;
+      margin:34px auto 64px;
+      padding:0 16px;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --line:#dbe3ee;
+      --line-soft:#e5e7eb;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+      --surface-soft:#f8fafc;
+    }
+
+    .ua-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px 22px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
+    }
+
+    .ua-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .ua-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:740px;
+    }
+
+    .ua-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cfd9e6;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .ua-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .ua-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .ua-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      margin-bottom:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .ua-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+      opacity:.75;
+    }
+
+    .ua-card-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .ua-card-sub{
+      margin:4px 0 12px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.45;
+    }
+
+    .ua-alert{
+      margin-bottom:14px;
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:14px;
+      border:1px solid;
+    }
+
+    .ua-alert.error{
+      background:#fee2e2;
+      color:#b91c1c;
+      border-color:#fecaca;
+    }
+
+    .ua-alert.ok{
+      background:#dcfce7;
+      color:#166534;
+      border-color:#bbf7d0;
+    }
+
+    .ua-form-grid{
+      display:grid;
+      grid-template-columns:repeat(12, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .ua-field{ grid-column:span 12; }
+    .ua-col-code{ grid-column:span 4; }
+    .ua-col-opening{ grid-column:span 4; }
+    .ua-col-side{ grid-column:span 4; }
+    .ua-col-name{ grid-column:span 12; }
+
+    .ua-field label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:5px;
+      color:var(--ink-700);
+    }
+
+    .ua-field input,
+    .ua-field select{
+      width:100%;
+      min-height:42px;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:9px 11px;
+      font-size:14px;
+      color:#0f172a;
+      background:var(--surface-soft);
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .ua-field input:focus,
+    .ua-field select:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      background:#fff;
+    }
+
+    .ua-hint{
+      font-size:12px;
+      color:#6b7280;
+      margin-top:3px;
+    }
+
+    .ua-tools{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .ua-chip{
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+
+    .ua-preview{
+      margin-top:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .ua-table-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .ua-search{
+      min-width:250px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .ua-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .ua-search input{
+      width:100%;
+      min-height:40px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+    }
+
+    .ua-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .ua-stats{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:10px;
+    }
+
+    .ua-stat{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .ua-table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid var(--line-soft);
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .ua-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:720px;
+    }
+
+    .ua-table th,
+    .ua-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .ua-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .ua-table tbody tr:nth-child(even){ background:#fbfdff; }
+    .ua-table tbody tr:hover{ background:#f8fbff; }
+    .ua-table tbody tr.is-hidden{ display:none; }
+
+    .center{text-align:center;}
+
+    .ua-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:54px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid;
+    }
+
+    .ua-pill.yes{
+      color:#166534;
+      background:#ecfdf3;
+      border-color:#bbf7d0;
+    }
+
+    .ua-pill.no{
+      color:#b91c1c;
+      background:#fee2e2;
+      border-color:#fecaca;
+    }
+
+    .ua-delete{
+      border:none;
+      background:none;
+      color:#b91c1c;
+      font-size:13px;
+      text-decoration:underline;
+      cursor:pointer;
+      padding:0;
+      font-weight:700;
+    }
+
+    @media (max-width:840px){
+      .ua-col-code, .ua-col-opening, .ua-col-side{ grid-column:span 12; }
+    }
+
+    @media (max-width:640px){
+      .ua-page{ padding:0 14px; margin:22px auto 52px; }
+      .ua-hero{ padding:16px; }
+      .ua-title{ font-size:25px; }
+      .ua-sub{ font-size:14px; }
+      .ua-btn{ width:100%; min-width:0; }
+      .ua-search{ min-width:100%; max-width:100%; }
+    }
+  </style>
 
   {# ---------- Top Bar ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="ua-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
-        🏦 Bank &amp; Cash Accounts
-      </h1>
-      <p style="margin:0 0 16px;font-size:15px;color:#475569;">
+      <h1 class="ua-title">🏦 Bank &amp; Cash Accounts</h1>
+      <p class="ua-sub">
         Define accounts like <strong>HBL</strong>, <strong>Cash Counter</strong>,
         <strong>Easypaisa</strong>, etc. These will appear on
         <em>New Sale</em>, <em>New Purchase</em> and <em>New Payment</em> screens.
       </p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;min-width:140px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
-      </a>
+    <div>
+      <a href="{% url 'dashboard' %}" class="ua-btn">← Dashboard</a>
     </div>
   </div>
 
   {# ---------- Messages ---------- #}
   {% if error %}
-    <div style="margin-bottom:14px;padding:10px 12px;border-radius:10px;
-                font-size:14px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
-      {{ error }}
-    </div>
+    <div class="ua-alert error">{{ error }}</div>
   {% endif %}
   {% if message %}
-    <div style="margin-bottom:14px;padding:10px 12px;border-radius:10px;
-                font-size:14px;background:#dcfce7;color:#166534;border:1px solid #bbf7d0;">
-      {{ message }}
-    </div>
+    <div class="ua-alert ok">{{ message }}</div>
   {% endif %}
 
   {# ---------- Add / Update Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-              margin-bottom:22px;">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Add / Update Account
-    </div>
-    <p style="margin:0 0 14px;font-size:14px;color:#6b7280;">
+  <div class="ua-card">
+    <h2 class="ua-card-title">Add / Update Account</h2>
+    <p class="ua-card-sub">
       Create a new bank or cash account. You can later adjust its code or name if required.
     </p>
 
@@ -55,139 +402,99 @@
       {% csrf_token %}
       <input type="hidden" name="account_id" id="account_id">
 
-      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:10px;">
-        <div style="flex:1 1 180px;min-width:220px;max-width:260px;">
-          <label for="code" style="display:block;font-size:14px;margin-bottom:4px;">
-            Code
-          </label>
-          <input type="text"
-                 name="code"
-                 id="code"
-                 required
-                 placeholder="e.g. HBL01, CASH1"
-                 style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-          <div style="font-size:12px;color:#6b7280;margin-top:3px;">
-            Short unique code for this account.
+      <div class="ua-form-grid">
+        <div class="ua-field ua-col-code">
+          <label for="code">Code</label>
+          <input type="text" name="code" id="code" required placeholder="e.g. HBL01, CASH1">
+          <div class="ua-hint">Short unique code for this account.</div>
+        </div>
+
+        <div class="ua-field ua-col-opening">
+          <label for="opening_amount">Opening Balance (optional)</label>
+          <input type="number" step="0.01" name="opening_amount" id="opening_amount" placeholder="e.g. 50000.00">
+          <div class="ua-hint">Leave blank for zero. Applied only when creating a new account.</div>
+          <div class="ua-tools">
+            <button type="button" class="ua-chip" data-set-opening="10000">+10,000</button>
+            <button type="button" class="ua-chip" data-set-opening="50000">+50,000</button>
+            <button type="button" class="ua-chip" data-set-opening="100000">+100,000</button>
+            <button type="button" class="ua-chip" data-set-opening="0">Clear</button>
           </div>
         </div>
 
-              <!-- Opening balance for NEW accounts (optional) -->
-
-        <div style="flex:1 1 180px;min-width:220px;max-width:260px;">
-          <label for="opening_amount" style="display:block;font-size:14px;margin-bottom:4px;">
-            Opening Balance (optional)
-          </label>
-          <input type="number"
-                 step="0.01"
-                 name="opening_amount"
-                 id="opening_amount"
-                 placeholder="e.g. 50000.00"
-                 style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-                 <div style="font-size:12px;color:#6b7280;margin-top:3px;">
-                  Leave blank for zero. Applied only when creating a new account.
-                </div>
-              </div>
-      
-              <div style="flex:0 0 140px;min-width:140px;">
-          <label for="opening_side" style="display:block;font-size:14px;margin-bottom:4px;">
-            Dr / Cr
-          </label>
-          <select name="opening_side"
-                  id="opening_side"
-                  style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;">
+        <div class="ua-field ua-col-side">
+          <label for="opening_side">Dr / Cr</label>
+          <select name="opening_side" id="opening_side">
             <option value="DEBIT" selected>Debit (positive balance)</option>
             <option value="CREDIT">Credit (overdraft)</option>
           </select>
         </div>
-      </div>
 
-        <div style="flex:2 1 260px;min-width:260px;">
-          <label for="name" style="display:block;font-size:14px;margin-bottom:4px;">
-            Account Name
-          </label>
-          <input type="text"
-                 name="name"
-                 id="name"
-                 required
-                 placeholder="e.g. HBL Main Branch, Easypaisa Wallet"
-                 style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        <div class="ua-field ua-col-name">
+          <label for="name">Account Name</label>
+          <input type="text" name="name" id="name" required placeholder="e.g. HBL Main Branch, Easypaisa Wallet">
         </div>
-
-
       </div>
 
-      <button type="submit"
-              class="btn-primary"
-              style="display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-size:16px;font-weight:800;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;min-width:160px;">
-        💾 Save Account
-      </button>
+      <div class="ua-preview">Opening Preview: <span id="openingPreview">0.00</span> (<span id="openingSidePreview">DEBIT</span>)</div>
+
+      <div style="margin-top:14px;">
+        <button type="submit" class="ua-btn ua-btn-primary">💾 Save Account</button>
+      </div>
     </form>
   </div>
 
   {# ---------- Existing Accounts Card ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-      Existing Bank &amp; Cash Accounts
+  <div class="ua-card">
+    <div class="ua-table-head">
+      <div>
+        <h2 class="ua-card-title">Existing Bank &amp; Cash Accounts</h2>
+        <p class="ua-card-sub" style="margin-bottom:0;">
+          These accounts will appear when recording receipts, payments, purchases and sales.
+        </p>
+      </div>
+      <div class="ua-search">
+        <label for="accountQuickSearch">Quick Search (code / name / type)</label>
+        <input id="accountQuickSearch" type="text" placeholder="Type to filter visible rows...">
+      </div>
     </div>
-    <p style="margin:0 0 12px;font-size:14px;color:#6b7280;">
-      These accounts will appear when recording receipts, payments, purchases and sales.
-    </p>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:650px;">
+    <div class="ua-stats">
+      <span class="ua-stat">Server Rows: <span id="server-row-count">{{ accounts|length }}</span></span>
+      <span class="ua-stat">Visible Rows: <span id="visible-row-count">{{ accounts|length }}</span></span>
+    </div>
+
+    <div class="ua-table-wrap">
+      <table class="ua-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:13%;">
-              Code
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">
-              Name
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;width:15%;">
-              Type
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;width:18%;">
-              Used for Payments?
-            </th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;width:12%;">
-              Action
-            </th>
+            <th style="width:13%;">Code</th>
+            <th>Name</th>
+            <th style="width:15%;">Type</th>
+            <th class="center" style="width:18%;">Used for Payments?</th>
+            <th class="center" style="width:12%;">Action</th>
           </tr>
         </thead>
         <tbody>
         {% for acc in accounts %}
-          <tr>
-            <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-              {{ acc.code }}
-            </td>
-            <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-              {{ acc.name }}
-            </td>
-            <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;">
-              {{ acc.get_account_type_display }}
-            </td>
-            <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:15px;text-align:center;">
+          <tr class="account-row">
+            <td>{{ acc.code }}</td>
+            <td style="font-weight:700;color:#0f172a;">{{ acc.name }}</td>
+            <td>{{ acc.get_account_type_display }}</td>
+            <td class="center">
               {% if acc.allow_for_payments %}
-                <span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#dcfce7;color:#166534;">
-                  Yes
-                </span>
+                <span class="ua-pill yes">Yes</span>
               {% else %}
-                <span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#fee2e2;color:#b91c1c;">
-                  No
-                </span>
+                <span class="ua-pill no">No</span>
               {% endif %}
             </td>
-            <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
-              <form method="post"
-                    action="{% url 'user_account_delete' acc.id %}"
-                    style="display:inline;margin:0;">
+            <td class="center">
+              <form method="post" action="{% url 'user_account_delete' acc.id %}" style="display:inline;margin:0;">
                 {% csrf_token %}
-                <button type="submit"
-                        title="Delete account"
-                        onclick="return confirm('Delete {{ acc.code }} – {{ acc.name }}?\n\nIf this account is used in transactions, deletion will be blocked.');"
-                        style="border:none;background:none;color:#b91c1c;font-size:13px;
-                               text-decoration:underline;cursor:pointer;padding:0;">
+                <button
+                  type="submit"
+                  class="ua-delete"
+                  title="Delete account"
+                  onclick="return confirm('Delete {{ acc.code }} – {{ acc.name }}?\n\nIf this account is used in transactions, deletion will be blocked.');">
                   Delete
                 </button>
               </form>
@@ -195,8 +502,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="5"
-                style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;color:#6b7280;">
+            <td colspan="5" style="padding:12px 10px;font-size:14px;color:#6b7280;">
               No bank/cash accounts defined yet.
             </td>
           </tr>
@@ -207,4 +513,55 @@
   </div>
 
 </div>
+
+<script>
+  (function () {
+    const openingInput = document.getElementById("opening_amount");
+    const sideSelect = document.getElementById("opening_side");
+    const openingPreview = document.getElementById("openingPreview");
+    const sidePreview = document.getElementById("openingSidePreview");
+    const chips = document.querySelectorAll("[data-set-opening]");
+    const searchInput = document.getElementById("accountQuickSearch");
+    const rows = Array.from(document.querySelectorAll("tr.account-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+
+    function fmt(n) {
+      const v = parseFloat(n || 0) || 0;
+      return v.toFixed(2);
+    }
+
+    function updateOpeningPreview() {
+      if (openingPreview) openingPreview.textContent = fmt(openingInput && openingInput.value);
+      if (sidePreview && sideSelect) sidePreview.textContent = sideSelect.value;
+    }
+
+    function applyQuickFilter() {
+      const q = ((searchInput && searchInput.value) || "").trim().toLowerCase();
+      let visible = 0;
+      rows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (!openingInput) return;
+        const val = parseFloat(chip.getAttribute("data-set-opening") || "0") || 0;
+        openingInput.value = val === 0 ? "" : String(val);
+        updateOpeningPreview();
+      });
+    });
+
+    if (openingInput) openingInput.addEventListener("input", updateOpeningPreview);
+    if (sideSelect) sideSelect.addEventListener("change", updateOpeningPreview);
+    if (searchInput) searchInput.addEventListener("input", applyQuickFilter);
+
+    updateOpeningPreview();
+    applyQuickFilter();
+  })();
+</script>
 {% endblock %}

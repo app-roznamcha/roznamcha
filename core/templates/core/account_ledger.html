@@ -4,164 +4,417 @@
 {% block container_class %}is-fluid{% endblock %}
 
 {% block content %}
-<div class="page" style="width:100%;margin:40px 0 60px;padding:0 16px;">
+<div class="account-ledger-page">
+  <style>
+    .account-ledger-page{
+      width:100%;
+      margin:34px 0 64px;
+      padding:0 16px;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --line:#dbe3ee;
+      --line-soft:#e5e7eb;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+      --surface-soft:#f8fafc;
+    }
 
-  {# ---------- Top Bar (Title + Back Button) ---------- #}
-  <div class="top-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+    .al-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px 22px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
+    }
+
+    .al-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .al-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:800px;
+    }
+
+    .al-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cfd9e6;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .al-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .al-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .al-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      margin-bottom:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .al-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+      opacity:.75;
+    }
+
+    .al-card-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .al-card-sub{
+      margin:4px 0 12px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.45;
+    }
+
+    .al-filter{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+
+    .al-filter .field{
+      min-width:180px;
+      flex:1;
+    }
+    .al-filter .field.account{ min-width:260px; flex:2; }
+    .al-filter .field.small{ min-width:160px; max-width:220px; flex:0 0 auto; }
+
+    .al-filter label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:5px;
+      color:var(--ink-700);
+    }
+
+    .al-filter select,
+    .al-filter input[type="date"]{
+      width:100%;
+      min-height:42px;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:9px 11px;
+      font-size:14px;
+      color:#0f172a;
+      background:var(--surface-soft);
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .al-filter select:focus,
+    .al-filter input[type="date"]:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      background:#fff;
+    }
+
+    .al-check{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      color:#1f2937;
+      font-weight:600;
+      min-height:42px;
+    }
+
+    .al-actions{
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .al-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .al-kpis{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .al-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .al-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .al-search{
+      min-width:260px;
+      max-width:380px;
+      flex:1;
+    }
+
+    .al-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .al-search input{
+      width:100%;
+      min-height:40px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+    }
+
+    .al-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .al-table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid var(--line-soft);
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .al-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:960px;
+    }
+
+    .al-table th,
+    .al-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .al-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+      white-space:nowrap;
+    }
+
+    .al-table tbody tr:nth-child(even){ background:#fbfdff; }
+    .al-table tbody tr:hover{ background:#f8fbff; }
+    .al-table tbody tr.is-hidden{ display:none; }
+
+    .right{text-align:right;}
+    .type-cell,.counter-cell{color:#334155;white-space:nowrap;}
+    .date-cell{white-space:nowrap;}
+    .debit{color:#166534;white-space:nowrap;}
+    .credit{color:#dc2626;white-space:nowrap;}
+    .balance-cell{white-space:nowrap;}
+    .balance-label{color:#64748b;font-size:12px;margin-left:6px;}
+
+    @media (max-width:640px){
+      .account-ledger-page{ padding:0 14px; margin:22px 0 52px; }
+      .al-hero{ padding:16px; }
+      .al-title{ font-size:25px; }
+      .al-sub{ font-size:14px; }
+      .al-btn{ width:100%; min-width:0; }
+      .al-filter .field, .al-filter .field.account, .al-filter .field.small{
+        min-width:100%;
+        max-width:100%;
+        flex:1 1 100%;
+      }
+      .al-search{ min-width:100%; max-width:100%; }
+    }
+  </style>
+
+  <div class="al-hero">
     <div>
-      <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">Account Ledger</h1>
-      <p class="subtitle" style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <h1 class="al-title">Account Ledger</h1>
+      <p class="al-sub">
         View detailed debit/credit movements and running balance for a single account.
       </p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:140px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
-        ← Dashboard
-      </a>
+    <div>
+      <a href="{% url 'dashboard' %}" class="al-btn">← Dashboard</a>
     </div>
   </div>
 
-  {# ---------- Filter Card ---------- #}
-  <div class="card"
-       style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:20px;">
-    <div class="card-title" style="font-size:18px;font-weight:600;margin-bottom:6px;">
-      Filters
-    </div>
-    <div class="card-subtitle" style="font-size:15px;color:#475569;margin-bottom:14px;">
-      Choose an account and optional date range, then click <strong>Apply</strong>.
-    </div>
+  <div class="al-card">
+    <h2 class="al-card-title">Filters</h2>
+    <p class="al-card-sub">Choose an account and optional date range, then click <strong>Apply</strong>.</p>
 
-    <form method="get"
-          class="filter-form"
-          style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-          <div style="min-width:220px;flex:1;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">Account</label>
-        <select name="account"
-                style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
+    <form method="get" class="al-filter">
+      <div class="field account">
+        <label>Account</label>
+        <select name="account">
           <option value="">-- Select account --</option>
           {% for acc in accounts %}
-            <option value="{{ acc.id }}"
-                    {% if selected_account and acc.id == selected_account.id %}selected{% endif %}>
+            <option value="{{ acc.id }}" {% if selected_account and acc.id == selected_account.id %}selected{% endif %}>
               {{ acc.code }} - {{ acc.name }}
             </option>
           {% endfor %}
         </select>
-        
       </div>
-      <div style="min-width:180px;">
-        <label style="display:flex;gap:8px;align-items:center;font-size:14px;">
-          <input type="checkbox" name="show_system" value="1"
-                 {% if show_system %}checked{% endif %}>
+
+      <div class="field small">
+        <label>From</label>
+        <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
+      </div>
+
+      <div class="field small">
+        <label>To</label>
+        <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
+      </div>
+
+      <div class="field" style="min-width:220px;flex:0 0 auto;">
+        <label class="al-check">
+          <input type="checkbox" name="show_system" value="1" {% if show_system %}checked{% endif %}>
           Show system accounts
         </label>
       </div>
-      <div style="min-width:160px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">From</label>
-        <input type="date"
-               name="from"
-               value="{{ date_from|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-      </div>
 
-      <div style="min-width:160px;">
-        <label style="display:block;font-size:14px;margin-bottom:4px;">To</label>
-        <input type="date"
-               name="to"
-               value="{{ date_to|date:'Y-m-d' }}"
-               style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;">
-      </div>
-
-      <div style="display:flex;gap:8px;align-items:flex-end;">
-        <button type="submit"
-                class="btn btn-primary"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
-          Apply
-        </button>
-
-        <a href="{% url 'account_ledger' %}"
-           class="btn btn-secondary"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
-          Reset
-        </a>
+      <div class="al-actions">
+        <button type="submit" class="al-btn al-btn-primary">Apply</button>
+        <a href="{% url 'account_ledger' %}" class="al-btn">Reset</a>
       </div>
     </form>
   </div>
 
-  {# ---------- Ledger Result Card ---------- #}
   {% if selected_account %}
-    <div class="card"
-         style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
-        <div class="card-title" style="font-size:18px;font-weight:600;margin:0;">
-          {{ selected_account.code }} – {{ selected_account.name }}
-        </div>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:14px;color:#475569;">
-          <span style="background:#f8fafc;border:1px solid #e5e7eb;padding:6px 10px;border-radius:999px;">
-            Opening: <strong style="font-weight:700;color:#0f172a;">{{ opening_balance|floatformat:2 }}</strong>
-          </span>
-          <span style="background:#f8fafc;border:1px solid #e5e7eb;padding:6px 10px;border-radius:999px;">
-            Closing: <strong style="font-weight:700;color:#0f172a;">{{ closing_balance|floatformat:2 }}</strong>
-          </span>
+    <div class="al-card">
+      <div class="al-head">
+        <h2 class="al-card-title">{{ selected_account.code }} – {{ selected_account.name }}</h2>
+        <div class="al-kpis">
+          <span class="al-chip">Opening: <strong>{{ opening_balance|floatformat:2 }}</strong></span>
+          <span class="al-chip">Closing: <strong>{{ closing_balance|floatformat:2 }}</strong></span>
+          <span class="al-chip">Rows: <span id="visible-row-count">{{ rows|length }}</span>/<span id="server-row-count">{{ rows|length }}</span></span>
         </div>
       </div>
 
-      <div class="table-wrapper" style="width:100%;overflow-x:auto;">
-        <table style="border-collapse:collapse;width:100%;min-width:900px;">
+      <div class="al-toolbar">
+        <div></div>
+        <div class="al-search">
+          <label for="ledgerSearch">Quick Search (type / counter / description)</label>
+          <input id="ledgerSearch" type="text" placeholder="Type to filter visible rows...">
+        </div>
+      </div>
+
+      <div class="al-table-wrap">
+        <table class="al-table">
           <thead>
             <tr>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Date</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Type</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;white-space:nowrap;">Counter Account</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Description</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;white-space:nowrap;">Debit (↑)</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;white-space:nowrap;">Credit (↓)</th>
-              <th style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;background:#f9fafb;text-align:right;font-weight:600;white-space:nowrap;">Balance</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Counter Account</th>
+              <th>Description</th>
+              <th class="right">Debit (↑)</th>
+              <th class="right">Credit (↓)</th>
+              <th class="right">Balance</th>
             </tr>
           </thead>
           <tbody>
             {% if rows %}
               {% for r in rows %}
-                <tr>
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;white-space:nowrap;">
-                    {{ r.date|date:"M j, Y" }}
-                  </td>
-
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;white-space:nowrap;color:#334155;">
-                    {{ r.type|default:"Journal" }}
-                  </td>
-
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;white-space:nowrap;color:#334155;">
-                    {{ r.counter|default:"—" }}
-                  </td>
-
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;">
-                    {{ r.description }}
-                  </td>
-
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;text-align:right;white-space:nowrap;color:#166534;">
-                    {% if r.debit and r.debit != 0 %}↑ {{ r.debit|floatformat:2 }}{% else %}—{% endif %}
-                  </td>
-
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;text-align:right;white-space:nowrap;color:#dc2626;">
-                    {% if r.credit and r.credit != 0 %}↓ {{ r.credit|floatformat:2 }}{% else %}—{% endif %}
-                  </td>
-
-                  <td style="border-bottom:1px solid #e5e7eb;padding:8px 10px;font-size:14px;text-align:right;white-space:nowrap;">
+                <tr class="ledger-row">
+                  <td class="date-cell">{{ r.date|date:"M j, Y" }}</td>
+                  <td class="type-cell">{{ r.type|default:"Journal" }}</td>
+                  <td class="counter-cell">{{ r.counter|default:"—" }}</td>
+                  <td>{{ r.description }}</td>
+                  <td class="right debit">{% if r.debit and r.debit != 0 %}↑ {{ r.debit|floatformat:2 }}{% else %}—{% endif %}</td>
+                  <td class="right credit">{% if r.credit and r.credit != 0 %}↓ {{ r.credit|floatformat:2 }}{% else %}—{% endif %}</td>
+                  <td class="right balance-cell">
                     {{ r.balance|floatformat:2 }}
-                    {% if r.balance_label %}
-                      <span style="color:#64748b;font-size:12px;margin-left:6px;">{{ r.balance_label }}</span>
-                    {% endif %}
+                    {% if r.balance_label %}<span class="balance-label">{{ r.balance_label }}</span>{% endif %}
                   </td>
                 </tr>
               {% endfor %}
             {% else %}
               <tr>
-                <td colspan="7"
-                    style="border-bottom:1px solid #e5e7eb;padding:12px 10px;font-size:14px;text-align:center;color:#6b7280;">
+                <td colspan="7" style="padding:12px 10px;font-size:14px;text-align:center;color:#6b7280;">
                   No transactions for this period.
                 </td>
               </tr>
@@ -171,6 +424,29 @@
       </div>
     </div>
   {% endif %}
-
 </div>
+
+<script>
+  (function () {
+    const input = document.getElementById("ledgerSearch");
+    const rows = Array.from(document.querySelectorAll(".ledger-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+    if (!input) return;
+
+    function applyQuickFilter() {
+      const q = (input.value || "").trim().toLowerCase();
+      let visible = 0;
+      rows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    input.addEventListener("input", applyQuickFilter);
+    applyQuickFilter();
+  })();
+</script>
 {% endblock %}

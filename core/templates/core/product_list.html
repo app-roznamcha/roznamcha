@@ -2,88 +2,363 @@
 {% block title %}Products{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="product-list-page">
   <style>
+    .product-list-page{
+      max-width:1150px;
+      margin:34px auto 64px;
+      padding:0 16px;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --line:#dbe3ee;
+      --line-soft:#e5e7eb;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+    }
+
+    .pr-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px 22px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
+    }
+
+    .pr-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .pr-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:720px;
+    }
+
+    .pr-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .pr-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cfd9e6;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .pr-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .pr-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .pr-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .pr-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+      opacity:.75;
+    }
+
+    .pr-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .pr-card-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .pr-note{
+      margin:4px 0 0;
+      font-size:13px;
+      color:#64748b;
+    }
+
+    .pr-stats{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:10px;
+    }
+
+    .pr-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .pr-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .pr-search{
+      min-width:260px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .pr-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .pr-search input{
+      width:100%;
+      min-height:40px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .pr-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .pr-table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid var(--line-soft);
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .products-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:950px;
+    }
+
+    .products-table th,
+    .products-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .products-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .products-table tbody tr:nth-child(even){ background:#fbfdff; }
+    .products-table tbody tr:hover{ background:#f8fbff; }
+    .products-table tbody tr.is-hidden{ display:none; }
+
+    .right{text-align:right;}
+    .center{text-align:center;}
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:54px;
+      border-radius:999px;
+      border:1px solid;
+      padding:4px 8px;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .status.on{
+      color:#166534;
+      background:#ecfdf3;
+      border-color:#bbf7d0;
+    }
+
+    .status.off{
+      color:#b91c1c;
+      background:#fef2f2;
+      border-color:#fecaca;
+    }
+
+    .edit-link{
+      color:#1d4ed8;
+      text-decoration:none;
+      font-weight:700;
+      font-size:13px;
+    }
+
     @media (max-width:640px){
-      .products-title{font-size:24px !important;}
-      .products-sub{font-size:14px !important;margin-bottom:12px !important;}
-      .products-btn{
-        padding:9px 14px !important;
-        font-size:14px !important;
-        min-width:auto !important;
-      }
-      .page{ padding:0 16px !important; }
+      .product-list-page{padding:0 14px !important; margin:22px auto 52px;}
+      .pr-hero{padding:16px;}
+      .pr-title{font-size:25px !important;}
+      .pr-sub{font-size:14px !important;}
+      .pr-btn{width:100%; min-width:0;}
+      .pr-search{min-width:100%; max-width:100%;}
       .products-table{ min-width:860px !important; } /* still scrolls horizontally */
     }
   </style>
 
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="pr-hero">
     <div>
-      <h1 class="products-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">Products</h1>
-      <p class="products-sub" style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <h1 class="pr-title">Products</h1>
+      <p class="pr-sub">
         Listing of all products with units, prices, and current stock status.
       </p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="pr-actions">
       <a href="{% url 'dashboard' %}"
-         class="btn btn-secondary products-btn"
-         class="btn btn-secondary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:160px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+         class="pr-btn">
         ← Dashboard
       </a>
       <a href="{% url 'product_create' %}"
-         class="btn btn-primary products-btn"
-         class="btn btn-primary"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+         class="pr-btn pr-btn-primary">
         ➕ New Product
       </a>
     </div>
   </div>
 
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:0;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="width:100%;overflow-x:auto;">
-      <table class="products-table" style="border-collapse:collapse;width:100%;min-width:900px;">
+  <div class="pr-card">
+    <div class="pr-top">
+      <div>
+        <h2 class="pr-card-title">All Products</h2>
+        <p class="pr-note">Review and edit product prices, units, and active status.</p>
+      </div>
+    </div>
+
+    <div class="pr-stats">
+      <span class="pr-chip">Server Rows: <span id="server-row-count">{{ products|length }}</span></span>
+      <span class="pr-chip">Visible Rows: <span id="visible-row-count">{{ products|length }}</span></span>
+    </div>
+
+    <div class="pr-toolbar">
+      <div></div>
+      <div class="pr-search">
+        <label for="productQuickSearch">Quick Search (code / name / unit)</label>
+        <input id="productQuickSearch" type="text" placeholder="Type to filter visible rows...">
+      </div>
+    </div>
+
+    <div class="pr-table-wrap">
+      <table class="products-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Code</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Name</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:left;font-weight:600;">Unit</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Purchase Price</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Sale Price</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:right;font-weight:600;">Stock</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Active?</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;background:#f9fafb;text-align:center;font-weight:600;">Action</th>
+            <th>#</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Unit</th>
+            <th class="right">Purchase Price</th>
+            <th class="right">Sale Price</th>
+            <th class="right">Stock</th>
+            <th class="center">Active?</th>
+            <th class="center">Action</th>
           </tr>
         </thead>
         <tbody>
           {% if products %}
           {% for p in products %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ forloop.counter }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ p.code }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ p.name }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;">{{ p.get_unit_display }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:right;">
+            <tr class="product-row">
+              <td>{{ forloop.counter }}</td>
+              <td>{{ p.code }}</td>
+              <td style="font-weight:700;color:#0f172a;">{{ p.name }}</td>
+              <td>{{ p.get_unit_display }}</td>
+              <td class="right">
                 {{ p.purchase_price_per_unit }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:right;">
+              <td class="right">
                 {{ p.sale_price_per_unit }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:right;">
+              <td class="right">
                 {{ p.current_stock }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:center;">
+              <td class="center">
                 {% if p.is_active %}
-                  <span style="color:#166534;font-weight:600;">Yes</span>
+                  <span class="status on">Yes</span>
                 {% else %}
-                  <span style="color:#b91c1c;font-weight:600;">No</span>
+                  <span class="status off">No</span>
                 {% endif %}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:9px 9px;font-size:15px;text-align:center;">
+              <td class="center">
                 <a href="{% url 'product_edit' p.id %}"
-                   style="color:#0d6efd;text-decoration:none;font-weight:500;">
+                   class="edit-link">
                   Edit
                 </a>
               </td>
@@ -101,4 +376,28 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    const input = document.getElementById("productQuickSearch");
+    const rows = Array.from(document.querySelectorAll("tr.product-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+    if (!input) return;
+
+    function applyQuickFilter() {
+      const q = (input.value || "").trim().toLowerCase();
+      let visible = 0;
+      rows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    input.addEventListener("input", applyQuickFilter);
+    applyQuickFilter();
+  })();
+</script>
 {% endblock %}

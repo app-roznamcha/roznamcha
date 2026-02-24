@@ -2,36 +2,229 @@
 {% block title %}{% if product %}Edit Product{% else %}New Product{% endif %}{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:720px;margin:40px auto 60px;padding:0 26px;">
+<div class="product-form-page">
   <style>
+    .product-form-page{
+      max-width:860px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --line:#dbe3ee;
+      --line-strong:#cfd9e6;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+      --surface-soft:#f8fafc;
+    }
+
+    .pf-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px 22px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
+    }
+
+    .pf-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .pf-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:620px;
+    }
+
+    .pf-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 16px;
+      min-width:170px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid var(--line-strong);
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .pf-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .pf-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .pf-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      margin-bottom:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .pf-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+      opacity:.75;
+    }
+
+    .pf-card-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .pf-card-sub{
+      margin:4px 0 10px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.45;
+    }
+
+    .pf-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .pf-field label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:5px;
+      color:var(--ink-700);
+    }
+
+    .pf-field input,
+    .pf-field select{
+      width:100%;
+      min-height:42px;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:9px 11px;
+      font-size:14px;
+      color:#0f172a;
+      background:var(--surface-soft);
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .pf-field input:focus,
+    .pf-field select:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      background:#fff;
+    }
+
+    .pf-error{
+      margin-bottom:16px;
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:14px;
+      background:#fee2e2;
+      color:#b91c1c;
+      border:1px solid #fecaca;
+    }
+
+    .pf-inline-check{
+      margin-top:6px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      color:#0f172a;
+      font-weight:600;
+    }
+
+    .pf-pack-preview{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .pf-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .pf-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .req{ color:#b91c1c; }
+
     @media (max-width:640px){
-      .prod-title{font-size:24px !important;}
-      .prod-sub{font-size:14px !important;}
-      .prod-btn{
-        padding:9px 14px !important;
-        font-size:14px !important;
-        min-width:auto !important;
-      }
-      .page{
-        padding:0 16px !important;
-      }
+      .product-form-page{ padding:0 14px !important; margin:22px auto 52px; }
+      .pf-hero{ padding:16px; }
+      .pf-title{font-size:25px !important;}
+      .pf-sub{font-size:14px !important;}
+      .pf-btn{ width:100%; min-width:0; }
     }
   </style>
 
   {# ---------- Top Bar (Title + Back Button) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="pf-hero">
     <div>
-      <h1 class="prod-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">
+      <h1 class="pf-title">
         {% if product %}Edit Product{% else %}New Product{% endif %}
       </h1>
-      <p class="prod-sub" style="margin:0 0 20px;font-size:15px;color:#475569;">
+      <p class="pf-sub">
         Define base unit, packing, and prices for this product.
       </p>
     </div>
     <div>
       <a href="{% url 'product_list' %}"
-      class="btn btn-secondary prod-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+      class="pf-btn">
         ← Back to Products
       </a>
     </div>
@@ -39,8 +232,7 @@
 
   {# ---------- Error Message (if any) ---------- #}
   {% if error %}
-    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
-                font-size:14px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+    <div class="pf-error">
       {{ error }}
     </div>
   {% endif %}
@@ -49,42 +241,36 @@
     {% csrf_token %}
 
     {# ---------- Basic Details Card ---------- #}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:10px;">
-        Basic Details
-      </div>
+    <div class="pf-card">
+      <h2 class="pf-card-title">Basic Details</h2>
+      <p class="pf-card-sub">Set product identity and unit configuration used across sales and stock.</p>
 
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
-            Code <span style="color:#b91c1c">*</span>
+      <div class="pf-grid">
+        <div class="pf-field">
+          <label>
+            Code <span class="req">*</span>
           </label>
           <input type="text"
                  name="code"
                  value="{{ product.code|default_if_none:'' }}"
-                 required
-                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+                 required>
         </div>
 
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
-            Name <span style="color:#b91c1c">*</span>
+        <div class="pf-field">
+          <label>
+            Name <span class="req">*</span>
           </label>
           <input type="text"
                  name="name"
                  value="{{ product.name|default_if_none:'' }}"
-                 required
-                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+                 required>
         </div>
 
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
+        <div class="pf-field">
+          <label>
             Base Unit
           </label>
-          <select name="unit"
-                  style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+          <select name="unit">
             {% for value,label in UNIT_CHOICES %}
             <option value="{{ value }}"
               {% if product and product.unit == value %}selected{% endif %}>
@@ -97,25 +283,19 @@
     </div>
 
     {# ---------- Packing Card ---------- #}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-        Packing
-      </div>
-
-      <p style="margin:0 0 12px;font-size:14px;color:#6b7280;">
+    <div class="pf-card">
+      <h2 class="pf-card-title">Packing</h2>
+      <p class="pf-card-sub">
         Base unit = the smallest unit you sell (bottle, kg, piece). Packing = outer carton/bag/container.
         Example: weedicide bottle as base unit, 12 bottles in one carton.
       </p>
 
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
+      <div class="pf-grid">
+        <div class="pf-field">
+          <label>
             Packing Type
           </label>
-          <select name="packing_type"
-                  style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+          <select name="packing_type">
                   {% for value,label in PACKING_CHOICES %}
                   <option value="{{ value }}"
                     {% if product and product.packing_type == value %}selected{% endif %}>
@@ -125,53 +305,55 @@
           </select>
         </div>
 
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
+        <div class="pf-field">
+          <label>
             Pieces per Pack
           </label>
           <input type="number"
                  step="0.001"
                  min="1"
+                 id="piecesPerPackInput"
                  name="pieces_per_pack"
-                 value="{% if product %}{{ product.pieces_per_pack }}{% else %}1{% endif %}"
-                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+                 value="{% if product %}{{ product.pieces_per_pack }}{% else %}1{% endif %}">
         </div>
       </div>
     </div>
 
     {# ---------- Prices Card ---------- #}
-    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-                padding:18px 20px 22px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
-                margin-bottom:20px;">
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px;">
-        Prices
-      </div>
+    <div class="pf-card">
+      <h2 class="pf-card-title">Prices</h2>
+      <p class="pf-card-sub">Set per-unit prices. Pack-level preview updates live from packing quantity.</p>
 
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
+      <div class="pf-grid">
+        <div class="pf-field">
+          <label>
             Purchase Price per Unit
           </label>
           <input type="number"
                  step="0.01"
+                 id="purchaseUnitPriceInput"
                  name="purchase_price_per_unit"
-                 value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}"
-                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+                 value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}">
         </div>
 
-        <div>
-          <label style="display:block;font-size:14px;margin-bottom:4px;">
+        <div class="pf-field">
+          <label>
             Sale Price per Unit
           </label>
           <input type="number"
                  step="0.01"
+                 id="saleUnitPriceInput"
                  name="sale_price_per_unit"
-                 value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}"
-                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;">
+                 value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}">
         </div>
 
-        <div style="margin-top:6px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+        <div class="pf-pack-preview">
+          <span class="pf-chip">Purchase / Pack: Rs <strong id="purchasePackPreview">0.00</strong></span>
+          <span class="pf-chip">Sale / Pack: Rs <strong id="salePackPreview">0.00</strong></span>
+        </div>
+
+        <div class="pf-inline-check">
+          <label class="pf-inline-check">
             <input type="checkbox"
                    name="is_active"
                    {% if not product or product.is_active %}checked{% endif %}>
@@ -182,19 +364,49 @@
     </div>
 
     {# ---------- Actions ---------- #}
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="pf-actions">
       <button type="submit"
-      class="btn btn-primary prod-btn"
-              style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+      class="pf-btn pf-btn-primary">
         {% if product %}💾 Save Changes{% else %}➕ Create Product{% endif %}
       </button>
       <a href="{% url 'product_list' %}"
-        class="btn btn-secondary prod-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+        class="pf-btn">
         Cancel
       </a>
     </div>
 
   </form>
 </div>
+
+<script>
+  (function () {
+    const pieces = document.getElementById("piecesPerPackInput");
+    const purchase = document.getElementById("purchaseUnitPriceInput");
+    const sale = document.getElementById("saleUnitPriceInput");
+    const purchasePreview = document.getElementById("purchasePackPreview");
+    const salePreview = document.getElementById("salePackPreview");
+
+    function num(v) {
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function fmt(v) {
+      return (num(v)).toFixed(2);
+    }
+
+    function updatePackPreview() {
+      const q = Math.max(num(pieces && pieces.value), 0);
+      const pur = num(purchase && purchase.value);
+      const sal = num(sale && sale.value);
+      if (purchasePreview) purchasePreview.textContent = fmt(q * pur);
+      if (salePreview) salePreview.textContent = fmt(q * sal);
+    }
+
+    [pieces, purchase, sale].forEach((el) => {
+      if (el) el.addEventListener("input", updatePackPreview);
+    });
+    updatePackPreview();
+  })();
+</script>
 {% endblock %}
