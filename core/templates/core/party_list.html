@@ -1,104 +1,361 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="party-list-page">
   <style>
-    /* Mobile tweaks for this page only */
+    .party-list-page{
+      max-width:1150px;
+      margin:34px auto 64px;
+      padding:0 16px;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --line:#dbe3ee;
+      --line-soft:#e5e7eb;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+      --surface-soft:#f8fafc;
+    }
+
+    .pl-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:20px 22px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
+    }
+
+    .pl-title{
+      margin:0 0 4px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .pl-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:720px;
+    }
+
+    .pl-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .pl-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cfd9e6;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .pl-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .pl-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .pl-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      padding:18px 20px 20px;
+      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .pl-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+      opacity:.75;
+    }
+
+    .pl-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .pl-card-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .pl-note{
+      margin:3px 0 0;
+      font-size:13px;
+      color:#64748b;
+    }
+
+    .pl-stats{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:10px;
+    }
+
+    .pl-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .pl-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .pl-search{
+      min-width:260px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .pl-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .pl-search input{
+      width:100%;
+      min-height:40px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .pl-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .pl-search-hint{
+      display:block;
+      margin-top:4px;
+      font-size:12px;
+      color:#64748b;
+    }
+
+    .pl-table-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid var(--line-soft);
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .ps-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:760px;
+    }
+
+    .ps-table th,
+    .ps-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .ps-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .ps-table tbody tr:nth-child(even){ background:#fbfdff; }
+    .ps-table tbody tr:hover{ background:#f8fbff; }
+    .ps-table tbody tr.is-hidden{ display:none; }
+
+    .ps-name{ color:#0f172a; font-weight:700; }
+    .ps-muted{ color:#475569; }
+    .ps-actions{ text-align:center; white-space:nowrap; }
+    .ps-actions a{
+      font-size:13px;
+      text-decoration:none;
+      font-weight:700;
+    }
+    .ps-actions a.edit{ color:#1d4ed8; }
+    .ps-actions a.statement{ color:#0f172a; }
+
     @media (max-width: 640px){
-      .ps-title{ font-size:24px !important; }
-      .ps-sub{ font-size:14px !important; }
-      .ps-btn{ padding:9px 14px !important; font-size:14px !important; min-width:auto !important; }
-      .ps-table th, .ps-table td{ padding:8px 8px !important; font-size:13px !important; }
+      .party-list-page{padding:0 14px !important;margin:22px auto 52px;}
+      .pl-hero{padding:16px;}
+      .pl-title{ font-size:25px !important; }
+      .pl-sub{ font-size:14px !important; }
+      .pl-btn{ width:100%; min-width:0; }
+      .pl-search{ min-width:100%; max-width:100%; }
+      .ps-table th, .ps-table td{ padding:9px 8px !important; font-size:13px !important; }
       .ps-truncate{ max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     }
   </style>
 
   {# -------- Top Bar -------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+  <div class="pl-hero">
     <div>
-      <h1 class="ps-title" style="margin:0 0 4px;font-size:32px;font-weight:700;">
+      <h1 class="pl-title">
         {{ party_type_label }}s
       </h1>
-      <p class="ps-sub" style="margin:0;font-size:15px;color:#475569;">
+      <p class="pl-sub">
         Manage {{ party_type_label|lower }} records used in sales, purchases, and payments.
       </p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="pl-actions">
       <a href="{% url 'dashboard' %}"
-      class="btn btn-secondary ps-btn"
-      style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:130px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+      class="pl-btn">
           ← Dashboard
         </a>
       
         <a href="{% url party_type|lower|add:'_create' %}"
-           class="btn btn-primary ps-btn"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:150px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+           class="pl-btn pl-btn-primary">
           ➕ New {{ party_type_label }}
         </a>
       </div>
   </div>
 
   {# -------- List Card -------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:16px 18px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-      <div style="font-size:17px;font-weight:600;">
-        All {{ party_type_label }}s
+  <div class="pl-card">
+    <div class="pl-top">
+      <div>
+        <h2 class="pl-card-title">All {{ party_type_label }}s</h2>
+        <p class="pl-note">Click <strong>Edit</strong> to update party details and <strong>Statement</strong> for ledger view.</p>
       </div>
-      <div style="font-size:13px;color:#6b7280;">
-        Click <strong>Edit</strong> to update a {{ party_type_label|lower }}’s details.
+      <div class="pl-stats">
+        <span class="pl-chip">Server Rows: <span id="server-row-count">{{ parties|length }}</span></span>
+        <span class="pl-chip">Visible Rows: <span id="visible-row-count">{{ parties|length }}</span></span>
       </div>
     </div>
 
-    <div style="width:100%;overflow-x:auto;">
-      <table class="ps-table" style="border-collapse:collapse;width:100%;min-width:640px;">
+    <div class="pl-toolbar">
+      <div></div>
+      <div class="pl-search">
+        <label for="partyQuickSearch">Quick Search (name / city / phone / address)</label>
+        <input id="partyQuickSearch" type="text" placeholder="Type to filter visible rows...">
+        <span class="pl-search-hint">Tip: paste phone digits to quickly find a party.</span>
+      </div>
+    </div>
+
+    <div class="pl-table-wrap">
+      <table class="ps-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:60px;">#</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Name</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:160px;">City</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;width:160px;">Phone</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:left;font-weight:600;">Address</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;background:#f9fafb;text-align:center;font-weight:600;width:120px;">Action</th>
+            <th style="width:60px;">#</th>
+            <th>Name</th>
+            <th style="width:160px;">City</th>
+            <th style="width:160px;">Phone</th>
+            <th>Address</th>
+            <th style="text-align:center;width:130px;">Action</th>
           </tr>
         </thead>
         <tbody>
           {% for p in parties %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+            <tr class="party-row">
+              <td class="ps-muted">
                 {{ forloop.counter }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#111827;font-weight:500;">
+              <td class="ps-name">
                 {{ p.name }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+              <td class="ps-muted">
                 {{ p.city|default:"—" }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
+              <td class="ps-muted">
                 {{ p.phone|default:"—" }}
               </td>
-              <td class="ps-truncate" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#4b5563;">
+              <td class="ps-truncate ps-muted">
                 {{ p.address|default:"—" }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
+              <td class="ps-actions">
                 {% if party_type == "CUSTOMER" %}
                   <a href="{% url 'customer_edit' p.id %}"
-                     style="font-size:13px;color:#0d6efd;text-decoration:none;font-weight:500;">
+                     class="edit">
                     Edit
                   </a>
                   <span style="color:#9ca3af;"> | </span>
                   <a href="{% url 'party_statement' p.id %}"
-                     style="font-size:13px;color:#111827;text-decoration:none;font-weight:600;">
+                     class="statement">
                     Statement
                   </a>
                 {% else %}
                   <a href="{% url 'supplier_edit' p.id %}"
-                     style="font-size:13px;color:#0d6efd;text-decoration:none;font-weight:500;">
+                     class="edit">
                     Edit
                   </a>
                   <span style="color:#9ca3af;"> | </span>
                   <a href="{% url 'party_statement' p.id %}"
-                     style="font-size:13px;color:#111827;text-decoration:none;font-weight:600;">
+                     class="statement">
                     Statement
                   </a>
                 {% endif %}
@@ -118,4 +375,28 @@
   </div>
 
 </div>
+
+<script>
+  (function () {
+    const input = document.getElementById("partyQuickSearch");
+    const rows = Array.from(document.querySelectorAll("tr.party-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+    if (!input) return;
+
+    function applyQuickFilter() {
+      const q = (input.value || "").trim().toLowerCase();
+      let visible = 0;
+      rows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    input.addEventListener("input", applyQuickFilter);
+    applyQuickFilter();
+  })();
+</script>
 {% endblock %}
