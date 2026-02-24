@@ -3,8 +3,60 @@
 {% block title %}New Payment{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:50px auto 80px;padding:0 32px;font-size:17px;line-height:1.45;">
+<div class="page payment-new-page">
   <style>
+    .payment-new-page{
+      max-width:1120px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --line:#e2e8f0;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+    }
+
+    .pn-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 20px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 10px 24px rgba(15,23,42,.07);
+    }
+
+    .pn-title{
+      margin:0 0 6px;
+      font-size:31px;
+      font-weight:800;
+      letter-spacing:-.02em;
+      color:var(--ink-900);
+    }
+
+    .pn-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:740px;
+    }
+
+    .pn-head-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
     @media (max-width:640px){
       .np-title{font-size:24px !important;}
       .np-sub{font-size:14px !important;}
@@ -21,28 +73,189 @@
         padding:0 16px !important;
       }
     }
+
+    .np-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cbd5e1;
+      background:#f8fafc;
+      color:#111827;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+
+    .np-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .np-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .np-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid #d1d5db;
+      padding:20px 22px 22px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+    }
+
+    .np-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:16px;
+    }
+
+    .np-field label{
+      display:block;
+      font-size:14px;
+      margin-bottom:6px;
+      color:#334155;
+      font-weight:600;
+    }
+
+    .np-field input,
+    .np-field select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      background:#fff;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .np-field input:focus,
+    .np-field select:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .np-radio-box{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:14px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      border-radius:10px;
+      padding:10px 12px;
+    }
+
+    .np-help{
+      margin:6px 0 0;
+      font-size:13px;
+      color:#64748b;
+    }
+
+    .np-amount-tools{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .np-chip{
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+
+    .np-summary{
+      margin-top:16px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .np-summary-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
+      color:#0f172a;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .np-summary-chip.amount{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .np-actions{
+      margin-top:20px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    @media (max-width:640px){
+      .payment-new-page{
+        margin:22px auto 52px;
+        padding:0 14px;
+      }
+      .pn-header{
+        padding:16px;
+      }
+      .pn-title{
+        font-size:25px;
+      }
+      .np-btn{
+        width:100%;
+      }
+      .np-grid{
+        grid-template-columns:1fr !important;
+      }
+      .np-summary-chip{
+        width:100%;
+        justify-content:space-between;
+      }
+    }
   </style>
 
   {# ---------- Top Bar (Title + Dashboard + Back) ---------- #}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+  <div class="pn-header">
     <div>
-      <h1 class="np-title" style="margin:0 0 6px;font-size:34px;font-weight:700;">
+      <h1 class="pn-title">
         <span data-i18n="new_payment_title">New Payment</span>
       </h1>
-      <p class="np-sub" style="margin:0 0 20px;font-size:16px;color:#475569;" data-i18n="new_payment_sub">
+      <p class="pn-sub" data-i18n="new_payment_sub">
         Record money received from customers or paid to suppliers using a cash or bank account.
       </p>
     </div>
 
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+    <div class="pn-head-actions">
       <a href="{% url 'dashboard' %}"
-        class="btn btn-secondary np-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:170px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
+        class="np-btn">
         <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
       <a href="{% url 'payment_list' %}"
-        class="btn btn-secondary np-btn"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 20px;min-width:190px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;cursor:pointer;white-space:nowrap;background:#0d6efd;color:#ffffff;">
+        class="np-btn np-btn-primary">
         <span data-i18n="back_to_payments">← Back to Payments</span>
       </a>
     </div>
@@ -57,25 +270,24 @@
   {% endif %}
 
   {# ---------- Card with Form ---------- #}
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:22px 24px 24px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+  <div class="np-card">
 
     <form method="post">
       {% csrf_token %}
 
-      <div class="np-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+      <div class="np-grid">
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_date">Date</label>
+        <div class="np-field">
+          <label data-i18n="label_date">Date</label>
           <input type="date"
                  name="date"
                  value="{{ today }}"
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+                 >
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_direction">Direction</label>
-          <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;">
+        <div class="np-field">
+          <label data-i18n="label_direction">Direction</label>
+          <div class="np-radio-box">
             <label>
               <input type="radio" name="direction" value="IN" checked>
               <span data-i18n="direction_in">Receipt (money coming IN)</span>
@@ -87,12 +299,12 @@
           </div>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_party">
+        <div class="np-field">
+          <label data-i18n="label_party">
             Party (Customer / Supplier)
           </label>
           <select name="party" required
-                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+                  >
             <option value="" data-i18n="opt_select_party">-- Select Party --</option>
             {% for p in parties %}
               <option value="{{ p.id }}">{{ p.name }} ({{ p.get_party_type_display }})</option>
@@ -100,54 +312,64 @@
           </select>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_account">
+        <div class="np-field">
+          <label data-i18n="label_account">
             Cash / Bank Account
           </label>
           <select name="account" required
-                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
+                  >
             <option value="" data-i18n="opt_select_account">-- Select Account --</option>
             {% for acc in accounts %}
               <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
             {% endfor %}
           </select>
-          <p style="margin:6px 0 0;font-size:14px;color:#6b7280;" data-i18n="account_help">
+          <p class="np-help" data-i18n="account_help">
             Only accounts marked as Cash/Bank and allowed for payments are shown.
           </p>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_amount">
+        <div class="np-field">
+          <label data-i18n="label_amount">
             Amount (Rs)
           </label>
           <input type="number"
+                 id="amountInput"
                  name="amount"
                  step="0.01"
                  min="0"
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+                 >
+          <div class="np-amount-tools">
+            <button type="button" class="np-chip" data-set-amount="500">+500</button>
+            <button type="button" class="np-chip" data-set-amount="1000">+1000</button>
+            <button type="button" class="np-chip" data-set-amount="5000">+5000</button>
+            <button type="button" class="np-chip" data-set-amount="0">Clear</button>
+          </div>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="label_description">
+        <div class="np-field">
+          <label data-i18n="label_description">
             Description (optional)
           </label>
           <input type="text"
                  name="description"
                  maxlength="255"
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+                 >
         </div>
 
       </div>
 
-      <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;">
+      <div class="np-summary">
+        <span class="np-summary-chip"><span data-i18n="summary_direction">Direction</span>: <span id="directionPreview" data-i18n="direction_in">Receipt (money coming IN)</span></span>
+        <span class="np-summary-chip amount"><span data-i18n="summary_amount">Amount Preview</span>: Rs <span id="amountPreview">0.00</span></span>
+      </div>
+
+      <div class="np-actions">
         <button type="submit"
-              class="btn btn-primary np-btn"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+              class="np-btn np-btn-primary">
           <span data-i18n="save_post">💾 Save &amp; Post</span>
         </button>
         <a href="{% url 'payment_list' %}"
-          class="btn btn-secondary np-btn"
-           style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;text-decoration:none;cursor:pointer;white-space:nowrap;">
+          class="np-btn">
           <span data-i18n="cancel">Cancel</span>
         </a>
       </div>
@@ -177,6 +399,8 @@
     account_help: "Only accounts marked as Cash/Bank and allowed for payments are shown.",
     label_amount: "Amount (Rs)",
     label_description: "Description (optional)",
+    summary_direction: "Direction",
+    summary_amount: "Amount Preview",
     save_post: "💾 Save & Post",
     cancel: "Cancel"
   });
@@ -197,8 +421,55 @@
     account_help: "صرف وہ اکاؤنٹس دکھائے جاتے ہیں جو کیش/بینک مارک ہوں اور ادائیگی کے لیے اجازت یافتہ ہوں۔",
     label_amount: "رقم (روپے)",
     label_description: "تفصیل (اختیاری)",
+    summary_direction: "سمت",
+    summary_amount: "رقم پیش نظارہ",
     save_post: "💾 محفوظ کریں اور پوسٹ کریں",
     cancel: "منسوخ کریں"
   });
+
+  (function () {
+    const amountInput = document.getElementById("amountInput");
+    const amountPreview = document.getElementById("amountPreview");
+    const directionPreview = document.getElementById("directionPreview");
+    const directionRadios = document.querySelectorAll('input[name="direction"]');
+    const chips = document.querySelectorAll("[data-set-amount]");
+
+    function fmt(n) {
+      const v = parseFloat(n || 0) || 0;
+      return v.toFixed(2);
+    }
+
+    function updateAmountPreview() {
+      if (!amountPreview || !amountInput) return;
+      amountPreview.textContent = fmt(amountInput.value);
+    }
+
+    function updateDirectionPreview() {
+      if (!directionPreview) return;
+      const selected = document.querySelector('input[name="direction"]:checked');
+      const key = selected && selected.value === "OUT" ? "direction_out" : "direction_in";
+      const lang = localStorage.getItem("roz_lang") || "en";
+      const pack = (window.ROZ_I18N && window.ROZ_I18N[lang]) ? window.ROZ_I18N[lang] : {};
+      const fallback = (window.ROZ_I18N.en && window.ROZ_I18N.en[key]) || "";
+      directionPreview.textContent = pack[key] || fallback;
+    }
+
+    if (amountInput) amountInput.addEventListener("input", updateAmountPreview);
+    directionRadios.forEach((r) => r.addEventListener("change", updateDirectionPreview));
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (!amountInput) return;
+        const val = parseFloat(chip.getAttribute("data-set-amount") || "0") || 0;
+        amountInput.value = val === 0 ? "" : String(val);
+        updateAmountPreview();
+      });
+    });
+
+    updateAmountPreview();
+    updateDirectionPreview();
+    window.addEventListener("storage", function(e){
+      if (e.key === "roz_lang") updateDirectionPreview();
+    });
+  })();
 </script>
 {% endblock %}
