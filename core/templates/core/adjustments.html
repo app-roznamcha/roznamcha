@@ -2,25 +2,257 @@
 {% block title %}Adjustments{% endblock %}
 
 {% block content %}
-<div class="page" style="max-width:1100px;margin:50px auto 80px;padding:0 16px;font-size:17px;line-height:1.45;">
+<div class="page adj-page">
+  <style>
+    .adj-page{
+      max-width:1120px;
+      margin:34px auto 64px;
+      padding:0 18px;
+      --line:#e2e8f0;
+      --ink-900:#0f172a;
+      --ink-700:#334155;
+      --ink-500:#64748b;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --surface:#ffffff;
+    }
 
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+    .adj-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 20px;
+      background:
+        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        var(--surface);
+      box-shadow:0 10px 24px rgba(15,23,42,.07);
+    }
+
+    .adj-title{
+      margin:0 0 6px;
+      font-size:31px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+
+    .adj-sub{
+      margin:0;
+      font-size:15px;
+      color:#475569;
+      line-height:1.55;
+      max-width:760px;
+    }
+
+    .adj-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
+    .adj-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:140px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      border:1px solid #cbd5e1;
+      background:#f8fafc;
+      color:#111827;
+      white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+
+    .adj-btn:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 8px 16px rgba(15,23,42,.08);
+    }
+
+    .adj-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+    }
+
+    .adj-card{
+      background:#ffffff;
+      border-radius:16px;
+      border:1px solid #d1d5db;
+      padding:18px 16px 18px;
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+    }
+
+    .adj-card + .adj-card{
+      margin-top:22px;
+    }
+
+    .adj-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:16px;
+    }
+
+    .adj-page input,
+    .adj-page select{
+      border:1px solid #cbd5e1 !important;
+      border-radius:10px !important;
+      padding:10px 12px !important;
+      font-size:14px !important;
+      background:#fff !important;
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .adj-page input:focus,
+    .adj-page select:focus{
+      outline:none;
+      border-color:#93c5fd !important;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .adj-help{
+      margin-top:6px;
+      font-size:13px;
+      color:#6b7280;
+    }
+
+    .adj-amount-tools{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .adj-chip{
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+
+    .adj-toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .adj-search{
+      min-width:250px;
+      max-width:360px;
+      flex:1;
+    }
+
+    .adj-search label{
+      display:block;
+      font-size:13px;
+      color:#475569;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+
+    .adj-search input{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+    }
+
+    .adj-search input:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+
+    .adj-table-wrap{
+      margin-top:12px;
+      overflow-x:auto;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      background:#fff;
+    }
+
+    .adj-table{
+      border-collapse:collapse;
+      width:100%;
+      min-width:860px;
+    }
+
+    .adj-table th,
+    .adj-table td{
+      border-bottom:1px solid #e5e7eb;
+      padding:8px 10px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    .adj-table th{
+      background:#f8fafc;
+      text-align:left;
+      font-weight:700;
+      color:#334155;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .adj-table tbody tr:nth-child(even){ background:#fcfdff; }
+    .adj-table tbody tr:hover{ background:#f8fbff; }
+    .adj-table tbody tr.is-hidden{ display:none; }
+
+    .adj-count{
+      font-size:13px;
+      color:#64748b;
+      font-weight:700;
+    }
+
+    @media (max-width:640px){
+      .adj-page{padding:0 14px;margin:22px auto 52px;}
+      .adj-hero{padding:16px;}
+      .adj-title{font-size:25px;}
+      .adj-btn{width:100%;}
+      .adj-search{min-width:100%;max-width:100%;}
+    }
+  </style>
+
+  <div class="adj-hero">
     <div>
-      <h1 style="margin:0 0 6px;font-size:34px;font-weight:700;" data-i18n="adj_title">Adjustments</h1>
-      <p style="margin:0 0 20px;font-size:16px;color:#475569;">
+      <h1 class="adj-title" data-i18n="adj_title">Adjustments</h1>
+      <p class="adj-sub">
         <span data-i18n="adj_subtitle">
           Customer/Supplier opening balance corrections (no cash/bank involved). Posts against
         </span>
         <strong>3000 <span data-i18n="opening_balances">Opening Balances</span></strong>.
       </p>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-      <a href="{% url 'dashboard' %}"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:140px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;">
+    <div class="adj-actions">
+      <a href="{% url 'dashboard' %}" class="adj-btn">
         <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
-      <a href="{% url 'payments_list' %}"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;">
+      <a href="{% url 'payments_list' %}" class="adj-btn adj-btn-primary">
         <span data-i18n="payments">Payments</span>
       </a>
     </div>
@@ -59,8 +291,7 @@
   <!-- =========================
        PARTY ADJUSTMENT (FORM)
        ========================= -->
-  <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 16px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+  <div class="adj-card">
 
     <h2 style="margin:0 0 14px;font-size:20px;font-weight:700;" data-i18n="new_adj">New Adjustment</h2>
 
@@ -68,7 +299,7 @@
       {% csrf_token %}
       <input type="hidden" name="form_type" value="party_adjust">
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+      <div class="adj-grid">
 
         <div>
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
@@ -89,8 +320,13 @@
 
         <div>
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="amount_rs">Amount (Rs)</label>
-          <input type="number" name="amount" step="0.01" min="0" required
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+          <input type="number" id="pa_amount" name="amount" step="0.01" min="0" required>
+          <div class="adj-amount-tools">
+            <button type="button" class="adj-chip" data-pa-amount="500">+500</button>
+            <button type="button" class="adj-chip" data-pa-amount="1000">+1000</button>
+            <button type="button" class="adj-chip" data-pa-amount="5000">+5000</button>
+            <button type="button" class="adj-chip" data-pa-amount="0">Clear</button>
+          </div>
         </div>
 
         <div>
@@ -107,7 +343,7 @@
             After this adjustment, —
           </div>
 
-          <div style="margin-top:6px;font-size:13px;color:#6b7280;" data-i18n="tip_opening_only">
+          <div class="adj-help" data-i18n="tip_opening_only">
             Tip: This is only an opening balance correction (no cash/bank).
           </div>
         </div>
@@ -121,8 +357,7 @@
       </div>
 
       <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
-        <button type="submit"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        <button type="submit" class="adj-btn adj-btn-primary">
           <span data-i18n="save_post_adj">💾 Save &amp; Post Adjustment</span>
         </button>
       </div>
@@ -132,9 +367,8 @@
   <!-- =========================
        PARTY ADJUSTMENT (HISTORY)
        ========================= -->
-  <div style="margin-top:22px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:14px 12px 16px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+  <div class="adj-card">
+    <div class="adj-toolbar">
       <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="adj_history">Adjustment History</h2>
       <div style="font-size:14px;color:#475569;">
         <span data-i18n="total_amount_sum">Total (amount sum):</span>
@@ -142,25 +376,33 @@
       </div>
     </div>
 
-    <div style="margin-top:12px;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:860px;">
+    <div class="adj-toolbar" style="margin-bottom:0;">
+      <div class="adj-search">
+        <label data-i18n="quick_search_adj">Quick Search (party / type / note)</label>
+        <input type="text" id="adjHistorySearch" placeholder="Type to filter history...">
+      </div>
+      <div class="adj-count">Visible: <span id="adjVisibleCount">{{ adjustments|length }}</span></div>
+    </div>
+
+    <div class="adj-table-wrap">
+      <table class="adj-table">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="date">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="party">Party</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="type">Type</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="side">Side</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="amount">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="note">Note</th>
+            <th data-i18n="date">Date</th>
+            <th data-i18n="party">Party</th>
+            <th data-i18n="type">Type</th>
+            <th data-i18n="side">Side</th>
+            <th style="text-align:right;" data-i18n="amount">Amount</th>
+            <th data-i18n="note">Note</th>
           </tr>
         </thead>
         <tbody>
           {% for a in adjustments %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.date }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.party.name }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ a.party.get_party_type_display }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">
+            <tr class="adj-history-row">
+              <td>{{ a.date }}</td>
+              <td>{{ a.party.name }}</td>
+              <td>{{ a.party.get_party_type_display }}</td>
+              <td>
                 {% if a.party.party_type == "CUSTOMER" %}
                   {% if a.adjustment_side == "DR" %}Customer owes MORE{% else %}Customer owes LESS{% endif %}
                 {% elif a.party.party_type == "SUPPLIER" %}
@@ -169,8 +411,8 @@
                   {{ a.adjustment_side }}
                 {% endif %}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ a.amount }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;color:#475569;">{{ a.description|default:"—" }}</td>
+              <td style="text-align:right;">{{ a.amount }}</td>
+              <td style="color:#475569;">{{ a.description|default:"—" }}</td>
             </tr>
           {% empty %}
             <tr>
@@ -191,8 +433,7 @@
   </div>
 
   {# ===================== STOCK ADJUSTMENT CARD ===================== #}
-  <div style="margin-top:26px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:18px 16px 18px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
+  <div class="adj-card">
 
     <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;" data-i18n="stock_adj">Stock Adjustment</h2>
     <p style="margin:0 0 18px;font-size:15px;color:#475569;" data-i18n="stock_adj_desc">
@@ -203,7 +444,7 @@
       {% csrf_token %}
       <input type="hidden" name="form_type" value="stock_adjust">
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+      <div class="adj-grid">
 
         <div>
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
@@ -244,7 +485,7 @@
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="unit_cost_rs">Unit Cost (Rs)</label>
           <input type="number" name="unit_cost" id="sa_unit_cost" step="0.01" min="0"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-          <div style="margin-top:6px;font-size:13px;color:#6b7280;" data-i18n="autofill_cost">
+          <div class="adj-help" data-i18n="autofill_cost">
             Auto-fills from product purchase price.
           </div>
         </div>
@@ -264,8 +505,7 @@
       </div>
 
       <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
-        <button type="submit"
-                style="display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:999px;font-size:17px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        <button type="submit" class="adj-btn adj-btn-primary">
           <span data-i18n="save_post_stock">💾 Save &amp; Post Stock Adjustment</span>
         </button>
       </div>
@@ -401,35 +641,44 @@
   <!-- =========================
        STOCK ADJUSTMENT (HISTORY)
        ========================= -->
-  <div style="margin-top:22px;background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
-              padding:14px 12px 16px;box-shadow:0 6px 18px rgba(15,23,42,0.06);">
-    <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="stock_history">Stock Adjustment History</h2>
+  <div class="adj-card">
+    <div class="adj-toolbar" style="margin-bottom:0;">
+      <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="stock_history">Stock Adjustment History</h2>
+      <div class="adj-count">Visible: <span id="stockVisibleCount">{{ stock_adjustments|length }}</span></div>
+    </div>
 
-    <div style="margin-top:12px;overflow-x:auto;">
-      <table style="border-collapse:collapse;width:100%;min-width:900px;">
+    <div class="adj-toolbar" style="margin-bottom:0;">
+      <div class="adj-search">
+        <label data-i18n="quick_search_stock">Quick Search (product / reason / direction)</label>
+        <input type="text" id="stockHistorySearch" placeholder="Type to filter stock history...">
+      </div>
+    </div>
+
+    <div class="adj-table-wrap">
+      <table class="adj-table" style="min-width:900px;">
         <thead>
           <tr>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="date">Date</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="product">Product</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="direction">Direction</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="qty">Qty</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="unit_cost">Unit Cost</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:right;" data-i18n="amount">Amount</th>
-            <th style="border-bottom:1px solid #e5e7eb;padding:7px 9px;background:#f9fafb;text-align:left;" data-i18n="reason">Reason</th>
+            <th data-i18n="date">Date</th>
+            <th data-i18n="product">Product</th>
+            <th data-i18n="direction">Direction</th>
+            <th style="text-align:right;" data-i18n="qty">Qty</th>
+            <th style="text-align:right;" data-i18n="unit_cost">Unit Cost</th>
+            <th style="text-align:right;" data-i18n="amount">Amount</th>
+            <th data-i18n="reason">Reason</th>
           </tr>
         </thead>
         <tbody>
           {% for s in stock_adjustments %}
-            <tr>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ s.date }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">
+            <tr class="stock-history-row">
+              <td>{{ s.date }}</td>
+              <td>
                 {{ s.product.code }} - {{ s.product.name }}
               </td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;">{{ s.direction }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ s.qty }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ s.unit_cost }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;text-align:right;">{{ s.amount }}</td>
-              <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;color:#475569;">{{ s.reason|default:"—" }}</td>
+              <td>{{ s.direction }}</td>
+              <td style="text-align:right;">{{ s.qty }}</td>
+              <td style="text-align:right;">{{ s.unit_cost }}</td>
+              <td style="text-align:right;">{{ s.amount }}</td>
+              <td style="color:#475569;">{{ s.reason|default:"—" }}</td>
             </tr>
           {% empty %}
             <tr>
@@ -481,6 +730,7 @@
     note: "Note",
     no_adjustments_yet: "No adjustments yet.",
     posting_rule_party: "Posting rule: hits Customer Control (1300) or Supplier Control (2100) vs Opening Balances (3000).",
+    quick_search_adj: "Quick Search (party / type / note)",
 
     stock_adj: "Stock Adjustment",
     stock_adj_desc: "Damage/expiry or correction of stock with accounting impact.",
@@ -502,6 +752,7 @@
     reason: "Reason",
     no_stock_adjustments: "No stock adjustments yet.",
     posting_rule_stock: "Posting rule: DOWN → Dr Inventory Write-off (5100) / Cr Inventory (1400), UP → Dr Inventory (1400) / Cr Opening Balances (3000).",
+    quick_search_stock: "Quick Search (product / reason / direction)",
 
     // JS dynamic labels/sentences
     dr_customer_more: "DR — Customer will owe you MORE",
@@ -549,6 +800,7 @@
     note: "نوٹ",
     no_adjustments_yet: "ابھی تک کوئی ایڈجسٹمنٹ نہیں۔",
     posting_rule_party: "پوسٹنگ رول: کسٹمر کنٹرول (1300) یا سپلائر کنٹرول (2100) بمقابلہ اوپننگ بیلنس (3000)۔",
+    quick_search_adj: "فوری تلاش (پارٹی / قسم / نوٹ)",
 
     stock_adj: "اسٹاک ایڈجسٹمنٹ",
     stock_adj_desc: "نقصان/ایکسپائری یا اسٹاک کی درستگی (اکاؤنٹنگ اثر کے ساتھ)۔",
@@ -570,6 +822,7 @@
     reason: "وجہ",
     no_stock_adjustments: "ابھی تک کوئی اسٹاک ایڈجسٹمنٹ نہیں۔",
     posting_rule_stock: "پوسٹنگ رول: DOWN → Dr Inventory Write-off (5100) / Cr Inventory (1400)، UP → Dr Inventory (1400) / Cr Opening Balances (3000)۔",
+    quick_search_stock: "فوری تلاش (پروڈکٹ / وجہ / ڈائریکشن)",
 
     // JS dynamic labels/sentences
     dr_customer_more: "DR — کسٹمر آپ کو زیادہ دے گا",
@@ -591,6 +844,53 @@
 
   // Apply current language to this page after dict is loaded
   if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");
+
+  (function () {
+    const paAmount = document.getElementById("pa_amount");
+    const paChips = document.querySelectorAll("[data-pa-amount]");
+    paChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (!paAmount) return;
+        const val = parseFloat(chip.getAttribute("data-pa-amount") || "0") || 0;
+        paAmount.value = val === 0 ? "" : String(val);
+        paAmount.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+    });
+
+    const adjSearch = document.getElementById("adjHistorySearch");
+    const adjRows = Array.from(document.querySelectorAll("tr.adj-history-row"));
+    const adjCount = document.getElementById("adjVisibleCount");
+
+    function filterAdjRows() {
+      const q = ((adjSearch && adjSearch.value) || "").trim().toLowerCase();
+      let visible = 0;
+      adjRows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (adjCount) adjCount.textContent = String(visible);
+    }
+    if (adjSearch) adjSearch.addEventListener("input", filterAdjRows);
+
+    const stockSearch = document.getElementById("stockHistorySearch");
+    const stockRows = Array.from(document.querySelectorAll("tr.stock-history-row"));
+    const stockCount = document.getElementById("stockVisibleCount");
+
+    function filterStockRows() {
+      const q = ((stockSearch && stockSearch.value) || "").trim().toLowerCase();
+      let visible = 0;
+      stockRows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (stockCount) stockCount.textContent = String(visible);
+    }
+    if (stockSearch) stockSearch.addEventListener("input", filterStockRows);
+  })();
 </script>
 
 {% endblock %}
