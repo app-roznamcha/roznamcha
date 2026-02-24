@@ -6,20 +6,12 @@ media/
 staticfiles/
 .env
 
-.DS_Store
-**/.DS_Store
-backups/
-
 # macOS junk
 .DS_Store
 **/.DS_Store
 
 # backups
 backups/
-
-# python junk
-__pycache__/
-*.pyc
 
 .npm-cache/
 android-twa/
