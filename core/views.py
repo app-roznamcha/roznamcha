@@ -1546,7 +1546,11 @@ def sales_new(request):
 def sales_post(request, pk):
     invoice = tenant_get_object_or_404(request, SalesInvoice, pk=pk)
     if not invoice.posted:
-        invoice.post()
+        try:
+            invoice.post()
+            messages.success(request, f"Sale #{invoice.invoice_number or invoice.id} posted successfully.")
+        except ValidationError as exc:
+            messages.error(request, str(exc))
     return redirect("sales_list")
 
 

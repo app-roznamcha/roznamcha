@@ -369,7 +369,13 @@ class Product(OwnerRequiredMixin, TimeStampedModel):
             quantity_delta = Decimal(str(quantity_delta))
 
         base = self.current_stock or Decimal("0")
-        self.current_stock = base + quantity_delta
+        new_stock = base + quantity_delta
+        if new_stock < 0:
+            raise ValidationError(
+                f"Insufficient stock for {self.code} - {self.name}. "
+                f"Available: {base}, Requested outflow: {abs(quantity_delta)}."
+            )
+        self.current_stock = new_stock
         self.save(update_fields=["current_stock"])
 
     class Meta:
@@ -1006,6 +1012,24 @@ class SalesInvoice(OwnerRequiredMixin, TimeStampedModel):
             total = self.calculate_total()
             if total <= 0:
                 return
+
+            # Hard stock guard at post-time (protects all posting paths).
+            # Historical posted invoices remain untouched.
+            shortages = []
+            for item in self.items.select_related("product"):
+                qty = item.quantity_units or Decimal("0")
+                if qty <= 0:
+                    continue
+                available = item.product.current_stock or Decimal("0")
+                if qty > available:
+                    shortages.append(
+                        f"{item.product.code} - {item.product.name} "
+                        f"(available: {available}, requested: {qty})"
+                    )
+            if shortages:
+                raise ValidationError(
+                    "Posting blocked due to insufficient stock: " + "; ".join(shortages)
+                )
 
             # 🔒 Tenant-safe control accounts
             customer_control = get_company_account(
