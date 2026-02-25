@@ -1625,8 +1625,8 @@ def purchase_new(request):
     if request.method == "POST":
         supplier_id = request.POST.get("supplier")
         invoice_number = (request.POST.get("invoice_number") or "").strip()
-        if not invoice_number:
-            invoice_number = str(get_next_sequence(request.owner, "purchase_invoice"))
+        if not invoice_number and not error:
+            error = "Invoice number is required."
         invoice_date_str = request.POST.get("invoice_date") or ""
         date_received_str = request.POST.get("date_received") or ""
         notes = (request.POST.get("notes") or "").strip()

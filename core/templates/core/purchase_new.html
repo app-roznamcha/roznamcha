@@ -312,9 +312,9 @@
           <span data-i18n="supplier_invoice_no">Supplier Invoice #</span>
           <input type="text"
             name="invoice_number"
-            value="{% if edit_mode %}{{ invoice.invoice_number }}{% else %}{{ suggested_invoice_number }}{% endif %}"
-            readonly
-            style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;">
+            value="{% if edit_mode %}{{ invoice.invoice_number }}{% else %}{{ request.POST.invoice_number|default:'' }}{% endif %}"
+            placeholder="Enter supplier invoice # (must be unique)"
+            style="padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;background:#fff;">
         </label>
 
         <div></div> {# keep grid balanced #}
