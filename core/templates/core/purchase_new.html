@@ -4,251 +4,19 @@
 {% endblock %}
 
 {% block content %}
-<div class="page purchase-new-page">
-  <style>
-    .purchase-new-page{
-      max-width:1120px;
-      margin:34px auto 64px;
-      padding:0 18px;
-      --line:#e2e8f0;
-      --ink-900:#0f172a;
-      --ink-700:#334155;
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
-      --surface:#ffffff;
-    }
-
-    .pn-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-      gap:12px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:18px 20px;
-      background:
-        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
-        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
-        var(--surface);
-      box-shadow:0 10px 24px rgba(15,23,42,.07);
-    }
-
-    .pn-title{
-      margin:0 0 4px;
-      font-size:31px;
-      font-weight:800;
-      letter-spacing:-.02em;
-      color:var(--ink-900);
-    }
-
-    .pn-sub{
-      margin:0;
-      font-size:15px;
-      color:#475569;
-      line-height:1.55;
-      max-width:720px;
-    }
-
-    .pn-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .pn-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:10px 16px;
-      min-width:150px;
-      border-radius:12px;
-      font-size:14px;
-      font-weight:700;
-      text-decoration:none;
-      border:1px solid #cbd5e1;
-      background:#f8fafc;
-      color:#111827;
-      white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-      cursor:pointer;
-    }
-
-    .pn-btn:hover{
-      transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
-    }
-
-    .pn-btn-primary{
-      border-color:var(--primary-dark);
-      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
-      color:#fff;
-    }
-
-    .pn-card{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--line);
-      padding:18px 20px 20px;
-      box-shadow:0 8px 18px rgba(15,23,42,.06);
-      margin-bottom:18px;
-    }
-
-    .pn-card-title{
-      font-size:18px;
-      font-weight:800;
-      margin-bottom:10px;
-      color:#0f172a;
-    }
-
-    .purchase-new-page input,
-    .purchase-new-page select,
-    .purchase-new-page textarea{
-      border-color:#cbd5e1 !important;
-      border-radius:10px !important;
-      padding:8px 10px !important;
-      font-size:14px !important;
-      transition:border-color .14s ease, box-shadow .14s ease;
-    }
-
-    .purchase-new-page input:focus,
-    .purchase-new-page select:focus,
-    .purchase-new-page textarea:focus{
-      border-color:#93c5fd !important;
-      box-shadow:0 0 0 3px rgba(37,99,235,.15);
-      outline:none;
-    }
-
-    .items-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:10px;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .items-stats{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .items-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      border:1px solid #e2e8f0;
-      background:#f8fafc;
-      color:#0f172a;
-      font-size:13px;
-      font-weight:700;
-      border-radius:999px;
-      padding:6px 10px;
-    }
-
-    .items-chip.total{
-      border-color:#bfdbfe;
-      background:#eff6ff;
-      color:#1d4ed8;
-    }
-
-    .table-wrap{
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      overflow:auto;
-      background:#fff;
-      margin-bottom:10px !important;
-    }
-
-    #items-table th{
-      position:sticky;
-      top:0;
-      z-index:1;
-      background:#f8fafc !important;
-      color:#334155;
-      text-transform:uppercase;
-      letter-spacing:.05em;
-      font-size:12px !important;
-      font-weight:700 !important;
-    }
-
-    #items-table tbody tr:hover{ background:#f8fbff; }
-
-    .items-actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:10px;
-    }
-
-    .items-note{
-      margin-left:auto;
-      color:#64748b;
-      font-size:12px;
-    }
-
-    .pay-radios{
-      display:flex;
-      flex-wrap:wrap;
-      gap:16px;
-      margin-bottom:12px;
-      font-size:14px;
-      padding:10px 12px;
-      border:1px solid #e2e8f0;
-      border-radius:10px;
-      background:#f8fafc;
-    }
-
-    .form-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .pn-link-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:9px 14px;
-      border-radius:12px;
-      font-size:14px;
-      font-weight:700;
-      text-decoration:none;
-      color:#1d4ed8;
-      border:1px solid #dbeafe;
-      background:#eff6ff;
-    }
-
-    @media (max-width: 700px){
-      .purchase-new-page{
-        margin:22px auto 52px;
-        padding:0 14px;
-      }
-      .pn-header{ padding:16px; }
-      .pn-title{ font-size:25px; }
-      .pn-btn,.pn-link-btn{ width:100%; }
-      .items-note{ margin-left:0; width:100%; }
-    }
-  </style>
+<div class="page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
 
   {# ---------- Top Bar (Title + Buttons) ---------- #}
-<div class="pn-header">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
   <div>
-    <h1 class="pn-title">
+    <h1 style="margin:0 0 4px;font-size:32px;font-weight:700;">
       {% if edit_mode %}
       <span data-i18n="edit_purchase_prefix">Edit Purchase #</span>{{ invoice.invoice_number }}
       {% else %}
         <span data-i18n="new_purchase_title">New Purchase</span>
       {% endif %}
     </h1>
-    <p class="pn-sub">
+    <p style="margin:0 0 20px;font-size:15px;color:#475569;">
       {% if edit_mode %}
         <span data-i18n="edit_purchase_subtitle">Update this purchase invoice, adjust items, and payment details.</span>
       {% else %}
@@ -257,11 +25,13 @@
     </p>
   </div>
 
-  <div class="pn-actions">
-    <a href="{% url 'dashboard' %}" class="pn-btn">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary"
+       style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:150px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #d1d5db;cursor:pointer;white-space:nowrap;background:#f3f4f6;color:#111827;">
       <span data-i18n="back_dashboard">← Dashboard</span>
     </a>
-    <a href="{% url 'purchase_list' %}" class="pn-btn pn-btn-primary">
+    <a href="{% url 'purchase_list' %}" class="btn btn-primary"
+       style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;min-width:180px;border-radius:999px;font-size:16px;font-weight:500;text-decoration:none;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
       <span data-i18n="purchase_list_btn">📄 Purchase List</span>
     </a>
   </div>
@@ -278,8 +48,10 @@
     {% csrf_token %}
 
     {# ---------- Supplier & Invoice Details Card ---------- #}
-    <div class="pn-card">
-      <div class="pn-card-title" data-i18n="supplier_invoice_details">
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:10px;" data-i18n="supplier_invoice_details">
         Supplier &amp; Invoice Details
       </div>
 
@@ -322,8 +94,10 @@
     </div>
 
     {# ---------- Charges Card ---------- #}
-    <div class="pn-card">
-      <div class="pn-card-title" data-i18n="charges">
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:10px;" data-i18n="charges">
         Charges
       </div>
 
@@ -358,16 +132,13 @@
     </div>
 
     {# ---------- Items Card ---------- #}
-    <div class="pn-card">
-      <div class="items-top">
-        <div class="pn-card-title" style="margin-bottom:0;" data-i18n="items">Items</div>
-        <div class="items-stats">
-          <div class="items-chip"><span data-i18n="lines_label">Lines</span>: <span id="items-line-count">0</span></div>
-          <div class="items-chip"><span data-i18n="total_qty_label">Total Qty</span>: <span id="items-total-qty">0.000</span></div>
-          <div class="items-chip"><span data-i18n="items_value_label">Items Value</span>: Rs <span id="items-subtotal-amount">0.00</span></div>
-          <div id="items-total-display" class="items-chip total">
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
+        <div style="font-size:18px;font-weight:600;" data-i18n="items">Items</div>
+        <div id="items-total-display" style="font-weight:600;font-size:15px;">
           <span data-i18n="total_purchase_prefix">Total Purchase: Rs</span> <span id="items-total-amount">0.00</span>
-          </div>
         </div>
       </div>
 
@@ -645,21 +416,21 @@
         </table>
       </div>
 
-      <div class="items-actions">
-        <button type="button" class="pn-btn" onclick="addRow()" data-i18n="add_item_row_btn">
-          + Add Item Row
-        </button>
-        <button type="button" class="pn-btn" onclick="removeEmptyRows()" data-i18n="remove_empty_rows_btn">
-          Remove Empty Rows
-        </button>
-        <div class="items-note"><span data-i18n="shortcut_note_prefix">Shortcut:</span> <strong>Alt + =</strong> <span data-i18n="shortcut_note_suffix">adds a row quickly</span></div>
-      </div>
+      <button type="button"
+              class="btn btn-sm btn-secondary"
+              onclick="addRow()"
+              style="padding:7px 14px;border-radius:999px;font-size:14px;"
+              data-i18n="add_item_row_btn">
+        + Add Item Row
+      </button>
     </div>
     {# ---------- END Items Card ---------- #}
 
     {# ---------- Payment Card ---------- #}
-    <div class="pn-card">
-      <div class="pn-card-title" style="margin-bottom:8px;" data-i18n="payment">
+    <div style="background:#ffffff;border-radius:14px;border:1px solid #d1d5db;
+                padding:18px 20px 20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+                margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;" data-i18n="payment">
         Payment
       </div>
 
@@ -667,7 +438,8 @@
         <span data-i18n="total_purchase_prefix">Total Purchase: Rs</span> <span id="payment-total-amount">0.00</span>
       </p>
 
-      <div class="field-group pay-radios">
+      <div class="field-group"
+      style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px;font-size:14px;">
    <label>
      <input type="radio" name="payment_type" value="FULL"
             {% if not edit_mode or invoice.payment_type == "FULL" %}checked{% endif %}>
@@ -733,9 +505,10 @@
     </div>
 
     {# ---------- Form Actions ---------- #}
-    <div class="form-actions">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button type="submit"
-      class="pn-btn pn-btn-primary">
+      class="btn btn-primary"
+      style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:999px;font-size:15px;font-weight:500;border:1px solid #0d6efd;background:#0d6efd;color:#ffffff;cursor:pointer;white-space:nowrap;">
 {% if edit_mode %}
   <span data-i18n="update_purchase_btn">💾 Update Purchase</span>
 {% else %}
@@ -743,7 +516,8 @@
 {% endif %}
 </button>
       <a href="{% url 'purchase_list' %}"
-         class="pn-link-btn">
+         class="btn btn-link"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;color:#0d6efd;cursor:pointer;white-space:nowrap;">
         <span data-i18n="cancel">Cancel</span>
       </a>
     </div>
@@ -936,21 +710,11 @@ function attachRowEvents(tr) {
 function recalcGrandTotal() {
   const rows = document.querySelectorAll('#items-table tbody tr');
   let itemsTotal = 0;
-  let totalQty = 0;
-  let lineCount = 0;
 
   rows.forEach(tr => {
     const totalSpan = tr.querySelector('.line-total');
-    const lineVal = parseFloat((totalSpan && totalSpan.textContent) || 0) || 0;
+    const lineVal = parseFloat(totalSpan.textContent || 0) || 0;
     itemsTotal += lineVal;
-
-    const product = tr.querySelector('.product-select');
-    const qtyHidden = tr.querySelector('.qty-hidden-input');
-    const qty = parseFloat((qtyHidden && qtyHidden.value) || 0) || 0;
-    if (product && product.value) {
-      lineCount += 1;
-      totalQty += qty;
-    }
   });
 
   const freight = parseFloat(document.getElementById('freight-input').value || 0) || 0;
@@ -958,14 +722,8 @@ function recalcGrandTotal() {
 
   const grandTotal = itemsTotal + freight + other;
 
-  const subtotalNode = document.getElementById('items-subtotal-amount');
-  if (subtotalNode) subtotalNode.textContent = fmt(itemsTotal);
   document.getElementById('items-total-amount').textContent = fmt(grandTotal);
   document.getElementById('payment-total-amount').textContent = fmt(grandTotal);
-  const lineNode = document.getElementById('items-line-count');
-  const qtyNode = document.getElementById('items-total-qty');
-  if (lineNode) lineNode.textContent = String(lineCount);
-  if (qtyNode) qtyNode.textContent = (totalQty || 0).toFixed(3);
 
   updatePaymentAmount(grandTotal);
 }
@@ -1099,22 +857,6 @@ function removeRow(btn) {
   recalcGrandTotal();
 }
 
-function removeEmptyRows() {
-  const rows = Array.from(document.querySelectorAll('#items-table tbody tr'));
-  rows.forEach((tr) => {
-    const product = tr.querySelector('.product-select');
-    const qtyDisplay = tr.querySelector('.qty-display-input');
-    const priceInput = tr.querySelector('.price-input');
-    const hasProduct = !!(product && product.value);
-    const qty = parseFloat((qtyDisplay && qtyDisplay.value) || 0) || 0;
-    const price = parseFloat((priceInput && priceInput.value) || 0) || 0;
-    if (!hasProduct && qty <= 0 && price <= 0) {
-      tr.remove();
-    }
-  });
-  recalcGrandTotal();
-}
-
 // ---- Payment section behaviour ----
 function updatePaymentVisibility() {
   const type = getSelectedPaymentType();
@@ -1140,7 +882,6 @@ function updatePaymentVisibility() {
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('#items-table tbody tr').forEach(tr => {
     attachRowEvents(tr);
-    syncRow(tr);
     updateStockDisplay(tr); // ✅ NEW
 
   });
@@ -1153,13 +894,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   recalcGrandTotal();
   updatePaymentVisibility();
-
-  document.addEventListener('keydown', function(e) {
-    if (e.altKey && e.key === '=') {
-      e.preventDefault();
-      addRow();
-    }
-  });
 });
 </script>
 
@@ -1200,12 +934,6 @@ document.addEventListener('DOMContentLoaded', function() {
     select: "-- Select --",
     select_unit: "-- Unit --",
     add_item_row_btn: "+ Add Item Row",
-    remove_empty_rows_btn: "Remove Empty Rows",
-    lines_label: "Lines",
-    total_qty_label: "Total Qty",
-    items_value_label: "Items Value",
-    shortcut_note_prefix: "Shortcut:",
-    shortcut_note_suffix: "adds a row quickly",
     qty_ph: "Qty",
     rs_prefix: "Rs",
     base_prefix: "Base",
@@ -1267,12 +995,6 @@ document.addEventListener('DOMContentLoaded', function() {
     select: "-- منتخب کریں --",
     select_unit: "-- یونٹ --",
     add_item_row_btn: "+ آئٹم رو شامل کریں",
-    remove_empty_rows_btn: "خالی قطاریں ہٹائیں",
-    lines_label: "قطاریں",
-    total_qty_label: "کل مقدار",
-    items_value_label: "آئٹمز ویلیو",
-    shortcut_note_prefix: "شارٹ کٹ:",
-    shortcut_note_suffix: "جلدی نئی قطار شامل کریں",
     qty_ph: "مقدار",
     rs_prefix: "Rs",
     base_prefix: "بیس",
