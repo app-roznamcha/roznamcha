@@ -135,9 +135,12 @@ class UserProfile(TimeStampedModel):
     def is_trial_active(self):
         if self.role != "OWNER":
             return False
-        if not self.trial_started_at:
-            return True  # treat as trial until initialized
-        return timezone.now() < (self.trial_started_at + timedelta(days=self.TRIAL_DAYS))
+        anchor = self.trial_started_at or getattr(self.user, "date_joined", None)
+        if not anchor:
+            return False
+        if timezone.is_naive(anchor):
+            anchor = timezone.make_aware(anchor, timezone.get_current_timezone())
+        return timezone.now() < (anchor + timedelta(days=self.TRIAL_DAYS))
 
     def get_effective_status(self):
         """
@@ -177,9 +180,12 @@ class UserProfile(TimeStampedModel):
             return self.subscription_expires_at
 
         if status == "TRIAL":
-            if not self.trial_started_at:
-                return timezone.now() + timedelta(days=self.TRIAL_DAYS)
-            return self.trial_started_at + timedelta(days=self.TRIAL_DAYS)
+            anchor = self.trial_started_at or getattr(self.user, "date_joined", None)
+            if not anchor:
+                return None
+            if timezone.is_naive(anchor):
+                anchor = timezone.make_aware(anchor, timezone.get_current_timezone())
+            return anchor + timedelta(days=self.TRIAL_DAYS)
 
         # EXPIRED
         # show trial end if no subscription ever existed, else show subscription expiry

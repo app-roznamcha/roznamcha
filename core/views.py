@@ -300,6 +300,9 @@ def signup_submit(request):
     prof.role = "OWNER"
     prof.owner = None          # ✅ IMPORTANT
     prof.is_active = True
+    prof.subscription_status = "TRIAL"
+    if not prof.trial_started_at:
+        prof.trial_started_at = timezone.now()
     prof.save()
 
     from .models import seed_default_accounts_for_owner
