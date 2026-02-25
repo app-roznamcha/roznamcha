@@ -7,6 +7,7 @@ from .models import CompanyProfile
 
 class TenantMiddleware(MiddlewareMixin):
     SAFE_PATH_PREFIXES = (
+        "/internal/",
         "/login/",
         "/logout/",
         "/subscription/",   # ✅ add this

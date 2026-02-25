@@ -3467,8 +3467,12 @@ def download_backup(request, filename):
 # ---------- RETURNS: SALES RETURN ----------
 
 def run_backup_job(request):
-    # Simple secret token check (cron will call this)
-    token = request.headers.get("X-CRON-TOKEN") or request.GET.get("token")
+    token = (
+        request.headers.get("X-CRON-TOKEN")
+        or request.GET.get("token")
+        or request.GET.get("key")   # ✅ accept Render's key param
+    )
+
     if not token or token != getattr(settings, "CRON_TOKEN", ""):
         return HttpResponseForbidden("Forbidden")
 
