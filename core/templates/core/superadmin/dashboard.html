@@ -8,13 +8,30 @@
   .page-wrap{
     max-width:1200px;
     margin:0 auto;
-    padding:24px 16px 48px;
+    padding:24px 16px 56px;
   }
 
   .page-shell{
-    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 55%);
+    background:transparent;
     border-radius: 18px;
-    padding: 18px 14px 26px;
+    padding:0;
+  }
+
+  .hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+    border:1px solid #dbe3ee;
+    border-radius:18px;
+    padding:20px 22px;
+    background:
+      radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
+      radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+      #ffffff;
+    box-shadow:0 12px 28px rgba(15,23,42,.08);
   }
 
   .page-header{
@@ -23,12 +40,12 @@
     align-items:flex-end;
     gap:14px;
     flex-wrap:wrap;
-    margin-bottom:16px;
+    margin-bottom:0;
   }
 
   .title{
     margin:0;
-    font-size:28px;
+    font-size:30px;
     font-weight:900;
     color:#0f172a;
     letter-spacing:-0.02em;
@@ -36,17 +53,114 @@
 
   .subtitle{
     margin:6px 0 0;
-    font-size:14px;
+    font-size:15px;
     color:#64748b;
-    font-weight:600;
+    font-weight:650;
+    line-height:1.5;
   }
 
   .card{
     background:#fff;
-    border:1px solid #e5e7eb;
+    border:1px solid #dbe3ee;
     border-radius:18px;
     box-shadow:0 10px 26px rgba(15,23,42,.06);
     overflow:hidden;
+    position:relative;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:3px;
+    background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
+    opacity:.75;
+    z-index:3;
+  }
+
+  .card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:12px;
+    padding:16px 16px 10px;
+    border-bottom:1px solid #eef2f7;
+    background:#fff;
+  }
+
+  .card-title{
+    margin:0;
+    font-size:18px;
+    font-weight:900;
+    color:#0f172a;
+  }
+
+  .card-sub{
+    margin:4px 0 0;
+    font-size:13px;
+    color:#64748b;
+  }
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+
+  .search{
+    min-width:250px;
+    max-width:360px;
+    flex:1;
+  }
+
+  .search label{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    color:#475569;
+    margin-bottom:4px;
+    letter-spacing:.02em;
+  }
+
+  .search input{
+    width:100%;
+    min-height:40px;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:14px;
+    background:#fff;
+    transition:border-color .14s ease, box-shadow .14s ease;
+  }
+
+  .search input:focus{
+    outline:none;
+    border-color:#93c5fd;
+    box-shadow:0 0 0 3px rgba(37,99,235,.14);
+  }
+
+  .meta-chips{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+    color:#0f172a;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:800;
   }
 
   .table-wrap{
@@ -85,9 +199,15 @@
     white-space:nowrap;
   }
 
+  tbody tr:nth-child(even) td{
+    background:#fbfdff;
+  }
+
   tbody tr:hover td{
     background:#fbfdff;
   }
+
+  tbody tr.is-hidden{ display:none; }
 
   .muted{ color:#6b7280; font-weight:650; }
 
@@ -144,6 +264,14 @@
     padding:8px 12px;
     box-shadow:0 10px 20px rgba(15,23,42,.05);
   }
+
+  @media (max-width: 720px){
+    .page-wrap{ padding:18px 14px 48px; }
+    .hero{ padding:16px; }
+    .title{ font-size:25px; }
+    .subtitle{ font-size:14px; }
+    .search{ min-width:100%; max-width:100%; }
+  }
 </style>
 {% endblock %}
 
@@ -151,10 +279,12 @@
 <div class="page-wrap">
   <div class="page-shell">
 
-    <div class="page-header">
-      <div>
-        <h1 class="title">🛡️ Super Admin Dashboard</h1>
-        <p class="subtitle">Manage owners & companies (suspension, subscription updates, and hard purge eligibility).</p>
+    <div class="hero">
+      <div class="page-header">
+        <div>
+          <h1 class="title">🛡️ Super Admin Dashboard</h1>
+          <p class="subtitle">Manage owners & companies (suspension, subscription updates, and hard purge eligibility).</p>
+        </div>
       </div>
 
       <div class="right-note">
@@ -163,6 +293,24 @@
     </div>
 
     <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Owners & Companies</h2>
+          <p class="card-sub">Search by owner, company, slug, or status to quickly find records.</p>
+        </div>
+
+        <div class="toolbar">
+          <div class="meta-chips">
+            <span class="chip">Server Rows: <span id="server-row-count">{{ rows|length }}</span></span>
+            <span class="chip">Visible Rows: <span id="visible-row-count">{{ rows|length }}</span></span>
+          </div>
+          <div class="search">
+            <label for="superadminSearch">Quick Search</label>
+            <input id="superadminSearch" type="text" placeholder="Owner, company, slug, status...">
+          </div>
+        </div>
+      </div>
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -180,7 +328,7 @@
 
           <tbody>
             {% for r in rows %}
-              <tr>
+              <tr class="owner-row">
                 <td>{{ r.owner.username }}</td>
 
                 <td>
@@ -237,4 +385,28 @@
 
   </div>
 </div>
+
+<script>
+  (function () {
+    const input = document.getElementById("superadminSearch");
+    const rows = Array.from(document.querySelectorAll("tr.owner-row"));
+    const visibleNode = document.getElementById("visible-row-count");
+    if (!input) return;
+
+    function applyFilter() {
+      const q = (input.value || "").trim().toLowerCase();
+      let visible = 0;
+      rows.forEach((row) => {
+        const txt = (row.textContent || "").toLowerCase();
+        const ok = !q || txt.includes(q);
+        row.classList.toggle("is-hidden", !ok);
+        if (ok) visible += 1;
+      });
+      if (visibleNode) visibleNode.textContent = String(visible);
+    }
+
+    input.addEventListener("input", applyFilter);
+    applyFilter();
+  })();
+</script>
 {% endblock %}
