@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container" style="max-width:720px;margin:40px auto;padding:0 16px;">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
+    <h3 style="margin:0 0 8px;">Redirecting to JazzCash...</h3>
+    <p style="margin:0 0 14px;color:#475569;">Please wait while we connect you to JazzCash securely.</p>
+    <p style="margin:0 0 14px;color:#475569;">Reference: <strong>{{ transaction.merchant_ref }}</strong></p>
+
+    <form id="jazzcashForm" method="post" action="{{ endpoint }}">
+      {% for k, v in payload.items %}
+      <input type="hidden" name="{{ k }}" value="{{ v }}">
+      {% endfor %}
+      <noscript>
+        <button type="submit" style="padding:10px 14px;border-radius:10px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;">Continue to JazzCash</button>
+      </noscript>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById('jazzcashForm').submit();
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container" style="max-width:720px;margin:40px auto;padding:0 16px;">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;">
+    <h3 style="margin:0 0 8px;">JazzCash Payment</h3>
+
+    {% if success %}
+    <div style="padding:10px 12px;border-radius:10px;background:#ecfdf3;border:1px solid #bbf7d0;color:#166534;margin-bottom:12px;">
+      {{ message }}
+    </div>
+    {% else %}
+    <div style="padding:10px 12px;border-radius:10px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;margin-bottom:12px;">
+      {{ message }}
+    </div>
+    {% endif %}
+
+    <p style="margin:0 0 6px;"><strong>Reference:</strong> {{ transaction.merchant_ref }}</p>
+    <p style="margin:0 0 6px;"><strong>Status:</strong> {{ transaction.status }}</p>
+    <p style="margin:0;"><strong>Plan:</strong> {{ transaction.plan_code }} ({{ transaction.duration_days }} days)</p>
+
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="{% url 'subscription_page' %}" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:1px solid #2563eb;background:#2563eb;color:#fff;text-decoration:none;font-weight:700;">Go to Subscription</a>
+      <a href="{% url 'dashboard' %}" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;color:#111827;text-decoration:none;font-weight:700;">Back to Dashboard</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

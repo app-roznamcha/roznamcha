@@ -103,6 +103,9 @@ urlpatterns = [
     path("payments/", staff_blocked(views.payment_list), name="payment_list"),
     path("payments-list/", RedirectView.as_view(pattern_name="payment_list", permanent=False), name="payments_list"),
     path("payments/new/", staff_allowed(views.payment_new), name="payment_new"),
+    path("payments/jazzcash/start/", views.jazzcash_start, name="jazzcash_start"),
+    path("payments/jazzcash/return/", views.jazzcash_return, name="jazzcash_return"),
+    path("payments/jazzcash/ipn/", views.jazzcash_ipn, name="jazzcash_ipn"),
 
     # =========================
     # Adjustments (staff allowed)

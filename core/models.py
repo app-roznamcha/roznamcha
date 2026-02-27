@@ -2225,3 +2225,51 @@ def _seed_sequence_from_existing(owner, key):
 
     # Future keys can be added here (purchase_invoice, payment, etc.)
     return 0
+
+
+class SubscriptionTransaction(TimeStampedModel):
+    STATUS_INITIATED = "INITIATED"
+    STATUS_PENDING = "PENDING"
+    STATUS_SUCCESS = "SUCCESS"
+    STATUS_FAILED = "FAILED"
+
+    STATUS_CHOICES = [
+        (STATUS_INITIATED, "Initiated"),
+        (STATUS_PENDING, "Pending"),
+        (STATUS_SUCCESS, "Success"),
+        (STATUS_FAILED, "Failed"),
+    ]
+
+    PROVIDER_JAZZCASH = "JAZZCASH"
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="subscription_transactions",
+    )
+    plan_code = models.CharField(max_length=20)
+    duration_days = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    currency = models.CharField(max_length=10, default="PKR")
+    provider = models.CharField(max_length=20, default=PROVIDER_JAZZCASH)
+    merchant_ref = models.CharField(max_length=80, unique=True, db_index=True)
+    provider_txn_id = models.CharField(max_length=120, null=True, blank=True)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_INITIATED)
+    request_payload = models.JSONField(null=True, blank=True)
+    return_payload = models.JSONField(null=True, blank=True)
+    ipn_payload = models.JSONField(null=True, blank=True)
+    hash_ok = models.BooleanField(null=True, blank=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    return_received_at = models.DateTimeField(null=True, blank=True)
+    ipn_received_at = models.DateTimeField(null=True, blank=True)
+    failure_reason = models.TextField(blank=True, default="")
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["owner", "status"]),
+            models.Index(fields=["provider", "status"]),
+            models.Index(fields=["created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.provider} {self.merchant_ref} ({self.status})"

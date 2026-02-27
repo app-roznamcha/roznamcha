@@ -211,6 +211,28 @@ CRON_TOKEN = os.getenv("CRON_TOKEN", "")
 
 INTERNAL_BACKUP_KEY = os.environ.get("INTERNAL_BACKUP_KEY", "")
 
+# JazzCash payment gateway (subscription billing)
+JAZZCASH_ENV = os.getenv("JAZZCASH_ENV", "SANDBOX").upper()
+JAZZCASH_MERCHANT_ID = os.getenv("JAZZCASH_MERCHANT_ID", "")
+JAZZCASH_PASSWORD = os.getenv("JAZZCASH_PASSWORD", "")
+JAZZCASH_INTEGRITY_SALT = os.getenv("JAZZCASH_INTEGRITY_SALT", "")
+JAZZCASH_RETURN_URL = os.getenv(
+    "JAZZCASH_RETURN_URL",
+    "https://www.roznamcha.app/payments/jazzcash/return/",
+)
+JAZZCASH_IPN_URL = os.getenv(
+    "JAZZCASH_IPN_URL",
+    "https://www.roznamcha.app/payments/jazzcash/ipn/",
+)
+JAZZCASH_ENDPOINT = os.getenv(
+    "JAZZCASH_ENDPOINT",
+    (
+        "https://sandbox.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform/"
+        if JAZZCASH_ENV == "SANDBOX"
+        else "https://payments.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform/"
+    ),
+)
+
 # Android app metadata for Trusted Web Activity verification
 ANDROID_APP_ID = os.environ.get("ANDROID_APP_ID", "")
 ANDROID_SHA256_CERT_FINGERPRINTS = [

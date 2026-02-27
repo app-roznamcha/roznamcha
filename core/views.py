@@ -3,6 +3,10 @@
 # =========================
 import re
 import tempfile
+import uuid
+import hashlib
+import hmac
+import logging
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -48,6 +52,7 @@ from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_date
 from django.utils.text import slugify
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 # =========================
 # Local app imports (core)
@@ -72,6 +77,7 @@ from .models import (
     SalesReturn,
     SalesReturnItem,
     StockAdjustment,
+    SubscriptionTransaction,
     UserProfile,
     get_company_owner,
     peek_next_sequence,   # ✅ ADD THIS
@@ -118,6 +124,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import DailyExpense, CashBankTransfer
 from core.models import get_next_sequence
+
+logger = logging.getLogger(__name__)
 
 
 class TenantAwareLoginView(auth_views.LoginView):
@@ -4845,6 +4853,336 @@ def subscription_page(request):
         "is_active": (status == "ACTIVE"),
     }
     return render(request, "core/subscription_page.html", context)
+
+
+_JAZZCASH_PLAN_CONFIG = {
+    "MONTHLY": {"duration_days": 30, "amount": Decimal("1500.00")},
+    "YEARLY": {"duration_days": 365, "amount": Decimal("15000.00")},
+}
+
+
+def _jazzcash_parse_payload(request):
+    source = request.POST if request.method == "POST" else request.GET
+    payload = {}
+    for key in source.keys():
+        payload[key] = source.get(key)
+    return payload
+
+
+def compute_jazzcash_hash(payload, integrity_salt):
+    if not integrity_salt:
+        return ""
+    keys = sorted(
+        k for k, v in payload.items()
+        if k != "pp_SecureHash" and v not in (None, "")
+    )
+    parts = [integrity_salt]
+    parts.extend(str(payload[k]) for k in keys)
+    raw = "&".join(parts)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def verify_jazzcash_hash(payload, integrity_salt):
+    received_hash = (payload.get("pp_SecureHash") or "").strip().lower()
+    if not received_hash:
+        return False, "Missing pp_SecureHash"
+    expected_hash = compute_jazzcash_hash(payload, integrity_salt).lower()
+    if not expected_hash:
+        return False, "Missing integrity salt in settings"
+    if not hmac.compare_digest(received_hash, expected_hash):
+        return False, "Secure hash mismatch"
+    return True, ""
+
+
+def _resolve_jazzcash_provider_txn_id(payload):
+    for key in (
+        "pp_TxnID",
+        "pp_TransactionId",
+        "pp_RetreivalReferenceNo",
+        "pp_BankTxnID",
+    ):
+        val = payload.get(key)
+        if val:
+            return str(val)
+    return ""
+
+
+def _is_jazzcash_success(payload):
+    response_code = str(payload.get("pp_ResponseCode") or "").strip()
+    response_message = str(payload.get("pp_ResponseMessage") or "").strip()
+    return response_code in {"000", "121", "200"}, response_code, response_message
+
+
+def finalize_subscription_payment(txn):
+    with transaction.atomic():
+        locked = SubscriptionTransaction.objects.select_for_update().get(pk=txn.pk)
+        if locked.status == SubscriptionTransaction.STATUS_SUCCESS:
+            return locked
+
+        owner = locked.owner
+        profile = getattr(owner, "profile", None)
+        if not profile or profile.role != "OWNER":
+            raise ValueError("Subscription transaction owner profile is invalid.")
+
+        now = timezone.now()
+        base = now
+        if profile.subscription_expires_at and profile.subscription_expires_at > now:
+            base = profile.subscription_expires_at
+
+        profile.subscription_status = "ACTIVE"
+        profile.subscription_expires_at = base + timedelta(days=locked.duration_days)
+        profile.save(update_fields=["subscription_status", "subscription_expires_at"])
+
+        return locked
+
+
+@login_required
+@resolve_tenant_context(require_company=True)
+def jazzcash_start(request):
+    if request.method != "POST":
+        return redirect("subscription_page")
+
+    user = request.user
+    profile = getattr(user, "profile", None)
+    if not profile or profile.role != "OWNER":
+        raise PermissionDenied("Only owner can start subscription payment.")
+
+    plan = (request.POST.get("plan") or "").upper()
+    config = _JAZZCASH_PLAN_CONFIG.get(plan)
+    if not config:
+        messages.error(request, "Please select a valid plan.")
+        return redirect("subscription_page")
+
+    amount = config["amount"]
+    duration_days = config["duration_days"]
+    now = timezone.now()
+    txn_datetime = now.strftime("%Y%m%d%H%M%S")
+    txn_expiry = (now + timedelta(days=1)).strftime("%Y%m%d%H%M%S")
+    merchant_ref = f"T{txn_datetime}{uuid.uuid4().hex[:8].upper()}"
+    amount_paisa = str(int((amount * Decimal("100")).quantize(Decimal("1"))))
+
+    txn = SubscriptionTransaction.objects.create(
+        owner=user,
+        plan_code=plan,
+        duration_days=duration_days,
+        amount=amount,
+        currency="PKR",
+        provider=SubscriptionTransaction.PROVIDER_JAZZCASH,
+        merchant_ref=merchant_ref,
+        status=SubscriptionTransaction.STATUS_INITIATED,
+    )
+
+    payload = {
+        "pp_Version": "1.1",
+        "pp_TxnType": "MWALLET",
+        "pp_Language": "EN",
+        "pp_MerchantID": settings.JAZZCASH_MERCHANT_ID,
+        "pp_SubMerchantID": "",
+        "pp_Password": settings.JAZZCASH_PASSWORD,
+        "pp_BankID": "TBANK",
+        "pp_ProductID": "RETL",
+        "pp_TxnRefNo": merchant_ref,
+        "pp_Amount": amount_paisa,
+        "pp_TxnCurrency": "PKR",
+        "pp_TxnDateTime": txn_datetime,
+        "pp_BillReference": f"SUB-{txn.owner_id}",
+        "pp_Description": f"Roznamcha {plan} subscription",
+        "pp_TxnExpiryDateTime": txn_expiry,
+        "pp_ReturnURL": settings.JAZZCASH_RETURN_URL,
+        "ppmpf_1": str(txn.pk),
+        "ppmpf_2": str(duration_days),
+        "ppmpf_3": plan,
+        "ppmpf_4": "",
+        "ppmpf_5": "",
+        "pp_IPNURL": settings.JAZZCASH_IPN_URL,
+    }
+    payload["pp_SecureHash"] = compute_jazzcash_hash(payload, settings.JAZZCASH_INTEGRITY_SALT)
+
+    txn.request_payload = payload
+    txn.status = SubscriptionTransaction.STATUS_PENDING
+    txn.save(update_fields=["request_payload", "status", "updated_at"])
+
+    return render(
+        request,
+        "core/jazzcash_redirect.html",
+        {
+            "endpoint": settings.JAZZCASH_ENDPOINT,
+            "payload": payload,
+            "transaction": txn,
+        },
+    )
+
+
+@csrf_exempt
+def jazzcash_return(request):
+    payload = _jazzcash_parse_payload(request)
+    merchant_ref = (
+        payload.get("pp_TxnRefNo")
+        or payload.get("pp_TxnRefNo".lower())
+        or payload.get("merchant_ref")
+    )
+    if not merchant_ref:
+        logger.warning("JazzCash return missing transaction reference.")
+        return HttpResponse("Missing transaction reference.", status=400)
+
+    txn = SubscriptionTransaction.objects.filter(merchant_ref=str(merchant_ref)).select_related("owner").first()
+    if not txn:
+        logger.warning("JazzCash return unknown transaction reference: %s", merchant_ref)
+        return HttpResponse("Transaction not found.", status=404)
+
+    txn.return_payload = payload
+    txn.return_received_at = timezone.now()
+    provider_txn_id = _resolve_jazzcash_provider_txn_id(payload)
+    if provider_txn_id:
+        txn.provider_txn_id = provider_txn_id
+
+    hash_ok, hash_reason = verify_jazzcash_hash(payload, settings.JAZZCASH_INTEGRITY_SALT)
+    txn.hash_ok = hash_ok
+
+    success, response_code, response_message = _is_jazzcash_success(payload)
+    message = response_message or hash_reason or "Payment failed."
+
+    if txn.status == SubscriptionTransaction.STATUS_SUCCESS:
+        txn.save(
+            update_fields=[
+                "return_payload",
+                "return_received_at",
+                "provider_txn_id",
+                "hash_ok",
+                "updated_at",
+            ]
+        )
+        return render(
+            request,
+            "core/jazzcash_result.html",
+            {"success": True, "message": "Payment already processed.", "transaction": txn},
+        )
+
+    if hash_ok and success:
+        txn.status = SubscriptionTransaction.STATUS_SUCCESS
+        txn.failure_reason = ""
+        txn.verified_at = timezone.now()
+        txn.save(
+            update_fields=[
+                "status",
+                "failure_reason",
+                "verified_at",
+                "hash_ok",
+                "provider_txn_id",
+                "return_payload",
+                "return_received_at",
+                "updated_at",
+            ]
+        )
+        finalize_subscription_payment(txn)
+        return render(
+            request,
+            "core/jazzcash_result.html",
+            {"success": True, "message": "Payment successful. Subscription updated.", "transaction": txn},
+        )
+
+    txn.status = SubscriptionTransaction.STATUS_FAILED
+    txn.failure_reason = f"{hash_reason or ''} code={response_code} message={response_message}".strip()
+    logger.warning(
+        "JazzCash return verification failed for %s: %s",
+        txn.merchant_ref,
+        txn.failure_reason,
+    )
+    txn.save(
+        update_fields=[
+            "status",
+            "failure_reason",
+            "hash_ok",
+            "provider_txn_id",
+            "return_payload",
+            "return_received_at",
+            "updated_at",
+        ]
+    )
+    return render(
+        request,
+        "core/jazzcash_result.html",
+        {"success": False, "message": message, "transaction": txn},
+    )
+
+
+@csrf_exempt
+def jazzcash_ipn(request):
+    if request.method != "POST":
+        return HttpResponse("Method not allowed", status=405)
+
+    payload = _jazzcash_parse_payload(request)
+    merchant_ref = payload.get("pp_TxnRefNo") or payload.get("merchant_ref")
+    if not merchant_ref:
+        logger.warning("JazzCash IPN missing transaction reference.")
+        return HttpResponse("Missing transaction reference.", status=400)
+
+    txn = SubscriptionTransaction.objects.filter(merchant_ref=str(merchant_ref)).select_related("owner").first()
+    if not txn:
+        logger.warning("JazzCash IPN unknown transaction reference: %s", merchant_ref)
+        return HttpResponse("Transaction not found.", status=404)
+
+    txn.ipn_payload = payload
+    txn.ipn_received_at = timezone.now()
+    provider_txn_id = _resolve_jazzcash_provider_txn_id(payload)
+    if provider_txn_id:
+        txn.provider_txn_id = provider_txn_id
+
+    hash_ok, hash_reason = verify_jazzcash_hash(payload, settings.JAZZCASH_INTEGRITY_SALT)
+    txn.hash_ok = hash_ok
+    success, response_code, response_message = _is_jazzcash_success(payload)
+
+    if txn.status == SubscriptionTransaction.STATUS_SUCCESS:
+        txn.save(
+            update_fields=[
+                "ipn_payload",
+                "ipn_received_at",
+                "provider_txn_id",
+                "hash_ok",
+                "updated_at",
+            ]
+        )
+        return HttpResponse("OK")
+
+    if hash_ok and success:
+        txn.status = SubscriptionTransaction.STATUS_SUCCESS
+        txn.failure_reason = ""
+        txn.verified_at = timezone.now()
+        txn.save(
+            update_fields=[
+                "status",
+                "failure_reason",
+                "verified_at",
+                "hash_ok",
+                "provider_txn_id",
+                "ipn_payload",
+                "ipn_received_at",
+                "updated_at",
+            ]
+        )
+        finalize_subscription_payment(txn)
+        return HttpResponse("OK")
+
+    txn.status = SubscriptionTransaction.STATUS_FAILED
+    txn.failure_reason = f"{hash_reason or ''} code={response_code} message={response_message}".strip()
+    logger.warning(
+        "JazzCash IPN verification failed for %s: %s",
+        txn.merchant_ref,
+        txn.failure_reason,
+    )
+    txn.save(
+        update_fields=[
+            "status",
+            "failure_reason",
+            "hash_ok",
+            "provider_txn_id",
+            "ipn_payload",
+            "ipn_received_at",
+            "updated_at",
+        ]
+    )
+    return HttpResponse("OK")
+
 
 @login_required
 @resolve_tenant_context(require_company=True)
