@@ -18,23 +18,21 @@
 
   <div style="padding:14px 16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4>Renew / Activate Subscription</h4>
-    <p style="color: #666;">
-      (Phase 4) Payment gateway will be connected here. For now, this form is a placeholder.
-    </p>
+    <p style="color:#666;">Select a plan and continue to JazzCash payment.</p>
 
-    <form method="post">
+    <form method="post" action="{% url 'jazzcash_start' %}">
       {% csrf_token %}
 
       <label style="display:block; margin-top:10px;">Select Plan</label>
-      <select name="plan" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+      <select name="plan_code" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
         <option value="">-- Select --</option>
         <option value="MONTHLY">Monthly</option>
         <option value="YEARLY">Yearly</option>
       </select>
 
-      <div style="margin-top: 15px;">
+      <div style="margin-top:15px;">
         <button type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">
-          Submit Renewal Request
+          Proceed to Payment
         </button>
       </div>
     </form>

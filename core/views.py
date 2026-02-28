@@ -4947,7 +4947,7 @@ def jazzcash_start(request):
     if not profile or profile.role != "OWNER":
         raise PermissionDenied("Only owner can start subscription payment.")
 
-    plan = (request.POST.get("plan") or "").upper()
+    plan = (request.POST.get("plan_code") or "").upper()
     config = _JAZZCASH_PLAN_CONFIG.get(plan)
     if not config:
         messages.error(request, "Please select a valid plan.")
