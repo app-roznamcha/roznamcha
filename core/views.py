@@ -4957,6 +4957,7 @@ def jazzcash_start(request):
     duration_days = config["duration_days"]
     now = timezone.now()
     txn_datetime = now.strftime("%Y%m%d%H%M%S")
+    txn_ref = "T" + txn_datetime
     txn_expiry = (now + timedelta(days=1)).strftime("%Y%m%d%H%M%S")
     merchant_ref = f"T{txn_datetime}{uuid.uuid4().hex[:8].upper()}"
     amount_paisa = str(int((amount * Decimal("100")).quantize(Decimal("1"))))
@@ -4981,7 +4982,7 @@ def jazzcash_start(request):
         "pp_Password": settings.JAZZCASH_PASSWORD,
         "pp_BankID": "TBANK",
         "pp_ProductID": "RETL",
-        "pp_TxnRefNo": merchant_ref,
+        "pp_TxnRefNo": txn_ref,
         "pp_Amount": amount_paisa,
         "pp_TxnCurrency": "PKR",
         "pp_TxnDateTime": txn_datetime,
