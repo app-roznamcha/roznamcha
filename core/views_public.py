@@ -13,7 +13,7 @@ Disallow: /login/
 Disallow: /signup/
 Allow: /
 
-Sitemap: https://roznamcha.app/sitemap.xml
+Sitemap: https://www.roznamcha.app/sitemap.xml
 """
     return HttpResponse(content, content_type="text/plain")
 
@@ -100,37 +100,37 @@ def sitemap_xml(request):
     xml = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://roznamcha.app/</loc>
+    <loc>https://www.roznamcha.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/login/</loc>
+    <loc>https://www.roznamcha.app/login/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/signup/</loc>
+    <loc>https://www.roznamcha.app/signup/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/privacy/</loc>
+    <loc>https://www.roznamcha.app/privacy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/terms/</loc>
+    <loc>https://www.roznamcha.app/terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/refund/</loc>
+    <loc>https://www.roznamcha.app/refund/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/service/</loc>
+    <loc>https://www.roznamcha.app/service/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>

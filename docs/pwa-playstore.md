@@ -18,8 +18,8 @@ Set these variables where you host Django (Render, etc):
     `AA:BB:...:11,22:33:...:FF`
 
 After deploy, verify:
-- `https://roznamcha.app/manifest.webmanifest`
-- `https://roznamcha.app/.well-known/assetlinks.json`
+- `https://www.roznamcha.app/manifest.webmanifest`
+- `https://www.roznamcha.app/.well-known/assetlinks.json`
 
 ## 2) Validate PWA quality
 
@@ -35,7 +35,7 @@ Recommended: Bubblewrap (from GoogleChromeLabs).
 
 Typical flow:
 1. `npm i -g @bubblewrap/cli`
-2. `bubblewrap init --manifest https://roznamcha.app/manifest.webmanifest`
+2. `bubblewrap init --manifest https://www.roznamcha.app/manifest.webmanifest`
 3. Use app id matching `ANDROID_APP_ID` (example: `com.roznamcha.app`).
 4. `bubblewrap build`
 

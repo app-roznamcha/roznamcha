@@ -6037,7 +6037,7 @@ def sitemap_xml(request):
         # reverse("features"),
     ]
 
-    base = "https://roznamcha.app"
+    base = "https://www.roznamcha.app"
     xml_items = []
     for p in pages:
         xml_items.append(f"""

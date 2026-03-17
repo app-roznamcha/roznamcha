@@ -4,7 +4,7 @@ set -euo pipefail
 # Trusted Web Activity scaffold helper for Roznamcha
 # Requires: internet access, Java 17+, Node/NPM.
 
-APP_URL="${APP_URL:-https://roznamcha.app}"
+APP_URL="${APP_URL:-https://www.roznamcha.app}"
 MANIFEST_URL="${MANIFEST_URL:-$APP_URL/manifest.webmanifest}"
 APP_ID="${APP_ID:-com.roznamcha.app}"
 TWA_DIR="${TWA_DIR:-android-twa}"

@@ -10,9 +10,9 @@ Use this from your machine terminal in project root.
 
 ## 2) Verify web endpoints after deploy
 
-- `https://roznamcha.app/manifest.webmanifest`
-- `https://roznamcha.app/service-worker.js`
-- `https://roznamcha.app/.well-known/assetlinks.json`
+- `https://www.roznamcha.app/manifest.webmanifest`
+- `https://www.roznamcha.app/service-worker.js`
+- `https://www.roznamcha.app/.well-known/assetlinks.json`
 
 `assetlinks.json` must not be empty for production.
 
@@ -29,7 +29,7 @@ Include both:
 
 ```bash
 cd /Users/syedamirshah/Documents/standard-zarai
-APP_URL=https://roznamcha.app APP_ID=com.roznamcha.app ./scripts/prepare_twa.sh
+APP_URL=https://www.roznamcha.app APP_ID=com.roznamcha.app ./scripts/prepare_twa.sh
 ```
 
 This creates/uses `android-twa/` and runs Bubblewrap init/build.
