@@ -21,7 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.management import call_command
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.db.models import (
     Case,
     DecimalField,
@@ -995,6 +995,7 @@ def product_list(request):
 def product_create(request):
     error = None
     owner = request.owner
+    product = None
 
     if request.method == "POST":
         code = (request.POST.get("code") or "").strip()
@@ -1029,24 +1030,42 @@ def product_create(request):
             if pieces_per_pack <= 0:
                 pieces_per_pack = Decimal("1")
 
-            kwargs = {
-                "owner": owner,
-                "code": code,
-                "name": name,
-                "unit": unit,
-                "purchase_price_per_unit": purchase_price,
-                "sale_price_per_unit": sale_price,
-                "is_active": is_active,
-                "packing_type": packing_type,
-                "pieces_per_pack": pieces_per_pack,
-            }
-            kwargs = set_tenant_on_create_kwargs(request, kwargs, Product)
-            Product.objects.create(**kwargs)
-            return redirect("product_list")
+            product = Product(
+                owner=owner,
+                code=code,
+                name=name,
+                unit=unit,
+                purchase_price_per_unit=purchase_price,
+                sale_price_per_unit=sale_price,
+                is_active=is_active,
+                packing_type=packing_type,
+                pieces_per_pack=pieces_per_pack,
+            )
+
+            if Product.objects.filter(owner=owner, code=code).exists():
+                error = "A product with this code already exists for your company."
+            else:
+                kwargs = {
+                    "owner": owner,
+                    "code": code,
+                    "name": name,
+                    "unit": unit,
+                    "purchase_price_per_unit": purchase_price,
+                    "sale_price_per_unit": sale_price,
+                    "is_active": is_active,
+                    "packing_type": packing_type,
+                    "pieces_per_pack": pieces_per_pack,
+                }
+                kwargs = set_tenant_on_create_kwargs(request, kwargs, Product)
+                try:
+                    Product.objects.create(**kwargs)
+                    return redirect("product_list")
+                except IntegrityError:
+                    error = "A product with this code already exists for your company."
 
     return render(request, "core/product_form.html", {
         "error": error,
-        "product": None,
+        "product": product,
         "UNIT_CHOICES": Product.UNIT_CHOICES,
         "PACKING_CHOICES": Product.PACKING_CHOICES,
     })
@@ -1108,17 +1127,24 @@ def product_edit(request, pk):
             product.is_active = is_active
             product.packing_type = packing_type
             product.pieces_per_pack = pieces_per_pack
-            product.save(update_fields=[
-                "code",
-                "name",
-                "unit",
-                "purchase_price_per_unit",
-                "sale_price_per_unit",
-                "is_active",
-                "packing_type",
-                "pieces_per_pack",
-            ])
-            return redirect("product_list")
+
+            if Product.objects.filter(owner=owner, code=code).exclude(pk=product.pk).exists():
+                error = "A product with this code already exists for your company."
+            else:
+                try:
+                    product.save(update_fields=[
+                        "code",
+                        "name",
+                        "unit",
+                        "purchase_price_per_unit",
+                        "sale_price_per_unit",
+                        "is_active",
+                        "packing_type",
+                        "pieces_per_pack",
+                    ])
+                    return redirect("product_list")
+                except IntegrityError:
+                    error = "A product with this code already exists for your company."
 
     return render(request, "core/product_form.html", {
         "error": error,
