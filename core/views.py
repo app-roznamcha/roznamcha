@@ -445,25 +445,11 @@ def dashboard(request):
     ZERO = Value(Decimal("0.00"), output_field=MONEY)
 
     # -------------------------
-    # Cash/Bank balance (sum of cash/bank accounts)
+    # Cash/Bank balance (sum of real ledger balances for cash/bank accounts)
     # -------------------------
     cash_bank_balance = Decimal("0.00")
-    # Option A: if your Account has a balance/current_balance field
-    if hasattr(Account, "current_balance"):
-        cash_bank_balance = (
-            Account.objects.filter(owner=owner, is_cash_or_bank=True)
-            .aggregate(total=Coalesce(Sum("current_balance"), ZERO))
-            .get("total", Decimal("0.00"))
-        )
-    elif hasattr(Account, "balance"):
-        cash_bank_balance = (
-            Account.objects.filter(owner=owner, is_cash_or_bank=True)
-            .aggregate(total=Coalesce(Sum("balance"), ZERO))
-            .get("total", Decimal("0.00"))
-        )
-    else:
-        # If you don't store balances on Account yet, keep 0 for now.
-        cash_bank_balance = Decimal("0.00")
+    for account in Account.objects.filter(owner=owner, is_cash_or_bank=True):
+        cash_bank_balance += get_account_balance(owner=owner, account=account)
 
     customers_count = Party.objects.filter(owner=owner, party_type="CUSTOMER", is_active=True).count()
     products_count = Product.objects.filter(owner=owner, is_active=True).count()
