@@ -473,6 +473,19 @@ def dashboard(request):
         .get("total", Decimal("0.00"))
     )
 
+    month_sales_returns = (
+        SalesReturnItem.objects.filter(
+            owner=owner,
+            sales_return__posted=True,
+            sales_return__return_date__gte=month_start,
+            sales_return__return_date__lte=today,
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), ZERO))
+        .get("total", Decimal("0.00"))
+    )
+
+    month_sales = (month_sales or Decimal("0.00")) - (month_sales_returns or Decimal("0.00"))
+
     month_purchase_items = (
         PurchaseInvoiceItem.objects.filter(
             owner=owner,
@@ -500,7 +513,22 @@ def dashboard(request):
         .get("total", Decimal("0.00"))
     )
 
-    month_purchases = (month_purchase_items or Decimal("0.00")) + (month_purchase_charges or Decimal("0.00"))
+    month_purchase_returns = (
+        PurchaseReturnItem.objects.filter(
+            owner=owner,
+            purchase_return__posted=True,
+            purchase_return__return_date__gte=month_start,
+            purchase_return__return_date__lte=today,
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), ZERO))
+        .get("total", Decimal("0.00"))
+    )
+
+    month_purchases = (
+        (month_purchase_items or Decimal("0.00"))
+        + (month_purchase_charges or Decimal("0.00"))
+        - (month_purchase_returns or Decimal("0.00"))
+    )
 
     # Simple profit snapshot (not full accounting profit, but very useful for traders)
     month_profit_simple = (month_sales or Decimal("0.00")) - (month_purchases or Decimal("0.00"))
