@@ -530,8 +530,23 @@ def dashboard(request):
         - (month_purchase_returns or Decimal("0.00"))
     )
 
+    month_expenses = (
+        DailyExpense.objects.filter(
+            owner=owner,
+            posted=True,
+            date__gte=month_start,
+            date__lte=today,
+        )
+        .aggregate(total=Coalesce(Sum("amount"), ZERO))
+        .get("total", Decimal("0.00"))
+    )
+
     # Simple profit snapshot (not full accounting profit, but very useful for traders)
-    month_profit_simple = (month_sales or Decimal("0.00")) - (month_purchases or Decimal("0.00"))
+    month_profit_simple = (
+        (month_sales or Decimal("0.00"))
+        - (month_purchases or Decimal("0.00"))
+        - (month_expenses or Decimal("0.00"))
+    )
     
     total_sales_all = (
         SalesInvoiceItem.objects.filter(owner=owner, sales_invoice__posted=True)
