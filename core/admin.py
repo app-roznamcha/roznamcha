@@ -301,11 +301,15 @@ class StockAdjustmentAdmin(OwnerScopedAdmin):
     list_display = ("date", "product", "direction", "qty", "unit_cost", "posted")
 
 
+@admin.register(CompanyProfile)
+class CompanyProfileAdmin(HiddenFromStaffAdmin):
+    list_display = ("name", "owner", "slug", "accounting_mode", "accounting_cutover_date")
+
+
 # -------------------------
 # Hide these from STAFF
 # -------------------------
 admin.site.register(UserProfile, HiddenFromStaffAdmin)
-admin.site.register(CompanyProfile, HiddenFromStaffAdmin)
 admin.site.register(AppBranding, HiddenFromStaffAdmin)
 admin.site.register(Account, HiddenFromStaffAdmin)
 admin.site.register(JournalEntry, HiddenFromStaffAdmin)

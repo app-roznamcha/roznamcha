@@ -1092,33 +1092,142 @@ class SalesInvoice(OwnerRequiredMixin, TimeStampedModel):
                     "allow_for_payments": False,
                 },
             )
-            inventory_acct = get_company_account(
-                owner=self.owner,
-                code="1200",
-                defaults={
-                    "name": "Inventory",
-                    "account_type": "ASSET",
-                    "is_cash_or_bank": False,
-                    "allow_for_payments": False,
-                },
+            from core.services.journal import (
+                create_balanced_journal,
+                get_weighted_average_cost,
+                is_accounting_v2_active,
             )
 
-            # 🔒 Prevent duplicate journal entry
-            if not JournalEntry.objects.filter(
-                owner=self.owner,
-                related_model="SalesInvoice",
-                related_id=self.id,
-            ).exists():
-                JournalEntry.objects.create(
+            if is_accounting_v2_active(self.owner, self.invoice_date):
+                sales_revenue = get_company_account(
                     owner=self.owner,
-                    date=self.invoice_date,
-                    description=f"Sales Invoice {self.id}",
-                    debit_account=customer_control,
-                    credit_account=inventory_acct,
-                    amount=total,
+                    code="4100",
+                    defaults={
+                        "name": "Sales Revenue",
+                        "account_type": "INCOME",
+                        "is_cash_or_bank": False,
+                        "allow_for_payments": False,
+                    },
+                )
+
+                if not JournalEntry.objects.filter(
+                    owner=self.owner,
                     related_model="SalesInvoice",
                     related_id=self.id,
+                ).exists():
+                    create_balanced_journal(
+                        owner=self.owner,
+                        date=self.invoice_date,
+                        description=f"Sales Invoice {self.id}",
+                        related_model="SalesInvoice",
+                        related_id=self.id,
+                        lines=[
+                            {
+                                "account": customer_control,
+                                "debit": total,
+                                "credit": Decimal("0"),
+                                "description": f"Sales Invoice {self.id} receivable",
+                            },
+                            {
+                                "account": sales_revenue,
+                                "debit": Decimal("0"),
+                                "credit": total,
+                                "description": f"Sales Invoice {self.id} revenue",
+                            },
+                        ],
+                    )
+
+                cogs_account = get_company_account(
+                    owner=self.owner,
+                    code="5110",
+                    defaults={
+                        "name": "Cost of Goods Sold",
+                        "account_type": "EXPENSE",
+                        "is_cash_or_bank": False,
+                        "allow_for_payments": False,
+                    },
                 )
+                inventory_acct = get_company_account(
+                    owner=self.owner,
+                    code="1200",
+                    defaults={
+                        "name": "Inventory",
+                        "account_type": "ASSET",
+                        "is_cash_or_bank": False,
+                        "allow_for_payments": False,
+                    },
+                )
+
+                total_cogs = Decimal("0")
+                for item in self.items.select_related("product"):
+                    qty = item.quantity_units or Decimal("0")
+                    if qty <= 0:
+                        continue
+
+                    avg_cost = get_weighted_average_cost(
+                        owner=self.owner,
+                        product=item.product,
+                        as_of_date=self.invoice_date,
+                    )
+                    if avg_cost <= 0:
+                        continue
+
+                    total_cogs += qty * avg_cost
+
+                if total_cogs > 0 and not JournalEntry.objects.filter(
+                    owner=self.owner,
+                    related_model="SalesInvoiceCOGS",
+                    related_id=self.id,
+                ).exists():
+                    create_balanced_journal(
+                        owner=self.owner,
+                        date=self.invoice_date,
+                        description=f"Sales Invoice {self.id} COGS",
+                        related_model="SalesInvoiceCOGS",
+                        related_id=self.id,
+                        lines=[
+                            {
+                                "account": cogs_account,
+                                "debit": total_cogs,
+                                "credit": Decimal("0"),
+                                "description": f"Sales Invoice {self.id} COGS",
+                            },
+                            {
+                                "account": inventory_acct,
+                                "debit": Decimal("0"),
+                                "credit": total_cogs,
+                                "description": f"Sales Invoice {self.id} inventory reduction",
+                            },
+                        ],
+                    )
+            else:
+                inventory_acct = get_company_account(
+                    owner=self.owner,
+                    code="1200",
+                    defaults={
+                        "name": "Inventory",
+                        "account_type": "ASSET",
+                        "is_cash_or_bank": False,
+                        "allow_for_payments": False,
+                    },
+                )
+
+                # 🔒 Prevent duplicate journal entry
+                if not JournalEntry.objects.filter(
+                    owner=self.owner,
+                    related_model="SalesInvoice",
+                    related_id=self.id,
+                ).exists():
+                    JournalEntry.objects.create(
+                        owner=self.owner,
+                        date=self.invoice_date,
+                        description=f"Sales Invoice {self.id}",
+                        debit_account=customer_control,
+                        credit_account=inventory_acct,
+                        amount=total,
+                        related_model="SalesInvoice",
+                        related_id=self.id,
+                    )
 
             # Stock movement (unchanged)
             for item in self.items.select_related("product"):
@@ -2023,6 +2132,11 @@ class StockAdjustment(OwnerRequiredMixin, TimeStampedModel):
         ]
 
 class CompanyProfile(TimeStampedModel):
+    ACCOUNTING_MODE_CHOICES = [
+        ("legacy", "Legacy"),
+        ("v2", "Accounting V2"),
+    ]
+
     owner = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -2036,6 +2150,12 @@ class CompanyProfile(TimeStampedModel):
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
     slug = models.SlugField(max_length=50, unique=True, blank=True)
+    accounting_mode = models.CharField(
+        max_length=20,
+        choices=ACCOUNTING_MODE_CHOICES,
+        default="legacy",
+    )
+    accounting_cutover_date = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         # Source for slug:
@@ -2090,7 +2210,9 @@ def seed_default_accounts_for_owner(owner: User) -> None:
         ("1300", "Customer Control", "ASSET", False, False),
         ("2100", "Supplier Control", "LIABILITY", False, False),
         ("3000", "Opening Balances", "EQUITY", False, False),
+        ("4100", "Sales Revenue", "INCOME", False, False),
         ("5100", "Inventory Write-off (Damage/Expiry)", "EXPENSE", False, False),
+        ("5110", "Cost of Goods Sold", "EXPENSE", False, False),
         ("1010", "Cash", "ASSET", True, True),
         ("1020", "Bank", "ASSET", True, True),
         ("5200", "Wages / Staff Salaries", "EXPENSE", False, False),

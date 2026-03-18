@@ -61,6 +61,7 @@ from .models import (
     Account,
     CompanyProfile,
     JournalEntry,
+    JournalEntryLine,
     Party,
     Payment,
     Product,
@@ -2918,50 +2919,152 @@ def profit_loss(request):
     - Expense accounts: net = debits - credits
     """
     date_from, date_to = _get_date_range(request)
+    company = getattr(request.owner, "company_profile", None)
 
-    entries = JournalEntry.objects.filter(
-        owner=request.owner,
-        date__range=(date_from, date_to),
-    )
+    if company and company.accounting_mode == "v2":
+        cutover = company.accounting_cutover_date
+        if cutover is not None:
+            cutover_date = cutover.date()
+
+            if date_to < cutover_date:
+                messages.error(
+                    request,
+                    "This date range is before Accounting V2 activation. Legacy reports are not supported here.",
+                )
+                return render(
+                    request,
+                    "core/profit_loss.html",
+                    {
+                        "date_from": date_from,
+                        "date_to": date_to,
+                        "income_rows": [],
+                        "expense_rows": [],
+                        "total_income": Decimal("0"),
+                        "total_expense": Decimal("0"),
+                        "net_profit": Decimal("0"),
+                    },
+                )
+
+            if date_from < cutover_date <= date_to:
+                messages.error(
+                    request,
+                    "Selected period crosses Accounting V2 cutover date. Please select a date range fully after cutover.",
+                )
+                return render(
+                    request,
+                    "core/profit_loss.html",
+                    {
+                        "date_from": date_from,
+                        "date_to": date_to,
+                        "income_rows": [],
+                        "expense_rows": [],
+                        "total_income": Decimal("0"),
+                        "total_expense": Decimal("0"),
+                        "net_profit": Decimal("0"),
+                    },
+                )
+
     income_rows = []
     expense_rows = []
     total_income = Decimal("0")
     total_expense = Decimal("0")
 
-    debit_totals = {
-        row["debit_account"]: (row["total"] or Decimal("0"))
-        for row in (
-            entries.values("debit_account")
-            .annotate(total=Sum("amount"))
+    if company and company.accounting_mode == "v2":
+        line_qs = JournalEntryLine.objects.filter(
+            journal_entry__owner=request.owner,
+            journal_entry__date__range=(date_from, date_to),
         )
-    }
-    credit_totals = {
-        row["credit_account"]: (row["total"] or Decimal("0"))
-        for row in (
-            entries.values("credit_account")
-            .annotate(total=Sum("amount"))
-        )
-    }
 
-    for account in (
-        Account.objects.filter(
+        income_accounts = {
+            row["account"]: {
+                "debit": row["total_debit"] or Decimal("0"),
+                "credit": row["total_credit"] or Decimal("0"),
+            }
+            for row in (
+                line_qs.filter(account__account_type="INCOME")
+                .values("account")
+                .annotate(
+                    total_debit=Sum("debit"),
+                    total_credit=Sum("credit"),
+                )
+            )
+        }
+        expense_accounts = {
+            row["account"]: {
+                "debit": row["total_debit"] or Decimal("0"),
+                "credit": row["total_credit"] or Decimal("0"),
+            }
+            for row in (
+                line_qs.filter(account__account_type="EXPENSE")
+                .values("account")
+                .annotate(
+                    total_debit=Sum("debit"),
+                    total_credit=Sum("credit"),
+                )
+            )
+        }
+
+        for account in (
+            Account.objects.filter(
+                owner=request.owner,
+                account_type="INCOME",
+            ).order_by("code")
+        ):
+            amount = income_accounts.get(account.id, {}).get("credit", Decimal("0"))
+            if amount != 0:
+                income_rows.append({"account": account, "amount": amount})
+                total_income += amount
+
+        for account in (
+            Account.objects.filter(
+                owner=request.owner,
+                account_type="EXPENSE",
+            ).order_by("code")
+        ):
+            amount = expense_accounts.get(account.id, {}).get("debit", Decimal("0"))
+            if amount != 0:
+                expense_rows.append({"account": account, "amount": amount})
+                total_expense += amount
+    else:
+        entries = JournalEntry.objects.filter(
             owner=request.owner,
-            account_type__in=["INCOME", "EXPENSE"],
-        ).order_by("code")
-    ):
-        debit_sum = debit_totals.get(account.id, Decimal("0"))
-        credit_sum = credit_totals.get(account.id, Decimal("0"))
+            date__range=(date_from, date_to),
+        )
 
-        if account.account_type == "INCOME":
-            net = credit_sum - debit_sum
-            if net != 0:
-                income_rows.append({"account": account, "amount": net})
-                total_income += net
-        else:
-            net = debit_sum - credit_sum
-            if net != 0:
-                expense_rows.append({"account": account, "amount": net})
-                total_expense += net
+        debit_totals = {
+            row["debit_account"]: (row["total"] or Decimal("0"))
+            for row in (
+                entries.values("debit_account")
+                .annotate(total=Sum("amount"))
+            )
+        }
+        credit_totals = {
+            row["credit_account"]: (row["total"] or Decimal("0"))
+            for row in (
+                entries.values("credit_account")
+                .annotate(total=Sum("amount"))
+            )
+        }
+
+        for account in (
+            Account.objects.filter(
+                owner=request.owner,
+                account_type__in=["INCOME", "EXPENSE"],
+            ).order_by("code")
+        ):
+            debit_sum = debit_totals.get(account.id, Decimal("0"))
+            credit_sum = credit_totals.get(account.id, Decimal("0"))
+
+            if account.account_type == "INCOME":
+                net = credit_sum - debit_sum
+                if net != 0:
+                    income_rows.append({"account": account, "amount": net})
+                    total_income += net
+            else:
+                net = debit_sum - credit_sum
+                if net != 0:
+                    expense_rows.append({"account": account, "amount": net})
+                    total_expense += net
 
     net_profit = total_income - total_expense
 
