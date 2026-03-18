@@ -3997,28 +3997,36 @@ def sales_edit(request, pk):
 
         return redirect("sales_list")
 
+    try:
+        items = invoice.items.select_related("product").all()
+    except Exception:
+        items = tenant_qs(request, SalesInvoiceItem, strict=True).filter(sales_invoice=invoice).select_related("product")
+
+    linked_product_ids = list(items.values_list("product_id", flat=True).distinct())
+
     customers = (
         tenant_qs(request, Party, strict=True)
-        .filter(party_type="CUSTOMER", is_active=True)
+        .filter(
+            Q(party_type="CUSTOMER"),
+            Q(is_active=True) | Q(pk=invoice.customer_id),
+        )
         .order_by("name")
     )
 
     products = (
         tenant_qs(request, Product, strict=True)
-        .filter(is_active=True)
+        .filter(Q(is_active=True) | Q(pk__in=linked_product_ids))
         .order_by("code")
     )
 
     accounts = (
         tenant_qs(request, Account, strict=True)
-        .filter(is_cash_or_bank=True, allow_for_payments=True)
+        .filter(
+            Q(is_cash_or_bank=True, allow_for_payments=True) |
+            Q(pk=invoice.payment_account_id)
+        )
         .order_by("code")
     )
-
-    try:
-        items = invoice.items.select_related("product").all()
-    except Exception:
-        items = tenant_qs(request, SalesInvoiceItem, strict=True).filter(sales_invoice=invoice).select_related("product")
 
     context = {
         "edit_mode": True,
