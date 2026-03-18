@@ -146,6 +146,7 @@
       padding:0 22px 18px;
       background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
       border-bottom:1px solid #e5e7eb;
+      text-align:center;
     }
     .doc-heading h2{
       margin:0;
@@ -319,6 +320,18 @@
       color:#111827;
       font-weight:900;
     }
+    .ledger-summary .mini.primary{
+      background:linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+      border-color:#bfdbfe;
+      box-shadow:0 8px 16px rgba(37,99,235,0.08);
+    }
+    .ledger-summary .mini.primary .k{
+      color:#1d4ed8;
+    }
+    .ledger-summary .mini.primary .v{
+      font-size:16px;
+      color:#0f172a;
+    }
     .ledger-wrap{
       width:100%;
       overflow-x:auto;
@@ -475,18 +488,6 @@
       <div class="section">
         <div class="grid">
           <div class="box">
-            <div class="label">Seller / Business</div>
-            <div class="value">{{ company_name }}</div>
-            {% if company_phone or company_email %}
-              <div class="muted">
-                {% if company_phone %}📞 {{ company_phone }}{% endif %}
-                {% if company_phone and company_email %} • {% endif %}
-                {% if company_email %}✉️ {{ company_email }}{% endif %}
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="box">
             <div class="label">Customer</div>
             <div class="value">{{ customer.name }}</div>
             {% if customer.phone or customer.city or customer.address %}
@@ -588,34 +589,16 @@
 
         <div class="ledger-summary">
           <div class="mini">
-            <div class="k">Opening / Previous Due</div>
+            <div class="k">Previous Balance</div>
             <div class="v">PKR {{ opening_balance|floatformat:2 }}</div>
           </div>
           <div class="mini">
-            <div class="k">This Invoice Total</div>
+            <div class="k">This Invoice</div>
             <div class="v">PKR {{ total|floatformat:2 }}</div>
           </div>
-          <div class="mini">
-            <div class="k">Paid</div>
-            <div class="v">PKR {{ paid|floatformat:2 }}</div>
-          </div>
-          <div class="mini">
-            <div class="k">This Invoice Due</div>
-            <div class="v">PKR {{ invoice_due|floatformat:2 }}</div>
-          </div>
-          <div class="mini">
-            <div class="k">Current Due</div>
+          <div class="mini primary">
+            <div class="k">Total Payable</div>
             <div class="v">PKR {{ current_due|floatformat:2 }}</div>
-          </div>
-          <div class="mini">
-            <div class="k">Last Payment Date</div>
-            <div class="v">
-              {% if last_payment_date %}
-                {{ last_payment_date|date:"M j, Y" }}
-              {% else %}
-                —
-              {% endif %}
-            </div>
           </div>
         </div>
 
