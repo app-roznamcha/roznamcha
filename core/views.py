@@ -6427,6 +6427,12 @@ def sales_invoice_share(request, pk):
         or ""
     )
 
+    company_email = (
+        getattr(company, "email", None)
+        or getattr(request.owner, "email", None)
+        or ""
+    )
+
     context = {
         "invoice": invoice,
         "items": invoice.items.all(),
@@ -6438,8 +6444,10 @@ def sales_invoice_share(request, pk):
         "current_due": current_due,
         "is_draft": is_draft,
         "is_staff_user": is_staff_user,
+        "company": company,
         "company_name": company_name,
         "company_phone": company_phone,
+        "company_email": company_email,
         "ledger_rows": ledger_rows,
         "ledger_limit": ledger_limit,
         "opening_balance": previous_due,

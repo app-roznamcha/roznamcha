@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Sales Invoice #{{ invoice.invoice_number }} — Roznamcha</title>
+  <title>Sales Invoice #{{ invoice.invoice_number }} — {{ company_name }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -33,43 +33,140 @@
     }
 
     .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding: 16px 18px;
+      display:grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(220px, .9fr) minmax(180px, .7fr);
+      gap:16px;
+      padding: 18px 18px;
       border-bottom:1px solid #e5e7eb;
-      background:#ffffff;
+      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
     }
 
-    .brand{
+    .brand-primary{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      min-width:0;
+    }
+    .company-logo{
+      width:68px;
+      height:68px;
+      border-radius:16px;
+      border:1px solid #d1deec;
+      object-fit:cover;
+      background:#ffffff;
+      box-shadow:0 10px 18px rgba(15,23,42,0.08);
+    }
+    .company-logo-fallback{
+      width:68px;
+      height:68px;
+      border-radius:16px;
+      border:1px solid #d1deec;
+      background:linear-gradient(160deg, #e8f1ff 0%, #f8fbff 100%);
+      color:#2563eb;
       display:flex;
       align-items:center;
-      gap:12px;
+      justify-content:center;
+      font-size:26px;
+      font-weight:900;
+      letter-spacing:.04em;
+      box-shadow:0 10px 18px rgba(15,23,42,0.08);
+      flex:0 0 auto;
+    }
+    .company-copy{
       min-width:0;
     }
-    .logo{
-      height:44px;
-      width:auto;
-      border-radius:10px;
-    }
-    .title{
-      min-width:0;
-    }
-    .title h1{
+    .company-copy h1{
       margin:0;
-      font-size:18px;
-      font-weight:800;
-      line-height:1.1;
+      font-size:28px;
+      font-weight:900;
+      line-height:1.05;
+      letter-spacing:-0.02em;
     }
-    .title .sub{
+    .company-meta{
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 10px;
+      font-size:12px;
+      color:#475569;
+      font-weight:700;
+    }
+
+    .doc-identity{
+      border:1px solid #e5e7eb;
+      border-radius:16px;
+      background:#ffffff;
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      gap:4px;
+    }
+    .doc-kicker{
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#64748b;
+      font-weight:800;
+    }
+    .doc-title{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.1;
+      color:#0f172a;
+    }
+    .doc-meta{
+      font-size:13px;
+      color:#475569;
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .brand-secondary{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      min-width:0;
+    }
+    .powered-by{
+      width:100%;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      background:#f8fafc;
+      padding:12px 14px;
+      text-align:right;
+    }
+    .powered-by img{
+      width:34px;
+      height:34px;
+      border-radius:10px;
+      display:block;
+      margin-left:auto;
+      margin-bottom:8px;
+    }
+    .powered-by .k{
+      font-size:10px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#6b7280;
+      font-weight:800;
+      margin-bottom:4px;
+    }
+    .powered-by .v{
+      font-size:14px;
+      color:#111827;
+      font-weight:800;
+    }
+    .powered-by .sub{
       margin-top:3px;
       font-size:12px;
-      color:#6b7280;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 520px;
+      color:#64748b;
+      font-weight:700;
     }
 
     .pill{
@@ -331,11 +428,24 @@
     {% endif %}
 
     @media (max-width: 720px){
+      .topbar{
+        grid-template-columns: 1fr;
+      }
+      .brand-secondary{
+        align-items:stretch;
+      }
+      .powered-by{
+        text-align:left;
+      }
+      .powered-by img{
+        margin-left:0;
+      }
       .grid{ grid-template-columns: 1fr; }
       .watermark{ font-size: 62px; }
       .totals .sum{ width:100%; }
       .marketing-strip{ flex-direction:column; align-items:flex-start; }
       .ledger-summary{ grid-template-columns: 1fr 1fr; }
+      .company-copy h1{ font-size:24px; }
     }
   </style>
 </head>
@@ -349,33 +459,62 @@
       {% endif %}
 
       <div class="topbar">
-        <div class="brand">
-          <img class="logo" src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
-          <div class="title">
-            <h1>Sales Invoice</h1>
-            <div class="sub">
-              Invoice #{{ invoice.invoice_number }} • {{ invoice.invoice_date|date:"M j, Y" }}
+        <div class="brand-primary">
+          {% if company and company.logo %}
+            <img class="company-logo" src="{{ company.logo.url }}" alt="{{ company_name }}">
+          {% else %}
+            <div class="company-logo-fallback">
+              {{ company_name|default:"C"|slice:":2"|upper }}
             </div>
-            {% if company_name %}
-              <div class="sub">
-                {{ company_name }}{% if company_phone %} • {{ company_phone }}{% endif %}
-              </div>
-            {% endif %}
+          {% endif %}
+          <div class="company-copy">
+            <h1>{{ company_name }}</h1>
+            <div class="company-meta">
+              {% if company_phone %}<span>📞 {{ company_phone }}</span>{% endif %}
+              {% if company_email %}<span>✉️ {{ company_email }}</span>{% endif %}
+            </div>
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="doc-identity">
+          <div class="doc-kicker">Document</div>
+          <h2 class="doc-title">Sales Invoice</h2>
+          <div class="doc-meta">
+            Invoice #{{ invoice.invoice_number }}<br>
+            {{ invoice.invoice_date|date:"M j, Y" }}
+          </div>
+        </div>
+
+        <div class="brand-secondary">
           {% if is_draft %}
             <div class="pill warn">UNPOSTED / DRAFT</div>
           {% else %}
             <div class="pill ok">POSTED</div>
           {% endif %}
+          <div class="powered-by">
+            <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
+            <div class="k">Powered by</div>
+            <div class="v">Roznamcha</div>
+            <div class="sub">Accounting software platform</div>
+          </div>
         </div>
       </div>
 
       <!-- ✅ Keep content INSIDE card (fixed closing-tag bug) -->
       <div class="section">
         <div class="grid">
+          <div class="box">
+            <div class="label">Seller / Business</div>
+            <div class="value">{{ company_name }}</div>
+            {% if company_phone or company_email %}
+              <div class="muted">
+                {% if company_phone %}📞 {{ company_phone }}{% endif %}
+                {% if company_phone and company_email %} • {% endif %}
+                {% if company_email %}✉️ {{ company_email }}{% endif %}
+              </div>
+            {% endif %}
+          </div>
+
           <div class="box">
             <div class="label">Customer</div>
             <div class="value">{{ customer.name }}</div>
@@ -407,7 +546,7 @@
 
         <!-- ✅ Marketing strip that will be visible in PNG -->
         <div class="marketing-strip">
-          <div>Generated via Roznamcha</div>
+          <div>Seller: <strong>{{ company_name }}</strong></div>
           <div class="site">www.roznamcha.app</div>
         </div>
       </div>
@@ -572,7 +711,7 @@
       </div>
 
       <div class="footer">
-        Generated by Roznamcha • https://www.roznamcha.app
+        Invoice generated by {{ company_name }} using Roznamcha • https://www.roznamcha.app
       </div>
 
     </div>
