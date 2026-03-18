@@ -11,6 +11,7 @@ from .models import (
     Product,
     Party,
     JournalEntry,
+    JournalEntryLine,
     Payment,
     SalesInvoice,
     SalesInvoiceItem,
@@ -308,6 +309,7 @@ admin.site.register(CompanyProfile, HiddenFromStaffAdmin)
 admin.site.register(AppBranding, HiddenFromStaffAdmin)
 admin.site.register(Account, HiddenFromStaffAdmin)
 admin.site.register(JournalEntry, HiddenFromStaffAdmin)
+admin.site.register(JournalEntryLine, HiddenFromStaffAdmin)
 
 # Also hide Django auth Users/Groups from STAFF
 admin.site.unregister(Group)

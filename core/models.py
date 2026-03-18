@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from datetime import timedelta
 import re
@@ -584,6 +585,49 @@ class JournalEntry(OwnerRequiredMixin, TimeStampedModel):
         indexes = [
             models.Index(fields=["owner", "date", "id"]),
             models.Index(fields=["owner", "related_model", "related_id"]),
+        ]
+
+
+class JournalEntryLine(TimeStampedModel):
+    journal_entry = models.ForeignKey(
+        JournalEntry,
+        on_delete=models.CASCADE,
+        related_name="lines",
+    )
+    account = models.ForeignKey(
+        Account,
+        on_delete=models.PROTECT,
+        related_name="journal_lines",
+    )
+    debit = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    credit = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    description = models.CharField(max_length=255, blank=True)
+
+    def clean(self):
+        super().clean()
+
+        if self.debit is not None and self.debit < 0:
+            raise ValidationError("Debit must be greater than or equal to zero.")
+        if self.credit is not None and self.credit < 0:
+            raise ValidationError("Credit must be greater than or equal to zero.")
+        if (self.debit or Decimal("0")) > 0 and (self.credit or Decimal("0")) > 0:
+            raise ValidationError("A journal line cannot have both debit and credit amounts.")
+
+        if self.journal_entry_id and self.account_id:
+            if self.journal_entry.owner_id != self.account.owner_id:
+                raise ValidationError("Account does not belong to the same owner as the journal entry.")
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=Q(debit__gte=0), name="journal_line_debit_gte_0"),
+            models.CheckConstraint(check=Q(credit__gte=0), name="journal_line_credit_gte_0"),
+            models.CheckConstraint(
+                check=~(Q(debit__gt=0) & Q(credit__gt=0)),
+                name="journal_line_not_both_debit_credit",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["journal_entry", "account"]),
         ]
 # --------------------------
 # Payments
