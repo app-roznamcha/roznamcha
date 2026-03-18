@@ -549,37 +549,6 @@
           </tbody>
         </table>
 
-        <div class="totals">
-          <div class="sum">
-            <div class="row">
-              <div class="k">Previous Due</div>
-              <div class="v">PKR {{ previous_due|floatformat:2 }}</div>
-            </div>
-
-            <div class="row">
-              <div class="k">Invoice Total</div>
-              <div class="v">PKR {{ total|floatformat:2 }}</div>
-            </div>
-
-            {% if invoice.payment_type != "CREDIT" %}
-              <div class="row">
-                <div class="k">Paid</div>
-                <div class="v">PKR {{ paid|floatformat:2 }}</div>
-              </div>
-            {% endif %}
-
-            <div class="row">
-              <div class="k">This Invoice Due</div>
-              <div class="v">PKR {{ invoice_due|floatformat:2 }}</div>
-            </div>
-
-            <div class="row total">
-              <div class="k">Current Due</div>
-              <div class="v">PKR {{ current_due|floatformat:2 }}</div>
-            </div>
-          </div>
-        </div>
-
         <div class="ledger-title">Customer Ledger (Recent)</div>
         {% if show_ledger_note %}
           <div class="ledger-note">
