@@ -3,22 +3,22 @@
 <html lang="en" id="docRoot">
 <head>
   <meta charset="utf-8">
-  <title>Roznamcha — Counter par staff, control aapke haath.</title>
+  <title>Roznamcha — Staff at the counter, control in your hands.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- SEO -->
   <meta name="description" content="Roznamcha is a complete accounting system for Pakistani wholesalers: sales, purchases, stock, ledgers, double-entry reports, backups, and Tax Pack exports designed for Pakistan compliance workflows.">
-  <meta name="keywords" content="khata app Pakistan, accounting software Pakistan, double entry accounting, wholesaler accounting, stock management, ledger app, tax exports Pakistan">
+  <meta name="keywords" content="accounting software Pakistan, wholesale accounting software, double entry accounting, stock management, ledger software, tax exports Pakistan">
   <link rel="canonical" href="https://www.roznamcha.app/">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Roznamcha — Counter par staff, control aapke haath.">
+  <meta property="og:title" content="Roznamcha — Staff at the counter, control in your hands.">
   <meta property="og:description" content="Built for Pakistani wholesalers: proper accounting, owner/staff controls, and Tax Pack exports for compliance workflows.">
   <meta property="og:url" content="https://www.roznamcha.app/">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&family=Noto+Nastaliq+Urdu:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Schema -->
   <script type="application/ld+json">
@@ -47,7 +47,6 @@
       color:#0f172a;
       line-height:1.55;
     }
-    html[lang="ur"] body{font-family:"Noto Nastaliq Urdu","Manrope",sans-serif}
     a{text-decoration:none;color:inherit}
     img{max-width:100%;height:auto}
     .container{max-width:1220px;margin:0 auto;padding:0 20px}
@@ -107,24 +106,6 @@
       font-weight:850;
     }
     .btn-wa:hover{background:#059669;border-color:#059669}
-
-    /* Language toggle */
-    .lang-toggle{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:5px 7px;border-radius:999px;
-      border:1px solid #dbe5f1;background:#fff;
-      font-weight:900;font-size:13px;
-    }
-    .lang-toggle button{
-      border:none;background:transparent;cursor:pointer;
-      font-weight:950;padding:5px 10px;border-radius:999px;
-    }
-    .lang-toggle button.active{background:#eff6ff;color:#1d4ed8}
-    html[dir="rtl"]{direction:rtl}
-    html[dir="rtl"] .hero, html[dir="rtl"] .grid3, html[dir="rtl"] .grid2, html[dir="rtl"] .compare, html[dir="rtl"] .pricing{
-      direction:rtl;
-    }
-    html[dir="rtl"] .hero, html[dir="rtl"] .section, html[dir="rtl"] .footer-inner{ text-align:right; }
 
     /* Hero */
     .hero-wrap{padding:34px 0 24px}
@@ -274,8 +255,6 @@
     }
     .box h4{margin:0 0 8px;font-size:15px;font-weight:950}
     .box ul{margin:0;padding-left:18px;color:#64748b;line-height:1.8}
-    html[dir="rtl"] .box ul{padding-left:0;padding-right:18px}
-
     /* Steps */
     .step{
       background:linear-gradient(90deg, rgba(37,99,235,.10), rgba(5,150,105,.08));
@@ -426,11 +405,6 @@
       </div>
 
       <div class="actions">
-        <span class="lang-toggle" title="Language">
-          <button type="button" id="btnEN" class="active">EN</button>
-          <button type="button" id="btnUR">اردو</button>
-        </span>
-
         <a class="btn btn-ghost" href="{% url 'login' %}" data-i18n="login">Login</a>
         <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="create_account">Create Account</a>
       </div>
@@ -446,11 +420,11 @@
       <span class="eyebrow" data-i18n="eyebrow">Built for Pakistani wholesalers & distributors</span>
 
       <h1 class="headline">
-        <span data-i18n="hero_title">Counter par staff, control aapke haath.</span>
+        <span data-i18n="hero_title">Staff at the counter, control in your hands.</span>
       </h1>
 
       <p class="subhead" data-i18n="hero_sub">
-        The wholesaler’s remote control: <strong>track every rupee</strong>, keep the “ghallah” matching the books,
+        The wholesaler’s remote control: <strong>track every rupee</strong>, keep cash collections matching the books,
         and generate <strong>audit-ready reports</strong> with proper double-entry — plus a <strong>Tax Pack</strong> for standardized exports & downloads.
       </p>
 
@@ -465,7 +439,7 @@
       </div>
 
       <p class="fineprint" data-i18n="hero_note">
-        Polished but locally grounded. Hamari team WhatsApp par aapki madad ke liye hazir hai.
+        Polished but locally grounded. Our team is available on WhatsApp to help with setup and daily use.
       </p>
     </div>
 
@@ -475,7 +449,7 @@
         <h3 data-i18n="panel_why_title">The 3-Layered Shield</h3>
         <p data-i18n="panel_why_text">
           Control (Security) → Protection (Compliance workflows) → Growth (Bank-ready reporting).
-          Roznamcha is the professional upgrade from “khata notes” to real accounting.
+          Roznamcha is the professional upgrade from handwritten notes to real accounting.
         </p>
 
         <ul class="list">
@@ -535,7 +509,7 @@
 
     <div class="block">
       <span class="kicker" data-i18n="fear_k4">📉 CLARITY (Cash & Profit)</span>
-      <h4 data-i18n="fear_4_title">Fix the “ghallah mismatch”</h4>
+      <h4 data-i18n="fear_4_title">Fix cash drawer mismatches</h4>
       <p data-i18n="fear_4_text">Real-time Profit & Loss and ledgers help you find leaks: expenses, bad debt, or pricing issues — early.</p>
     </div>
   </div>
@@ -586,7 +560,7 @@
   <!-- Comparison -->
   <div class="compare">
     <div class="box">
-      <h4 data-i18n="cmp_left_title">Simple “khata apps”</h4>
+      <h4 data-i18n="cmp_left_title">Basic note-taking apps</h4>
       <ul>
         <li data-i18n="cmp_l1">Single-entry notes (easy to miss/fake)</li>
         <li data-i18n="cmp_l2">Weak stock + weak reporting</li>
@@ -614,7 +588,7 @@
     </div>
     <div class="step">
       <strong data-i18n="step2_title">2) Control (Owner)</strong>
-      <p data-i18n="step2_text">Owner reviews summaries and makes sure the “ghallah” matches the books.</p>
+      <p data-i18n="step2_text">Owner reviews summaries and makes sure cash collected matches the books.</p>
     </div>
     <div class="step">
       <strong data-i18n="step3_title">3) Export (Tax Pack)</strong>
@@ -693,9 +667,9 @@
 
   <div class="grid2">
     <div class="box">
-      <h4 data-i18n="about_title">For the bazaars of Pakistan</h4>
+      <h4 data-i18n="about_title">Built for Pakistan's wholesale markets</h4>
       <p class="muted" data-i18n="about_text">
-        Polished but locally grounded. We understand bazaar terms and accounting terms — both.
+        Polished but locally grounded. We understand how wholesale trade works on the ground and how professional accounting should support it.
         Roznamcha is designed for wholesalers who want control, clean reporting, and professional exports without slow “enterprise” complexity.
       </p>
     </div>
@@ -703,7 +677,7 @@
     <div class="box">
       <h4 data-i18n="support_title">Support</h4>
       <p class="muted" data-i18n="support_text">
-        Hamari team WhatsApp par aapki madad ke liye hazir hai. Get help with setup, daily workflow, and exports.
+        Our team is available on WhatsApp to help with setup, daily workflow, and exports.
       </p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
         <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" style="flex:1;" data-i18n="support_wa">WhatsApp</a>
@@ -719,7 +693,7 @@
   <div class="container">
     <div class="footer-inner">
       <div class="footer-brand">
-        <div class="footer-title" data-i18n="footer_title">Roznamcha — Smart Khata & Hisab System</div>
+        <div class="footer-title" data-i18n="footer_title">Roznamcha — Smart Accounting System</div>
         <div class="footer-sub" data-i18n="footer_addr">
           Office No. 7, 2nd Floor, Shaheen View,<br>
           Model Town, Quetta Cantt
@@ -750,179 +724,6 @@
   <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="sticky_wa">WhatsApp</a>
   <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="sticky_start">Create Account</a>
 </div>
-
-<script>
-  // EN/UR toggle
-  const dict = {
-    en: {
-      nav_features:"Features", nav_taxpack:"Tax Pack", nav_pricing:"Pricing", nav_contact:"Contact",
-      login:"Login", create_account:"Create Account", wa_cta:"WhatsApp",
-      eyebrow:"Built for Pakistani wholesalers & distributors",
-      hero_title:"Counter par staff, control aapke haath.",
-      hero_sub:"The wholesaler’s remote control: track every rupee, keep the “ghallah” matching the books, and generate audit-ready reports with proper double-entry — plus a Tax Pack for standardized exports & downloads.",
-      proof_1:"✅ Owner controls edits (staff enters)",
-      proof_2:"📊 Double-entry reports (Trial Balance, P&L, Balance Sheet)",
-      proof_3:"🧾 Standardized Annex-C style exports",
-      cta_primary:"Create Account",
-      cta_secondary:"Start on WhatsApp",
-      hero_note:"Polished but locally grounded. Hamari team WhatsApp par aapki madad ke liye hazir hai.",
-      panel_why_title:"The 3-Layered Shield",
-      panel_why_text:"Control (Security) → Protection (Compliance workflows) → Growth (Bank-ready reporting). Roznamcha is the professional upgrade from “khata notes” to real accounting.",
-      bullet_1:"Control: activity logs + owner-level permissions (no silent edits).",
-      bullet_2:"Protection: standardized exports for Pakistan compliance workflows.",
-      bullet_3:"Growth: audit-ready reports banks and partners respect.",
-      panel_btn:"See Pricing",
-      panel_for_title:"Made for real markets",
-      panel_for_text:"Fertilizers, pesticides, tools, general trade — with staff entry + owner oversight.",
-      for_1:"Multi-device access (phone + laptop)", for_2:"Fast daily entry: minimal clicks", for_3:"Exports you can hand to a consultant",
-      hook_title:"What keeps owners worried",
-      fear_k1:"🔒 CONTROL (Security)",
-      fear_1_title:"Stop worrying about the counter",
-      fear_1_text:"Staff can enter sales/purchases — but owner controls edits and sensitive actions. Know who did what, and when.",
-      fear_k2:"🧾 PROTECTION (Compliance workflows)",
-      fear_2_title:"No more “surprise notice” fear",
-      fear_2_text:"Standardized exports & downloads (Level 1/2, per-file, full ZIP) so your data is prepared for professional portal workflows.",
-      fear_k3:"☁️ SAFETY (Data)",
-      fear_3_title:"Your data is never hostage",
-      fear_3_text:"Controlled backups + multi-device access so business continues even if a phone is lost or replaced.",
-      fear_k4:"📉 CLARITY (Cash & Profit)",
-      fear_4_title:"Fix the “ghallah mismatch”",
-      fear_4_text:"Real-time Profit & Loss and ledgers help you find leaks: expenses, bad debt, or pricing issues — early.",
-      features_title:"Core capabilities",
-      f1_title:"Sales & Purchases", f1_text:"Fast entry, clean lists, and proper posting that affects ledgers automatically.",
-      f2_title:"Customer & Supplier Ledgers", f2_text:"Running balances, statements, and party-wise history — always updated.",
-      f4_title:"Stock & Product Reports", f4_text:"Know what’s in stock and what moved today — with product ledger support.",
-      f5_title:"Audit-Ready Double-Entry Reports", f5_text:"Trial Balance, Profit & Loss, Balance Sheet — built from real entries.", f5_note:"Built for professional review",
-      f6_title:"Owner + Staff Controls", f6_text:"Granular roles: staff enters, owner approves/controls sensitive actions.", f6_note:"Activity log support",
-      f8_title:"Tax Pack", f8_text:"Standardized exports + downloads (Level 1 & 2, per-file, and full ZIP).", f8_note:"Annex-C style structure",
-      cmp_left_title:"Simple “khata apps”", cmp_l1:"Single-entry notes (easy to miss/fake)", cmp_l2:"Weak stock + weak reporting", cmp_l3:"No audit-ready statements", cmp_l4:"Everyone sees everything",
-      cmp_right_title:"Roznamcha (Professional Upgrade)", cmp_r1:"Proper posting → ledgers & reports", cmp_r2:"Owner + staff permissions", cmp_r3:"Audit-ready Trial Balance / P&L / Balance Sheet", cmp_r4:"Standardized exports + downloads (Tax Pack)",
-      step1_title:"1) Entry (Staff)", step1_text:"Staff records sale/purchase. System posts it correctly so ledgers stay clean.",
-      step2_title:"2) Control (Owner)", step2_text:"Owner reviews summaries and makes sure the “ghallah” matches the books.",
-      step3_title:"3) Export (Tax Pack)", step3_text:"Download standardized files/ZIP for your consultant — no manual retyping.",
-      step4_title:"4) Growth (Bank-ready)", step4_text:"Double-entry reporting supports financing and professional supplier/bank relationships.",
-      pricing_title:"Pricing (Fixed fee, no surprises)",
-      plan_monthly_badge:"Wholesaler Plan (Monthly)", per_month:"/ month", plan_monthly_desc:"No hidden charges. Owner + up to 3 Staff. Cancel anytime.",
-      p1:"Sales, Purchases, Stock, Ledgers", p2:"Audit-ready Double-Entry Reports", p3:"Tax Pack exports + downloads (Level 1/2 + ZIP)", p4:"Owner + Staff controls",
-      founder_note:"Why Rs 1,000? We keep costs low so Pakistani SMEs can go digital without “enterprise” pricing — no fancy offices, just solid workflows.",
-      pricing_cta:"Create Account",
-      plan_yearly_badge:"Yearly (Best Value)", per_year:"/ year", plan_yearly_desc:"25% discount — predictable cost for the full year.",
-      y1:"Save 25% vs monthly", y2:"Best for compliance season peace of mind", y3:"Same full features as monthly", y4:"WhatsApp support available",
-      pricing_cta2:"Start", pricing_wa:"Chat on WhatsApp",
-      anchor_note:"Optional future “Professional” plan (multi-branch / 10 staff) will be higher priced. Today’s plan is focused for wholesalers: control + reporting + exports.",
-      legal_note:"Roznamcha provides tools to facilitate record-keeping and standardized exports for Pakistan compliance workflows. Final filing and compliance remain the responsibility of the business owner and their tax consultant.",
-      bottom_title:"Start in minutes", bottom_text:"Create your company and begin entering sales/purchases today.", bottom_btn:"Create Account",
-      contact_title:"About & Contact",
-      about_title:"Built in Quetta, for the bazaars of Pakistan",
-      about_text:"Polished but locally grounded. We understand bazaar terms and accounting terms — both. Roznamcha is designed for wholesalers who want control, clean reporting, and professional exports without slow “enterprise” complexity.",
-      about_addr:"Office No. 7, 2nd Floor, Shaheen View, Model Town, Quetta Cantt",
-      support_title:"Support", support_text:"Hamari team WhatsApp par aapki madad ke liye hazir hai. Get help with setup, daily workflow, and exports.",
-      support_wa:"WhatsApp",
-      footer_title:"Roznamcha — Smart Khata & Hisab System",
-      footer_addr:"Office No. 7, 2nd Floor, Shaheen View,<br>Model Town, Quetta Cantt",
-      privacy:"Privacy Policy", terms:"Terms & Conditions", refund:"Refund Policy", service:"Service Policy",
-      sticky_wa:"WhatsApp", sticky_start:"Create Account"
-    },
-    ur: {
-      nav_features:"فیچرز", nav_taxpack:"ٹیکس پیک", nav_pricing:"قیمت", nav_contact:"رابطہ",
-      login:"لاگ اِن", create_account:"اکاؤنٹ بنائیں", wa_cta:"واٹس ایپ",
-      eyebrow:"پاکستان کے ہول سیلرز اور ڈسٹری بیوٹرز کے لیے",
-      hero_title:"کاؤنٹر پر اسٹاف، کنٹرول آپ کے ہاتھ۔",
-      hero_sub:"ہول سیلر کا ریموٹ کنٹرول: ہر روپیہ ٹریک کریں، “گلہ” میچ رکھیں، اور درست ڈبل انٹری سے آڈٹ-ریڈی رپورٹس بنائیں — ساتھ میں ٹیکس پیک کے اسٹینڈرڈ ایکسپورٹس اور ڈاؤن لوڈز۔",
-      proof_1:"✅ ایڈٹس کا کنٹرول اونر کے پاس (اسٹاف انٹری کرے)",
-      proof_2:"📊 ڈبل انٹری رپورٹس (ٹرائل بیلنس، P&L، بیلنس شیٹ)",
-      proof_3:"🧾 Annex-C اسٹائل اسٹینڈرڈ ایکسپورٹس",
-      cta_primary:"اکاؤنٹ بنائیں",
-      cta_secondary:"واٹس ایپ سے شروع کریں",
-      hero_note:"پروفیشنل مگر لوکل۔ ہماری ٹیم واٹس ایپ پر آپ کی مدد کے لیے حاضر ہے۔",
-      panel_why_title:"3-لیئرڈ شیلڈ",
-      panel_why_text:"کنٹرول (سیکیورٹی) → پروٹیکشن (کمپلائنس ورک فلو) → گروتھ (بینک-ریڈی رپورٹس)۔ Roznamcha کھاتا نوٹس سے پروفیشنل اکاؤنٹنگ کی طرف اپ گریڈ ہے۔",
-      bullet_1:"کنٹرول: ایکٹیویٹی لاگز + اونر لیول پرمیشنز (خاموش ایڈٹس نہیں)۔",
-      bullet_2:"پروٹیکشن: پاکستان کمپلائنس ورک فلو کے لیے اسٹینڈرڈ ایکسپورٹس۔",
-      bullet_3:"گروتھ: آڈٹ-ریڈی رپورٹس جو بینک اور پارٹنرز پسند کرتے ہیں۔",
-      panel_btn:"قیمت دیکھیں",
-      panel_for_title:"اصل مارکیٹس کے لیے",
-      panel_for_text:"کھاد، زرعی ادویات، ٹولز، جنرل ٹریڈ — اسٹاف انٹری + اونر اوور سائیٹ کے ساتھ۔",
-      for_1:"ملٹی ڈیوائس (موبائل + لیپ ٹاپ)", for_2:"تیز روزمرہ انٹری: کم کلکس", for_3:"ایکسپورٹس جو کنسلٹنٹ کو دیں",
-      hook_title:"اونر کی اصل ٹینشن کیا ہے؟",
-      fear_k1:"🔒 کنٹرول (سیکیورٹی)",
-      fear_1_title:"کاؤنٹر کی فکر ختم",
-      fear_1_text:"اسٹاف سیلز/پرچیز درج کرے — مگر ایڈٹس اور حساس کنٹرول اونر کے پاس۔ کون، کب، کیا کرے — سب واضح۔",
-      fear_k2:"🧾 پروٹیکشن (کمپلائنس ورک فلو)",
-      fear_2_title:"“نوٹس” والی گھبراہٹ کم کریں",
-      fear_2_text:"اسٹینڈرڈ ایکسپورٹس/ڈاؤن لوڈز (لیول 1/2، فی فائل، فل ZIP) — تاکہ آپ کا ڈیٹا پروفیشنل پورٹل ورک فلو کے لیے تیار ہو۔",
-      fear_k3:"☁️ سیفٹی (ڈیٹا)",
-      fear_3_title:"آپ کا ڈیٹا یرغمال نہیں",
-      fear_3_text:"کنٹرولڈ بیک اپس + ملٹی ڈیوائس، موبائل گم ہو جائے تو بھی کاروبار رکے نہیں۔",
-      fear_k4:"📉 وضاحت (کیش اور منافع)",
-      fear_4_title:"“گلہ” میچ کریں",
-      fear_4_text:"ریئل ٹائم منافع و نقصان اور لیجرز سے لیکس جلد پکڑیں: اخراجات، بیڈ ڈیٹ، یا پرائسنگ مسئلہ۔",
-      features_title:"بنیادی صلاحیتیں",
-      f1_title:"سیلز اور پرچیز", f1_text:"تیز انٹری، صاف لسٹس، اور درست پوسٹنگ جو لیجرز میں خود بخود اثر کرے۔",
-      f2_title:"کسٹمر/سپلائر لیجرز", f2_text:"رننگ بیلنس، اسٹیٹمنٹس، اور پارٹی وائز ہسٹری — ہمیشہ اپ ڈیٹ۔",
-      f4_title:"اسٹاک/پروڈکٹ رپورٹس", f4_text:"اسٹاک کیا ہے اور آج کیا موو ہوا — پروڈکٹ لیجر کے ساتھ۔",
-      f5_title:"آڈٹ-ریڈی ڈبل انٹری رپورٹس", f5_text:"ٹرائل بیلنس، P&L، بیلنس شیٹ — حقیقی انٹریز سے۔", f5_note:"پروفیشنل ریویو کے لیے",
-      f6_title:"اونر + اسٹاف کنٹرول", f6_text:"گرینولر رولز: اسٹاف انٹری کرے، حساس کنٹرول اونر کے پاس۔", f6_note:"ایکٹیویٹی لاگ سپورٹ",
-      f8_title:"ٹیکس پیک", f8_text:"اسٹینڈرڈ ایکسپورٹس + ڈاؤن لوڈز (لیول 1/2، فی فائل، فل ZIP)۔", f8_note:"Annex-C اسٹائل اسٹرکچر",
-      cmp_left_title:"سادہ کھاتا ایپس", cmp_l1:"سنگل انٹری نوٹس (غلطی/فیک آسان)", cmp_l2:"کمزور اسٹاک + کمزور رپورٹس", cmp_l3:"آڈٹ-ریڈی اسٹیٹمنٹس نہیں", cmp_l4:"سب کچھ سب کو نظر آتا ہے",
-      cmp_right_title:"Roznamcha (پروفیشنل اپ گریڈ)", cmp_r1:"درست پوسٹنگ → لیجرز/رپورٹس", cmp_r2:"اونر + اسٹاف پرمیشنز", cmp_r3:"آڈٹ-ریڈی ٹرائل بیلنس / P&L / بیلنس شیٹ", cmp_r4:"اسٹینڈرڈ ایکسپورٹس + ڈاؤن لوڈز (ٹیکس پیک)",
-      step1_title:"1) انٹری (اسٹاف)", step1_text:"اسٹاف سیل/پرچیز درج کرے — سسٹم درست پوسٹنگ کرے۔",
-      step2_title:"2) کنٹرول (اونر)", step2_text:"اونر سمریز دیکھے اور “گلہ” میچ کرے۔",
-      step3_title:"3) ایکسپورٹ (ٹیکس پیک)", step3_text:"اسٹینڈرڈ فائلیں/ZIP ڈاؤن لوڈ — دوبارہ ٹائپنگ نہیں۔",
-      step4_title:"4) گروتھ (بینک-ریڈی)", step4_text:"ڈبل انٹری رپورٹس فنانسنگ اور پروفیشنل ریلیشنشپس میں مدد دیں۔",
-      pricing_title:"قیمت (فکس فیس، کوئی سرپرائز نہیں)",
-      plan_monthly_badge:"ہول سیلر پلان (ماہانہ)", per_month:"/ ماہ", plan_monthly_desc:"کوئی ہِڈن چارجز نہیں۔ اونر + 3 تک اسٹاف۔ کبھی بھی ختم کر سکتے ہیں۔",
-      p1:"سیلز، پرچیز، اسٹاک، لیجرز", p2:"آڈٹ-ریڈی ڈبل انٹری رپورٹس", p3:"ٹیکس پیک ایکسپورٹس + ڈاؤن لوڈز (لیول 1/2 + ZIP)", p4:"اونر + اسٹاف کنٹرول",
-      founder_note:"Rs 1,000 کیوں؟ ہم لاگت کم رکھتے ہیں تاکہ پاکستانی SMEs “انٹرپرائز” قیمت کے بغیر ڈیجیٹل ہو سکیں — فینسی آفیس نہیں، بس مضبوط ورک فلو۔",
-      pricing_cta:"اکاؤنٹ بنائیں",
-      plan_yearly_badge:"سالانہ (بہترین ویلیو)", per_year:"/ سال", plan_yearly_desc:"25% ڈسکاؤنٹ — سال بھر فکس قیمت۔",
-      y1:"ماہانہ کے مقابلے 25% بچت", y2:"کمپلائنس سیزن میں سکون", y3:"وہی مکمل فیچرز", y4:"واٹس ایپ سپورٹ دستیاب",
-      pricing_cta2:"شروع کریں", pricing_wa:"واٹس ایپ پر بات کریں",
-      anchor_note:"مستقبل میں “پروفیشنل” پلان (ملٹی برانچ / 10 اسٹاف) کی قیمت زیادہ ہو سکتی ہے۔ آج کا پلان ہول سیلرز کے لیے فوکس ہے: کنٹرول + رپورٹس + ایکسپورٹس۔",
-      legal_note:"Roznamcha ریکارڈ کیپنگ اور اسٹینڈرڈ ایکسپورٹس کے لیے ٹولز فراہم کرتا ہے۔ حتمی فائلنگ اور کمپلائنس کاروبار کے مالک اور ٹیکس کنسلٹنٹ کی ذمہ داری ہے۔",
-      bottom_title:"منٹوں میں شروع کریں", bottom_text:"کمپنی بنائیں اور آج ہی سیلز/پرچیز درج کریں۔", bottom_btn:"اکاؤنٹ بنائیں",
-      contact_title:"تعرف اور رابطہ",
-      about_title:"کوئٹہ میں بنایا گیا، پاکستان کی مارکیٹس کے لیے",
-      about_text:"پروفیشنل مگر لوکل۔ ہم بازار اور اکاؤنٹنگ دونوں زبان سمجھتے ہیں۔ Roznamcha ہول سیلرز کے لیے کنٹرول، صاف رپورٹس، اور پروفیشنل ایکسپورٹس — بغیر سلو انٹرپرائز پیچیدگی کے۔",
-      about_addr:"آفس نمبر 7، دوسری منزل، شاہین ویو، ماڈل ٹاؤن، کوئٹہ کینٹ",
-      support_title:"سپورٹ", support_text:"ہماری ٹیم واٹس ایپ پر آپ کی مدد کے لیے حاضر ہے۔ سیٹ اپ، روزمرہ ورک فلو اور ایکسپورٹس میں مدد ملتی ہے۔",
-      support_wa:"واٹس ایپ",
-      footer_title:"Roznamcha — اسمارٹ کھاتا اور حساب سسٹم",
-      footer_addr:"آفس نمبر 7، دوسری منزل، شاہین ویو,<br>ماڈل ٹاؤن، کوئٹہ کینٹ",
-      privacy:"پرائیویسی پالیسی", terms:"شرائط و ضوابط", refund:"ریفنڈ پالیسی", service:"سروس پالیسی",
-      sticky_wa:"واٹس ایپ", sticky_start:"اکاؤنٹ بنائیں"
-    }
-  };
-
-  function applyLang(lang){
-    localStorage.setItem("roz_pub_lang", lang);
-    document.documentElement.lang = (lang === "ur") ? "ur" : "en";
-    document.documentElement.dir  = (lang === "ur") ? "rtl" : "ltr";
-
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (dict[lang] && dict[lang][key]){
-        if (key === "footer_addr") el.innerHTML = dict[lang][key];
-        else el.textContent = dict[lang][key];
-      }
-    });
-
-    const enBtn = document.getElementById("btnEN");
-    const urBtn = document.getElementById("btnUR");
-    if (enBtn && urBtn){
-      enBtn.classList.toggle("active", lang === "en");
-      urBtn.classList.toggle("active", lang === "ur");
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const enBtn = document.getElementById("btnEN");
-    const urBtn = document.getElementById("btnUR");
-    if (enBtn) enBtn.addEventListener("click", () => applyLang("en"));
-    if (urBtn) urBtn.addEventListener("click", () => applyLang("ur"));
-    applyLang(localStorage.getItem("roz_pub_lang") || "en");
-  });
-</script>
 
 </body>
 </html>
