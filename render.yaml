@@ -6,6 +6,9 @@ services:
     plan: starter
     buildCommand: "./build.sh"
     startCommand: "gunicorn agri_business.wsgi:application"
+    disk:
+      name: media
+      mountPath: /var/data
     envVars:
       - key: DEBUG
         value: "False"

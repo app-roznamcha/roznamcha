@@ -125,7 +125,12 @@ WHITENOISE_MIMETYPES = {
 }
 # Media (uploads like company logo)
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+if os.environ.get("RENDER") or os.environ.get("RENDER_EXTERNAL_URL"):
+    MEDIA_ROOT = Path("/var/data/media")
+else:
+    MEDIA_ROOT = BASE_DIR / "media"
+
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 BACKUP_DIR = Path(os.environ.get("BACKUP_DIR", str(BASE_DIR / "backups")))
 
