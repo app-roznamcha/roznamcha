@@ -4091,26 +4091,50 @@ def sales_delete(request, pk):
 @subscription_required
 def purchase_edit(request, pk):
     invoice = tenant_get_object_or_404(request, PurchaseInvoice, pk=pk)
+    effective_owner = invoice.owner
 
     # ❌ Don’t allow editing posted purchases
     if getattr(invoice, "posted", False):
         messages.error(request, "Posted purchases cannot be edited.")
         return redirect("purchase_list")
 
-    # Common dropdown data (tenant scoped)
+    try:
+        linked_product_ids = list(invoice.items.values_list("product_id", flat=True).distinct())
+    except Exception:
+        linked_product_ids = list(
+            PurchaseInvoiceItem.objects.filter(owner=effective_owner, purchase_invoice=invoice)
+            .values_list("product_id", flat=True)
+            .distinct()
+        )
+
+    submitted_supplier_id = (request.POST.get("supplier") or "") if request.method == "POST" else ""
+    submitted_payment_account_id = (request.POST.get("payment_account") or "") if request.method == "POST" else ""
+    submitted_product_ids = []
+    if request.method == "POST":
+        for key in request.POST.keys():
+            if key.startswith("product_"):
+                pid = request.POST.get(key)
+                if pid:
+                    submitted_product_ids.append(pid)
+
+    supplier_ids = [sid for sid in [invoice.supplier_id, submitted_supplier_id] if sid]
+    product_ids = list(linked_product_ids) + submitted_product_ids
+    account_ids = [aid for aid in [invoice.payment_account_id, submitted_payment_account_id] if aid]
+
+    # Common dropdown data scoped to the invoice owner
     suppliers = (
-        tenant_qs(request, Party, strict=True)
-        .filter(party_type="SUPPLIER", is_active=True)
+        Party.objects.filter(owner=effective_owner, party_type="SUPPLIER")
+        .filter(Q(is_active=True) | Q(pk__in=supplier_ids))
         .order_by("name")
     )
     products = (
-        tenant_qs(request, Product, strict=True)
-        .filter(is_active=True)
+        Product.objects.filter(owner=effective_owner)
+        .filter(Q(is_active=True) | Q(pk__in=product_ids))
         .order_by("code")
     )
     accounts = (
-        tenant_qs(request, Account, strict=True)
-        .filter(is_cash_or_bank=True, allow_for_payments=True)
+        Account.objects.filter(owner=effective_owner)
+        .filter(Q(is_cash_or_bank=True, allow_for_payments=True) | Q(pk__in=account_ids))
         .order_by("code")
     )
 
