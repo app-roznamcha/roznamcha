@@ -34,13 +34,20 @@
 
     .topbar{
       display:grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(220px, .9fr) minmax(180px, .7fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       gap:16px;
       padding: 22px 22px 18px;
       border-bottom:1px solid #e5e7eb;
       background:
         radial-gradient(520px 180px at 0% 0%, rgba(219,234,254,.55) 0%, transparent 60%),
         linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    }
+    .masthead-main{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      min-width:0;
     }
 
     .brand-primary{
@@ -94,37 +101,6 @@
       font-weight:700;
     }
 
-    .doc-identity{
-      padding:8px 10px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-      gap:4px;
-    }
-    .doc-kicker{
-      font-size:11px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:#64748b;
-      font-weight:800;
-    }
-    .doc-title{
-      margin:0;
-      font-size:28px;
-      font-weight:900;
-      line-height:1.1;
-      color:#0f172a;
-      letter-spacing:-0.03em;
-    }
-    .doc-meta{
-      font-size:13px;
-      color:#475569;
-      font-weight:700;
-      line-height:1.45;
-    }
-
     .brand-secondary{
       display:flex;
       flex-direction:column;
@@ -165,6 +141,19 @@
       font-size:11px;
       color:#64748b;
       font-weight:600;
+    }
+    .doc-heading{
+      padding:0 22px 18px;
+      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      border-bottom:1px solid #e5e7eb;
+    }
+    .doc-heading h2{
+      margin:0;
+      font-size:30px;
+      font-weight:900;
+      line-height:1.05;
+      color:#0f172a;
+      letter-spacing:-0.03em;
     }
 
     .pill{
@@ -409,6 +398,9 @@
       .topbar{
         grid-template-columns: 1fr;
       }
+      .masthead-main{
+        flex-direction:column;
+      }
       .brand-secondary{
         align-items:stretch;
       }
@@ -423,7 +415,12 @@
       .totals .sum{ width:100%; }
       .ledger-summary{ grid-template-columns: 1fr 1fr; }
       .company-copy h1{ font-size:24px; }
-      .doc-title{ font-size:24px; }
+      .doc-heading{
+        padding:0 18px 16px;
+      }
+      .doc-heading h2{
+        font-size:24px;
+      }
     }
   </style>
 </head>
@@ -437,45 +434,41 @@
       {% endif %}
 
       <div class="topbar">
-        <div class="brand-primary">
-          {% if company and company.logo %}
-            <img class="company-logo" src="{{ company.logo.url }}" alt="{{ company_name }}">
-          {% else %}
-            <div class="company-logo-fallback">
-              {{ company_name|default:"C"|slice:":2"|upper }}
+        <div class="masthead-main">
+          <div class="brand-primary">
+            {% if company and company.logo %}
+              <img class="company-logo" src="{{ company.logo.url }}" alt="{{ company_name }}">
+            {% else %}
+              <div class="company-logo-fallback">
+                {{ company_name|default:"C"|slice:":2"|upper }}
+              </div>
+            {% endif %}
+            <div class="company-copy">
+              <h1>{{ company_name }}</h1>
+              <div class="company-meta">
+                {% if company_phone %}<span>📞 {{ company_phone }}</span>{% endif %}
+                {% if company_email %}<span>✉️ {{ company_email }}</span>{% endif %}
+              </div>
             </div>
-          {% endif %}
-          <div class="company-copy">
-            <h1>{{ company_name }}</h1>
-            <div class="company-meta">
-              {% if company_phone %}<span>📞 {{ company_phone }}</span>{% endif %}
-              {% if company_email %}<span>✉️ {{ company_email }}</span>{% endif %}
+          </div>
+
+          <div class="brand-secondary">
+            {% if is_draft %}
+              <div class="pill warn">UNPOSTED / DRAFT</div>
+            {% else %}
+              <div class="pill ok">POSTED</div>
+            {% endif %}
+            <div class="powered-by">
+              <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
+              <div class="k">Powered by</div>
+              <div class="v">Roznamcha</div>
+              <div class="sub">Accounting software platform</div>
             </div>
           </div>
         </div>
-
-        <div class="doc-identity">
-          <div class="doc-kicker">Document</div>
-          <h2 class="doc-title">Sales Invoice</h2>
-          <div class="doc-meta">
-            Invoice #{{ invoice.invoice_number }}<br>
-            {{ invoice.invoice_date|date:"M j, Y" }}
-          </div>
-        </div>
-
-        <div class="brand-secondary">
-          {% if is_draft %}
-            <div class="pill warn">UNPOSTED / DRAFT</div>
-          {% else %}
-            <div class="pill ok">POSTED</div>
-          {% endif %}
-          <div class="powered-by">
-            <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
-            <div class="k">Powered by</div>
-            <div class="v">Roznamcha</div>
-            <div class="sub">Accounting software platform</div>
-          </div>
-        </div>
+      </div>
+      <div class="doc-heading">
+        <h2>Sales Invoice</h2>
       </div>
 
       <!-- ✅ Keep content INSIDE card (fixed closing-tag bug) -->
