@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date as date_cls, datetime
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -15,6 +15,10 @@ def _d(value) -> Decimal:
     if isinstance(value, Decimal):
         return value
     return Decimal(str(value or "0"))
+
+
+def quantize_money(value) -> Decimal:
+    return _d(value).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
 def create_journal_entry(*, owner, date, description="", related_model="", related_id=None) -> JournalEntry:
@@ -38,11 +42,14 @@ def add_journal_line(
     credit=0,
     description="",
 ) -> JournalEntryLine:
+    debit = quantize_money(debit)
+    credit = quantize_money(credit)
+
     line = JournalEntryLine(
         journal_entry=journal_entry,
         account=account,
-        debit=_d(debit),
-        credit=_d(credit),
+        debit=debit,
+        credit=credit,
         description=description or "",
     )
     line.full_clean()
@@ -55,8 +62,8 @@ def validate_journal_balance(*, journal_entry: JournalEntry) -> None:
         total_debit=Sum("debit"),
         total_credit=Sum("credit"),
     )
-    total_debit = totals["total_debit"] or Decimal("0")
-    total_credit = totals["total_credit"] or Decimal("0")
+    total_debit = quantize_money(totals["total_debit"] or Decimal("0"))
+    total_credit = quantize_money(totals["total_credit"] or Decimal("0"))
 
     if total_debit != total_credit:
         raise ValidationError(
@@ -78,8 +85,21 @@ def create_balanced_journal(
     if not normalized_lines:
         raise ValidationError("Balanced journal requires at least one line.")
 
-    total_debit = sum((_d(line.get("debit", 0)) for line in normalized_lines), Decimal("0"))
-    total_credit = sum((_d(line.get("credit", 0)) for line in normalized_lines), Decimal("0"))
+    normalized_lines = [
+        {
+            **line,
+            "debit": quantize_money(line.get("debit", 0)),
+            "credit": quantize_money(line.get("credit", 0)),
+        }
+        for line in normalized_lines
+    ]
+
+    total_debit = quantize_money(
+        sum((line["debit"] for line in normalized_lines), Decimal("0"))
+    )
+    total_credit = quantize_money(
+        sum((line["credit"] for line in normalized_lines), Decimal("0"))
+    )
     if total_debit != total_credit:
         raise ValidationError(
             f"Journal is not balanced before save: debit={total_debit} credit={total_credit}"
@@ -99,7 +119,7 @@ def create_balanced_journal(
             related_id=related_id,
             debit_account=debit_line["account"],
             credit_account=credit_line["account"],
-            amount=total_debit,
+            amount=quantize_money(total_debit),
         )
         journal_entry.full_clean()
         journal_entry.save()
@@ -203,6 +223,6 @@ def get_weighted_average_cost(*, owner, product, as_of_date=None) -> Decimal:
 
     if stock_quantity <= 0:
         fallback_cost = getattr(product, "purchase_price_per_unit", None) or Decimal("0")
-        return _d(fallback_cost)
+        return quantize_money(fallback_cost)
 
-    return total_purchase_value / stock_quantity
+    return quantize_money(total_purchase_value / stock_quantity)

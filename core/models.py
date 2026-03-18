@@ -1096,6 +1096,7 @@ class SalesInvoice(OwnerRequiredMixin, TimeStampedModel):
                 create_balanced_journal,
                 get_weighted_average_cost,
                 is_accounting_v2_active,
+                quantize_money,
             )
 
             if is_accounting_v2_active(self.owner, self.invoice_date):
@@ -1172,7 +1173,10 @@ class SalesInvoice(OwnerRequiredMixin, TimeStampedModel):
                     if avg_cost <= 0:
                         continue
 
-                    total_cogs += qty * avg_cost
+                    item_cost = quantize_money(qty * avg_cost)
+                    total_cogs += item_cost
+
+                total_cogs = quantize_money(total_cogs)
 
                 if total_cogs > 0 and not JournalEntry.objects.filter(
                     owner=self.owner,
