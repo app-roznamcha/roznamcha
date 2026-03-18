@@ -4028,6 +4028,22 @@ def sales_edit(request, pk):
         .order_by("code")
     )
 
+    items = list(items)
+    for item in items:
+        pieces_per_pack = getattr(getattr(item, "product", None), "pieces_per_pack", None) or 1
+        try:
+            pieces_per_pack = Decimal(str(pieces_per_pack))
+        except Exception:
+            pieces_per_pack = Decimal("1")
+
+        is_pack = getattr(item, "unit_type", "") == "PACK"
+        item.unit_mode = "PACK" if is_pack else "UNIT"
+
+        if is_pack and pieces_per_pack > 0:
+            item.display_quantity = item.quantity_units / pieces_per_pack
+        else:
+            item.display_quantity = item.quantity_units
+
     context = {
         "edit_mode": True,
         "invoice": invoice,

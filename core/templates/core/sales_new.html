@@ -457,7 +457,7 @@
                     <input type="number"
                           step="0.001"
                           class="qty-display-input"
-                          value="{{ item.quantity_units|floatformat:3 }}"
+                          value="{{ item.display_quantity|default:item.quantity_units|floatformat:3 }}"
                           style="width:100%;padding:6px 8px;border-radius:8px;border:1px solid #d1d5db;text-align:right;">
                     <input type="hidden"
                           name="quantity_{{ idx }}"
