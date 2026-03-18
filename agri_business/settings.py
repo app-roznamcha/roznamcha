@@ -130,8 +130,6 @@ if os.environ.get("RENDER") or os.environ.get("RENDER_EXTERNAL_URL"):
 else:
     MEDIA_ROOT = BASE_DIR / "media"
 
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-
 BACKUP_DIR = Path(os.environ.get("BACKUP_DIR", str(BASE_DIR / "backups")))
 
 # Default primary key field type
