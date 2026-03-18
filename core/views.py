@@ -1,6 +1,7 @@
 # =========================
 # Standard library
 # =========================
+import os
 import re
 import tempfile
 from collections import defaultdict
@@ -5721,6 +5722,8 @@ def owner_profile_page(request):
         if action == "update_company":
             company_form = CompanyUpdateForm(request.POST, request.FILES, instance=company)
             if company_form.is_valid():
+                os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+                os.makedirs(os.path.join(settings.MEDIA_ROOT, "company_logo"), exist_ok=True)
                 company_form.save()
                 messages.success(request, "Company profile updated successfully.")
             else:
@@ -5846,6 +5849,8 @@ def company_page(request):
         # logo upload (optional)
         if request.FILES.get("logo"):
             company.logo = request.FILES["logo"]
+            os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+            os.makedirs(os.path.join(settings.MEDIA_ROOT, "company_logo"), exist_ok=True)
 
         company.save()
         messages.success(request, "Company profile updated.")
