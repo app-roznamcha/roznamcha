@@ -4003,9 +4003,10 @@ def sales_edit(request, pk):
         items = tenant_qs(request, SalesInvoiceItem, strict=True).filter(sales_invoice=invoice).select_related("product")
 
     linked_product_ids = list(items.values_list("product_id", flat=True).distinct())
+    effective_owner = invoice.owner
 
     customers = (
-        tenant_qs(request, Party, strict=True)
+        Party.objects.filter(owner=effective_owner)
         .filter(
             Q(party_type="CUSTOMER"),
             Q(is_active=True) | Q(pk=invoice.customer_id),
@@ -4014,13 +4015,13 @@ def sales_edit(request, pk):
     )
 
     products = (
-        tenant_qs(request, Product, strict=True)
+        Product.objects.filter(owner=effective_owner)
         .filter(Q(is_active=True) | Q(pk__in=linked_product_ids))
         .order_by("code")
     )
 
     accounts = (
-        tenant_qs(request, Account, strict=True)
+        Account.objects.filter(owner=effective_owner)
         .filter(
             Q(is_cash_or_bank=True, allow_for_payments=True) |
             Q(pk=invoice.payment_account_id)
