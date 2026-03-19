@@ -504,7 +504,7 @@
             <div class="label">Invoice Details</div>
             <div class="muted">
               <b>Invoice #:</b> {{ invoice.invoice_number }}<br>
-              <b>Date:</b> {{ invoice.invoice_date|date:"M j, Y" }}<br>
+              <b>Date:</b> {{ invoice.invoice_date|date:"d M Y" }}<br>
               <b>Payment:</b>
               {% if invoice.payment_type == "CREDIT" %}Credit{% endif %}
               {% if invoice.payment_type == "FULL" %}Full Payment{% endif %}
@@ -586,7 +586,7 @@
             <tbody>
               {% for row in ledger_rows %}
                 <tr class="{% if row.is_this_invoice %}ledger-row-this{% endif %}">
-                  <td>{{ row.date|date:"M j, Y" }}</td>
+                  <td>{{ row.date|date:"d M Y" }}</td>
                   <td>{{ row.type }}</td>
                   <td class="truncate" title="{{ row.ref }}{% if row.note %} • {{ row.note }}{% endif %}">
                     {{ row.ref }}{% if row.is_this_invoice %} (This invoice){% endif %}

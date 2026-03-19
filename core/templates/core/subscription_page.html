@@ -6,10 +6,10 @@
 
   <div style="margin:15px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <p><strong>Status:</strong> {{ status|default:"-" }}</p>
-    <p><strong>Trial Started:</strong> {{ trial_started_at|date:"Y-m-d H:i" }}</p>
+    <p><strong>Trial Started:</strong> {{ trial_started_at|date:"d M Y, h:i A" }}</p>
 
     {% if expires_at %}
-      <p><strong>Expires At:</strong> {{ expires_at|date:"Y-m-d H:i" }}</p>
+      <p><strong>Expires At:</strong> {{ expires_at|date:"d M Y, h:i A" }}</p>
       <p><strong>Days Left:</strong> {{ days_left }}</p>
     {% else %}
       <p><strong>Expires At:</strong> (not set)</p>

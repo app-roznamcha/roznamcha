@@ -352,7 +352,7 @@
             {% if rows %}
               {% for r in rows %}
                 <tr class="ledger-row" data-debit="{{ r.debit|default:0 }}" data-credit="{{ r.credit|default:0 }}">
-                  <td style="white-space:nowrap;">{{ r.date }}</td>
+                  <td style="white-space:nowrap;">{{ r.date|date:"d M Y" }}</td>
                   <td class="desc-cell">{{ r.description }}</td>
                   <td class="right">
                     {% if r.debit and r.debit != 0 %}

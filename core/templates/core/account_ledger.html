@@ -400,7 +400,7 @@
             {% if rows %}
               {% for r in rows %}
                 <tr class="ledger-row">
-                  <td class="date-cell">{{ r.date|date:"M j, Y" }}</td>
+                  <td class="date-cell">{{ r.date|date:"d M Y" }}</td>
                   <td class="type-cell">{{ r.type|default:"Journal" }}</td>
                   <td class="counter-cell">{{ r.counter|default:"—" }}</td>
                   <td>{{ r.description }}</td>

@@ -584,7 +584,7 @@
           {% for t in transfers %}
             <tr class="transfer-row">
               <td>{{ forloop.counter }}</td>
-              <td>{{ t.date|date:"M j, Y" }}</td>
+              <td>{{ t.date|date:"d M Y" }}</td>
               <td>{{ t.from_account.name }}</td>
               <td>{{ t.to_account.name }}</td>
               <td class="right">{{ t.amount|floatformat:2 }}</td>

@@ -392,7 +392,7 @@
 
             <div class="k">Expires</div>
             <div class="v">
-              {% if expires_at %}{{ expires_at }}{% else %}<span class="muted">—</span>{% endif %}
+              {% if expires_at %}{{ expires_at|date:"d M Y, h:i A" }}{% else %}<span class="muted">—</span>{% endif %}
             </div>
 
             <div class="k">Suspended</div>

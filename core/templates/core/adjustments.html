@@ -399,7 +399,7 @@
         <tbody>
           {% for a in adjustments %}
             <tr class="adj-history-row">
-              <td>{{ a.date }}</td>
+              <td>{{ a.date|date:"d M Y" }}</td>
               <td>{{ a.party.name }}</td>
               <td>{{ a.party.get_party_type_display }}</td>
               <td>
@@ -670,7 +670,7 @@
         <tbody>
           {% for s in stock_adjustments %}
             <tr class="stock-history-row">
-              <td>{{ s.date }}</td>
+              <td>{{ s.date|date:"d M Y" }}</td>
               <td>
                 {{ s.product.code }} - {{ s.product.name }}
               </td>

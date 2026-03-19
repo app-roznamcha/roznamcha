@@ -313,9 +313,9 @@
             <option value="" data-i18n="none_option">-- None --</option>
             {% for inv in invoices %}
               {% if mode == "sales" %}
-                <option value="{{ inv.id }}">Inv {{ inv.invoice_number|default:inv.id }} – {{ inv.customer.name }} ({{ inv.invoice_date }})</option>
+                <option value="{{ inv.id }}">Inv {{ inv.invoice_number|default:inv.id }} – {{ inv.customer.name }} ({{ inv.invoice_date|date:"d M Y" }})</option>
               {% else %}
-                <option value="{{ inv.id }}">Inv {{ inv.invoice_number|default:inv.id }} – {{ inv.supplier.name }} ({{ inv.invoice_date }})</option>
+                <option value="{{ inv.id }}">Inv {{ inv.invoice_number|default:inv.id }} – {{ inv.supplier.name }} ({{ inv.invoice_date|date:"d M Y" }})</option>
               {% endif %}
             {% endfor %}
           </select>

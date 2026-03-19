@@ -490,7 +490,7 @@
           {% for e in expenses %}
             <tr class="expense-row">
               <td>{{ forloop.counter }}</td>
-              <td>{{ e.date|date:"M j, Y" }}</td>
+              <td>{{ e.date|date:"d M Y" }}</td>
               <td>{{ e.paid_from.name }}</td>
               <td>{{ e.expense_head.name }}</td>
               <td class="right">{{ e.amount|floatformat:2 }}</td>

@@ -359,7 +359,7 @@
             <tr class="searchable-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="nowrap">{{ inv.invoice_number|default:"—" }}</td>
-              <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
+              <td class="nowrap">{{ inv.invoice_date|date:"d M Y" }}</td>
               <td class="truncate" title="{{ inv.customer.name }}">{{ inv.customer.name }}</td>
 
               <td class="center nowrap">{{ inv.items.count }}</td>
@@ -434,7 +434,7 @@
             <tr class="searchable-row">
               <td class="nowrap">{{ forloop.counter }}</td>
               <td class="nowrap">{{ inv.invoice_number|default:"—" }}</td>
-              <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
+              <td class="nowrap">{{ inv.invoice_date|date:"d M Y" }}</td>
               <td class="truncate" title="{{ inv.supplier.name }}">{{ inv.supplier.name }}</td>
 
               <td class="center nowrap">{{ inv.items.count }}</td>

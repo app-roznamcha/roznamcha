@@ -463,7 +463,7 @@
           {% for inv in invoices %}
             <tr class="invoice-row">
               <td class="nowrap">{{ forloop.counter }}</td>
-              <td class="nowrap">{{ inv.invoice_date|date:"M j, Y" }}</td>
+              <td class="nowrap">{{ inv.invoice_date|date:"d M Y" }}</td>
               <td class="nowrap">{{ inv.invoice_number }}</td>
 
               <td class="truncate" title="{{ inv.customer.name }}">

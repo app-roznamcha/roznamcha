@@ -349,7 +349,7 @@
                   {% endif %}
                 </td>
 
-                <td class="muted">{{ r.expires_at|default:"—" }}</td>
+                <td class="muted">{% if r.expires_at %}{{ r.expires_at|date:"d M Y, h:i A" }}{% else %}—{% endif %}</td>
 
                 <td>
                   {% if r.suspended %}

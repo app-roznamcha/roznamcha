@@ -125,8 +125,8 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
       <div style="font-size:17px;font-weight:600;">Ledger</div>
       <div style="font-size:13px;color:#6b7280;">
-        Showing {% if date_from %}<strong>{{ date_from|date:"M j, Y" }}</strong>{% else %}<strong>all time</strong>{% endif %}
-        {% if date_to %} → <strong>{{ date_to|date:"M j, Y" }}</strong>{% endif %}
+        Showing {% if date_from %}<strong>{{ date_from|date:"d M Y" }}</strong>{% else %}<strong>all time</strong>{% endif %}
+        {% if date_to %} → <strong>{{ date_to|date:"d M Y" }}</strong>{% endif %}
       </div>
     </div>
 
@@ -146,7 +146,7 @@
             {% for r in rows %}
               <tr>
                 <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#374151;">
-                  {{ r.date|date:"M j, Y" }}
+                  {{ r.date|date:"d M Y" }}
                 </td>
                 <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;color:#111827;">
                   {{ r.description }}
