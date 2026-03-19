@@ -282,6 +282,9 @@
       margin-top:8px;
       font-size:15px;
     }
+    .row.total .v{
+      color:#0f172a;
+    }
 
     .ledger-title{
       margin: 14px 0 6px;
@@ -510,7 +513,7 @@
               {% if invoice.payment_type == "FULL" %}Full Payment{% endif %}
               {% if invoice.payment_type == "PARTIAL" %}Partial Payment{% endif %}
               {% if invoice.payment_type != "CREDIT" %}
-                <br><b>Paid:</b> {{ paid|floatformat:2 }}
+                <br><b>Invoice Payment:</b> {{ paid|floatformat:2 }}
               {% endif %}
             </div>
           </div>
@@ -549,10 +552,32 @@
           </tbody>
         </table>
 
+        <div class="totals">
+          <div class="sum">
+            <div class="row">
+              <span class="k">Invoice Total</span>
+              <span class="v">PKR {{ total|floatformat:2 }}</span>
+            </div>
+            <div class="row">
+              <span class="k">Invoice Payment</span>
+              <span class="v">PKR {{ paid|floatformat:2 }}</span>
+            </div>
+            <div class="row total">
+              <span class="k">{% if is_draft %}Invoice Due (Preview){% else %}Invoice Due{% endif %}</span>
+              <span class="v">PKR {{ invoice_due|floatformat:2 }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="ledger-title">Customer Ledger (Recent)</div>
         {% if show_ledger_note %}
           <div class="ledger-note">
             Showing last {{ ledger_limit }} entries. View full ledger in app.
+          </div>
+        {% endif %}
+        {% if draft_balance_note %}
+          <div class="ledger-note">
+            {{ draft_balance_note }}
           </div>
         {% endif %}
 
@@ -562,11 +587,11 @@
             <div class="v">PKR {{ opening_balance|floatformat:2 }}</div>
           </div>
           <div class="mini">
-            <div class="k">This Invoice</div>
+            <div class="k">{% if is_draft %}This Invoice (Preview){% else %}This Invoice{% endif %}</div>
             <div class="v">PKR {{ total|floatformat:2 }}</div>
           </div>
           <div class="mini primary">
-            <div class="k">Total Payable</div>
+            <div class="k">{% if is_draft %}Current Posted Balance{% else %}Current Payable{% endif %}</div>
             <div class="v">PKR {{ current_due|floatformat:2 }}</div>
           </div>
         </div>
@@ -593,7 +618,7 @@
                   </td>
                   <td class="right">{% if row.debit %}{{ row.debit|floatformat:2 }}{% else %}—{% endif %}</td>
                   <td class="right">{% if row.credit %}{{ row.credit|floatformat:2 }}{% else %}—{% endif %}</td>
-                  <td class="right">{{ row.running_balance|floatformat:2 }}</td>
+                  <td class="right">{{ row.running_balance_side }} {{ row.running_balance|floatformat:2 }}</td>
                 </tr>
               {% empty %}
                 <tr>
@@ -607,7 +632,7 @@
         </div>
       </div>
 
-      <div class="actions">
+      <div class="actions" id="actionBar">
         <a class="btn" href="{% url 'sales_list' %}">← Back</a>
 
         <div id="shareControls" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -641,6 +666,8 @@
   <script>
     const CUSTOMER_PHONE_RAW = "{{ customer.phone|default:'' }}";
     const INVOICE_NO = "{{ invoice.invoice_number|default:invoice.id }}";
+    const COMPANY_NAME = "{{ company_name|default:'Roznamcha'|escapejs }}";
+    const TOTAL_DISPLAY = "{{ total|floatformat:2 }}";
 
     function normalizePkPhone(raw) {
       if (!raw) return "";
@@ -654,8 +681,9 @@
       const node = document.getElementById("invoiceCanvas");
       if (!node) throw new Error("Invoice container not found.");
 
-      const controls = document.getElementById("shareControls");
-      if (controls) controls.style.display = "none";
+      const actionBar = document.getElementById("actionBar");
+      const oldDisplay = actionBar ? actionBar.style.display : "";
+      if (actionBar) actionBar.style.display = "none";
 
       try {
         const canvas = await html2canvas(node, {
@@ -670,17 +698,16 @@
         const fileName = `${INVOICE_NO}-invoice.png`;
         return new File([blob], fileName, { type: "image/png" });
       } finally {
-        const controls = document.getElementById("shareControls");
-        if (controls) controls.style.display = "flex";
+        if (actionBar) actionBar.style.display = oldDisplay;
       }
     }
 
     // ✅ unchanged behavior (still downloads PNG)
     async function downloadInvoicePNG() {
-    const controls = document.getElementById("shareControls");
-    const oldDisplay = controls ? controls.style.display : "";
+    const actionBar = document.getElementById("actionBar");
+    const oldDisplay = actionBar ? actionBar.style.display : "";
 
-    if (controls) controls.style.display = "none";
+    if (actionBar) actionBar.style.display = "none";
 
     try {
       const node = document.getElementById("invoiceCanvas");
@@ -709,7 +736,7 @@
       console.error(e);
       alert("Failed to generate PNG. Try again.");
     } finally {
-      if (controls) controls.style.display = oldDisplay; // ✅ restore exactly
+      if (actionBar) actionBar.style.display = oldDisplay; // ✅ restore exactly
     }
   }
 
@@ -724,8 +751,13 @@
         return;
         }
 
+        const message =
+          `Assalam o Alaikum. Please find your invoice ${INVOICE_NO} from ${COMPANY_NAME}. ` +
+          `Total amount: PKR ${TOTAL_DISPLAY}. Thank you.`;
+
         // ✅ WhatsApp Web only (PC decision)
-        const waUrl = `https://web.whatsapp.com/send?phone=${encodeURIComponent(phone)}`;
+        const waUrl =
+          `https://web.whatsapp.com/send?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}`;
 
         // ✅ Reuse the same tab if we opened it before
         try {

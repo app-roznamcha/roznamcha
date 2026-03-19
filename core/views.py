@@ -6785,37 +6785,13 @@ def sales_invoice_share(request, pk):
 
     is_draft = not bool(getattr(invoice, "posted", False))
 
-    # Totals
+    # Totals shown for this invoice header only
     total = Decimal(str(invoice.calculate_total() or 0))
     paid = Decimal(str(getattr(invoice, "payment_amount", 0) or 0))
 
-    # This invoice due
     invoice_due = total - paid
     if invoice_due < 0:
         invoice_due = Decimal("0")
-
-    # Previous due (BEFORE this invoice)
-    #
-    # IMPORTANT:
-    # If customer.current_balance already INCLUDES this invoice, then we must subtract invoice_due.
-    previous_due = Decimal("0")
-    try:
-        if hasattr(invoice.customer, "current_balance"):
-            current_bal = Decimal(str(invoice.customer.current_balance or 0))
-            previous_due = current_bal - invoice_due
-        elif hasattr(invoice.customer, "get_balance"):
-            current_bal = Decimal(str(invoice.customer.get_balance() or 0))
-            previous_due = current_bal - invoice_due
-        else:
-            previous_due = Decimal("0")
-    except Exception:
-        previous_due = Decimal("0")
-
-    if previous_due < 0:
-        previous_due = Decimal("0")
-
-    # Current due (after adding this invoice due)
-    current_due = previous_due + invoice_due
 
     # Useful flags for template
     prof = getattr(request.user, "profile", None)
@@ -6840,134 +6816,101 @@ def sales_invoice_share(request, pk):
         except Exception:
             return Decimal("0")
 
+    def _customer_due_from_balance(balance_abs, balance_side):
+        amt = _d(balance_abs)
+        return amt if str(balance_side or "").upper() == "DR" else Decimal("0")
+
+    def _customer_signed_balance(balance_abs, balance_side):
+        amt = _d(balance_abs)
+        return amt if str(balance_side or "").upper() == "DR" else -amt
+
+    def _ledger_type_label(raw_type):
+        return {
+            "OPENING": "Opening",
+            "SalesInvoice": "Sale",
+            "SalesReturn": "Return",
+            "Payment": "Payment",
+        }.get(raw_type, raw_type or "Journal")
+
+    def _ledger_ref(raw_type, raw_ref):
+        if raw_ref in (None, ""):
+            return ""
+        prefix = {
+            "SalesInvoice": "SI",
+            "SalesReturn": "SR",
+            "Payment": "PAY",
+        }.get(raw_type)
+        return f"{prefix}-{raw_ref}" if prefix else str(raw_ref)
+
     customer = invoice.customer
     owner = request.owner
+    ledger_data = build_party_ledger_for_owner(
+        owner=owner,
+        party=customer,
+        date_from=None,
+        date_to=None,
+    )
+    helper_rows = ledger_data.get("rows", [])
+    tx_rows = [row for row in helper_rows if row.get("type") != "OPENING"]
+
+    previous_due = Decimal("0")
+    current_due = _customer_due_from_balance(
+        ledger_data.get("closing_balance"),
+        ledger_data.get("closing_side"),
+    )
+    draft_balance_note = ""
+
+    invoice_row_index = None
+    if not is_draft:
+        for idx, row in enumerate(tx_rows):
+            if row.get("type") == "SalesInvoice" and str(row.get("ref")) == str(invoice.id):
+                invoice_row_index = idx
+                break
+
+    if invoice_row_index is not None:
+        invoice_row = tx_rows[invoice_row_index]
+        current_due = _customer_due_from_balance(
+            invoice_row.get("balance"),
+            invoice_row.get("balance_side"),
+        )
+        signed_after = _customer_signed_balance(
+            invoice_row.get("balance"),
+            invoice_row.get("balance_side"),
+        )
+        signed_before = signed_after - (_d(invoice_row.get("debit")) - _d(invoice_row.get("credit")))
+        previous_due = signed_before if signed_before > 0 else Decimal("0")
+    elif is_draft:
+        previous_due = _customer_due_from_balance(
+            ledger_data.get("closing_balance"),
+            ledger_data.get("closing_side"),
+        )
+        current_due = previous_due
+        draft_balance_note = "Draft invoice preview only. Customer balance and ledger below include posted entries only."
+    else:
+        previous_due = _customer_due_from_balance(
+            ledger_data.get("closing_balance"),
+            ledger_data.get("closing_side"),
+        )
+
     ledger_rows_raw = []
-
-    # Sales (posted), plus current invoice explicitly marked as "this invoice"
-    sales_qs = (
-        SalesInvoice.objects.filter(owner=owner, customer=customer, posted=True)
-        .exclude(pk=invoice.pk)
-        .only("id", "invoice_date", "invoice_number")
-        .order_by("-invoice_date", "-id")[:fetch_limit]
-    )
-    for inv in sales_qs:
-        ledger_rows_raw.append(
-            {
-                "date": inv.invoice_date,
-                "type": "Sale",
-                "ref": inv.invoice_number or f"SI-{inv.id}",
-                "debit": _d(inv.calculate_total()),
-                "credit": Decimal("0"),
-                "note": "",
-                "is_this_invoice": False,
-                "sort_pk": inv.id,
-            }
-        )
-
-    ledger_rows_raw.append(
-        {
-            "date": invoice.invoice_date,
-            "type": "Sale",
-            "ref": invoice.invoice_number or f"SI-{invoice.id}",
-            "debit": total,
-            "credit": Decimal("0"),
-            "note": "This invoice",
-            "is_this_invoice": True,
-            "sort_pk": invoice.id,
+    for row in tx_rows:
+        normalized_row = {
+            "date": parse_date(row.get("date")) if row.get("date") else None,
+            "type": _ledger_type_label(row.get("type")),
+            "ref": _ledger_ref(row.get("type"), row.get("ref")),
+            "debit": _d(row.get("debit")),
+            "credit": _d(row.get("credit")),
+            "note": row.get("description") or "",
+            "is_this_invoice": (
+                (not is_draft)
+                and row.get("type") == "SalesInvoice"
+                and str(row.get("ref")) == str(invoice.id)
+            ),
+            "sort_pk": int(row.get("ref") or 0) if str(row.get("ref") or "").isdigit() else 0,
+            "running_balance": _d(row.get("balance")),
+            "running_balance_side": str(row.get("balance_side") or ""),
         }
-    )
-
-    # Customer payments / receipts (posted only)
-    pay_qs = (
-        Payment.objects.filter(owner=owner, party=customer, posted=True)
-        .only(
-            "id",
-            "date",
-            "direction",
-            "amount",
-            "description",
-            "is_adjustment",
-            "adjustment_side",
-            "related_model",
-            "related_id",
-        )
-        .order_by("-date", "-id")[:fetch_limit]
-    )
-    for p in pay_qs:
-        debit = Decimal("0")
-        credit = Decimal("0")
-
-        if p.is_adjustment:
-            side = (p.adjustment_side or "DR").upper()
-            if side == "DR":
-                debit = _d(p.amount)
-            else:
-                credit = _d(p.amount)
-            row_type = "Adjustment"
-            ref = f"ADJ-{p.id}"
-        else:
-            if p.direction == "IN":
-                credit = _d(p.amount)
-                row_type = "Receipt"
-            else:
-                debit = _d(p.amount)
-                row_type = "Payment"
-            ref = f"PAY-{p.id}"
-
-        ledger_rows_raw.append(
-            {
-                "date": p.date,
-                "type": row_type,
-                "ref": ref,
-                "debit": debit,
-                "credit": credit,
-                "note": p.description or "",
-                "is_this_invoice": bool(
-                    (not p.is_adjustment)
-                    and p.related_model == "SalesInvoice"
-                    and p.related_id == invoice.id
-                ),
-                "sort_pk": p.id,
-            }
-        )
-
-    # Sales returns (posted only) reduce customer balance (credit)
-    returns_qs = (
-        SalesReturn.objects.filter(owner=owner, customer=customer, posted=True)
-        .only("id", "return_date", "reference_invoice_id")
-        .order_by("-return_date", "-id")[:fetch_limit]
-    )
-    for ret in returns_qs:
-        ledger_rows_raw.append(
-            {
-                "date": ret.return_date,
-                "type": "Return",
-                "ref": f"SR-{ret.id}",
-                "debit": Decimal("0"),
-                "credit": _d(ret.calculate_total()),
-                "note": (
-                    f"Ref SI-{ret.reference_invoice_id}"
-                    if ret.reference_invoice_id
-                    else ""
-                ),
-                "is_this_invoice": bool(ret.reference_invoice_id == invoice.id),
-                "sort_pk": ret.id,
-            }
-        )
-
-    # Sort ascending and compute running balance from opening (previous due)
-    ledger_rows_raw.sort(
-        key=lambda r: (
-            r.get("date") or timezone.now().date(),
-            r.get("sort_pk") or 0,
-        )
-    )
-
-    running_balance = previous_due
-    for row in ledger_rows_raw:
-        running_balance += (row["debit"] - row["credit"])
-        row["running_balance"] = running_balance
+        ledger_rows_raw.append(normalized_row)
 
     # Keep screenshot practical while centering window around this invoice row.
     total_rows = len(ledger_rows_raw)
@@ -7056,6 +6999,7 @@ def sales_invoice_share(request, pk):
         "opening_balance": previous_due,
         "show_ledger_note": True,
         "last_payment_date": last_payment_date,
+        "draft_balance_note": draft_balance_note,
     }
     return render(request, "core/sales_invoice_share.html", context)
 
