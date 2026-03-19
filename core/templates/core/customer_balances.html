@@ -77,6 +77,38 @@
       box-shadow:0 8px 18px rgba(15,23,42,0.06);
       margin-bottom:20px;
     }
+    .cb-kpis{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+      margin-bottom:20px;
+    }
+    .cb-kpi{
+      background:#fff;
+      border:1px solid var(--slate-200);
+      border-radius:16px;
+      padding:16px 18px;
+      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+    }
+    .cb-kpi-label{
+      font-size:13px;
+      color:var(--slate-500);
+      margin-bottom:8px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .cb-kpi-value{
+      font-size:26px;
+      font-weight:800;
+      color:var(--slate-900);
+      line-height:1.15;
+    }
+    .cb-kpi-sub{
+      font-size:13px;
+      color:var(--slate-500);
+      margin-top:8px;
+    }
     .cb-card-head{
       display:flex;
       justify-content:space-between;
@@ -150,6 +182,12 @@
       white-space:nowrap;
       font-weight:700;
     }
+    .meta-strip{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
 
     .tbl-wrap{ width:100%; overflow-x:auto; }
     .tbl{
@@ -201,6 +239,7 @@
       .cb-title { font-size: 26px !important; }
       .cb-sub { font-size: 14px !important; }
       .cb-btn { width:100%; min-width:unset; }
+      .cb-kpis { grid-template-columns:1fr !important; }
       .cb-filter .col, .cb-filter .col-sm { min-width:100% !important; }
     }
   </style>
@@ -234,34 +273,77 @@
 
       <div class="col-sm" style="min-width:180px;">
         <label for="typeFilter">Filter balance type</label>
-        <select id="typeFilter">
-          <option value="ALL">All</option>
-          <option value="DR">DR only</option>
-          <option value="CR">CR only</option>
+        <select id="typeFilter" name="balance_type">
+          <option value="ALL" {% if balance_filter == "ALL" %}selected{% endif %}>All</option>
+          <option value="DUE" {% if balance_filter == "DUE" %}selected{% endif %}>Due</option>
+          <option value="ADVANCE" {% if balance_filter == "ADVANCE" %}selected{% endif %}>Advance</option>
         </select>
+      </div>
+
+      <div class="col-sm" style="min-width:180px;">
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:0;padding:10px 0 0;">
+          <input type="checkbox" name="hide_zero" value="1" {% if zero_filter_enabled %}checked{% endif %} style="width:auto;">
+          <span>Hide zero balances</span>
+        </label>
       </div>
 
       <div>
         <button type="submit" class="cb-apply">Apply</button>
       </div>
     </form>
+
+    <div class="meta-strip">
+      <span class="pill">As of: {{ as_of|date:"d M Y" }}</span>
+      <span class="pill">Visible customers: {{ visible_customer_count }}</span>
+      <span class="pill">Filter: {{ balance_filter_label }}</span>
+      <span class="pill">Zero balances: {% if zero_filter_enabled %}Hidden{% else %}Shown{% endif %}</span>
+    </div>
+  </div>
+
+  <div class="cb-kpis">
+    <div class="cb-kpi">
+      <div class="cb-kpi-label">Total Receivable</div>
+      <div class="cb-kpi-value">PKR {{ total_receivable|floatformat:2 }}</div>
+      <div class="cb-kpi-sub">Debit-side customer balances</div>
+    </div>
+    <div class="cb-kpi">
+      <div class="cb-kpi-label">Customer Advances</div>
+      <div class="cb-kpi-value">PKR {{ total_advances|floatformat:2 }}</div>
+      <div class="cb-kpi-sub">Credit-side customer balances</div>
+    </div>
+    <div class="cb-kpi">
+      <div class="cb-kpi-label">Net Customer Position</div>
+      <div class="cb-kpi-value">{{ net_position_side }} PKR {{ net_position_abs|floatformat:2 }}</div>
+      <div class="cb-kpi-sub">Net balance across visible customers</div>
+    </div>
+    <div class="cb-kpi">
+      <div class="cb-kpi-label">Customers with Due</div>
+      <div class="cb-kpi-value">{{ customers_with_due_count }}</div>
+      <div class="cb-kpi-sub">Customers currently in debit balance</div>
+    </div>
   </div>
 
   <div class="cb-card">
     <div class="cb-card-head">
-      <div class="cb-card-title">Customer balances</div>
-      <div class="cb-card-sub">Visual view of net receivable / payable (absolute amount).</div>
+      <div class="cb-card-title">Top Due Customers</div>
+      <div class="cb-card-sub">Highest debit-side customer balances for the selected as-of date.</div>
     </div>
 
     <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">
-      Hover over a bar to see the exact balance. Labels include Dr/Cr.
+      Hover over a bar to see the exact due amount.
     </p>
 
-    <div style="width:100%;max-width:900px;overflow-x:auto;">
-      <div style="min-width:520px;">
-        <canvas id="customerBalanceChart" height="200"></canvas>
+    {% if top_due_chart_rows %}
+      <div style="width:100%;max-width:900px;overflow-x:auto;">
+        <div style="min-width:520px;">
+          <canvas id="customerBalanceChart" height="200"></canvas>
+        </div>
       </div>
-    </div>
+    {% else %}
+      <div style="padding:14px 16px;border-radius:12px;border:1px dashed #cbd5e1;background:#f8fafc;color:#64748b;font-size:14px;">
+        No due customer balances for this date.
+      </div>
+    {% endif %}
   </div>
 
   <div class="cb-card">
@@ -336,12 +418,12 @@
 <script id="customerBalanceData" type="application/json">
 {
   "labels": [
-    {% for row in rows %}
-      "{{ row.party.name|escapejs }} ({{ row.net_type }})"{% if not forloop.last %},{% endif %}
+    {% for row in top_due_chart_rows %}
+      "{{ row.party.name|escapejs }}"{% if not forloop.last %},{% endif %}
     {% endfor %}
   ],
   "balances": [
-    {% for row in rows %}
+    {% for row in top_due_chart_rows %}
       {{ row.net_abs|default:0|floatformat:2 }}{% if not forloop.last %},{% endif %}
     {% endfor %}
   ]
@@ -352,23 +434,18 @@
 <script>
   (function () {
     const searchInput = document.getElementById("quickSearch");
-    const typeFilter = document.getElementById("typeFilter");
     const rows = Array.from(document.querySelectorAll(".balance-row"));
 
     function applyTableFilters() {
       const q = ((searchInput && searchInput.value) || "").trim().toLowerCase();
-      const t = (typeFilter && typeFilter.value) || "ALL";
       rows.forEach((row) => {
         const name = (row.querySelector(".customer-name")?.textContent || "").toLowerCase();
-        const rowType = (row.getAttribute("data-type") || "").toUpperCase();
         const textMatch = !q || name.includes(q);
-        const typeMatch = (t === "ALL") || (rowType === t);
-        row.style.display = (textMatch && typeMatch) ? "" : "none";
+        row.style.display = textMatch ? "" : "none";
       });
     }
 
     if (searchInput) searchInput.addEventListener("input", applyTableFilters);
-    if (typeFilter) typeFilter.addEventListener("change", applyTableFilters);
 
     const dataEl = document.getElementById('customerBalanceData');
     if (!dataEl) return;
@@ -401,7 +478,7 @@
       data: {
         labels: labels,
         datasets: [{
-          label: 'Net Balance (absolute)',
+          label: 'Due Amount',
           data: balances,
           borderWidth: 1,
           backgroundColor: '#60a5fa',
@@ -433,7 +510,7 @@
             callbacks: {
               label: function (context) {
                 const v = (context.parsed && typeof context.parsed.x === "number") ? context.parsed.x : 0;
-                return 'Balance: ' + v.toLocaleString('en-PK', {
+                return 'Due: PKR ' + v.toLocaleString('en-PK', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 });

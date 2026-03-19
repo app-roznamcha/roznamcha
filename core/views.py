@@ -2171,6 +2171,11 @@ def customer_balances(request):
     Per-customer balances as of a given date, aligned with party statement logic.
     """
     as_of_str = request.GET.get("date")
+    balance_filter = (request.GET.get("balance_type") or "ALL").upper()
+    if balance_filter not in {"ALL", "DUE", "ADVANCE"}:
+        balance_filter = "ALL"
+    zero_filter_enabled = request.GET.get("hide_zero") in {"1", "true", "on", "yes"}
+
     if as_of_str:
         try:
             as_of = date.fromisoformat(as_of_str)
@@ -2208,6 +2213,13 @@ def customer_balances(request):
         balance_type = ledger.get("closing_side", "DR")
         net = balance_abs if balance_type == "DR" else -balance_abs
 
+        if balance_filter == "DUE" and balance_type != "DR":
+            continue
+        if balance_filter == "ADVANCE" and balance_type != "CR":
+            continue
+        if zero_filter_enabled and balance_abs == 0:
+            continue
+
         rows.append({
             "party": cust,
             "opening_abs": opening_abs,
@@ -2220,18 +2232,58 @@ def customer_balances(request):
         grand_opening += opening_signed
         grand_balance += net
 
+    total_receivable = sum(
+        (row["net_abs"] for row in rows if row["net_type"] == "DR" and row["net_abs"] > 0),
+        Decimal("0"),
+    )
+    total_advances = sum(
+        (row["net_abs"] for row in rows if row["net_type"] == "CR" and row["net_abs"] > 0),
+        Decimal("0"),
+    )
+    customers_with_due_count = sum(
+        1 for row in rows if row["net_type"] == "DR" and row["net_abs"] > 0
+    )
+    visible_customer_count = len(rows)
+
     grand_opening_abs = abs(grand_opening)
     grand_opening_type = "Dr" if grand_opening >= 0 else "Cr"
+    net_position_abs = abs(grand_balance)
+    net_position_side = "Dr" if grand_balance >= 0 else "Cr"
+
+    balance_filter_label = {
+        "ALL": "All",
+        "DUE": "Due",
+        "ADVANCE": "Advance",
+    }[balance_filter]
+
+    top_due_chart_rows = sorted(
+        [
+            row for row in rows
+            if row["net_type"] == "DR" and row["net_abs"] > 0
+        ],
+        key=lambda row: row["net_abs"],
+        reverse=True,
+    )[:10]
 
     context = {
         "as_of": as_of,
         "rows": rows,
+        "balance_filter": balance_filter,
+        "balance_filter_label": balance_filter_label,
+        "zero_filter_enabled": zero_filter_enabled,
+        "total_receivable": total_receivable,
+        "total_advances": total_advances,
+        "net_position_abs": net_position_abs,
+        "net_position_side": net_position_side,
+        "customers_with_due_count": customers_with_due_count,
+        "visible_customer_count": visible_customer_count,
+        "top_due_chart_rows": top_due_chart_rows,
         "grand_opening": grand_opening,
         "grand_opening_abs": grand_opening_abs,
         "grand_opening_type": grand_opening_type,
         "grand_balance": grand_balance,
-        "grand_balance_abs": abs(grand_balance),
-        "grand_balance_type": "Dr" if grand_balance >= 0 else "Cr",
+        "grand_balance_abs": net_position_abs,
+        "grand_balance_type": net_position_side,
     }
     return render(request, "core/customer_balances.html", context)
 
