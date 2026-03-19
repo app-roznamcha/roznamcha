@@ -7,7 +7,9 @@ from openpyxl.utils import get_column_letter
 
 from .models import (
     SalesInvoice,
+    SalesReturn,
     PurchaseInvoice,
+    PurchaseReturn,
     Product,
     Payment,
     Party,
@@ -41,17 +43,20 @@ def _wb_to_bytes(wb: Workbook) -> bytes:
 def generate_sales_ledger(owner) -> bytes:
     """
     Uses your actual fields:
-    SalesInvoice: invoice_number, invoice_date, customer, posted, payment_type, payment_account, payment_amount, notes
+    SalesInvoice + SalesReturn
     """
     wb = Workbook()
     ws = wb.active
     ws.title = "Sales Ledger"
 
     headers = [
-        "Invoice No",
-        "Invoice Date",
+        "Entry Type",
+        "Reference No",
+        "Date",
         "Customer",
         "Customer Phone",
+        "Reference Invoice",
+        "Total Amount",
         "Posted",
         "Payment Type",
         "Payment Account",
@@ -60,9 +65,11 @@ def generate_sales_ledger(owner) -> bytes:
     ]
     ws.append(headers)
 
-    qs = SalesInvoice.objects.filter(owner=owner).select_related("customer", "payment_account").order_by("invoice_date", "id")
+    rows = []
 
-    for inv in qs:
+    invoice_qs = SalesInvoice.objects.filter(owner=owner).select_related("customer", "payment_account").order_by("invoice_date", "id")
+
+    for inv in invoice_qs:
         cust = inv.customer
         cust_name = cust.name if cust else ""
         cust_phone = getattr(cust, "phone", "") if cust else ""
@@ -70,17 +77,54 @@ def generate_sales_ledger(owner) -> bytes:
         acct = inv.payment_account
         acct_name = acct.name if acct else ""
 
-        ws.append([
+        rows.append((
+            inv.invoice_date,
+            inv.id,
+            [
+            "Invoice",
             inv.invoice_number or "",
             _fmt_date(inv.invoice_date),
             cust_name,
             cust_phone,
+            "",
+            inv.calculate_total(),
             "YES" if inv.posted else "NO",
             inv.payment_type or "",
             acct_name,
             inv.payment_amount or 0,
             inv.notes or "",
-        ])
+            ],
+        ))
+
+    return_qs = SalesReturn.objects.filter(owner=owner).select_related("customer", "reference_invoice").order_by("return_date", "id")
+
+    for ret in return_qs:
+        cust = ret.customer
+        cust_name = cust.name if cust else ""
+        cust_phone = getattr(cust, "phone", "") if cust else ""
+        ref_invoice = ret.reference_invoice
+
+        rows.append((
+            ret.return_date,
+            ret.id,
+            [
+            "Return",
+            f"SR-{ret.id}",
+            _fmt_date(ret.return_date),
+            cust_name,
+            cust_phone,
+            ref_invoice.invoice_number if ref_invoice else "",
+            ret.calculate_total(),
+            "YES" if ret.posted else "NO",
+            "",
+            "",
+            0,
+            ret.notes or "",
+            ],
+        ))
+
+    for _, _, row in sorted(rows, key=lambda item: (item[0] or date.min, item[1])):
+        ws.append(row)
 
     _auto_width(ws)
     return _wb_to_bytes(wb)
@@ -92,19 +136,21 @@ def generate_sales_ledger(owner) -> bytes:
 def generate_purchase_ledger(owner) -> bytes:
     """
     Uses your actual fields:
-    PurchaseInvoice: invoice_number, invoice_date, date_received, supplier, freight_charges, other_charges,
-                    posted, payment_type, payment_account, payment_amount, notes
+    PurchaseInvoice + PurchaseReturn
     """
     wb = Workbook()
     ws = wb.active
     ws.title = "Purchase Ledger"
 
     headers = [
-        "Invoice No",
-        "Invoice Date",
-        "Date Received",
+        "Entry Type",
+        "Reference No",
+        "Date",
         "Supplier",
         "Supplier Phone",
+        "Reference Invoice",
+        "Total Amount",
+        "Date Received",
         "Freight Charges",
         "Other Charges",
         "Posted",
@@ -115,9 +161,11 @@ def generate_purchase_ledger(owner) -> bytes:
     ]
     ws.append(headers)
 
-    qs = PurchaseInvoice.objects.filter(owner=owner).select_related("supplier", "payment_account").order_by("invoice_date", "id")
+    rows = []
 
-    for inv in qs:
+    invoice_qs = PurchaseInvoice.objects.filter(owner=owner).select_related("supplier", "payment_account").order_by("invoice_date", "id")
+
+    for inv in invoice_qs:
         sup = inv.supplier
         sup_name = sup.name if sup else ""
         sup_phone = getattr(sup, "phone", "") if sup else ""
@@ -125,12 +173,18 @@ def generate_purchase_ledger(owner) -> bytes:
         acct = inv.payment_account
         acct_name = acct.name if acct else ""
 
-        ws.append([
+        rows.append((
+            inv.invoice_date,
+            inv.id,
+            [
+            "Invoice",
             inv.invoice_number or "",
             _fmt_date(inv.invoice_date),
-            _fmt_date(inv.date_received),
             sup_name,
             sup_phone,
+            "",
+            inv.calculate_total(),
+            _fmt_date(inv.date_received),
             inv.freight_charges or 0,
             inv.other_charges or 0,
             "YES" if inv.posted else "NO",
@@ -138,7 +192,41 @@ def generate_purchase_ledger(owner) -> bytes:
             acct_name,
             inv.payment_amount or 0,
             inv.notes or "",
-        ])
+            ],
+        ))
+
+    return_qs = PurchaseReturn.objects.filter(owner=owner).select_related("supplier", "reference_invoice").order_by("return_date", "id")
+
+    for ret in return_qs:
+        sup = ret.supplier
+        sup_name = sup.name if sup else ""
+        sup_phone = getattr(sup, "phone", "") if sup else ""
+        ref_invoice = ret.reference_invoice
+
+        rows.append((
+            ret.return_date,
+            ret.id,
+            [
+            "Return",
+            f"PR-{ret.id}",
+            _fmt_date(ret.return_date),
+            sup_name,
+            sup_phone,
+            ref_invoice.invoice_number if ref_invoice else "",
+            ret.calculate_total(),
+            "",
+            0,
+            0,
+            "YES" if ret.posted else "NO",
+            "",
+            "",
+            0,
+            ret.notes or "",
+            ],
+        ))
+
+    for _, _, row in sorted(rows, key=lambda item: (item[0] or date.min, item[1])):
+        ws.append(row)
 
     _auto_width(ws)
     return _wb_to_bytes(wb)
@@ -209,18 +297,19 @@ def generate_products_list(owner) -> bytes:
     ws = wb.active
     ws.title = "Products"
 
-    headers = ["Product", "SKU/Code", "Unit", "Cost Price", "Sale Price", "Notes"]
+    headers = ["Code", "Product", "Unit", "Purchase Price", "Sale Price", "Current Stock", "Active"]
     ws.append(headers)
 
     qs = Product.objects.filter(owner=owner).order_by("id")
     for pr in qs:
         ws.append([
-            getattr(pr, "name", "") or "",
-            getattr(pr, "sku", "") or getattr(pr, "code", "") or "",
-            getattr(pr, "unit", "") or "",
-            getattr(pr, "cost_price", 0) or 0,
-            getattr(pr, "sale_price", 0) or 0,
-            getattr(pr, "notes", "") or "",
+            pr.code or "",
+            pr.name or "",
+            pr.unit or "",
+            pr.purchase_price_per_unit or 0,
+            pr.sale_price_per_unit or 0,
+            pr.current_stock or 0,
+            "YES" if pr.is_active else "NO",
         ])
 
     _auto_width(ws)
@@ -260,16 +349,17 @@ def generate_accounts_list(owner) -> bytes:
     ws = wb.active
     ws.title = "Accounts"
 
-    headers = ["Account", "Type", "Opening Balance", "Notes"]
+    headers = ["Code", "Account", "Type", "Cash/Bank", "Allow for Payments"]
     ws.append(headers)
 
     qs = Account.objects.filter(owner=owner).order_by("id")
     for a in qs:
         ws.append([
-            getattr(a, "name", "") or "",
-            getattr(a, "account_type", "") or getattr(a, "type", "") or "",
-            getattr(a, "opening_balance", 0) or 0,
-            getattr(a, "notes", "") or "",
+            a.code or "",
+            a.name or "",
+            a.account_type or "",
+            "YES" if a.is_cash_or_bank else "NO",
+            "YES" if a.allow_for_payments else "NO",
         ])
 
     _auto_width(ws)
