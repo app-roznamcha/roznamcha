@@ -172,9 +172,13 @@
       font-weight:800;
     }
     .kpi.sales .value{ color:var(--ok); }
+    .kpi.sales-return .value{ color:#0f766e; }
     .kpi.purchase .value{ color:var(--warn); }
+    .kpi.purchase-return .value{ color:#7c2d12; }
     .kpi.in .value{ color:#1d4ed8; }
     .kpi.out .value{ color:var(--out); }
+    .kpi.expense .value{ color:var(--out); }
+    .kpi.transfer .value{ color:#4338ca; }
     .kpi.net{
       background:linear-gradient(180deg,#111827,#0f172a);
       border-color:#111827;
@@ -196,6 +200,17 @@
       background:var(--out-soft);
       border-radius:8px;
       padding:2px 7px;
+    }
+    .section-label{
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--slate-500);
+      margin:0 0 8px;
+    }
+    .summary-group{
+      margin-bottom:18px;
     }
 
     .mini-box{
@@ -260,7 +275,7 @@
     <div>
       <h1 class="day-title">Day Summary</h1>
       <p class="day-sub">
-        View all posted sales, purchases, and payments for a single day.
+        View posted sales, returns, purchases, expenses, payments, and transfers for a single day.
       </p>
     </div>
     <div>
@@ -299,30 +314,57 @@
     </form>
   </div>
 
-  <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(5, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
-    <div class="kpi sales">
-      <div class="label">Total Sales</div>
-      <div class="value">{{ total_sales|floatformat:2 }}</div>
+  <div class="summary-group">
+    <div class="section-label">Commercial Activity</div>
+    <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+      <div class="kpi sales">
+        <div class="label">Total Sales</div>
+        <div class="value">{{ total_sales|floatformat:2 }}</div>
+      </div>
+      <div class="kpi sales-return">
+        <div class="label">Sales Returns</div>
+        <div class="value">{{ total_sales_returns|floatformat:2 }}</div>
+      </div>
+      <div class="kpi purchase">
+        <div class="label">Total Purchases</div>
+        <div class="value">{{ total_purchases|floatformat:2 }}</div>
+      </div>
+      <div class="kpi purchase-return">
+        <div class="label">Purchase Returns</div>
+        <div class="value">{{ total_purchase_returns|floatformat:2 }}</div>
+      </div>
     </div>
+  </div>
 
-    <div class="kpi purchase">
-      <div class="label">Total Purchases</div>
-      <div class="value">{{ total_purchases|floatformat:2 }}</div>
+  <div class="summary-group">
+    <div class="section-label">Cash Movement</div>
+    <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+      <div class="kpi in">
+        <div class="label">Money In</div>
+        <div class="value">{{ total_payments_in|floatformat:2 }}</div>
+      </div>
+      <div class="kpi out">
+        <div class="label">Money Out</div>
+        <div class="value">{{ total_payments_out|floatformat:2 }}</div>
+      </div>
+      <div class="kpi net">
+        <div class="label">Net Cash Flow</div>
+        <div class="value">{{ net_cash_flow|floatformat:2 }}</div>
+      </div>
     </div>
+  </div>
 
-    <div class="kpi in">
-      <div class="label">Money In</div>
-      <div class="value">{{ total_payments_in|floatformat:2 }}</div>
-    </div>
-
-    <div class="kpi out">
-      <div class="label">Money Out</div>
-      <div class="value">{{ total_payments_out|floatformat:2 }}</div>
-    </div>
-
-    <div class="kpi net">
-      <div class="label">Net Movement</div>
-      <div class="value">{{ net_cash_flow|floatformat:2 }}</div>
+  <div class="summary-group">
+    <div class="section-label">Other Day Activity</div>
+    <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+      <div class="kpi expense">
+        <div class="label">Daily Expenses</div>
+        <div class="value">{{ total_expenses|floatformat:2 }}</div>
+      </div>
+      <div class="kpi transfer">
+        <div class="label">Cash/Bank Transfers</div>
+        <div class="value">{{ total_transfers|floatformat:2 }}</div>
+      </div>
     </div>
   </div>
 
@@ -403,6 +445,73 @@
 
   <div class="ds-card">
     <div class="ds-card-head">
+      <div class="ds-card-title">Sales Returns (Posted)</div>
+      <div class="pill">Count: {{ sales_returns_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:16%;">
+          <col style="width:14%;">
+          <col style="width:22%;">
+          <col style="width:10%;">
+          <col style="width:16%;">
+          <col style="width:16%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Return #</th>
+            <th class="nowrap">Date</th>
+            <th>Customer</th>
+            <th class="center nowrap">Items</th>
+            <th>Reference</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ret in sales_returns_qs %}
+            <tr class="searchable-row">
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ ret.id }}</td>
+              <td class="nowrap">{{ ret.return_date|date:"d M Y" }}</td>
+              <td class="truncate" title="{{ ret.customer.name }}">{{ ret.customer.name }}</td>
+              <td class="center nowrap">{{ ret.items.count }}</td>
+              <td class="truncate" title="{{ ret.reference_invoice.invoice_number|default:ret.reference_invoice_id|default:'—' }}">
+                {% if ret.reference_invoice %}
+                  {{ ret.reference_invoice.invoice_number|default:ret.reference_invoice_id }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="right nowrap"><span class="money-out">{{ ret.calculate_total|floatformat:2 }}</span></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="text-align:center;padding:10px;color:#6b7280;">
+                No records for this day.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="6" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Sales Returns
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_sales_returns|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="ds-card">
+    <div class="ds-card-head">
       <div class="ds-card-title">Purchase Invoices (Posted)</div>
       <div class="pill">Count: {{ purchase_qs|length }}</div>
     </div>
@@ -469,6 +578,73 @@
             </th>
             <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
               {{ total_purchases|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="ds-card">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Purchase Returns (Posted)</div>
+      <div class="pill">Count: {{ purchase_returns_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:16%;">
+          <col style="width:14%;">
+          <col style="width:22%;">
+          <col style="width:10%;">
+          <col style="width:16%;">
+          <col style="width:16%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Return #</th>
+            <th class="nowrap">Date</th>
+            <th>Supplier</th>
+            <th class="center nowrap">Items</th>
+            <th>Reference</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ret in purchase_returns_qs %}
+            <tr class="searchable-row">
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ ret.id }}</td>
+              <td class="nowrap">{{ ret.return_date|date:"d M Y" }}</td>
+              <td class="truncate" title="{{ ret.supplier.name }}">{{ ret.supplier.name }}</td>
+              <td class="center nowrap">{{ ret.items.count }}</td>
+              <td class="truncate" title="{{ ret.reference_invoice.invoice_number|default:ret.reference_invoice_id|default:'—' }}">
+                {% if ret.reference_invoice %}
+                  {{ ret.reference_invoice.invoice_number|default:ret.reference_invoice_id }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="right nowrap"><span class="money-in">{{ ret.calculate_total|floatformat:2 }}</span></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="text-align:center;padding:10px;color:#6b7280;">
+                No records for this day.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="6" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Purchase Returns
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_purchase_returns|floatformat:2 }}
             </th>
           </tr>
         </tfoot>
@@ -617,6 +793,122 @@
           </div>
         </div>
       {% endif %}
+    </div>
+  </div>
+
+  <div class="ds-card">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Daily Expenses (Posted)</div>
+      <div class="pill">Count: {{ expenses_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl" style="min-width:920px;">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:14%;">
+          <col style="width:22%;">
+          <col style="width:22%;">
+          <col style="width:22%;">
+          <col style="width:14%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Date</th>
+            <th>Paid From</th>
+            <th>Expense Head</th>
+            <th>Notes</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in expenses_qs %}
+            <tr class="searchable-row">
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ e.date|date:"d M Y" }}</td>
+              <td class="truncate" title="{{ e.paid_from.name }}">{{ e.paid_from.name }}</td>
+              <td class="truncate" title="{{ e.expense_head.name }}">{{ e.expense_head.name }}</td>
+              <td class="truncate" title="{{ e.notes|default:'—' }}">{{ e.notes|default:"—" }}</td>
+              <td class="right nowrap"><span class="money-out">{{ e.amount|floatformat:2 }}</span></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" style="text-align:center;padding:10px;color:#6b7280;">
+                No records for this day.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="5" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Daily Expenses
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_expenses|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="ds-card" style="margin-bottom:10px;">
+    <div class="ds-card-head">
+      <div class="ds-card-title">Cash / Bank Transfers (Posted)</div>
+      <div class="pill">Count: {{ transfers_qs|length }}</div>
+    </div>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table class="tbl" style="min-width:920px;">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:14%;">
+          <col style="width:24%;">
+          <col style="width:24%;">
+          <col style="width:20%;">
+          <col style="width:12%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="nowrap">#</th>
+            <th class="nowrap">Date</th>
+            <th>From Account</th>
+            <th>To Account</th>
+            <th>Notes</th>
+            <th class="right nowrap">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in transfers_qs %}
+            <tr class="searchable-row">
+              <td class="nowrap">{{ forloop.counter }}</td>
+              <td class="nowrap">{{ t.date|date:"d M Y" }}</td>
+              <td class="truncate" title="{{ t.from_account.name }}">{{ t.from_account.name }}</td>
+              <td class="truncate" title="{{ t.to_account.name }}">{{ t.to_account.name }}</td>
+              <td class="truncate" title="{{ t.notes|default:'—' }}">{{ t.notes|default:"—" }}</td>
+              <td class="right nowrap">{{ t.amount|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" style="text-align:center;padding:10px;color:#6b7280;">
+                No records for this day.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="5" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
+              Total Transfer Amount
+            </th>
+            <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
+              {{ total_transfers|floatformat:2 }}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   </div>
 

@@ -1999,6 +1999,20 @@ def day_summary(request):
         .prefetch_related(Prefetch("items", queryset=PurchaseInvoiceItem.objects.select_related("product")))
     )
 
+    sales_returns_qs = (
+        SalesReturn.objects
+        .filter(owner=request.owner, posted=True, return_date=selected_date)
+        .select_related("customer", "reference_invoice")
+        .prefetch_related(Prefetch("items", queryset=SalesReturnItem.objects.select_related("product")))
+    )
+
+    purchase_returns_qs = (
+        PurchaseReturn.objects
+        .filter(owner=request.owner, posted=True, return_date=selected_date)
+        .select_related("supplier", "reference_invoice")
+        .prefetch_related(Prefetch("items", queryset=PurchaseReturnItem.objects.select_related("product")))
+    )
+
     payments_in_qs = (
         Payment.objects.filter(
             owner=request.owner,
@@ -2019,9 +2033,31 @@ def day_summary(request):
         )
         .select_related("party", "account")
     )
+
+    expenses_qs = (
+        DailyExpense.objects.filter(
+            owner=request.owner,
+            posted=True,
+            date=selected_date,
+        )
+        .select_related("paid_from", "expense_head")
+    )
+
+    transfers_qs = (
+        CashBankTransfer.objects.filter(
+            owner=request.owner,
+            posted=True,
+            date=selected_date,
+        )
+        .select_related("from_account", "to_account")
+    )
     # 4) Totals (all in Python, no weird ORM math)
     total_sales = sum((inv.calculate_total() for inv in sales_qs), Decimal("0"))
+    total_sales_returns = sum((ret.calculate_total() for ret in sales_returns_qs), Decimal("0"))
     total_purchases = sum((inv.calculate_total() for inv in purchase_qs), Decimal("0"))
+    total_purchase_returns = sum((ret.calculate_total() for ret in purchase_returns_qs), Decimal("0"))
+    total_expenses = expenses_qs.aggregate(s=Sum("amount"))["s"] or Decimal("0")
+    total_transfers = transfers_qs.aggregate(s=Sum("amount"))["s"] or Decimal("0")
 
     total_payments_in = payments_in_qs.aggregate(s=Sum("amount"))["s"] or Decimal("0")
     total_payments_out = payments_out_qs.aggregate(s=Sum("amount"))["s"] or Decimal("0")
@@ -2046,12 +2082,20 @@ def day_summary(request):
         "selected_date": selected_date,
         "sales_qs": sales_qs,
         "purchase_qs": purchase_qs,
+        "sales_returns_qs": sales_returns_qs,
+        "purchase_returns_qs": purchase_returns_qs,
         "payments_in_qs": payments_in_qs,
         "payments_out_qs": payments_out_qs,
+        "expenses_qs": expenses_qs,
+        "transfers_qs": transfers_qs,
         "total_sales": total_sales,
+        "total_sales_returns": total_sales_returns,
         "total_purchases": total_purchases,
+        "total_purchase_returns": total_purchase_returns,
         "total_payments_in": total_payments_in,
         "total_payments_out": total_payments_out,
+        "total_expenses": total_expenses,
+        "total_transfers": total_transfers,
         "net_movement": net_movement,
         "net_cash_flow": net_cash_flow,
         "payments_in_by_account": payments_in_by_account,
