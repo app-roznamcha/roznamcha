@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load humanize %}
 
 {% block title %}Operational Profit Report{% endblock %}
 
@@ -361,15 +362,15 @@
   <div class="kpi-grid">
     <div class="kpi sales">
       <div class="label">Net Sales</div>
-      <div class="value">{{ net_sales|floatformat:2 }}</div>
+      <div class="value">PKR {{ net_sales|floatformat:"-2"|intcomma }}</div>
     </div>
     <div class="kpi cost">
       <div class="label">Purchase Basis</div>
-      <div class="value">{{ purchase_basis|floatformat:2 }}</div>
+      <div class="value">PKR {{ purchase_basis|floatformat:"-2"|intcomma }}</div>
     </div>
     <div class="kpi net {% if net_profit >= 0 %}profit{% else %}loss{% endif %}">
       <div class="label">Net Operational Profit</div>
-      <div class="value">{{ net_profit|floatformat:2 }}</div>
+      <div class="value">PKR {{ net_profit|floatformat:"-2"|intcomma }}</div>
     </div>
   </div>
 
@@ -412,15 +413,15 @@
       <table class="summary-table">
         <tr>
           <td>Gross Sales</td>
-          <td>{{ gross_sales|floatformat:2 }}</td>
+          <td>PKR {{ gross_sales|floatformat:"-2"|intcomma }}</td>
         </tr>
         <tr class="negative">
           <td>Sales Returns</td>
-          <td>{{ sales_returns|floatformat:2 }}</td>
+          <td>PKR {{ sales_returns|floatformat:"-2"|intcomma }}</td>
         </tr>
         <tr class="total">
           <td>Net Sales</td>
-          <td>{{ net_sales|floatformat:2 }}</td>
+          <td>PKR {{ net_sales|floatformat:"-2"|intcomma }}</td>
         </tr>
       </table>
     </div>
@@ -430,7 +431,7 @@
       <table class="summary-table">
         <tr>
           <td>Purchase Basis</td>
-          <td>{{ purchase_basis|floatformat:2 }}</td>
+          <td>PKR {{ purchase_basis|floatformat:"-2"|intcomma }}</td>
         </tr>
         <tr>
           <td style="font-size:13px;color:var(--slate-500);padding-top:0;">Period purchase activity</td>
@@ -438,7 +439,7 @@
         </tr>
         <tr class="total">
           <td>Gross Operating Margin</td>
-          <td>{{ gross_margin|floatformat:2 }}</td>
+          <td>PKR {{ gross_margin|floatformat:"-2"|intcomma }}</td>
         </tr>
       </table>
     </div>
@@ -450,11 +451,11 @@
       <table class="summary-table">
         <tr>
           <td>Operating Expenses</td>
-          <td>{{ operating_expenses|floatformat:2 }}</td>
+          <td>PKR {{ operating_expenses|floatformat:"-2"|intcomma }}</td>
         </tr>
         <tr>
           <td>Stock Write-off Expense</td>
-          <td>{{ stock_writeoff_expense|floatformat:2 }}</td>
+          <td>PKR {{ stock_writeoff_expense|floatformat:"-2"|intcomma }}</td>
         </tr>
       </table>
     </div>
@@ -462,7 +463,7 @@
     <div class="opr-card final-card {% if net_profit < 0 %}loss{% endif %}">
       <div class="opr-card-title">Final</div>
       <div class="opr-card-sub">Net result for the selected period after purchase basis and operating costs.</div>
-      <div class="final-value">{{ net_profit|floatformat:2 }}</div>
+      <div class="final-value">PKR {{ net_profit|floatformat:"-2"|intcomma }}</div>
     </div>
   </div>
 
@@ -490,9 +491,9 @@
               {% for row in top_selling_products %}
                 <tr>
                   <td>{{ row.product_name }}</td>
-                  <td>{{ row.gross_sales|floatformat:2 }}</td>
-                  <td>{{ row.sales_returns|floatformat:2 }}</td>
-                  <td>{{ row.net_sales|floatformat:2 }}</td>
+                  <td>PKR {{ row.gross_sales|floatformat:"-2"|intcomma }}</td>
+                  <td>PKR {{ row.sales_returns|floatformat:"-2"|intcomma }}</td>
+                  <td>PKR {{ row.net_sales|floatformat:"-2"|intcomma }}</td>
                   <td>{{ row.quantity_sold|floatformat:3 }}</td>
                 </tr>
               {% endfor %}
@@ -520,9 +521,9 @@
               {% for row in purchase_basis_by_product %}
                 <tr>
                   <td>{{ row.product_name }}</td>
-                  <td>{{ row.purchase_total|floatformat:2 }}</td>
-                  <td>{{ row.purchase_returns|floatformat:2 }}</td>
-                  <td>{{ row.net_purchase_basis|floatformat:2 }}</td>
+                  <td>PKR {{ row.purchase_total|floatformat:"-2"|intcomma }}</td>
+                  <td>PKR {{ row.purchase_returns|floatformat:"-2"|intcomma }}</td>
+                  <td>PKR {{ row.net_purchase_basis|floatformat:"-2"|intcomma }}</td>
                   <td>{{ row.quantity_purchased|floatformat:3 }}</td>
                 </tr>
               {% endfor %}
@@ -548,7 +549,7 @@
               {% for row in expense_breakdown %}
                 <tr>
                   <td>{{ row.label }}</td>
-                  <td>{{ row.amount|floatformat:2 }}</td>
+                  <td>PKR {{ row.amount|floatformat:"-2"|intcomma }}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -574,7 +575,7 @@
                 <tr>
                   <td>{{ row.product_name }}</td>
                   <td>{{ row.quantity|floatformat:3 }}</td>
-                  <td>{{ row.amount|floatformat:2 }}</td>
+                  <td>PKR {{ row.amount|floatformat:"-2"|intcomma }}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -605,16 +606,51 @@
         maximumFractionDigits: 2
       });
     };
+    const currencyFormat = function (value) {
+      return "PKR " + numberFormat(value);
+    };
+    const compactAxisFormat = function (value) {
+      return Number(value || 0).toLocaleString("en-PK", {
+        notation: "compact",
+        maximumFractionDigits: 1
+      });
+    };
+    const overallNetProfit = Number("{{ net_profit|default_if_none:0|floatformat:2|cut:','|escapejs }}") || 0;
+    const summaryBarColor = function (label, value) {
+      if (label === "Gross Sales") {
+        return { background: "#34d399", border: "#059669" };
+      }
+      if (label === "Purchase Basis") {
+        return { background: "#fdba74", border: "#ea580c" };
+      }
+      if (label === "Operating Expenses") {
+        return { background: "#fca5a5", border: "#dc2626" };
+      }
+      if (label === "Stock Write-off") {
+        return { background: "#f87171", border: "#991b1b" };
+      }
+      if (label === "Net Profit") {
+        if (value > 0) {
+          return { background: "#86efac", border: "#16a34a" };
+        }
+        if (value < 0) {
+          return { background: "#fca5a5", border: "#dc2626" };
+        }
+        return { background: "#cbd5e1", border: "#64748b" };
+      }
+      return { background: "#cbd5e1", border: "#64748b" };
+    };
 
     if (summaryChartEl && summaryData.length) {
+      const summaryColors = summaryData.map((item) => summaryBarColor(item.label, item.value));
       new Chart(summaryChartEl, {
         type: "bar",
         data: {
           labels: summaryData.map((item) => item.label),
           datasets: [{
             data: summaryData.map((item) => item.value),
-            backgroundColor: ["#34d399", "#fdba74", "#fca5a5", "#f87171", "#93c5fd"],
-            borderColor: ["#059669", "#ea580c", "#ef4444", "#dc2626", "#2563eb"],
+            backgroundColor: summaryColors.map((item) => item.background),
+            borderColor: summaryColors.map((item) => item.border),
             borderWidth: 1,
             borderRadius: 10,
           }]
@@ -627,7 +663,7 @@
             tooltip: {
               callbacks: {
                 label: function (context) {
-                  return "Rs " + numberFormat(context.parsed.y);
+                  return currencyFormat(context.parsed.y);
                 }
               }
             }
@@ -636,7 +672,7 @@
             y: {
               ticks: {
                 callback: function (value) {
-                  return numberFormat(value);
+                  return compactAxisFormat(value);
                 }
               }
             }
@@ -646,6 +682,8 @@
     }
 
     if (trendChartEl && trendData.length) {
+      const trendLineColor = overallNetProfit >= 0 ? "#16a34a" : "#dc2626";
+      const trendFillColor = overallNetProfit >= 0 ? "rgba(22, 163, 74, 0.14)" : "rgba(220, 38, 38, 0.12)";
       new Chart(trendChartEl, {
         type: "line",
         data: {
@@ -653,10 +691,10 @@
           datasets: [{
             label: "Daily Net Profit",
             data: trendData.map((item) => item.profit),
-            borderColor: "#2563eb",
-            backgroundColor: "rgba(37, 99, 235, 0.14)",
+            borderColor: trendLineColor,
+            backgroundColor: trendFillColor,
             fill: true,
-            tension: 0.28,
+            tension: 0.3,
             pointRadius: 3,
             pointHoverRadius: 5,
           }]
@@ -669,16 +707,26 @@
             tooltip: {
               callbacks: {
                 label: function (context) {
-                  return "Rs " + numberFormat(context.parsed.y);
+                  return currencyFormat(context.parsed.y);
                 }
               }
             }
           },
           scales: {
+            x: {
+              grid: {
+                color: "rgba(148, 163, 184, 0.10)",
+                drawBorder: false,
+              }
+            },
             y: {
+              grid: {
+                color: "rgba(148, 163, 184, 0.14)",
+                drawBorder: false,
+              },
               ticks: {
                 callback: function (value) {
-                  return numberFormat(value);
+                  return compactAxisFormat(value);
                 }
               }
             }
