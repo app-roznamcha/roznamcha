@@ -2927,94 +2927,172 @@ def profit_loss(request):
         F("qty") * F("unit_cost"),
         output_field=money_field,
     )
-
-    gross_sales = (
-        SalesInvoiceItem.objects.filter(
-            owner=owner,
-            sales_invoice__owner=owner,
-            sales_invoice__posted=True,
-            sales_invoice__invoice_date__range=(date_from, date_to),
+    def compute_operational_metrics(period_from, period_to):
+        gross_sales = (
+            SalesInvoiceItem.objects.filter(
+                owner=owner,
+                sales_invoice__owner=owner,
+                sales_invoice__posted=True,
+                sales_invoice__invoice_date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
 
-    sales_returns = (
-        SalesReturnItem.objects.filter(
-            owner=owner,
-            sales_return__owner=owner,
-            sales_return__posted=True,
-            sales_return__return_date__range=(date_from, date_to),
+        sales_returns = (
+            SalesReturnItem.objects.filter(
+                owner=owner,
+                sales_return__owner=owner,
+                sales_return__posted=True,
+                sales_return__return_date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
-    net_sales = gross_sales - sales_returns
+        net_sales = gross_sales - sales_returns
 
-    purchase_items_total = (
-        PurchaseInvoiceItem.objects.filter(
-            owner=owner,
-            purchase_invoice__owner=owner,
-            purchase_invoice__posted=True,
-            purchase_invoice__invoice_date__range=(date_from, date_to),
+        purchase_items_total = (
+            PurchaseInvoiceItem.objects.filter(
+                owner=owner,
+                purchase_invoice__owner=owner,
+                purchase_invoice__posted=True,
+                purchase_invoice__invoice_date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
 
-    purchase_charges_total = (
-        PurchaseInvoice.objects.filter(
-            owner=owner,
-            posted=True,
-            invoice_date__range=(date_from, date_to),
+        purchase_charges_total = (
+            PurchaseInvoice.objects.filter(
+                owner=owner,
+                posted=True,
+                invoice_date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum(purchase_charges_expr), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum(purchase_charges_expr), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
 
-    purchase_returns_total = (
-        PurchaseReturnItem.objects.filter(
-            owner=owner,
-            purchase_return__owner=owner,
-            purchase_return__posted=True,
-            purchase_return__return_date__range=(date_from, date_to),
+        purchase_returns_total = (
+            PurchaseReturnItem.objects.filter(
+                owner=owner,
+                purchase_return__owner=owner,
+                purchase_return__posted=True,
+                purchase_return__return_date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
 
-    purchase_basis = purchase_items_total + purchase_charges_total - purchase_returns_total
-    gross_margin = net_sales - purchase_basis
+        purchase_basis = purchase_items_total + purchase_charges_total - purchase_returns_total
+        gross_margin = net_sales - purchase_basis
 
-    operating_expenses = (
-        DailyExpense.objects.filter(
-            owner=owner,
-            posted=True,
-            date__range=(date_from, date_to),
+        operating_expenses = (
+            DailyExpense.objects.filter(
+                owner=owner,
+                posted=True,
+                date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum("amount"), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum("amount"), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
 
-    stock_writeoff_expense = (
-        StockAdjustment.objects.filter(
-            owner=owner,
-            posted=True,
-            direction="DOWN",
-            date__range=(date_from, date_to),
+        stock_writeoff_expense = (
+            StockAdjustment.objects.filter(
+                owner=owner,
+                posted=True,
+                direction="DOWN",
+                date__range=(period_from, period_to),
+            )
+            .aggregate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
+            .get("total", Decimal("0.00"))
+            or Decimal("0.00")
         )
-        .aggregate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
-        .get("total", Decimal("0.00"))
-        or Decimal("0.00")
-    )
 
-    net_profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
+        net_profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
+        return {
+            "gross_sales": gross_sales,
+            "sales_returns": sales_returns,
+            "net_sales": net_sales,
+            "purchase_basis": purchase_basis,
+            "gross_margin": gross_margin,
+            "operating_expenses": operating_expenses,
+            "stock_writeoff_expense": stock_writeoff_expense,
+            "net_profit": net_profit,
+        }
+
+    current_metrics = compute_operational_metrics(date_from, date_to)
+    current_period_days = (date_to - date_from).days
+    previous_date_to = date_from - timedelta(days=1)
+    previous_date_from = previous_date_to - timedelta(days=current_period_days)
+    previous_metrics = compute_operational_metrics(previous_date_from, previous_date_to)
+
+    gross_sales = current_metrics["gross_sales"]
+    sales_returns = current_metrics["sales_returns"]
+    net_sales = current_metrics["net_sales"]
+    purchase_basis = current_metrics["purchase_basis"]
+    gross_margin = current_metrics["gross_margin"]
+    operating_expenses = current_metrics["operating_expenses"]
+    stock_writeoff_expense = current_metrics["stock_writeoff_expense"]
+    net_profit = current_metrics["net_profit"]
+
+    def percent_change(current_value, previous_value):
+        if previous_value == 0:
+            return Decimal("0.00") if current_value == 0 else None
+        return ((current_value - previous_value) / previous_value) * Decimal("100")
+
+    comparison_metric_map = [
+        ("Gross Sales", "gross_sales"),
+        ("Sales Returns", "sales_returns"),
+        ("Net Sales", "net_sales"),
+        ("Purchase Basis", "purchase_basis"),
+        ("Gross Operating Margin", "gross_margin"),
+        ("Operating Expenses", "operating_expenses"),
+        ("Stock Write-off Expense", "stock_writeoff_expense"),
+        ("Net Operational Profit", "net_profit"),
+    ]
+    comparison_rows = []
+    for label, key in comparison_metric_map:
+        current_value = current_metrics[key]
+        previous_value = previous_metrics[key]
+        comparison_rows.append(
+            {
+                "label": label,
+                "current": current_value,
+                "previous": previous_value,
+                "change": current_value - previous_value,
+                "percent_change": percent_change(current_value, previous_value),
+            }
+        )
+
+    comparison_highlights = [
+        {
+            "label": "Net Sales",
+            "current": current_metrics["net_sales"],
+            "previous": previous_metrics["net_sales"],
+            "change": current_metrics["net_sales"] - previous_metrics["net_sales"],
+            "percent_change": percent_change(current_metrics["net_sales"], previous_metrics["net_sales"]),
+        },
+        {
+            "label": "Purchase Basis",
+            "current": current_metrics["purchase_basis"],
+            "previous": previous_metrics["purchase_basis"],
+            "change": current_metrics["purchase_basis"] - previous_metrics["purchase_basis"],
+            "percent_change": percent_change(current_metrics["purchase_basis"], previous_metrics["purchase_basis"]),
+        },
+        {
+            "label": "Net Operational Profit",
+            "current": current_metrics["net_profit"],
+            "previous": previous_metrics["net_profit"],
+            "change": current_metrics["net_profit"] - previous_metrics["net_profit"],
+            "percent_change": percent_change(current_metrics["net_profit"], previous_metrics["net_profit"]),
+        },
+    ]
 
     summary_chart_data = [
         {"label": "Gross Sales", "value": float(gross_sales)},
@@ -3301,6 +3379,11 @@ def profit_loss(request):
         "operating_expenses": operating_expenses,
         "stock_writeoff_expense": stock_writeoff_expense,
         "net_profit": net_profit,
+        "comparison_enabled": True,
+        "previous_date_from": previous_date_from,
+        "previous_date_to": previous_date_to,
+        "comparison_rows": comparison_rows,
+        "comparison_highlights": comparison_highlights,
         "summary_chart_data": summary_chart_data,
         "trend_chart_data": trend_chart_data,
         "top_selling_products": top_selling_products,

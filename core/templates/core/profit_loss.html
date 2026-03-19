@@ -186,6 +186,54 @@
     .kpi.net.loss{ background:var(--loss-soft); border-color:#fca5a5; }
     .kpi.net.profit .value{ color:var(--profit); }
     .kpi.net.loss .value{ color:var(--loss); }
+    .comparison-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .comparison-kpi{
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      padding:14px 16px;
+      background:var(--slate-50);
+    }
+    .comparison-kpi .metric{
+      font-size:13px;
+      color:var(--slate-500);
+      margin-bottom:8px;
+    }
+    .comparison-kpi .pair{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      color:var(--slate-700);
+      margin-bottom:4px;
+    }
+    .comparison-kpi .pair strong{
+      color:var(--slate-900);
+    }
+    .change-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:var(--slate-100);
+      color:var(--slate-700);
+    }
+    .change-pill.positive{
+      background:var(--profit-soft);
+      color:var(--profit);
+    }
+    .change-pill.negative{
+      background:var(--loss-soft);
+      color:var(--loss);
+    }
 
     .section-grid{
       display:grid;
@@ -304,8 +352,29 @@
     .final-card.loss .final-value{
       color:var(--loss);
     }
+    .comparison-table th:nth-child(n+2),
+    .comparison-table td:nth-child(n+2){
+      text-align:right;
+    }
+    .comparison-table td:first-child,
+    .comparison-table th:first-child{
+      text-align:left;
+    }
+    .change-positive{
+      color:var(--profit);
+      font-weight:700;
+    }
+    .change-negative{
+      color:var(--loss);
+      font-weight:700;
+    }
+    .change-neutral{
+      color:var(--slate-500);
+      font-weight:700;
+    }
 
     @media (max-width:800px){
+      .comparison-grid,
       .section-grid,
       .breakdown-grid,
       .chart-grid,
@@ -373,6 +442,75 @@
       <div class="value">PKR {{ net_profit|floatformat:"-2"|intcomma }}</div>
     </div>
   </div>
+
+  {% if comparison_enabled %}
+    <div class="opr-card">
+      <div class="opr-card-head">
+        <div class="opr-card-title">Period Comparison</div>
+        <div class="opr-card-sub">
+          Current: <strong>{{ date_from|date:"d M Y" }} - {{ date_to|date:"d M Y" }}</strong>
+          &nbsp;|&nbsp;
+          Previous: <strong>{{ previous_date_from|date:"d M Y" }} - {{ previous_date_to|date:"d M Y" }}</strong>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+        {% for item in comparison_highlights %}
+          <div class="comparison-kpi">
+            <div class="metric">{{ item.label }}</div>
+            <div class="pair">
+              <span>Current</span>
+              <strong>PKR {{ item.current|floatformat:"-2"|intcomma }}</strong>
+            </div>
+            <div class="pair">
+              <span>Previous</span>
+              <strong>PKR {{ item.previous|floatformat:"-2"|intcomma }}</strong>
+            </div>
+            <div class="change-pill {% if item.change > 0 %}positive{% elif item.change < 0 %}negative{% endif %}">
+              Change:
+              {% if item.change > 0 %}+{% endif %}PKR {{ item.change|floatformat:"-2"|intcomma }}
+              {% if item.percent_change is None %}
+                (—)
+              {% else %}
+                ({{ item.percent_change|floatformat:"-1" }}%)
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <table class="report-table comparison-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Current Period</th>
+            <th>Previous Period</th>
+            <th>Change</th>
+            <th>% Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in comparison_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td>PKR {{ row.current|floatformat:"-2"|intcomma }}</td>
+              <td>PKR {{ row.previous|floatformat:"-2"|intcomma }}</td>
+              <td class="{% if row.change > 0 %}change-positive{% elif row.change < 0 %}change-negative{% else %}change-neutral{% endif %}">
+                {% if row.change > 0 %}+{% endif %}PKR {{ row.change|floatformat:"-2"|intcomma }}
+              </td>
+              <td class="{% if row.change > 0 %}change-positive{% elif row.change < 0 %}change-negative{% else %}change-neutral{% endif %}">
+                {% if row.percent_change is None %}
+                  —
+                {% else %}
+                  {{ row.percent_change|floatformat:"-1" }}%
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
 
   <div class="chart-grid">
     <div class="opr-card chart-card">
