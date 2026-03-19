@@ -101,7 +101,7 @@
         <span style="color:#6b7280;">Opening balance:</span>
         <strong style="margin-left:6px;">
           {% if opening_balance and opening_balance != 0 %}
-            {% if opening_is_debit %}Dr{% else %}Cr{% endif %}
+            {{ opening_side }}
             {{ opening_balance|floatformat:2 }}
           {% else %}
             0.00
@@ -112,8 +112,11 @@
       <div style="font-size:15px;">
         <span style="color:#6b7280;">Closing balance:</span>
         <strong style="margin-left:6px;">
-          {# If your helper already returns signed/side-aware closing, keep number only #}
-          {{ closing_balance|floatformat:2 }}
+          {% if closing_balance and closing_balance != 0 %}
+            {{ closing_side }} {{ closing_balance|floatformat:2 }}
+          {% else %}
+            0.00
+          {% endif %}
         </strong>
       </div>
     </div>
@@ -158,7 +161,11 @@
                   {% if r.credit %}{{ r.credit|floatformat:2 }}{% else %}—{% endif %}
                 </td>
                 <td style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:right;color:#111827;font-weight:600;">
-                  {{ r.balance|floatformat:2 }}
+                  {% if r.balance and r.balance != 0 %}
+                    {{ r.balance_side }} {{ r.balance|floatformat:2 }}
+                  {% else %}
+                    0.00
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}

@@ -208,7 +208,7 @@
   <div class="cb-hero">
     <div>
       <h1 class="cb-title">Customer Balances</h1>
-      <p class="cb-sub">See opening balances, total sales, receipts, and net position (Dr/Cr) for each customer.</p>
+      <p class="cb-sub">See each customer's opening position and closing ledger balance as of the selected date, using the same statement logic as the party ledger.</p>
     </div>
     <div>
       <a href="{% url 'dashboard' %}" class="cb-btn">← Back to Dashboard</a>
@@ -249,7 +249,7 @@
 
   <div class="cb-card">
     <div class="cb-card-head">
-      <div class="cb-card-title">Top customer balances</div>
+      <div class="cb-card-title">Customer balances</div>
       <div class="cb-card-sub">Visual view of net receivable / payable (absolute amount).</div>
     </div>
 
@@ -276,11 +276,10 @@
           <tr>
             <th>#</th>
             <th>Customer</th>
-            <th class="right">Opening (Dr/Cr)</th>
-            <th class="right">Sales</th>
-            <th class="right">Receipts</th>
-            <th class="right">Balance</th>
+            <th class="right">Opening Position</th>
+            <th class="right">Closing Balance</th>
             <th class="center">Dr/Cr</th>
+            <th class="center">Statement</th>
           </tr>
         </thead>
         <tbody>
@@ -288,17 +287,26 @@
             <tr class="balance-row" data-type="{{ row.net_type }}">
               <td>{{ forloop.counter }}</td>
               <td class="customer-name">{{ row.party.name }}</td>
-              <td class="right">{{ row.opening|floatformat:2 }}</td>
-              <td class="right">{{ row.sales|floatformat:2 }}</td>
-              <td class="right">{{ row.receipts|floatformat:2 }}</td>
+              <td class="right">
+                {% if row.opening_abs and row.opening_abs != 0 %}
+                  {{ row.opening_side }} {{ row.opening_abs|floatformat:2 }}
+                {% else %}
+                  0.00
+                {% endif %}
+              </td>
               <td class="right">{{ row.net_abs|floatformat:2 }}</td>
               <td class="center">
                 <span class="bal-pill {% if row.net_type == 'DR' %}dr{% else %}cr{% endif %}">{{ row.net_type }}</span>
               </td>
+              <td class="center">
+                <a href="{% url 'party_statement' row.party.id %}?to={{ as_of|date:'Y-m-d' }}" style="color:#2563eb;text-decoration:none;font-weight:600;">
+                  View
+                </a>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
+              <td colspan="6" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
                 No customers found.
               </td>
             </tr>
@@ -307,11 +315,16 @@
         <tfoot>
           <tr>
             <th colspan="2" style="border-top:2px solid #e5e7eb;padding:7px 9px;text-align:right;">Grand Totals:</th>
-            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_opening|floatformat:2 }}</th>
-            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_sales|floatformat:2 }}</th>
-            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_receipts|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">
+              {% if grand_opening_abs and grand_opening_abs != 0 %}
+                {{ grand_opening_type }} {{ grand_opening_abs|floatformat:2 }}
+              {% else %}
+                0.00
+              {% endif %}
+            </th>
             <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_abs|floatformat:2 }}</th>
             <th class="center" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_type }}</th>
+            <th class="center" style="border-top:2px solid #e5e7eb;padding:7px 9px;">—</th>
           </tr>
         </tfoot>
       </table>

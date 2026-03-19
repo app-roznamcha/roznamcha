@@ -324,16 +324,31 @@
     }
 
     .balance-status{
-      display:inline-flex;
-      align-items:center;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
       gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
+      padding:10px 12px;
+      border-radius:16px;
       background:var(--neutral-soft);
       border:1px solid var(--line);
       font-size:13px;
       font-weight:700;
       color:#0f172a;
+      min-width:280px;
+    }
+    .balance-status.good{
+      background:#f0fdf4;
+      border-color:#86efac;
+    }
+    .balance-status.bad{
+      background:#fff7ed;
+      border-color:#fdba74;
+    }
+    .balance-status-head{
+      display:flex;
+      align-items:center;
+      gap:8px;
     }
 
     .dot{
@@ -341,6 +356,21 @@
       height:8px;
       border-radius:999px;
       background:#16a34a;
+    }
+    .balance-status.bad .dot{
+      background:#ea580c;
+    }
+    .balance-lines{
+      display:grid;
+      gap:3px;
+      font-weight:600;
+      color:var(--ink-700);
+    }
+    .balance-note{
+      font-size:12px;
+      line-height:1.45;
+      color:#9a3412;
+      font-weight:600;
     }
 
     @media (max-width: 900px) {
@@ -367,7 +397,6 @@
     }
   </style>
 
-  {% with total_le=total_liabilities|add:total_equity %}
   <div class="bs-topbar">
     <div class="bs-title-wrap">
       <div class="bs-kicker">Financial Statement</div>
@@ -375,9 +404,21 @@
       <p class="bs-sub">Snapshot of assets, liabilities, and equity for your business as of a specific date.</p>
     </div>
     <div class="bs-actions">
-      <div class="balance-status">
-        <span class="dot"></span>
-        Balance Check: Assets (Rs {{ total_assets|floatformat:2 }}) | L+E (Rs {{ total_le|floatformat:2 }})
+      <div class="balance-status {% if is_balanced %}good{% else %}bad{% endif %}">
+        <div class="balance-status-head">
+          <span class="dot"></span>
+          <span>Balance Check: {{ balance_status }}</span>
+        </div>
+        <div class="balance-lines">
+          <div>Assets: Rs {{ total_assets|floatformat:2 }}</div>
+          <div>Liabilities + Equity: Rs {{ total_liabilities_and_equity|floatformat:2 }}</div>
+          <div>Difference: Rs {{ balance_difference|floatformat:2 }}</div>
+        </div>
+        {% if not is_balanced %}
+          <div class="balance-note">
+            This balance sheet may be out of balance because current earnings are not yet included in equity under the current system design.
+          </div>
+        {% endif %}
       </div>
       <a href="{% url 'dashboard' %}" class="bs-btn">← Back to Dashboard</a>
       <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
@@ -433,7 +474,7 @@
     </div>
     <div class="kpi total">
       <div class="label">Liabilities + Equity</div>
-      <div class="value">Rs {{ total_le|floatformat:2 }}</div>
+      <div class="value">Rs {{ total_liabilities_and_equity|floatformat:2 }}</div>
     </div>
   </div>
 
@@ -536,13 +577,12 @@
           </tr>
           <tr>
             <th class="right">Liabilities + Equity</th>
-            <th class="right">Rs {{ total_le|floatformat:2 }}</th>
+            <th class="right">Rs {{ total_liabilities_and_equity|floatformat:2 }}</th>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
-  {% endwith %}
 
 </div>
 

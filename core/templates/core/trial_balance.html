@@ -230,6 +230,41 @@
       font-size:14px;
     }
     .totals-strip .eq{ font-weight:800; color:#0f172a; }
+    .balance-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:800;
+      border:1px solid var(--slate-200);
+      background:#fff;
+    }
+    .balance-pill .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:var(--ok);
+      box-shadow:0 0 0 4px rgba(4,120,87,0.12);
+    }
+    .balance-pill.bad{
+      color:var(--warn);
+      background:#fff7ed;
+      border-color:#fdba74;
+    }
+    .balance-pill.bad .dot{
+      background:#d97706;
+      box-shadow:0 0 0 4px rgba(217,119,6,0.14);
+    }
+    .tb-clarify{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--slate-200);
+      background:var(--slate-50);
+      color:#475569;
+      font-size:14px;
+    }
 
     @media (max-width: 640px) {
       .trial-balance-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
@@ -278,12 +313,27 @@
         <button type="submit" class="tb-apply">Apply</button>
       </div>
     </form>
+
+    <div class="tb-clarify">
+      This report currently reflects net journal balances for the selected date range.
+    </div>
   </div>
 
   <div class="tb-card">
     <div class="tb-head">
       <div>
-        <div class="tb-head-title">Trial balance from {{ date_from|date:"d M Y" }} to {{ date_to|date:"d M Y" }}</div>
+        <div class="tb-head-title">Trial Balance</div>
+        <div class="tb-head-sub">
+          {% if date_from and date_to %}
+            Date range: {{ date_from|date:"d M Y" }} to {{ date_to|date:"d M Y" }}
+          {% elif date_from %}
+            Date range: from {{ date_from|date:"d M Y" }}
+          {% elif date_to %}
+            Date range: up to {{ date_to|date:"d M Y" }}
+          {% else %}
+            Date range: all journal dates
+          {% endif %}
+        </div>
         <div class="tb-head-sub">Total debits should equal total credits for a balanced ledger.</div>
       </div>
       <div class="tb-tools no-print">
@@ -341,9 +391,13 @@
     </div>
 
     <div class="totals-strip">
+      <span class="balance-pill {% if not is_balanced %}bad{% endif %}">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Balance Check: {{ balance_status }}</span>
+      </span>
       <span>Debit Total: <strong>{{ total_debits|floatformat:2 }}</strong></span>
       <span>Credit Total: <strong>{{ total_credits|floatformat:2 }}</strong></span>
-      <span class="eq">Expected: Debit = Credit</span>
+      <span class="eq">Difference: <strong>{{ difference|floatformat:2 }}</strong></span>
     </div>
   </div>
 

@@ -2168,14 +2168,7 @@ def party_adjustments_net(party, as_of):
 @staff_blocked
 def customer_balances(request):
     """
-    Per-customer balances as of a given date.
-
-    Formula (per customer):
-        opening  (Dr = +, Cr = -)
-      + total_sales
-      - total_receipts
-      + adjustments_net (DR +, CR -)
-      = net balance (Dr positive, Cr negative)
+    Per-customer balances as of a given date, aligned with party statement logic.
     """
     as_of_str = request.GET.get("date")
     if as_of_str:
@@ -2192,82 +2185,50 @@ def customer_balances(request):
         Party.objects.filter(owner=request.owner, party_type="CUSTOMER", is_active=True)
         .order_by("name")
     )
-    invoices_by_customer = (
-        SalesInvoice.objects.filter(
-            owner=request.owner,
-            posted=True,
-            invoice_date__lte=as_of,
-            customer__party_type="CUSTOMER",
-            customer__is_active=True,
-        )
-        .select_related("customer")
-        .prefetch_related("items")
-    )
-    receipts_by_customer = (
-        Payment.objects.filter(
-            owner=request.owner,
-            direction="IN",
-            posted=True,
-            is_adjustment=False,
-            date__lte=as_of,
-            party__party_type="CUSTOMER",
-            party__is_active=True,
-        )
-        .values("party_id")
-        .annotate(total=Coalesce(Sum("amount"), Decimal("0")))
-    )
-    receipts_map = {r["party_id"]: (r["total"] or Decimal("0")) for r in receipts_by_customer}
-
-    invoices_map = {}
-    for inv in invoices_by_customer:
-        cid = inv.customer_id
-        invoices_map.setdefault(cid, []).append(inv)
 
     rows = []
     grand_opening = Decimal("0")
-    grand_sales = Decimal("0")
-    grand_receipts = Decimal("0")
     grand_balance = Decimal("0")
 
     for cust in customers:
-        opening = cust.opening_balance or Decimal("0")
-        if not cust.opening_balance_is_debit:
-            opening = -opening
+        ledger = build_party_ledger_for_owner(
+            owner=owner,
+            party=cust,
+            date_from=None,
+            date_to=as_of,
+        )
+        raw_rows = ledger.get("rows", [])
+        opening_row = raw_rows[0] if raw_rows and raw_rows[0].get("type") == "OPENING" else None
 
-        total_sales = Decimal("0")
-        for inv in invoices_map.get(cust.id, []):
-            total_sales += inv.calculate_total()
+        opening_abs = Decimal(str(opening_row.get("balance", "0"))) if opening_row else Decimal("0")
+        opening_side = opening_row.get("balance_side", "DR") if opening_row else "DR"
+        opening_signed = opening_abs if opening_side == "DR" else -opening_abs
 
-        receipts_total = receipts_map.get(cust.id, Decimal("0"))
-
-        adj_net = party_adjustments_net(cust, as_of)
-
-        net = opening + total_sales - receipts_total + adj_net
-        balance_type = "Dr" if net >= 0 else "Cr"
-        balance_abs = abs(net)
+        balance_abs = Decimal(ledger.get("closing_balance", "0"))
+        balance_type = ledger.get("closing_side", "DR")
+        net = balance_abs if balance_type == "DR" else -balance_abs
 
         rows.append({
             "party": cust,
-            "opening": opening,
-            "sales": total_sales,
-            "receipts": receipts_total,
-            "adjustments": adj_net,
+            "opening_abs": opening_abs,
+            "opening_side": opening_side,
             "net": net,
             "net_abs": balance_abs,
             "net_type": balance_type,
         })
 
-        grand_opening += opening
-        grand_sales += total_sales
-        grand_receipts += receipts_total
+        grand_opening += opening_signed
         grand_balance += net
+
+    grand_opening_abs = abs(grand_opening)
+    grand_opening_type = "Dr" if grand_opening >= 0 else "Cr"
 
     context = {
         "as_of": as_of,
         "rows": rows,
         "grand_opening": grand_opening,
-        "grand_sales": grand_sales,
-        "grand_receipts": grand_receipts,
+        "grand_opening_abs": grand_opening_abs,
+        "grand_opening_type": grand_opening_type,
         "grand_balance": grand_balance,
         "grand_balance_abs": abs(grand_balance),
         "grand_balance_type": "Dr" if grand_balance >= 0 else "Cr",
@@ -2621,16 +2582,47 @@ def party_statement(request, pk):
     date_from = parse_date(from_str) if from_str else None
     date_to = parse_date(to_str) if to_str else None
 
-    rows, opening_balance, closing_balance = build_party_ledger(
-        party, date_from=date_from, date_to=date_to
+    ledger = build_party_ledger_for_owner(
+        owner=request.owner,
+        party=party,
+        date_from=date_from,
+        date_to=date_to,
     )
+
+    raw_rows = ledger.get("rows", [])
+    opening_row = raw_rows[0] if raw_rows and raw_rows[0].get("type") == "OPENING" else None
+    rows = raw_rows[1:] if opening_row else raw_rows
+
+    opening_balance = Decimal(str(opening_row.get("balance", "0"))) if opening_row else Decimal("0")
+    opening_side = opening_row.get("balance_side", "DR") if opening_row else "DR"
+    opening_is_debit = (opening_side == "DR")
+
+    closing_balance = Decimal(ledger.get("closing_balance", "0"))
+    closing_side = ledger.get("closing_side", "DR")
+    closing_is_debit = (closing_side == "DR")
+
+    normalized_rows = []
+    for row in rows:
+        normalized_rows.append(
+            {
+                "date": parse_date(row["date"]) if row.get("date") else None,
+                "description": row.get("description") or "",
+                "debit": Decimal(str(row.get("debit", 0) or 0)),
+                "credit": Decimal(str(row.get("credit", 0) or 0)),
+                "balance": Decimal(str(row.get("balance", 0) or 0)),
+                "balance_side": row.get("balance_side", "DR"),
+            }
+        )
 
     context = {
         "party": party,
-        "rows": rows,
+        "rows": normalized_rows,
         "opening_balance": opening_balance,
-        "opening_is_debit": party.opening_balance_is_debit,
+        "opening_is_debit": opening_is_debit,
+        "opening_side": opening_side,
         "closing_balance": closing_balance,
+        "closing_is_debit": closing_is_debit,
+        "closing_side": closing_side,
         "date_from": date_from,
         "date_to": date_to,
         "from_str": from_str,
@@ -2940,10 +2932,17 @@ def trial_balance(request):
 
     rows.sort(key=lambda r: r["account"].code)
 
+    difference = total_debits - total_credits
+    is_balanced = difference == Decimal("0")
+    balance_status = "Balanced" if is_balanced else "Out of Balance"
+
     context = {
         "rows": rows,
         "total_debits": total_debits,
         "total_credits": total_credits,
+        "difference": difference,
+        "is_balanced": is_balanced,
+        "balance_status": balance_status,
         "date_from": date_from,
         "date_to": date_to,
     }
@@ -3626,6 +3625,11 @@ def balance_sheet(request):
                 equity.append({"account": account, "amount": balance})
                 total_equity += balance
 
+    total_liabilities_and_equity = total_liabilities + total_equity
+    balance_difference = total_assets - total_liabilities_and_equity
+    is_balanced = balance_difference == Decimal("0")
+    balance_status = "Balanced" if is_balanced else "Out of Balance"
+
     context = {
         "as_of": date_to,
         "assets": assets,
@@ -3634,6 +3638,10 @@ def balance_sheet(request):
         "total_assets": total_assets,
         "total_liabilities": total_liabilities,
         "total_equity": total_equity,
+        "total_liabilities_and_equity": total_liabilities_and_equity,
+        "balance_difference": balance_difference,
+        "is_balanced": is_balanced,
+        "balance_status": balance_status,
     }
     return render(request, "core/balance_sheet.html", context)
 
