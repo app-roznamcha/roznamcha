@@ -3094,6 +3094,94 @@ def profit_loss(request):
         },
     ]
 
+    smart_insights = []
+    insight_limit = 5
+    min_abs_change = Decimal("1000.00")
+    min_percent_change = Decimal("5.00")
+
+    def add_metric_insight(key, title, positive_message, negative_message, neutral_type="neutral"):
+        if len(smart_insights) >= insight_limit:
+            return
+        current_value = current_metrics[key]
+        previous_value = previous_metrics[key]
+        change_value = current_value - previous_value
+        pct_value = percent_change(current_value, previous_value)
+
+        if previous_value == 0 and current_value == 0:
+            return
+        if abs(change_value) < min_abs_change:
+            return
+        if pct_value is not None and abs(pct_value) < min_percent_change:
+            return
+
+        if previous_value == 0 and current_value != 0:
+            message = f"{title} was recorded in this period, compared to no activity in the previous period."
+        elif change_value > 0:
+            message = positive_message.format(percent=abs(pct_value or Decimal("0")).quantize(Decimal("0.1")))
+        else:
+            message = negative_message.format(percent=abs(pct_value or Decimal("0")).quantize(Decimal("0.1")))
+
+        insight_type = neutral_type
+        if change_value > 0:
+            insight_type = "positive"
+        elif change_value < 0:
+            insight_type = "negative"
+
+        smart_insights.append(
+            {
+                "type": insight_type,
+                "title": title,
+                "message": message,
+            }
+        )
+
+    add_metric_insight(
+        "net_profit",
+        "Profit Trend",
+        "Net operational profit improved by {percent}%.",
+        "Net operational profit declined by {percent}%.",
+    )
+    add_metric_insight(
+        "net_sales",
+        "Sales Trend",
+        "Net sales increased by {percent}% compared to the previous period.",
+        "Net sales decreased by {percent}% compared to the previous period.",
+    )
+    add_metric_insight(
+        "purchase_basis",
+        "Purchase Activity",
+        "Purchase activity was higher this period, which may reduce short-term profit.",
+        "Purchase activity was lower than the previous period.",
+        neutral_type="warning",
+    )
+    add_metric_insight(
+        "operating_expenses",
+        "Expense Trend",
+        "Operating expenses increased compared to the previous period.",
+        "Operating expenses decreased compared to the previous period.",
+        neutral_type="warning",
+    )
+    if len(smart_insights) < insight_limit and current_metrics["stock_writeoff_expense"] > 0:
+        stock_message = "Stock write-off expense was recorded in this period."
+        if previous_metrics["stock_writeoff_expense"] == 0:
+            stock_message = "Stock write-off expense was recorded in this period, compared to none in the previous period."
+        smart_insights.append(
+            {
+                "type": "warning",
+                "title": "Stock Loss",
+                "message": stock_message,
+            }
+        )
+
+    if not smart_insights:
+        smart_insights = [
+            {
+                "type": "neutral",
+                "title": "Stable Period",
+                "message": "No major changes detected for this period.",
+            }
+        ]
+
     summary_chart_data = [
         {"label": "Gross Sales", "value": float(gross_sales)},
         {"label": "Purchase Basis", "value": float(purchase_basis)},
@@ -3368,6 +3456,46 @@ def profit_loss(request):
         )
     ]
 
+    root_cause_insights = []
+    if top_selling_products and top_selling_products[0]["net_sales"] > 0:
+        root_cause_insights.append(
+            {
+                "type": "info",
+                "title": "Sales Driver",
+                "message": f'Sales activity was mainly driven by {top_selling_products[0]["product_name"]}.',
+            }
+        )
+    if purchase_basis_by_product and purchase_basis_by_product[0]["net_purchase_basis"] > 0 and len(root_cause_insights) < 3:
+        root_cause_insights.append(
+            {
+                "type": "info",
+                "title": "Purchase Driver",
+                "message": f'Purchase activity was highest for {purchase_basis_by_product[0]["product_name"]}.',
+            }
+        )
+    if expense_breakdown and expense_breakdown[0]["amount"] > 0 and len(root_cause_insights) < 3:
+        root_cause_insights.append(
+            {
+                "type": "info",
+                "title": "Expense Driver",
+                "message": f'The largest expense category was {expense_breakdown[0]["label"]}.',
+            }
+        )
+    if stock_writeoff_breakdown and stock_writeoff_breakdown[0]["amount"] > 0 and len(root_cause_insights) < 3:
+        root_cause_insights.append(
+            {
+                "type": "info",
+                "title": "Stock Loss Driver",
+                "message": f'Stock loss was mainly due to {stock_writeoff_breakdown[0]["product_name"]}.',
+            }
+        )
+
+    if smart_insights and smart_insights[0]["title"] == "Stable Period" and root_cause_insights:
+        smart_insights = root_cause_insights
+    else:
+        remaining_slots = max(0, insight_limit - len(smart_insights))
+        smart_insights.extend(root_cause_insights[:remaining_slots])
+
     context = {
         "date_from": date_from,
         "date_to": date_to,
@@ -3384,6 +3512,7 @@ def profit_loss(request):
         "previous_date_to": previous_date_to,
         "comparison_rows": comparison_rows,
         "comparison_highlights": comparison_highlights,
+        "smart_insights": smart_insights,
         "summary_chart_data": summary_chart_data,
         "trend_chart_data": trend_chart_data,
         "top_selling_products": top_selling_products,

@@ -234,6 +234,50 @@
       background:var(--loss-soft);
       color:var(--loss);
     }
+    .insights-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:20px;
+    }
+    .insight-card{
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      padding:14px 16px;
+      background:#fff;
+      box-shadow:0 6px 16px rgba(15,23,42,0.05);
+    }
+    .insight-card.positive{
+      border-color:#86efac;
+      background:var(--profit-soft);
+    }
+    .insight-card.negative{
+      border-color:#fca5a5;
+      background:var(--loss-soft);
+    }
+    .insight-card.warning{
+      border-color:#fcd34d;
+      background:#fffbeb;
+    }
+    .insight-card.info{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+    }
+    .insight-card.neutral{
+      border-color:var(--slate-200);
+      background:var(--slate-50);
+    }
+    .insight-title{
+      font-size:14px;
+      font-weight:800;
+      color:var(--slate-900);
+      margin-bottom:6px;
+    }
+    .insight-message{
+      font-size:14px;
+      line-height:1.55;
+      color:var(--slate-700);
+    }
 
     .section-grid{
       display:grid;
@@ -374,6 +418,7 @@
     }
 
     @media (max-width:800px){
+      .insights-grid,
       .comparison-grid,
       .section-grid,
       .breakdown-grid,
@@ -509,6 +554,23 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
+  {% endif %}
+
+  {% if smart_insights %}
+    <div class="opr-card">
+      <div class="opr-card-head">
+        <div class="opr-card-title">Smart Insights</div>
+        <div class="opr-card-sub">Automatic commentary based on the current and previous period results.</div>
+      </div>
+      <div class="insights-grid">
+        {% for insight in smart_insights %}
+          <div class="insight-card {{ insight.type }}">
+            <div class="insight-title">{{ insight.title }}</div>
+            <div class="insight-message">{{ insight.message }}</div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   {% endif %}
 
