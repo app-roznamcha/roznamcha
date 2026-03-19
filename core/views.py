@@ -2294,18 +2294,7 @@ def customer_balances(request):
 @staff_blocked
 def supplier_balances(request):
     """
-    Per-supplier balances as of a given date.
-
-    Consistent with dashboard logic:
-
-        opening  (Dr = +, Cr = -)
-      + total_purchases
-      - payments_out (excluding adjustments)
-      - total_purchase_returns
-      + adjustments_net (CR increases payable, DR decreases payable)
-      = net (Dr positive, Cr negative)
-
-    Where adjustments_net = supplier_adj_cr - supplier_adj_dr
+    Per-supplier balances as of a given date, aligned with party statement logic.
     """
     as_of_str = request.GET.get("date")
     if as_of_str:
@@ -2323,141 +2312,49 @@ def supplier_balances(request):
         .order_by("name")
     )
 
-    purchases_qs = (
-        PurchaseInvoice.objects.filter(
-            owner=request.owner,
-            posted=True,
-            invoice_date__lte=as_of,
-            supplier__party_type="SUPPLIER",
-        )
-        .select_related("supplier")
-        .prefetch_related("items")
-    )
-
-    returns_qs = (
-        PurchaseReturn.objects.filter(
-            owner=request.owner,
-            posted=True,
-            return_date__lte=as_of,
-            supplier__party_type="SUPPLIER",
-        )
-        .select_related("supplier")
-        .prefetch_related("items")
-    )
-    payments_out_qs = (
-        Payment.objects.filter(
-            owner=request.owner,
-            direction="OUT",
-            posted=True,
-            date__lte=as_of,
-            is_adjustment=False,
-            party__party_type="SUPPLIER",
-        )
-        .values("party_id")
-        .annotate(total=Coalesce(Sum("amount"), Decimal("0")))
-    )
-    payments_out_map = {
-        r["party_id"]: (r["total"] or Decimal("0"))
-        for r in payments_out_qs
-    }
-
-    adj_cr_qs = (
-        Payment.objects.filter(
-            owner=request.owner,
-            posted=True,
-            is_adjustment=True,
-            adjustment_side="CR",
-            date__lte=as_of,
-            party__party_type="SUPPLIER",
-        )
-        .values("party_id")
-        .annotate(total=Coalesce(Sum("amount"), Decimal("0")))
-    )
-    adj_cr_map = {r["party_id"]: (r["total"] or Decimal("0")) for r in adj_cr_qs}
-
-    adj_dr_qs = (
-        Payment.objects.filter(
-            owner=request.owner,
-            posted=True,
-            is_adjustment=True,
-            adjustment_side="DR",
-            date__lte=as_of,
-            party__party_type="SUPPLIER",
-        )
-        .values("party_id")
-        .annotate(total=Coalesce(Sum("amount"), Decimal("0")))
-    )
-    adj_dr_map = {r["party_id"]: (r["total"] or Decimal("0")) for r in adj_dr_qs}
-
-    purchases_map = {}
-    for inv in purchases_qs:
-        sid = inv.supplier_id
-        purchases_map.setdefault(sid, []).append(inv)
-
-    returns_map = {}
-    for ret in returns_qs:
-        sid = ret.supplier_id
-        returns_map.setdefault(sid, []).append(ret)
-
     rows = []
     grand_opening = Decimal("0")
-    grand_purchases = Decimal("0")
-    grand_returns = Decimal("0")
-    grand_payments = Decimal("0")
-    grand_adjustments = Decimal("0")
     grand_balance = Decimal("0")
 
     for supp in suppliers:
-        opening = supp.opening_balance or Decimal("0")
-        if not supp.opening_balance_is_debit:
-            opening = -opening
+        ledger = build_party_ledger_for_owner(
+            owner=owner,
+            party=supp,
+            date_from=None,
+            date_to=as_of,
+        )
+        raw_rows = ledger.get("rows", [])
+        opening_row = raw_rows[0] if raw_rows and raw_rows[0].get("type") == "OPENING" else None
 
-        total_purchases = Decimal("0")
-        for inv in purchases_map.get(supp.id, []):
-            total_purchases += inv.calculate_total()
+        opening_abs = Decimal(str(opening_row.get("balance", "0"))) if opening_row else Decimal("0")
+        opening_side = opening_row.get("balance_side", "CR") if opening_row else "CR"
+        opening_signed = opening_abs if opening_side == "DR" else -opening_abs
 
-        total_returns = Decimal("0")
-        for ret in returns_map.get(supp.id, []):
-            total_returns += ret.calculate_total()
-
-        payments_out_total = payments_out_map.get(supp.id, Decimal("0"))
-
-        supplier_adj_cr = adj_cr_map.get(supp.id, Decimal("0"))
-        supplier_adj_dr = adj_dr_map.get(supp.id, Decimal("0"))
-        adj_net = supplier_adj_cr - supplier_adj_dr
-
-        net = opening + total_purchases - payments_out_total - total_returns + adj_net
-
-        balance_type = "Dr" if net >= 0 else "Cr"
-        balance_abs = abs(net)
+        balance_abs = Decimal(ledger.get("closing_balance", "0"))
+        balance_type = ledger.get("closing_side", "CR")
+        net = balance_abs if balance_type == "DR" else -balance_abs
 
         rows.append({
             "party": supp,
-            "opening": opening,
-            "purchases": total_purchases,
-            "returns": total_returns,
-            "payments": payments_out_total,
-            "adjustments": adj_net,
+            "opening_abs": opening_abs,
+            "opening_side": opening_side,
             "net": net,
             "net_abs": balance_abs,
             "net_type": balance_type,
         })
 
-        grand_opening += opening
-        grand_purchases += total_purchases
-        grand_returns += total_returns
-        grand_payments += payments_out_total
-        grand_adjustments += adj_net
+        grand_opening += opening_signed
         grand_balance += net
+
+    grand_opening_abs = abs(grand_opening)
+    grand_opening_type = "Dr" if grand_opening >= 0 else "Cr"
 
     context = {
         "as_of": as_of,
         "rows": rows,
         "grand_opening": grand_opening,
-        "grand_purchases": grand_purchases,
-        "grand_returns": grand_returns,
-        "grand_payments": grand_payments,
-        "grand_adjustments": grand_adjustments,
+        "grand_opening_abs": grand_opening_abs,
+        "grand_opening_type": grand_opening_type,
         "grand_balance": grand_balance,
         "grand_balance_abs": abs(grand_balance),
         "grand_balance_type": "Dr" if grand_balance >= 0 else "Cr",
@@ -2692,7 +2589,7 @@ def customer_ledger(request):
     Customer Ledger screen:
     - Dropdown to pick a customer
     - Optional date range
-    - Shows running balance from opening balance + sales + payments
+    - Shows running balance using the same source of truth as party statement
     """
     customers = (
         Party.objects.filter(owner=request.owner, party_type="CUSTOMER", is_active=True)
@@ -2720,24 +2617,52 @@ def customer_ledger(request):
             party_type="CUSTOMER",
             is_active=True,
         )
-        rows, opening_balance, closing_balance = build_party_ledger(
-            selected_customer,
+        ledger = build_party_ledger_for_owner(
+            owner=request.owner,
+            party=selected_customer,
             date_from=date_from,
             date_to=date_to,
         )
-        closing_is_debit = (closing_balance >= 0)
+        raw_rows = ledger.get("rows", [])
+        opening_row = raw_rows[0] if raw_rows and raw_rows[0].get("type") == "OPENING" else None
+        entry_rows = raw_rows[1:] if opening_row else raw_rows
+
+        opening_balance = Decimal(str(opening_row.get("balance", "0"))) if opening_row else Decimal("0")
+        opening_side = opening_row.get("balance_side", "DR") if opening_row else "DR"
+        opening_is_debit = (opening_side == "DR")
+
+        closing_balance = Decimal(ledger.get("closing_balance", "0"))
+        closing_side = ledger.get("closing_side", "DR")
+        closing_is_debit = (closing_side == "DR")
+
+        normalized_rows = []
+        for row in entry_rows:
+            normalized_rows.append(
+                {
+                    "date": parse_date(row["date"]) if row.get("date") else None,
+                    "description": row.get("description") or "",
+                    "debit": Decimal(str(row.get("debit", 0) or 0)),
+                    "credit": Decimal(str(row.get("credit", 0) or 0)),
+                    "balance": Decimal(str(row.get("balance", 0) or 0)),
+                    "balance_side": row.get("balance_side", "DR"),
+                }
+            )
+        rows = normalized_rows
+    else:
+        opening_side = "DR"
+        closing_side = "DR"
+        opening_is_debit = True
 
     context = {
         "customers": customers,
         "selected_customer": selected_customer,
         "rows": rows,
         "opening_balance": opening_balance,
-        "opening_is_debit": (
-            selected_customer.opening_balance_is_debit
-            if selected_customer else True
-        ),
+        "opening_is_debit": opening_is_debit,
+        "opening_side": opening_side,
         "closing_balance": closing_balance,
         "closing_is_debit": closing_is_debit,
+        "closing_side": closing_side,
         "date_from": date_from,
         "date_to": date_to,
     }
@@ -2752,7 +2677,7 @@ def supplier_ledger(request):
     Supplier Ledger screen:
     - Dropdown to pick a supplier
     - Optional date range
-    - Shows running balance from opening balance + purchases + payments
+    - Shows running balance using the same source of truth as party statement
     """
     owner = request.owner
 
@@ -2781,24 +2706,52 @@ def supplier_ledger(request):
             party_type="SUPPLIER",
             is_active=True,
         )
-        rows, opening_balance, closing_balance = build_party_ledger(
-            selected_supplier,
+        ledger = build_party_ledger_for_owner(
+            owner=request.owner,
+            party=selected_supplier,
             date_from=date_from,
             date_to=date_to,
         )
-        closing_is_debit = (closing_balance >= 0)
+        raw_rows = ledger.get("rows", [])
+        opening_row = raw_rows[0] if raw_rows and raw_rows[0].get("type") == "OPENING" else None
+        entry_rows = raw_rows[1:] if opening_row else raw_rows
+
+        opening_balance = Decimal(str(opening_row.get("balance", "0"))) if opening_row else Decimal("0")
+        opening_side = opening_row.get("balance_side", "CR") if opening_row else "CR"
+        opening_is_debit = (opening_side == "DR")
+
+        closing_balance = Decimal(ledger.get("closing_balance", "0"))
+        closing_side = ledger.get("closing_side", "CR")
+        closing_is_debit = (closing_side == "DR")
+
+        normalized_rows = []
+        for row in entry_rows:
+            normalized_rows.append(
+                {
+                    "date": parse_date(row["date"]) if row.get("date") else None,
+                    "description": row.get("description") or "",
+                    "debit": Decimal(str(row.get("debit", 0) or 0)),
+                    "credit": Decimal(str(row.get("credit", 0) or 0)),
+                    "balance": Decimal(str(row.get("balance", 0) or 0)),
+                    "balance_side": row.get("balance_side", "CR"),
+                }
+            )
+        rows = normalized_rows
+    else:
+        opening_side = "CR"
+        closing_side = "CR"
+        opening_is_debit = False
 
     context = {
         "suppliers": suppliers,
         "selected_supplier": selected_supplier,
         "rows": rows,
         "opening_balance": opening_balance,
-        "opening_is_debit": (
-            selected_supplier.opening_balance_is_debit
-            if selected_supplier else True
-        ),
+        "opening_is_debit": opening_is_debit,
+        "opening_side": opening_side,
         "closing_balance": closing_balance,
         "closing_is_debit": closing_is_debit,
+        "closing_side": closing_side,
         "date_from": date_from,
         "date_to": date_to,
     }

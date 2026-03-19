@@ -305,16 +305,38 @@
 
       <div class="meta-grid">
         <div class="meta-pill">
-          <div class="meta-label">As Of</div>
-          <div class="meta-value">{% if date_to %}{{ date_to }}{% else %}All dates{% endif %}</div>
+          <div class="meta-label">Date Range</div>
+          <div class="meta-value">
+            {% if date_from and date_to %}
+              {{ date_from|date:"d M Y" }} to {{ date_to|date:"d M Y" }}
+            {% elif date_from %}
+              From {{ date_from|date:"d M Y" }}
+            {% elif date_to %}
+              Up to {{ date_to|date:"d M Y" }}
+            {% else %}
+              All dates
+            {% endif %}
+          </div>
         </div>
         <div class="meta-pill">
           <div class="meta-label">Opening Balance</div>
-          <div class="meta-value">{{ opening_balance|floatformat:2 }} {{ opening_is_debit|yesno:"Dr,Cr" }}</div>
+          <div class="meta-value">
+            {% if opening_balance and opening_balance != 0 %}
+              {{ opening_side }} {{ opening_balance|floatformat:2 }}
+            {% else %}
+              0.00
+            {% endif %}
+          </div>
         </div>
         <div class="meta-pill">
           <div class="meta-label">Closing Balance</div>
-          <div class="meta-value">{{ closing_balance|floatformat:2 }} {{ closing_is_debit|yesno:"Dr,Cr" }}</div>
+          <div class="meta-value">
+            {% if closing_balance and closing_balance != 0 %}
+              {{ closing_side }} {{ closing_balance|floatformat:2 }}
+            {% else %}
+              0.00
+            {% endif %}
+          </div>
         </div>
         <div class="meta-pill">
           <div class="meta-label">Rows</div>
@@ -368,7 +390,13 @@
                       {{ r.credit|floatformat:2 }}
                     {% endif %}
                   </td>
-                  <td class="right">{{ r.balance|floatformat:2 }}</td>
+                  <td class="right">
+                    {% if r.balance and r.balance != 0 %}
+                      {{ r.balance_side }} {{ r.balance|floatformat:2 }}
+                    {% else %}
+                      0.00
+                    {% endif %}
+                  </td>
                 </tr>
               {% endfor %}
             {% else %}

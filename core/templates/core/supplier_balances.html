@@ -211,7 +211,7 @@
   <div class="sb-hero">
     <div>
       <h1 class="sb-title">Supplier Balances</h1>
-      <p class="sb-sub">View supplier-wise opening balance, purchases, payments, and net payable/advance as of a specific date.</p>
+      <p class="sb-sub">See each supplier's opening position and closing ledger balance as of the selected date, using the same statement logic as the party ledger.</p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <a href="{% url 'dashboard' %}" class="sb-btn">← Dashboard</a>
@@ -251,7 +251,7 @@
   <div class="sb-card">
     <div class="sb-card-head">
       <div class="sb-card-title">Supplier-wise balances as of {{ as_of|date:"d M Y" }}</div>
-      <div class="sb-card-sub">Positive balance with <strong>Dr</strong> means advance paid to supplier; with <strong>Cr</strong> means amount payable.</div>
+      <div class="sb-card-sub">A <strong>Dr</strong> balance means advance paid to supplier. A <strong>Cr</strong> balance means amount payable.</div>
     </div>
 
     <div class="tbl-wrap">
@@ -260,11 +260,10 @@
           <tr>
             <th style="width:5%;">#</th>
             <th>Supplier</th>
-            <th class="right" style="width:15%;">Opening (Dr/Cr)</th>
-            <th class="right" style="width:15%;">Purchases</th>
-            <th class="right" style="width:15%;">Payments</th>
-            <th class="right" style="width:15%;">Balance</th>
+            <th class="right" style="width:18%;">Opening Position</th>
+            <th class="right" style="width:15%;">Closing Balance</th>
             <th class="center" style="width:8%;">Dr/Cr</th>
+            <th class="center" style="width:10%;">Statement</th>
           </tr>
         </thead>
         <tbody>
@@ -272,28 +271,42 @@
             <tr class="balance-row" data-type="{{ row.net_type }}">
               <td>{{ forloop.counter }}</td>
               <td class="supplier-name">{{ row.party.name }}</td>
-              <td class="right">{{ row.opening|floatformat:2 }}</td>
-              <td class="right">{{ row.purchases|floatformat:2 }}</td>
-              <td class="right">{{ row.payments|floatformat:2 }}</td>
+              <td class="right">
+                {% if row.opening_abs and row.opening_abs != 0 %}
+                  {{ row.opening_side }} {{ row.opening_abs|floatformat:2 }}
+                {% else %}
+                  0.00
+                {% endif %}
+              </td>
               <td class="right">{{ row.net_abs|floatformat:2 }}</td>
               <td class="center">
                 <span class="bal-pill {% if row.net_type == 'DR' %}dr{% else %}cr{% endif %}">{{ row.net_type }}</span>
               </td>
+              <td class="center">
+                <a href="{% url 'party_statement' row.party.id %}?to={{ as_of|date:'Y-m-d' }}" style="color:#2563eb;text-decoration:none;font-weight:600;">
+                  View
+                </a>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="7" style="padding:10px 9px;font-size:14px;color:#6b7280;">No suppliers found.</td>
+              <td colspan="6" style="padding:10px 9px;font-size:14px;color:#6b7280;">No suppliers found.</td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
             <th colspan="2" class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">Grand Totals:</th>
-            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_opening|floatformat:2 }}</th>
-            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_purchases|floatformat:2 }}</th>
-            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_payments|floatformat:2 }}</th>
+            <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">
+              {% if grand_opening_abs and grand_opening_abs != 0 %}
+                {{ grand_opening_type }} {{ grand_opening_abs|floatformat:2 }}
+              {% else %}
+                0.00
+              {% endif %}
+            </th>
             <th class="right" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_abs|floatformat:2 }}</th>
             <th class="center" style="border-top:2px solid #e5e7eb;padding:7px 9px;">{{ grand_balance_type }}</th>
+            <th class="center" style="border-top:2px solid #e5e7eb;padding:7px 9px;">—</th>
           </tr>
         </tfoot>
       </table>
