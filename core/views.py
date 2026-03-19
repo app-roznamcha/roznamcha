@@ -3016,6 +3016,280 @@ def profit_loss(request):
 
     net_profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
 
+    summary_chart_data = [
+        {"label": "Gross Sales", "value": float(gross_sales)},
+        {"label": "Purchase Basis", "value": float(purchase_basis)},
+        {"label": "Operating Expenses", "value": float(operating_expenses)},
+        {"label": "Stock Write-off", "value": float(stock_writeoff_expense)},
+        {"label": "Net Profit", "value": float(net_profit)},
+    ]
+
+    sales_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        SalesInvoiceItem.objects.filter(
+            owner=owner,
+            sales_invoice__owner=owner,
+            sales_invoice__posted=True,
+            sales_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .values("sales_invoice__invoice_date")
+        .annotate(total=Coalesce(Sum(line_total_expr), zero))
+    ):
+        sales_by_day[row["sales_invoice__invoice_date"]] = row["total"] or Decimal("0.00")
+
+    sales_returns_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        SalesReturnItem.objects.filter(
+            owner=owner,
+            sales_return__owner=owner,
+            sales_return__posted=True,
+            sales_return__return_date__range=(date_from, date_to),
+        )
+        .values("sales_return__return_date")
+        .annotate(total=Coalesce(Sum(line_total_expr), zero))
+    ):
+        sales_returns_by_day[row["sales_return__return_date"]] = row["total"] or Decimal("0.00")
+
+    purchase_items_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        PurchaseInvoiceItem.objects.filter(
+            owner=owner,
+            purchase_invoice__owner=owner,
+            purchase_invoice__posted=True,
+            purchase_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .values("purchase_invoice__invoice_date")
+        .annotate(total=Coalesce(Sum(line_total_expr), zero))
+    ):
+        purchase_items_by_day[row["purchase_invoice__invoice_date"]] = row["total"] or Decimal("0.00")
+
+    purchase_charges_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        PurchaseInvoice.objects.filter(
+            owner=owner,
+            posted=True,
+            invoice_date__range=(date_from, date_to),
+        )
+        .values("invoice_date")
+        .annotate(total=Coalesce(Sum(purchase_charges_expr), zero))
+    ):
+        purchase_charges_by_day[row["invoice_date"]] = row["total"] or Decimal("0.00")
+
+    purchase_returns_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        PurchaseReturnItem.objects.filter(
+            owner=owner,
+            purchase_return__owner=owner,
+            purchase_return__posted=True,
+            purchase_return__return_date__range=(date_from, date_to),
+        )
+        .values("purchase_return__return_date")
+        .annotate(total=Coalesce(Sum(line_total_expr), zero))
+    ):
+        purchase_returns_by_day[row["purchase_return__return_date"]] = row["total"] or Decimal("0.00")
+
+    expenses_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        DailyExpense.objects.filter(
+            owner=owner,
+            posted=True,
+            date__range=(date_from, date_to),
+        )
+        .values("date")
+        .annotate(total=Coalesce(Sum("amount"), zero))
+    ):
+        expenses_by_day[row["date"]] = row["total"] or Decimal("0.00")
+
+    stock_writeoff_by_day = defaultdict(lambda: Decimal("0.00"))
+    for row in (
+        StockAdjustment.objects.filter(
+            owner=owner,
+            posted=True,
+            direction="DOWN",
+            date__range=(date_from, date_to),
+        )
+        .values("date")
+        .annotate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
+    ):
+        stock_writeoff_by_day[row["date"]] = row["total"] or Decimal("0.00")
+
+    trend_chart_data = []
+    current_day = date_from
+    while current_day <= date_to:
+        daily_net_sales = sales_by_day[current_day] - sales_returns_by_day[current_day]
+        daily_purchase_basis = (
+            purchase_items_by_day[current_day]
+            + purchase_charges_by_day[current_day]
+            - purchase_returns_by_day[current_day]
+        )
+        daily_profit = (
+            daily_net_sales
+            - daily_purchase_basis
+            - expenses_by_day[current_day]
+            - stock_writeoff_by_day[current_day]
+        )
+        trend_chart_data.append(
+            {
+                "date": current_day.isoformat(),
+                "profit": float(daily_profit),
+            }
+        )
+        current_day += timedelta(days=1)
+
+    sales_product_rows = {}
+    for row in (
+        SalesInvoiceItem.objects.filter(
+            owner=owner,
+            sales_invoice__owner=owner,
+            sales_invoice__posted=True,
+            sales_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .values("product_id", "product__code", "product__name")
+        .annotate(
+            gross_sales=Coalesce(Sum(line_total_expr), zero),
+            quantity_sold=Coalesce(Sum("quantity_units"), Decimal("0.000")),
+        )
+    ):
+        sales_product_rows[row["product_id"]] = {
+            "product_id": row["product_id"],
+            "product_name": f'{row["product__code"]} - {row["product__name"]}',
+            "gross_sales": row["gross_sales"] or Decimal("0.00"),
+            "sales_returns": Decimal("0.00"),
+            "net_sales": row["gross_sales"] or Decimal("0.00"),
+            "quantity_sold": row["quantity_sold"] or Decimal("0.000"),
+        }
+
+    for row in (
+        SalesReturnItem.objects.filter(
+            owner=owner,
+            sales_return__owner=owner,
+            sales_return__posted=True,
+            sales_return__return_date__range=(date_from, date_to),
+        )
+        .values("product_id", "product__code", "product__name")
+        .annotate(
+            sales_returns=Coalesce(Sum(line_total_expr), zero),
+            quantity_returned=Coalesce(Sum("quantity_units"), Decimal("0.000")),
+        )
+    ):
+        item = sales_product_rows.setdefault(
+            row["product_id"],
+            {
+                "product_id": row["product_id"],
+                "product_name": f'{row["product__code"]} - {row["product__name"]}',
+                "gross_sales": Decimal("0.00"),
+                "sales_returns": Decimal("0.00"),
+                "net_sales": Decimal("0.00"),
+                "quantity_sold": Decimal("0.000"),
+            },
+        )
+        item["sales_returns"] += row["sales_returns"] or Decimal("0.00")
+        item["quantity_sold"] -= row["quantity_returned"] or Decimal("0.000")
+        item["net_sales"] = item["gross_sales"] - item["sales_returns"]
+
+    top_selling_products = sorted(
+        sales_product_rows.values(),
+        key=lambda item: (item["net_sales"], item["gross_sales"]),
+        reverse=True,
+    )[:10]
+
+    purchase_product_rows = {}
+    for row in (
+        PurchaseInvoiceItem.objects.filter(
+            owner=owner,
+            purchase_invoice__owner=owner,
+            purchase_invoice__posted=True,
+            purchase_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .values("product_id", "product__code", "product__name")
+        .annotate(
+            purchase_total=Coalesce(Sum(line_total_expr), zero),
+            quantity_purchased=Coalesce(Sum("quantity_units"), Decimal("0.000")),
+        )
+    ):
+        purchase_product_rows[row["product_id"]] = {
+            "product_id": row["product_id"],
+            "product_name": f'{row["product__code"]} - {row["product__name"]}',
+            "purchase_total": row["purchase_total"] or Decimal("0.00"),
+            "purchase_returns": Decimal("0.00"),
+            "net_purchase_basis": row["purchase_total"] or Decimal("0.00"),
+            "quantity_purchased": row["quantity_purchased"] or Decimal("0.000"),
+        }
+
+    for row in (
+        PurchaseReturnItem.objects.filter(
+            owner=owner,
+            purchase_return__owner=owner,
+            purchase_return__posted=True,
+            purchase_return__return_date__range=(date_from, date_to),
+        )
+        .values("product_id", "product__code", "product__name")
+        .annotate(
+            purchase_returns=Coalesce(Sum(line_total_expr), zero),
+            quantity_returned=Coalesce(Sum("quantity_units"), Decimal("0.000")),
+        )
+    ):
+        item = purchase_product_rows.setdefault(
+            row["product_id"],
+            {
+                "product_id": row["product_id"],
+                "product_name": f'{row["product__code"]} - {row["product__name"]}',
+                "purchase_total": Decimal("0.00"),
+                "purchase_returns": Decimal("0.00"),
+                "net_purchase_basis": Decimal("0.00"),
+                "quantity_purchased": Decimal("0.000"),
+            },
+        )
+        item["purchase_returns"] += row["purchase_returns"] or Decimal("0.00")
+        item["quantity_purchased"] -= row["quantity_returned"] or Decimal("0.000")
+        item["net_purchase_basis"] = item["purchase_total"] - item["purchase_returns"]
+
+    purchase_basis_by_product = sorted(
+        purchase_product_rows.values(),
+        key=lambda item: (item["net_purchase_basis"], item["purchase_total"]),
+        reverse=True,
+    )[:10]
+
+    expense_breakdown = [
+        {
+            "label": f'{row["expense_head__code"]} - {row["expense_head__name"]}',
+            "amount": row["amount"] or Decimal("0.00"),
+        }
+        for row in (
+            DailyExpense.objects.filter(
+                owner=owner,
+                posted=True,
+                date__range=(date_from, date_to),
+            )
+            .values("expense_head__code", "expense_head__name")
+            .annotate(amount=Coalesce(Sum("amount"), zero))
+            .order_by("-amount", "expense_head__code")
+        )
+    ]
+
+    stock_writeoff_breakdown = [
+        {
+            "product_id": row["product_id"],
+            "product_name": f'{row["product__code"]} - {row["product__name"]}',
+            "quantity": row["quantity"] or Decimal("0.000"),
+            "amount": row["amount"] or Decimal("0.00"),
+        }
+        for row in (
+            StockAdjustment.objects.filter(
+                owner=owner,
+                posted=True,
+                direction="DOWN",
+                date__range=(date_from, date_to),
+            )
+            .values("product_id", "product__code", "product__name")
+            .annotate(
+                quantity=Coalesce(Sum("qty"), Decimal("0.000")),
+                amount=Coalesce(Sum(stock_adjustment_amount_expr), zero),
+            )
+            .order_by("-amount", "product__code")
+        )
+    ]
+
     context = {
         "date_from": date_from,
         "date_to": date_to,
@@ -3027,6 +3301,12 @@ def profit_loss(request):
         "operating_expenses": operating_expenses,
         "stock_writeoff_expense": stock_writeoff_expense,
         "net_profit": net_profit,
+        "summary_chart_data": summary_chart_data,
+        "trend_chart_data": trend_chart_data,
+        "top_selling_products": top_selling_products,
+        "purchase_basis_by_product": purchase_basis_by_product,
+        "expense_breakdown": expense_breakdown,
+        "stock_writeoff_breakdown": stock_writeoff_breakdown,
     }
     return render(request, "core/profit_loss.html", context)
 

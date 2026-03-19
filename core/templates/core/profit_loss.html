@@ -192,6 +192,74 @@
       gap:16px;
       margin-bottom:20px;
     }
+    .chart-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .chart-card{
+      min-height:360px;
+    }
+    .chart-wrap{
+      position:relative;
+      height:280px;
+    }
+    .chart-empty{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:220px;
+      border:1px dashed var(--slate-300);
+      border-radius:12px;
+      background:var(--slate-50);
+      color:var(--slate-500);
+      font-size:14px;
+      text-align:center;
+      padding:20px;
+    }
+    .breakdown-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .report-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    .report-table th,
+    .report-table td{
+      padding:10px 0;
+      border-bottom:1px solid var(--slate-100);
+      vertical-align:top;
+    }
+    .report-table th{
+      font-size:13px;
+      text-align:left;
+      color:var(--slate-500);
+      font-weight:700;
+    }
+    .report-table td:last-child,
+    .report-table th:last-child{
+      text-align:right;
+    }
+    .report-table td:not(:first-child),
+    .report-table th:not(:first-child){
+      padding-left:12px;
+    }
+    .table-note{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--slate-500);
+      line-height:1.5;
+    }
+    .table-empty{
+      padding:16px 0 4px;
+      color:var(--slate-500);
+      font-size:14px;
+    }
     .summary-table{
       width:100%;
       border-collapse:collapse;
@@ -238,6 +306,8 @@
 
     @media (max-width:800px){
       .section-grid,
+      .breakdown-grid,
+      .chart-grid,
       .kpi-grid{ grid-template-columns:1fr; }
     }
     @media (max-width:640px){
@@ -303,6 +373,36 @@
     </div>
   </div>
 
+  <div class="chart-grid">
+    <div class="opr-card chart-card">
+      <div class="opr-card-head">
+        <div class="opr-card-title">Summary Comparison</div>
+        <div class="opr-card-sub">Gross sales, purchase basis, expenses, write-offs, and final result.</div>
+      </div>
+      {% if summary_chart_data %}
+        <div class="chart-wrap">
+          <canvas id="summaryChart"></canvas>
+        </div>
+      {% else %}
+        <div class="chart-empty">No chart data available for this period.</div>
+      {% endif %}
+    </div>
+
+    <div class="opr-card chart-card">
+      <div class="opr-card-head">
+        <div class="opr-card-title">Daily Operational Profit Trend</div>
+        <div class="opr-card-sub">Daily net result across the selected date range.</div>
+      </div>
+      {% if trend_chart_data %}
+        <div class="chart-wrap">
+          <canvas id="trendChart"></canvas>
+        </div>
+      {% else %}
+        <div class="chart-empty">No chart data available for this period.</div>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="section-grid">
     <div class="opr-card">
       <div class="opr-card-head">
@@ -365,5 +465,227 @@
       <div class="final-value">{{ net_profit|floatformat:2 }}</div>
     </div>
   </div>
+
+  <div class="opr-card">
+    <div class="opr-card-head">
+      <div class="opr-card-title">Breakdown Tables</div>
+      <div class="opr-card-sub">Detail behind the operational totals shown above.</div>
+    </div>
+
+    <div class="breakdown-grid">
+      <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
+        <div class="opr-card-title" style="margin-bottom:10px;">Top Selling Products</div>
+        {% if top_selling_products %}
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Gross Sales</th>
+                <th>Returns</th>
+                <th>Net Sales</th>
+                <th>Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in top_selling_products %}
+                <tr>
+                  <td>{{ row.product_name }}</td>
+                  <td>{{ row.gross_sales|floatformat:2 }}</td>
+                  <td>{{ row.sales_returns|floatformat:2 }}</td>
+                  <td>{{ row.net_sales|floatformat:2 }}</td>
+                  <td>{{ row.quantity_sold|floatformat:3 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="table-empty">No data available for this period.</div>
+        {% endif %}
+      </div>
+
+      <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
+        <div class="opr-card-title" style="margin-bottom:10px;">Purchase Basis by Product</div>
+        {% if purchase_basis_by_product %}
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Purchases</th>
+                <th>Returns</th>
+                <th>Net Purchase Basis</th>
+                <th>Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in purchase_basis_by_product %}
+                <tr>
+                  <td>{{ row.product_name }}</td>
+                  <td>{{ row.purchase_total|floatformat:2 }}</td>
+                  <td>{{ row.purchase_returns|floatformat:2 }}</td>
+                  <td>{{ row.net_purchase_basis|floatformat:2 }}</td>
+                  <td>{{ row.quantity_purchased|floatformat:3 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="table-note">Product purchase basis excludes shared invoice-level freight and other charges.</div>
+        {% else %}
+          <div class="table-empty">No data available for this period.</div>
+        {% endif %}
+      </div>
+
+      <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
+        <div class="opr-card-title" style="margin-bottom:10px;">Expense Breakdown</div>
+        {% if expense_breakdown %}
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Expense Head</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in expense_breakdown %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td>{{ row.amount|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="table-empty">No data available for this period.</div>
+        {% endif %}
+      </div>
+
+      <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
+        <div class="opr-card-title" style="margin-bottom:10px;">Stock Write-off Breakdown</div>
+        {% if stock_writeoff_breakdown %}
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in stock_writeoff_breakdown %}
+                <tr>
+                  <td>{{ row.product_name }}</td>
+                  <td>{{ row.quantity|floatformat:3 }}</td>
+                  <td>{{ row.amount|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="table-empty">No data available for this period.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
+{{ summary_chart_data|json_script:"summary-chart-data" }}
+{{ trend_chart_data|json_script:"trend-chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  (function () {
+    const summaryRaw = document.getElementById("summary-chart-data");
+    const trendRaw = document.getElementById("trend-chart-data");
+    const summaryChartEl = document.getElementById("summaryChart");
+    const trendChartEl = document.getElementById("trendChart");
+
+    const summaryData = summaryRaw ? JSON.parse(summaryRaw.textContent) : [];
+    const trendData = trendRaw ? JSON.parse(trendRaw.textContent) : [];
+
+    const numberFormat = function (value) {
+      return Number(value || 0).toLocaleString("en-PK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    };
+
+    if (summaryChartEl && summaryData.length) {
+      new Chart(summaryChartEl, {
+        type: "bar",
+        data: {
+          labels: summaryData.map((item) => item.label),
+          datasets: [{
+            data: summaryData.map((item) => item.value),
+            backgroundColor: ["#34d399", "#fdba74", "#fca5a5", "#f87171", "#93c5fd"],
+            borderColor: ["#059669", "#ea580c", "#ef4444", "#dc2626", "#2563eb"],
+            borderWidth: 1,
+            borderRadius: 10,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return "Rs " + numberFormat(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function (value) {
+                  return numberFormat(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    if (trendChartEl && trendData.length) {
+      new Chart(trendChartEl, {
+        type: "line",
+        data: {
+          labels: trendData.map((item) => item.date),
+          datasets: [{
+            label: "Daily Net Profit",
+            data: trendData.map((item) => item.profit),
+            borderColor: "#2563eb",
+            backgroundColor: "rgba(37, 99, 235, 0.14)",
+            fill: true,
+            tension: 0.28,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return "Rs " + numberFormat(context.parsed.y);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function (value) {
+                  return numberFormat(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  })();
+</script>
 {% endblock %}
