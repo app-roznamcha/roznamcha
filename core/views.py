@@ -2911,67 +2911,121 @@ def trial_balance(request):
 @owner_required
 @staff_blocked
 def profit_loss(request):
-    """
-    Simple Profit & Loss for a date range, using JournalEntry only.
-
-    - Income accounts: net = credits - debits
-    - Expense accounts: net = debits - credits
-    """
     date_from, date_to = _get_date_range(request)
-
-    entries = JournalEntry.objects.filter(
-        owner=request.owner,
-        date__range=(date_from, date_to),
+    owner = request.owner
+    money_field = DecimalField(max_digits=14, decimal_places=2)
+    zero = Value(Decimal("0.00"), output_field=money_field)
+    line_total_expr = ExpressionWrapper(
+        (F("quantity_units") * F("unit_price")) - Coalesce(F("discount_amount"), zero),
+        output_field=money_field,
     )
-    income_rows = []
-    expense_rows = []
-    total_income = Decimal("0")
-    total_expense = Decimal("0")
+    purchase_charges_expr = ExpressionWrapper(
+        Coalesce(F("freight_charges"), zero) + Coalesce(F("other_charges"), zero),
+        output_field=money_field,
+    )
+    stock_adjustment_amount_expr = ExpressionWrapper(
+        F("qty") * F("unit_cost"),
+        output_field=money_field,
+    )
 
-    debit_totals = {
-        row["debit_account"]: (row["total"] or Decimal("0"))
-        for row in (
-            entries.values("debit_account")
-            .annotate(total=Sum("amount"))
+    gross_sales = (
+        SalesInvoiceItem.objects.filter(
+            owner=owner,
+            sales_invoice__owner=owner,
+            sales_invoice__posted=True,
+            sales_invoice__invoice_date__range=(date_from, date_to),
         )
-    }
-    credit_totals = {
-        row["credit_account"]: (row["total"] or Decimal("0"))
-        for row in (
-            entries.values("credit_account")
-            .annotate(total=Sum("amount"))
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    sales_returns = (
+        SalesReturnItem.objects.filter(
+            owner=owner,
+            sales_return__owner=owner,
+            sales_return__posted=True,
+            sales_return__return_date__range=(date_from, date_to),
         )
-    }
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+    net_sales = gross_sales - sales_returns
 
-    for account in (
-        Account.objects.filter(
-            owner=request.owner,
-            account_type__in=["INCOME", "EXPENSE"],
-        ).order_by("code")
-    ):
-        debit_sum = debit_totals.get(account.id, Decimal("0"))
-        credit_sum = credit_totals.get(account.id, Decimal("0"))
+    purchase_items_total = (
+        PurchaseInvoiceItem.objects.filter(
+            owner=owner,
+            purchase_invoice__owner=owner,
+            purchase_invoice__posted=True,
+            purchase_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
 
-        if account.account_type == "INCOME":
-            net = credit_sum - debit_sum
-            if net != 0:
-                income_rows.append({"account": account, "amount": net})
-                total_income += net
-        else:
-            net = debit_sum - credit_sum
-            if net != 0:
-                expense_rows.append({"account": account, "amount": net})
-                total_expense += net
+    purchase_charges_total = (
+        PurchaseInvoice.objects.filter(
+            owner=owner,
+            posted=True,
+            invoice_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(purchase_charges_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
 
-    net_profit = total_income - total_expense
+    purchase_returns_total = (
+        PurchaseReturnItem.objects.filter(
+            owner=owner,
+            purchase_return__owner=owner,
+            purchase_return__posted=True,
+            purchase_return__return_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    purchase_basis = purchase_items_total + purchase_charges_total - purchase_returns_total
+    gross_margin = net_sales - purchase_basis
+
+    operating_expenses = (
+        DailyExpense.objects.filter(
+            owner=owner,
+            posted=True,
+            date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum("amount"), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    stock_writeoff_expense = (
+        StockAdjustment.objects.filter(
+            owner=owner,
+            posted=True,
+            direction="DOWN",
+            date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    net_profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
 
     context = {
         "date_from": date_from,
         "date_to": date_to,
-        "income_rows": income_rows,
-        "expense_rows": expense_rows,
-        "total_income": total_income,
-        "total_expense": total_expense,
+        "gross_sales": gross_sales,
+        "sales_returns": sales_returns,
+        "net_sales": net_sales,
+        "purchase_basis": purchase_basis,
+        "gross_margin": gross_margin,
+        "operating_expenses": operating_expenses,
+        "stock_writeoff_expense": stock_writeoff_expense,
         "net_profit": net_profit,
     }
     return render(request, "core/profit_loss.html", context)

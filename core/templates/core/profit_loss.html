@@ -1,11 +1,11 @@
 {% extends "core/base.html" %}
 
-{% block title %}Profit &amp; Loss{% endblock %}
+{% block title %}Operational Profit Report{% endblock %}
 
 {% block content %}
-<div class="page pl-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+<div class="page opr-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
   <style>
-    .pl-page{
+    .opr-page{
       --slate-50:#f8fafc;
       --slate-100:#f1f5f9;
       --slate-200:#e2e8f0;
@@ -15,8 +15,10 @@
       --slate-900:#0f172a;
       --brand:#2563eb;
       --brand-dark:#1d4ed8;
-      --income:#047857;
-      --income-soft:#d1fae5;
+      --sales:#047857;
+      --sales-soft:#d1fae5;
+      --cost:#b45309;
+      --cost-soft:#ffedd5;
       --expense:#b91c1c;
       --expense-soft:#fee2e2;
       --profit:#166534;
@@ -25,7 +27,7 @@
       --loss-soft:#fee2e2;
     }
 
-    .pl-hero{
+    .opr-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
@@ -38,21 +40,21 @@
       background:linear-gradient(180deg,#ffffff,#f8fbff);
       box-shadow:0 10px 24px rgba(15,23,42,0.07);
     }
-    .pl-title{
+    .opr-title{
       margin:0 0 4px;
       font-size:32px;
       font-weight:800;
       letter-spacing:-0.02em;
       color:var(--slate-900);
     }
-    .pl-sub{
+    .opr-sub{
       margin:0;
       font-size:15px;
       color:#475569;
       line-height:1.55;
-      max-width:700px;
+      max-width:760px;
     }
-    .pl-btn{
+    .opr-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -66,14 +68,9 @@
       background:linear-gradient(180deg,var(--brand),var(--brand-dark));
       color:#fff;
       white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease;
-    }
-    .pl-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.12);
     }
 
-    .pl-card{
+    .opr-card{
       background:#fff;
       border-radius:16px;
       border:1px solid var(--slate-200);
@@ -81,7 +78,7 @@
       box-shadow:0 8px 18px rgba(15,23,42,0.06);
       margin-bottom:20px;
     }
-    .pl-card-head{
+    .opr-card-head{
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -89,30 +86,30 @@
       gap:10px;
       flex-wrap:wrap;
     }
-    .pl-card-title{
+    .opr-card-title{
       font-size:18px;
       font-weight:700;
       color:var(--slate-900);
     }
-    .pl-card-sub{
+    .opr-card-sub{
       font-size:13px;
       color:var(--slate-500);
     }
 
-    .pl-filter-row{
+    .opr-filter-row{
       display:flex;
       flex-wrap:wrap;
       gap:12px;
       align-items:flex-end;
     }
-    .pl-filter-row .col{min-width:200px;}
-    .pl-filter-row label{
+    .opr-filter-row .col{min-width:200px;}
+    .opr-filter-row label{
       display:block;
       font-size:14px;
       margin-bottom:4px;
       color:#4b5563;
     }
-    .pl-filter-row input{
+    .opr-filter-row input{
       width:100%;
       padding:10px 12px;
       border-radius:10px;
@@ -121,11 +118,8 @@
       background:#fff;
       height:44px;
     }
-    .pl-filter-row input:focus{
-      outline:3px solid rgba(37,99,235,0.15);
-      border-color:#93c5fd;
-    }
-    .pl-apply{
+    .opr-apply,
+    .print-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -133,13 +127,20 @@
       border-radius:10px;
       font-size:14px;
       font-weight:700;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
-      color:#ffffff;
       cursor:pointer;
       white-space:nowrap;
       height:44px;
+    }
+    .opr-apply{
+      border:1px solid var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#ffffff;
       min-width:130px;
+    }
+    .print-btn{
+      border:1px solid var(--slate-300);
+      background:#f8fafc;
+      color:#111827;
     }
 
     .kpi-grid{
@@ -151,7 +152,7 @@
     .kpi{
       border:1px solid var(--slate-200);
       border-radius:14px;
-      padding:12px 14px;
+      padding:14px 16px;
       background:#fff;
       box-shadow:0 6px 16px rgba(15,23,42,0.05);
     }
@@ -161,327 +162,187 @@
       margin-bottom:6px;
     }
     .kpi .value{
-      font-size:22px;
+      font-size:24px;
       font-weight:800;
       letter-spacing:-0.01em;
     }
-    .kpi.income .value{ color:var(--income); }
-    .kpi.expense .value{ color:var(--expense); }
+    .kpi.sales .value{ color:var(--sales); }
+    .kpi.cost .value{ color:var(--cost); }
     .kpi.net.profit{ background:var(--profit-soft); border-color:#86efac; }
     .kpi.net.loss{ background:var(--loss-soft); border-color:#fca5a5; }
     .kpi.net.profit .value{ color:var(--profit); }
     .kpi.net.loss .value{ color:var(--loss); }
 
-    .pl-tools{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-left:auto;
+    .section-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:16px;
+      margin-bottom:20px;
     }
-    .search-input,
-    .section-filter{
-      padding:9px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
-      font-size:14px;
-      background:#fff;
-    }
-    .search-input{ width:280px; max-width:100%; }
-    .section-filter{ min-width:160px; }
-
-    .tbl-wrap{ width:100%; overflow-x:auto; }
-    .pl-table{
-      border-collapse:collapse;
+    .summary-table{
       width:100%;
-      min-width:620px;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
-      overflow:hidden;
+      border-collapse:collapse;
     }
-    .pl-table th,
-    .pl-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
+    .summary-table tr + tr td{
+      border-top:1px solid var(--slate-100);
+    }
+    .summary-table td{
+      padding:12px 0;
       font-size:15px;
-      vertical-align:middle;
-    }
-    .pl-table th{
-      background:#f9fafb;
-      text-align:left;
-      font-weight:700;
       color:var(--slate-700);
-      position:sticky;
-      top:0;
-      z-index:1;
     }
-    .pl-table tbody tr:nth-child(even){ background:#fcfdff; }
-    .pl-table tbody tr:hover{ background:#f8fbff; }
-    .right{ text-align:right; }
-
-    .amount-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:flex-end;
-      min-width:90px;
-      padding:2px 8px;
-      border-radius:8px;
-      font-weight:800;
-      font-size:13px;
-    }
-    .amount-chip.income{ color:var(--income); background:var(--income-soft); }
-    .amount-chip.expense{ color:var(--expense); background:var(--expense-soft); }
-
-    .print-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:9px 14px;
-      border-radius:10px;
-      font-size:14px;
+    .summary-table td:last-child{
+      text-align:right;
       font-weight:700;
-      border:1px solid var(--slate-300);
-      background:#f8fafc;
-      color:#111827;
-      cursor:pointer;
-      white-space:nowrap;
+      color:var(--slate-900);
+    }
+    .summary-table .total td{
+      padding-top:16px;
+      font-weight:800;
+      border-top:1px solid var(--slate-200);
+    }
+    .summary-table .negative td:last-child{
+      color:var(--expense);
+    }
+    .final-card{
+      border-color:#bbf7d0;
+      background:linear-gradient(180deg,#ffffff,#f0fdf4);
+    }
+    .final-card.loss{
+      border-color:#fecaca;
+      background:linear-gradient(180deg,#ffffff,#fef2f2);
+    }
+    .final-value{
+      font-size:34px;
+      font-weight:900;
+      letter-spacing:-0.03em;
+      margin-top:6px;
+      color:var(--profit);
+    }
+    .final-card.loss .final-value{
+      color:var(--loss);
     }
 
+    @media (max-width:800px){
+      .section-grid,
+      .kpi-grid{ grid-template-columns:1fr; }
+    }
     @media (max-width:640px){
-      .pl-page{ padding:0 16px !important; }
-      .pl-title{font-size:24px !important;}
-      .pl-sub{font-size:14px !important;}
-      .pl-btn,
-      .pl-apply,
+      .opr-page{ padding:0 16px !important; }
+      .opr-title{ font-size:24px !important; }
+      .opr-sub{ font-size:14px !important; }
+      .opr-btn,
+      .opr-apply,
       .print-btn{ width:100%; min-width:0 !important; }
-      .pl-filter-row .col{ min-width:100% !important; }
-      .kpi-grid{ grid-template-columns:1fr !important; }
-      .search-input,
-      .section-filter{ width:100%; }
-      .pl-table{ min-width:560px !important; }
-      .pl-table th,.pl-table td{ font-size:14px !important; }
+      .opr-filter-row .col{ min-width:100% !important; }
     }
-
     @media print {
       .no-print { display:none !important; }
-      .pl-card{ box-shadow:none; border-color:#d1d5db; }
+      .opr-card{ box-shadow:none; border-color:#d1d5db; }
     }
   </style>
 
-  <div class="pl-hero">
+  <div class="opr-hero">
     <div>
-      <h1 class="pl-title">Profit &amp; Loss</h1>
-      <p class="pl-sub">View total income, expenses, and net profit (or loss) for a selected date range.</p>
+      <h1 class="opr-title">Operational Profit Report</h1>
+      <p class="opr-sub">A period summary built from posted sales, returns, purchases, expenses, and stock write-offs using existing business records only.</p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="{% url 'dashboard' %}" class="pl-btn">← Back to Dashboard</a>
-      <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
+      <a href="{% url 'dashboard' %}" class="opr-btn">← Back to Dashboard</a>
+      <button type="button" class="print-btn no-print" onclick="window.print()">Print</button>
     </div>
   </div>
 
-  <div class="pl-card no-print">
-    <div class="pl-card-title" style="margin-bottom:6px;">Filter by date range</div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">Choose a start and end date, then click <strong>Apply</strong> to recalculate the report.</p>
-
-    <form method="get" class="pl-filter-row">
+  <div class="opr-card no-print">
+    <div class="opr-card-title" style="margin-bottom:6px;">Filter by date range</div>
+    <p style="font-size:15px;color:#475569;margin-bottom:12px;">Choose a start and end date, then click <strong>Apply</strong> to recalculate the operational report.</p>
+    <form method="get" class="opr-filter-row">
       <div class="col">
         <label>From</label>
         <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}">
       </div>
-
       <div class="col">
         <label>To</label>
         <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}">
       </div>
-
       <div>
-        <button type="submit" class="pl-apply">Apply</button>
+        <button type="submit" class="opr-apply">Apply</button>
       </div>
     </form>
   </div>
 
   <div class="kpi-grid">
-    <div class="kpi income">
-      <div class="label">Total Income</div>
-      <div class="value">{{ total_income|floatformat:2 }}</div>
+    <div class="kpi sales">
+      <div class="label">Net Sales</div>
+      <div class="value">{{ net_sales|floatformat:2 }}</div>
     </div>
-    <div class="kpi expense">
-      <div class="label">Total Expenses</div>
-      <div class="value">{{ total_expense|floatformat:2 }}</div>
+    <div class="kpi cost">
+      <div class="label">Purchase Basis</div>
+      <div class="value">{{ purchase_basis|floatformat:2 }}</div>
     </div>
     <div class="kpi net {% if net_profit >= 0 %}profit{% else %}loss{% endif %}">
-      <div class="label">Net Profit / (Loss)</div>
+      <div class="label">Net Operational Profit</div>
       <div class="value">{{ net_profit|floatformat:2 }}</div>
     </div>
   </div>
 
-  <div class="pl-card">
-    <div class="pl-card-head">
-      <div class="pl-card-title">Summary Chart</div>
-      <div class="pl-card-sub">Period: <strong>{{ date_from|date:"d M Y" }} – {{ date_to|date:"d M Y" }}</strong></div>
-    </div>
-
-    <p style="font-size:14px;color:#6b7280;margin-bottom:14px;">Quick comparison of income, expenses, and net result.</p>
-
-    <div class="pl-chart-wrap" style="width:100%;max-width:760px;">
-      <canvas id="plSummaryChart" height="120"></canvas>
-    </div>
-  </div>
-
-  <div class="pl-card">
-    <div class="pl-card-head">
-      <div class="pl-card-title">Income Accounts</div>
-      <div class="pl-tools no-print">
-        <input type="text" id="incomeSearch" class="search-input" placeholder="Search account...">
+  <div class="section-grid">
+    <div class="opr-card">
+      <div class="opr-card-head">
+        <div class="opr-card-title">Sales</div>
+        <div class="opr-card-sub">Period: <strong>{{ date_from|date:"d M Y" }} - {{ date_to|date:"d M Y" }}</strong></div>
       </div>
+      <table class="summary-table">
+        <tr>
+          <td>Gross Sales</td>
+          <td>{{ gross_sales|floatformat:2 }}</td>
+        </tr>
+        <tr class="negative">
+          <td>Sales Returns</td>
+          <td>{{ sales_returns|floatformat:2 }}</td>
+        </tr>
+        <tr class="total">
+          <td>Net Sales</td>
+          <td>{{ net_sales|floatformat:2 }}</td>
+        </tr>
+      </table>
     </div>
 
-    <div class="tbl-wrap">
-      <table class="pl-table" id="incomeTable">
-        <thead>
-          <tr>
-            <th>Account</th>
-            <th class="right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in income_rows %}
-            <tr class="income-row">
-              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
-              <td class="right"><span class="amount-chip income">{{ row.amount|floatformat:2 }}</span></td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="2">No income accounts for this period.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th class="right">Total Income</th>
-            <th class="right">{{ total_income|floatformat:2 }}</th>
-          </tr>
-        </tfoot>
+    <div class="opr-card">
+      <div class="opr-card-title" style="margin-bottom:10px;">Cost</div>
+      <table class="summary-table">
+        <tr>
+          <td>Purchase Basis</td>
+          <td>{{ purchase_basis|floatformat:2 }}</td>
+        </tr>
+        <tr class="total">
+          <td>Gross Operating Margin</td>
+          <td>{{ gross_margin|floatformat:2 }}</td>
+        </tr>
       </table>
     </div>
   </div>
 
-  <div class="pl-card">
-    <div class="pl-card-head">
-      <div class="pl-card-title">Expense Accounts</div>
-      <div class="pl-tools no-print">
-        <input type="text" id="expenseSearch" class="search-input" placeholder="Search account...">
-      </div>
-    </div>
-
-    <div class="tbl-wrap">
-      <table class="pl-table" id="expenseTable">
-        <thead>
-          <tr>
-            <th>Account</th>
-            <th class="right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in expense_rows %}
-            <tr class="expense-row">
-              <td class="acct-cell">{{ row.account.code }} – {{ row.account.name }}</td>
-              <td class="right"><span class="amount-chip expense">{{ row.amount|floatformat:2 }}</span></td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="2">No expense accounts for this period.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th class="right">Total Expenses</th>
-            <th class="right">{{ total_expense|floatformat:2 }}</th>
-          </tr>
-          <tr>
-            <th class="right">Net Profit / (Loss)</th>
-            <th class="right">{{ net_profit|floatformat:2 }}</th>
-          </tr>
-        </tfoot>
+  <div class="section-grid">
+    <div class="opr-card">
+      <div class="opr-card-title" style="margin-bottom:10px;">Expenses</div>
+      <table class="summary-table">
+        <tr>
+          <td>Operating Expenses</td>
+          <td>{{ operating_expenses|floatformat:2 }}</td>
+        </tr>
+        <tr>
+          <td>Stock Write-off Expense</td>
+          <td>{{ stock_writeoff_expense|floatformat:2 }}</td>
+        </tr>
       </table>
     </div>
-  </div>
 
+    <div class="opr-card final-card {% if net_profit < 0 %}loss{% endif %}">
+      <div class="opr-card-title">Final</div>
+      <div class="opr-card-sub">Net result for the selected period after purchase basis and operating costs.</div>
+      <div class="final-value">{{ net_profit|floatformat:2 }}</div>
+    </div>
+  </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-  (function () {
-    const incomeSearch = document.getElementById("incomeSearch");
-    const expenseSearch = document.getElementById("expenseSearch");
-
-    function bindSearch(input, rowSelector) {
-      if (!input) return;
-      const rows = Array.from(document.querySelectorAll(rowSelector));
-      input.addEventListener("input", function () {
-        const q = (input.value || "").trim().toLowerCase();
-        rows.forEach((row) => {
-          const text = (row.querySelector(".acct-cell")?.textContent || "").toLowerCase();
-          row.style.display = !q || text.includes(q) ? "" : "none";
-        });
-      });
-    }
-
-    bindSearch(incomeSearch, ".income-row");
-    bindSearch(expenseSearch, ".expense-row");
-  })();
-
-  (function () {
-    const totalIncome  = parseFloat("{{ total_income|default_if_none:0|floatformat:2|cut:','|escapejs }}")  || 0;
-    const totalExpense = parseFloat("{{ total_expense|default_if_none:0|floatformat:2|cut:','|escapejs }}") || 0;
-    const netProfit    = parseFloat("{{ net_profit|default_if_none:0|floatformat:2|cut:','|escapejs }}")    || 0;
-
-    const ctx = document.getElementById('plSummaryChart');
-    if (!ctx) return;
-
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Income', 'Expenses', 'Net Profit / (Loss)'],
-        datasets: [{
-          label: 'Amount (Rs)',
-          data: [totalIncome, totalExpense, netProfit],
-          borderWidth: 1,
-          backgroundColor: ['#34d399', '#fca5a5', netProfit >= 0 ? '#86efac' : '#fecaca'],
-          borderColor: ['#10b981', '#ef4444', netProfit >= 0 ? '#22c55e' : '#ef4444']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return value.toLocaleString('en-PK');
-              }
-            }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const v = context.parsed.y || 0;
-                return 'Rs ' + v.toLocaleString('en-PK', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                });
-              }
-            }
-          },
-          title: { display: false }
-        }
-      }
-    });
-  })();
-</script>
-
 {% endblock %}
