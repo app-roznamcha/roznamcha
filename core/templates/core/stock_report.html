@@ -242,8 +242,7 @@
         📦 Stock Report
       </h1>
       <p>
-        Current quantity in stock for each product, based on <strong>posted</strong> purchases and sales
-        <strong>+ posted stock adjustments</strong>.
+        Current stock snapshot for each product, based on <strong>posted</strong> inventory movement.
       </p>
       <div class="sr-meta">
         <div class="pill">
@@ -305,7 +304,7 @@
         Product-wise stock position
       </div>
       <div class="sr-card-sub">
-        Values shown in product’s base unit.
+        Current stock shown in the product's base unit.
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;">
         <input type="text" id="stockSearch" class="stock-search" placeholder="Search by code or product name">
@@ -321,13 +320,11 @@
       <table class="tbl">
         <colgroup>
           <col style="width:10%;">
-          <col style="width:26%;">
+          <col style="width:30%;">
           <col style="width:10%;">
-          <col style="width:14%;">
-          <col style="width:14%;">
-          <col style="width:12%;">
-          <col style="width:12%;">
-          <col style="width:12%;">
+          <col style="width:16%;">
+          <col style="width:16%;">
+          <col style="width:18%;">
         </colgroup>
         <thead>
           <tr>
@@ -336,8 +333,6 @@
             <th class="nowrap">Unit</th>
             <th class="right nowrap">Purchase Price</th>
             <th class="right nowrap">Sale Price</th>
-            <th class="right nowrap">Base Stock</th>
-            <th class="right nowrap">Adj (+/-)</th>
             <th class="right nowrap">Current Stock</th>
           </tr>
         </thead>
@@ -352,16 +347,13 @@
               <td class="right nowrap">{{ r.product.purchase_price_per_unit|floatformat:2 }}</td>
               <td class="right nowrap">{{ r.product.sale_price_per_unit|floatformat:2 }}</td>
 
-              <td class="right nowrap">{{ r.base_stock|floatformat:3 }}</td>
-              <td class="right nowrap">{{ r.net_adj|floatformat:3 }}</td>
-
               <td class="right nowrap">
                 <span class="stock-badge {% if r.final_stock > 0 %}pos{% else %}zero{% endif %}">{{ r.final_stock|floatformat:3 }}</span>
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="8" style="padding:12px 10px;color:#6b7280;text-align:center;">
+              <td colspan="6" style="padding:12px 10px;color:#6b7280;text-align:center;">
                 No products found.
               </td>
             </tr>
