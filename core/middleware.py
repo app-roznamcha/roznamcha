@@ -1,8 +1,43 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 
 from .models import CompanyProfile
+
+
+class PublicCanonicalHostMiddleware(MiddlewareMixin):
+    """
+    Force a single canonical public host before CSRF/auth views run.
+
+    Safe behavior:
+    - Redirect only GET/HEAD requests from www.public-host to bare public-host.
+    - Leave non-idempotent methods untouched to avoid cross-host POST surprises.
+    """
+
+    def process_request(self, request):
+        public_host = (getattr(settings, "PUBLIC_BASE_DOMAIN", "") or "").strip().lower()
+        base_domain = (getattr(settings, "SAAS_BASE_DOMAIN", "") or "").lstrip(".").lower()
+
+        if not public_host or not base_domain:
+            return None
+
+        current_host = (request.get_host() or "").strip()
+        current_host_only = current_host.split(":")[0].lower()
+        public_host_only = public_host.split(":")[0].lower()
+        www_host_only = f"www.{base_domain}"
+
+        # Canonical strategy: bare public host wins over www host.
+        if (
+            request.method in ("GET", "HEAD")
+            and public_host_only == base_domain
+            and current_host_only == www_host_only
+            and current_host.lower() != public_host
+        ):
+            target = f"{request.scheme}://{public_host}{request.get_full_path()}"
+            return redirect(target, permanent=True)
+
+        return None
 
 
 class TenantMiddleware(MiddlewareMixin):
@@ -120,7 +155,6 @@ class TenantMiddleware(MiddlewareMixin):
             if status == "EXPIRED":
                 if not path.startswith("/subscription/"):
                     # force them to renew
-                    from django.shortcuts import redirect
                     return redirect("subscription_page")
 
         request.tenant = company

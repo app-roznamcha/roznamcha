@@ -48,6 +48,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "core.middleware.PublicCanonicalHostMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -154,7 +155,7 @@ if DEBUG:
     ]
 else:
     SAAS_BASE_DOMAIN = "roznamcha.app"
-    PUBLIC_BASE_DOMAIN = "www.roznamcha.app"
+    PUBLIC_BASE_DOMAIN = "roznamcha.app"
     SESSION_COOKIE_DOMAIN = ".roznamcha.app"
     CSRF_COOKIE_DOMAIN = ".roznamcha.app"
     CSRF_TRUSTED_ORIGINS = [
