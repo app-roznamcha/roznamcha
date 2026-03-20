@@ -3035,6 +3035,21 @@ def profit_loss(request):
     stock_writeoff_expense = current_metrics["stock_writeoff_expense"]
     net_profit = current_metrics["net_profit"]
 
+    zero = Decimal("0.00")
+    money_field = DecimalField(max_digits=18, decimal_places=2)
+    line_total_expr = ExpressionWrapper(
+        F("quantity_units") * F("unit_price") - Coalesce(F("discount_amount"), zero),
+        output_field=money_field,
+    )
+    purchase_charges_expr = ExpressionWrapper(
+        Coalesce(F("freight_charges"), zero) + Coalesce(F("other_charges"), zero),
+        output_field=money_field,
+    )
+    stock_adjustment_amount_expr = ExpressionWrapper(
+        F("qty") * F("unit_cost"),
+        output_field=money_field,
+    )
+
     def percent_change(current_value, previous_value):
         if previous_value == 0:
             return Decimal("0.00") if current_value == 0 else None
@@ -5243,14 +5258,14 @@ def adjustments_page(request):
     )
 
     adjustments_qs = (
-        Payment.objects.filter(owner=owner, is_adjustment=True)
+        Payment.objects.filter(owner=owner, is_adjustment=True, posted=True)
         .select_related("party")
         .order_by("-date", "-id")
     )
     total_adjustments = adjustments_qs.aggregate(s=Sum("amount"))["s"] or Decimal("0")
 
     stock_qs = (
-        StockAdjustment.objects.filter(owner=owner)
+        StockAdjustment.objects.filter(owner=owner, posted=True)
         .select_related("product")
         .order_by("-date", "-id")[:200]
     )

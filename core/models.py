@@ -656,6 +656,12 @@ class Payment(OwnerRequiredMixin, TimeStampedModel):
         if self.owner_id and self.account_id and self.account.owner_id != self.owner_id:
             raise ValidationError("Account does not belong to this owner.")
 
+        # Protect posted party adjustments from later edits that would drift from their journal impact.
+        if self.pk:
+            old = Payment.objects.filter(pk=self.pk).first()
+            if old and old.posted and old.is_adjustment:
+                raise ValidationError("Posted party adjustments cannot be modified.")
+
         if self.is_adjustment:
             if not self.party:
                 raise ValidationError("Adjustment requires a party.")
@@ -667,6 +673,10 @@ class Payment(OwnerRequiredMixin, TimeStampedModel):
                 raise ValidationError("Payment requires a cash/bank account.")
             if self.direction not in ("IN", "OUT"):
                 raise ValidationError("Direction must be IN or OUT.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def post(self):
         """
