@@ -2150,6 +2150,51 @@ def stock_report(request):
     }
     return render(request, "core/stock_report.html", context)
 
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@owner_required
+@staff_blocked
+def stock_reconciliation(request):
+    """
+    Read-only stock reconciliation report.
+
+    Compares stored Product.current_stock with recomputed posted movement history.
+    Default view shows mismatches only.
+    """
+    show_all = request.GET.get("show") == "all"
+
+    products = Product.objects.filter(owner=request.owner).order_by("code")
+
+    rows = []
+    mismatch_count = 0
+
+    for product in products:
+        stored_stock = product.current_stock or Decimal("0")
+        recomputed_stock = get_current_stock_including_adjustments(product)
+        difference = stored_stock - recomputed_stock
+        has_mismatch = difference != 0
+
+        if has_mismatch:
+            mismatch_count += 1
+
+        if show_all or has_mismatch:
+            rows.append({
+                "product": product,
+                "stored_stock": stored_stock,
+                "recomputed_stock": recomputed_stock,
+                "difference": difference,
+                "has_mismatch": has_mismatch,
+            })
+
+    context = {
+        "rows": rows,
+        "show_all": show_all,
+        "total_products_checked": products.count(),
+        "mismatches_found": mismatch_count,
+    }
+    return render(request, "core/stock_reconciliation.html", context)
+
 def party_adjustments_net(party, as_of):
     """
     Net adjustments for a party up to a date.

@@ -1,0 +1,340 @@
+{% extends "core/base.html" %}
+
+{% block title %}Stock Reconciliation{% endblock %}
+
+{% block content %}
+<div class="page recon-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
+
+  <style>
+    .recon-page{
+      --slate-50:#f8fafc;
+      --slate-100:#f1f5f9;
+      --slate-200:#e2e8f0;
+      --slate-300:#cbd5e1;
+      --slate-500:#64748b;
+      --slate-700:#334155;
+      --slate-900:#0f172a;
+      --brand:#2563eb;
+      --brand-dark:#1d4ed8;
+      --ok:#047857;
+      --ok-soft:#d1fae5;
+      --warn:#b45309;
+      --warn-soft:#ffedd5;
+      --danger:#b91c1c;
+      --danger-soft:#fee2e2;
+    }
+
+    @media (max-width: 640px){
+      .recon-page{ padding:0 14px !important; margin:24px auto 40px !important; }
+      .recon-page h1{ font-size:24px !important; }
+      .recon-page p{ font-size:14px !important; }
+    }
+
+    .recon-hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+      gap:14px;
+      padding:18px 20px;
+      border-radius:20px;
+      border:1px solid var(--slate-200);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+    }
+    .recon-hero h1{
+      margin:0 0 6px;
+      font-size:30px;
+      font-weight:850;
+      letter-spacing:-0.02em;
+      color:var(--slate-900);
+    }
+    .recon-hero p{
+      margin:0 0 14px;
+      font-size:14px;
+      line-height:1.6;
+      color:#475569;
+      max-width:700px;
+    }
+    .recon-meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--slate-200);
+      background:#fff;
+      color:var(--slate-900);
+      white-space:nowrap;
+    }
+    .pill.warn{
+      border-color:#fecaca;
+      background:#fff7f7;
+      color:#991b1b;
+    }
+
+    .recon-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .btn-soft{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
+      min-width:150px;
+      border-radius:12px;
+      border:1px solid var(--slate-300);
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      color:#111827;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+    }
+    .btn-soft:hover{ box-shadow:0 8px 16px rgba(15,23,42,0.09); }
+    .btn-brand{
+      border-color:var(--brand-dark);
+      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      color:#fff;
+    }
+
+    .recon-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--slate-200);
+      padding:18px 20px 20px;
+      box-shadow:0 8px 20px rgba(15,23,42,0.06);
+      margin-bottom:18px;
+    }
+    .recon-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .recon-card-title{
+      font-size:18px;
+      font-weight:800;
+      color:var(--slate-900);
+    }
+    .recon-card-sub{
+      font-size:13px;
+      color:var(--slate-500);
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .summary-card{
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      padding:14px 16px;
+      background:linear-gradient(180deg,#fff,#f8fafc);
+    }
+    .summary-label{
+      font-size:12px;
+      font-weight:700;
+      color:var(--slate-500);
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      margin-bottom:6px;
+    }
+    .summary-value{
+      font-size:28px;
+      font-weight:850;
+      letter-spacing:-0.03em;
+      color:var(--slate-900);
+      line-height:1.1;
+    }
+    .summary-value.danger{ color:var(--danger); }
+
+    .tbl{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      min-width:920px;
+      border:1px solid var(--slate-200);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .tbl th, .tbl td{
+      border-bottom:1px solid var(--slate-200);
+      padding:10px 12px;
+      font-size:14px;
+      vertical-align:middle;
+    }
+    .tbl th{
+      background:#f8fafc;
+      font-weight:700;
+      text-align:left;
+      color:var(--slate-700);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
+    .tbl tbody tr.mismatch{ background:#fff7f7; }
+    .tbl tbody tr:hover{ background:#f8fbff; }
+    .right{ text-align:right; }
+    .nowrap{ white-space:nowrap; }
+    .truncate{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .diff-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:88px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      border:1px solid #fecaca;
+      color:var(--danger);
+      background:var(--danger-soft);
+    }
+    .success-state{
+      padding:18px 20px;
+      border-radius:14px;
+      border:1px solid #bbf7d0;
+      background:#f0fdf4;
+      color:#166534;
+    }
+    .success-state h3{
+      margin:0 0 6px;
+      font-size:18px;
+      font-weight:800;
+    }
+    .success-state p{
+      margin:0;
+      font-size:14px;
+      line-height:1.6;
+    }
+  </style>
+
+  <div class="recon-hero">
+    <div style="min-width:280px;">
+      <h1>Stock Reconciliation</h1>
+      <p>
+        Compare stored product stock with recomputed stock from posted purchases, sales, returns, and stock adjustments.
+        This report is read-only and helps detect inventory drift.
+      </p>
+      <div class="recon-meta">
+        <div class="pill">
+          <span style="color:#6b7280;">Checked:</span>
+          <strong>{{ total_products_checked }}</strong>
+        </div>
+        <div class="pill {% if mismatches_found %}warn{% endif %}">
+          <span style="color:#6b7280;">Mismatches:</span>
+          <strong>{{ mismatches_found }}</strong>
+        </div>
+        <div class="pill">
+          <span style="color:#6b7280;">View:</span>
+          <strong>{% if show_all %}All Products{% else %}Mismatches Only{% endif %}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="recon-actions">
+      <a href="{% url 'dashboard' %}" class="btn-soft">
+        ← Dashboard
+      </a>
+      {% if show_all %}
+        <a href="{% url 'stock_reconciliation' %}" class="btn-soft btn-brand">
+          Show Mismatches
+        </a>
+      {% else %}
+        <a href="{% url 'stock_reconciliation' %}?show=all" class="btn-soft btn-brand">
+          Show All Products
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">Products Checked</div>
+      <div class="summary-value">{{ total_products_checked }}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Mismatches Found</div>
+      <div class="summary-value {% if mismatches_found %}danger{% endif %}">{{ mismatches_found }}</div>
+    </div>
+  </div>
+
+  <div class="recon-card">
+    <div class="recon-card-head">
+      <div class="recon-card-title">Stored vs Recomputed Stock</div>
+      <div class="recon-card-sub">
+        Difference = stored stock - recomputed stock
+      </div>
+    </div>
+
+    {% if rows %}
+      <div style="width:100%;overflow-x:auto;">
+        <table class="tbl">
+          <colgroup>
+            <col style="width:12%;">
+            <col style="width:28%;">
+            <col style="width:12%;">
+            <col style="width:16%;">
+            <col style="width:16%;">
+            <col style="width:16%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="nowrap">Code</th>
+              <th>Product</th>
+              <th class="nowrap">Unit</th>
+              <th class="right nowrap">Stored Stock</th>
+              <th class="right nowrap">Recomputed Stock</th>
+              <th class="right nowrap">Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+              <tr class="{% if r.has_mismatch %}mismatch{% endif %}">
+                <td class="nowrap">{{ r.product.code }}</td>
+                <td class="truncate" title="{{ r.product.name }}">{{ r.product.name }}</td>
+                <td class="nowrap">{{ r.product.get_unit_display }}</td>
+                <td class="right nowrap">{{ r.stored_stock|floatformat:3 }}</td>
+                <td class="right nowrap">{{ r.recomputed_stock|floatformat:3 }}</td>
+                <td class="right nowrap">
+                  {% if r.has_mismatch %}
+                    <span class="diff-badge">{{ r.difference|floatformat:3 }}</span>
+                  {% else %}
+                    {{ r.difference|floatformat:3 }}
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="success-state">
+        <h3>No mismatches found.</h3>
+        <p>
+          Stored stock currently matches recomputed posted movement history for all checked products.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

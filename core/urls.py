@@ -119,6 +119,7 @@ urlpatterns = [
     # =========================
     path("day-summary/", staff_blocked(views.day_summary), name="day_summary"),
     path("stock-report/", staff_blocked(views.stock_report), name="stock_report"),
+    path("stock-reconciliation/", staff_blocked(views.stock_reconciliation), name="stock_reconciliation"),
     path("customer-balances/", staff_blocked(views.customer_balances), name="customer_balances"),
     path("supplier-balances/", staff_blocked(views.supplier_balances), name="supplier_balances"),
     path("reports/party/<int:pk>/", staff_blocked(views.party_statement), name="party_statement"),
