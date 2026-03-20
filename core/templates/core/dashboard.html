@@ -670,15 +670,15 @@ html[dir="rtl"] .dashboard-section{
         </div>
 
         <div class="dash-card">
-            <div class="dash-card-label" data-i18n="month_profit">This Month Profit (Simple)</div>
+            <div class="dash-card-label" data-i18n="month_profit" title="Based on operational profit calculation">This Month Profit</div>
             <div class="dash-card-value">
-                Rs {{ month_profit_simple|default:0|floatformat:0 }}
+                Rs {{ month_profit|default:0|floatformat:0 }}
             </div>
         </div>
 
         <a href="{% url 'customer_balances' %}" class="dash-card">
-            <div class="dash-card-label" data-i18n="customer_receivable">
-                Customer Receivable
+            <div class="dash-card-label" data-i18n="customer_receivable" title="Current ledger-backed customer receivable position">
+                Customer Receivable (Current)
               </div>
             <div class="dash-card-value">
                 Rs {{ customer_receivable|default:0|floatformat:0 }}
@@ -686,8 +686,8 @@ html[dir="rtl"] .dashboard-section{
         </a>
 
         <a href="{% url 'supplier_balances' %}" class="dash-card">
-            <div class="dash-card-label" data-i18n="supplier_payable">
-                Supplier Payable
+            <div class="dash-card-label" data-i18n="supplier_payable" title="Current ledger-backed supplier payable position">
+                Supplier Payable (Current)
               </div>
             <div class="dash-card-value">
                 Rs {{ supplier_payable|default:0|floatformat:0 }}
@@ -856,9 +856,9 @@ html[dir="rtl"] .dashboard-section{
       cash_balance: "Cash / Bank Balance",
       month_sales: "This Month Sales",
       month_purchases: "This Month Purchases",
-      month_profit: "This Month Profit (Simple)",
-      customer_receivable: "Customer Receivable",
-      supplier_payable: "Supplier Payable",
+      month_profit: "This Month Profit",
+      customer_receivable: "Customer Receivable (Current)",
+      supplier_payable: "Supplier Payable (Current)",
 
       new_sale: "➕ New Sale",
       sales_list: "📄 Sales List",
@@ -918,9 +918,9 @@ html[dir="rtl"] .dashboard-section{
       cash_balance: "کیش / بینک بیلنس",
       month_sales: "اس مہینے کی سیلز",
       month_purchases: "اس مہینے کی پرچیز",
-      month_profit: "اس مہینے کا منافع (سادہ)",
-      customer_receivable: "کسٹمر سے وصولی",
-      supplier_payable: "سپلائر کو ادائیگی",
+      month_profit: "اس مہینے کا منافع",
+      customer_receivable: "کسٹمر سے موجودہ وصولی",
+      supplier_payable: "سپلائر کو موجودہ ادائیگی",
 
       new_sale: "➕ نئی سیل",
       sales_list: "📄 سیلز لسٹ",

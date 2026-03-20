@@ -419,6 +419,122 @@ def _wipe_tenant_data(owner):
     # CompanyProfile is NOT deleted here (keep tenant identity)
 
 
+def get_operational_profit(owner, date_from, date_to):
+    money_field = DecimalField(max_digits=14, decimal_places=2)
+    zero = Value(Decimal("0.00"), output_field=money_field)
+    line_total_expr = ExpressionWrapper(
+        (F("quantity_units") * F("unit_price")) - Coalesce(F("discount_amount"), zero),
+        output_field=money_field,
+    )
+    purchase_charges_expr = ExpressionWrapper(
+        Coalesce(F("freight_charges"), zero) + Coalesce(F("other_charges"), zero),
+        output_field=money_field,
+    )
+    stock_adjustment_amount_expr = ExpressionWrapper(
+        F("qty") * F("unit_cost"),
+        output_field=money_field,
+    )
+
+    gross_sales = (
+        SalesInvoiceItem.objects.filter(
+            owner=owner,
+            sales_invoice__owner=owner,
+            sales_invoice__posted=True,
+            sales_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    sales_returns = (
+        SalesReturnItem.objects.filter(
+            owner=owner,
+            sales_return__owner=owner,
+            sales_return__posted=True,
+            sales_return__return_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+    net_sales = gross_sales - sales_returns
+
+    purchase_items_total = (
+        PurchaseInvoiceItem.objects.filter(
+            owner=owner,
+            purchase_invoice__owner=owner,
+            purchase_invoice__posted=True,
+            purchase_invoice__invoice_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    purchase_charges_total = (
+        PurchaseInvoice.objects.filter(
+            owner=owner,
+            posted=True,
+            invoice_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(purchase_charges_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    purchase_returns_total = (
+        PurchaseReturnItem.objects.filter(
+            owner=owner,
+            purchase_return__owner=owner,
+            purchase_return__posted=True,
+            purchase_return__return_date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(line_total_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    purchase_basis = purchase_items_total + purchase_charges_total - purchase_returns_total
+    gross_margin = net_sales - purchase_basis
+
+    operating_expenses = (
+        DailyExpense.objects.filter(
+            owner=owner,
+            posted=True,
+            date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum("amount"), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    stock_writeoff_expense = (
+        StockAdjustment.objects.filter(
+            owner=owner,
+            posted=True,
+            direction="DOWN",
+            date__range=(date_from, date_to),
+        )
+        .aggregate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
+        .get("total", Decimal("0.00"))
+        or Decimal("0.00")
+    )
+
+    profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
+    return {
+        "gross_sales": gross_sales,
+        "sales_returns": sales_returns,
+        "net_sales": net_sales,
+        "purchase_basis": purchase_basis,
+        "gross_margin": gross_margin,
+        "operating_expenses": operating_expenses,
+        "stock_writeoff_expense": stock_writeoff_expense,
+        "profit": profit,
+        "net_profit": profit,
+    }
+
+
 @login_required
 @owner_required
 def dashboard(request):
@@ -531,146 +647,44 @@ def dashboard(request):
         - (month_purchase_returns or Decimal("0.00"))
     )
 
-    month_expenses = (
-        DailyExpense.objects.filter(
-            owner=owner,
-            posted=True,
-            date__gte=month_start,
-            date__lte=today,
-        )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    # Simple profit snapshot (not full accounting profit, but very useful for traders)
-    month_profit_simple = (
-        (month_sales or Decimal("0.00"))
-        - (month_purchases or Decimal("0.00"))
-        - (month_expenses or Decimal("0.00"))
-    )
+    profit_data = get_operational_profit(owner, month_start, today)
+    month_profit = profit_data["profit"]
     
-    total_sales_all = (
-        SalesInvoiceItem.objects.filter(owner=owner, sales_invoice__posted=True)
-        .aggregate(total=Coalesce(Sum(line_total_expr), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    total_sales_returns_all = (
-        SalesReturnItem.objects.filter(owner=owner, sales_return__posted=True)
-        .aggregate(total=Coalesce(Sum(line_total_expr), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    total_customer_receipts = (
-        Payment.objects.filter(
+    customer_receivable = Decimal("0.00")
+    customer_advance = Decimal("0.00")
+    for customer in Party.objects.filter(owner=owner, party_type="CUSTOMER", is_active=True).only(
+        "id", "name", "party_type", "opening_balance", "opening_balance_is_debit"
+    ):
+        ledger = build_party_ledger_for_owner(
             owner=owner,
-            posted=True,
-            is_adjustment=False,
-            direction="IN",
-            party__party_type="CUSTOMER",
+            party=customer,
+            date_from=None,
+            date_to=today,
         )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
+        closing_balance = Decimal(str(ledger.get("closing_balance") or "0.00"))
+        closing_side = str(ledger.get("closing_side") or "").upper()
+        if closing_side == "DR":
+            customer_receivable += closing_balance
+        elif closing_side == "CR":
+            customer_advance += closing_balance
 
-    customer_adj_dr = (
-        Payment.objects.filter(
+    supplier_payable = Decimal("0.00")
+    supplier_advance = Decimal("0.00")
+    for supplier in Party.objects.filter(owner=owner, party_type="SUPPLIER", is_active=True).only(
+        "id", "name", "party_type", "opening_balance", "opening_balance_is_debit"
+    ):
+        ledger = build_party_ledger_for_owner(
             owner=owner,
-            posted=True,
-            is_adjustment=True,
-            party__party_type="CUSTOMER",
-            adjustment_side="DR",
+            party=supplier,
+            date_from=None,
+            date_to=today,
         )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    customer_adj_cr = (
-        Payment.objects.filter(
-            owner=owner,
-            posted=True,
-            is_adjustment=True,
-            party__party_type="CUSTOMER",
-            adjustment_side="CR",
-        )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    raw_customer_balance = (
-        (total_sales_all or Decimal("0.00"))
-        - (total_customer_receipts or Decimal("0.00"))
-        - (total_sales_returns_all or Decimal("0.00"))
-        + ((customer_adj_dr or Decimal("0.00")) - (customer_adj_cr or Decimal("0.00")))
-    )
-
-    customer_receivable = raw_customer_balance if raw_customer_balance > 0 else Decimal("0.00")
-    customer_advance = (-raw_customer_balance) if raw_customer_balance < 0 else Decimal("0.00")
-
-    total_purchase_items_all = (
-        PurchaseInvoiceItem.objects.filter(owner=owner, purchase_invoice__posted=True)
-        .aggregate(total=Coalesce(Sum(line_total_expr), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    total_purchase_charges_all = (
-        PurchaseInvoice.objects.filter(owner=owner, posted=True)
-        .aggregate(total=Coalesce(Sum(charges_expr), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    total_purchase_returns_all = (
-        PurchaseReturnItem.objects.filter(owner=owner, purchase_return__posted=True)
-        .aggregate(total=Coalesce(Sum(line_total_expr), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    total_supplier_payments = (
-        Payment.objects.filter(
-            owner=owner,
-            posted=True,
-            is_adjustment=False,
-            direction="OUT",
-            party__party_type="SUPPLIER",
-        )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    supplier_adj_cr = (
-        Payment.objects.filter(
-            owner=owner,
-            posted=True,
-            is_adjustment=True,
-            party__party_type="SUPPLIER",
-            adjustment_side="CR",
-        )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    supplier_adj_dr = (
-        Payment.objects.filter(
-            owner=owner,
-            posted=True,
-            is_adjustment=True,
-            party__party_type="SUPPLIER",
-            adjustment_side="DR",
-        )
-        .aggregate(total=Coalesce(Sum("amount"), ZERO))
-        .get("total", Decimal("0.00"))
-    )
-
-    raw_supplier_balance = (
-        (total_purchase_items_all or Decimal("0.00"))
-        + (total_purchase_charges_all or Decimal("0.00"))
-        - (total_supplier_payments or Decimal("0.00"))
-        - (total_purchase_returns_all or Decimal("0.00"))
-        + ((supplier_adj_cr or Decimal("0.00")) - (supplier_adj_dr or Decimal("0.00")))
-    )
-
-    supplier_payable = raw_supplier_balance if raw_supplier_balance > 0 else Decimal("0.00")
-    supplier_advance = (-raw_supplier_balance) if raw_supplier_balance < 0 else Decimal("0.00")
+        closing_balance = Decimal(str(ledger.get("closing_balance") or "0.00"))
+        closing_side = str(ledger.get("closing_side") or "").upper()
+        if closing_side == "CR":
+            supplier_payable += closing_balance
+        elif closing_side == "DR":
+            supplier_advance += closing_balance
 
     context = {
         "customers_count": customers_count,
@@ -690,7 +704,7 @@ def dashboard(request):
         "cash_bank_balance": cash_bank_balance,
         "month_sales": month_sales,
         "month_purchases": month_purchases,
-        "month_profit_simple": month_profit_simple,
+        "month_profit": month_profit,
     }
 
     return render(request, "core/dashboard.html", context)
@@ -2961,124 +2975,11 @@ def trial_balance(request):
 def profit_loss(request):
     date_from, date_to = _get_date_range(request)
     owner = request.owner
-    money_field = DecimalField(max_digits=14, decimal_places=2)
-    zero = Value(Decimal("0.00"), output_field=money_field)
-    line_total_expr = ExpressionWrapper(
-        (F("quantity_units") * F("unit_price")) - Coalesce(F("discount_amount"), zero),
-        output_field=money_field,
-    )
-    purchase_charges_expr = ExpressionWrapper(
-        Coalesce(F("freight_charges"), zero) + Coalesce(F("other_charges"), zero),
-        output_field=money_field,
-    )
-    stock_adjustment_amount_expr = ExpressionWrapper(
-        F("qty") * F("unit_cost"),
-        output_field=money_field,
-    )
-    def compute_operational_metrics(period_from, period_to):
-        gross_sales = (
-            SalesInvoiceItem.objects.filter(
-                owner=owner,
-                sales_invoice__owner=owner,
-                sales_invoice__posted=True,
-                sales_invoice__invoice_date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-
-        sales_returns = (
-            SalesReturnItem.objects.filter(
-                owner=owner,
-                sales_return__owner=owner,
-                sales_return__posted=True,
-                sales_return__return_date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-        net_sales = gross_sales - sales_returns
-
-        purchase_items_total = (
-            PurchaseInvoiceItem.objects.filter(
-                owner=owner,
-                purchase_invoice__owner=owner,
-                purchase_invoice__posted=True,
-                purchase_invoice__invoice_date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-
-        purchase_charges_total = (
-            PurchaseInvoice.objects.filter(
-                owner=owner,
-                posted=True,
-                invoice_date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum(purchase_charges_expr), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-
-        purchase_returns_total = (
-            PurchaseReturnItem.objects.filter(
-                owner=owner,
-                purchase_return__owner=owner,
-                purchase_return__posted=True,
-                purchase_return__return_date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum(line_total_expr), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-
-        purchase_basis = purchase_items_total + purchase_charges_total - purchase_returns_total
-        gross_margin = net_sales - purchase_basis
-
-        operating_expenses = (
-            DailyExpense.objects.filter(
-                owner=owner,
-                posted=True,
-                date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum("amount"), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-
-        stock_writeoff_expense = (
-            StockAdjustment.objects.filter(
-                owner=owner,
-                posted=True,
-                direction="DOWN",
-                date__range=(period_from, period_to),
-            )
-            .aggregate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
-            .get("total", Decimal("0.00"))
-            or Decimal("0.00")
-        )
-
-        net_profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
-        return {
-            "gross_sales": gross_sales,
-            "sales_returns": sales_returns,
-            "net_sales": net_sales,
-            "purchase_basis": purchase_basis,
-            "gross_margin": gross_margin,
-            "operating_expenses": operating_expenses,
-            "stock_writeoff_expense": stock_writeoff_expense,
-            "net_profit": net_profit,
-        }
-
-    current_metrics = compute_operational_metrics(date_from, date_to)
+    current_metrics = get_operational_profit(owner, date_from, date_to)
     current_period_days = (date_to - date_from).days
     previous_date_to = date_from - timedelta(days=1)
     previous_date_from = previous_date_to - timedelta(days=current_period_days)
-    previous_metrics = compute_operational_metrics(previous_date_from, previous_date_to)
+    previous_metrics = get_operational_profit(owner, previous_date_from, previous_date_to)
 
     gross_sales = current_metrics["gross_sales"]
     sales_returns = current_metrics["sales_returns"]
