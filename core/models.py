@@ -2272,6 +2272,9 @@ class SubscriptionTransaction(TimeStampedModel):
     verified_at = models.DateTimeField(null=True, blank=True)
     return_received_at = models.DateTimeField(null=True, blank=True)
     ipn_received_at = models.DateTimeField(null=True, blank=True)
+    subscription_applied = models.BooleanField(default=False)
+    applied_at = models.DateTimeField(null=True, blank=True)
+    last_event_id = models.CharField(max_length=120, null=True, blank=True)
     failure_reason = models.TextField(blank=True, default="")
 
     class Meta:
