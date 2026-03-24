@@ -5837,7 +5837,6 @@ def subscription_checkout_payer_auth_enrollment(request):
     access_token = (request.POST.get("access_token") or "").strip()
     device_data_collection_url = (request.POST.get("device_data_collection_url") or "").strip()
     device_fingerprint_session_id = (request.POST.get("device_fingerprint_session_id") or "").strip()
-    guest_jwt = (request.POST.get("guest_jwt") or "").strip()
     billing_name = (request.POST.get("billing_name") or "").strip()
     billing_email = (request.POST.get("billing_email") or "").strip()
     billing_phone = (request.POST.get("billing_phone") or "").strip()
@@ -5851,9 +5850,7 @@ def subscription_checkout_payer_auth_enrollment(request):
         request_id,
         payment_method_token,
         access_token,
-        device_data_collection_url,
         device_fingerprint_session_id,
-        guest_jwt,
         billing_name,
         billing_email,
         billing_phone,
@@ -5876,8 +5873,8 @@ def subscription_checkout_payer_auth_enrollment(request):
         return JsonResponse({"ok": False, "error": "Tracker not found."}, status=404)
 
     enrollment_payload = {
+        "request_id": request_id,
         "payload": {
-            "request_id": request_id,
             "payment_method": {
                 "token": payment_method_token,
             },
@@ -5896,7 +5893,6 @@ def subscription_checkout_payer_auth_enrollment(request):
             },
             "authentication_setup": {
                 "access_token": access_token,
-                "device_data_collection_url": device_data_collection_url,
                 "device_fingerprint_session_id": device_fingerprint_session_id,
             },
         }
@@ -5906,8 +5902,7 @@ def subscription_checkout_payer_auth_enrollment(request):
         response_data = _safepay_post(
             f"/order/payments/v3/{tracker}",
             enrollment_payload,
-            auth_mode="guest_jwt",
-            auth_token=guest_jwt,
+            auth_mode="merchant_secret",
         )
         tx.request_payload = {
             **(tx.request_payload or {}),
