@@ -5650,22 +5650,23 @@ def _safepay_checkout_subscription_with_token(
     """
     environment = _safepay_checkout_environment()
     base_url = (
-        "https://sandbox.api.getsafepay.com/checkout"
+        "https://sandbox.api.getsafepay.com"
         if environment == "sandbox"
-        else "https://api.getsafepay.com/checkout"
+        else "https://getsafepay.com"
     )
-    # Built to mirror Safepay PHP SDK subscription checkout contract.
+    # Mirrors Safepay PHP SDK SubscriptionsCheckout::constructURL contract.
     params = OrderedDict(
         [
             ("env", environment),
             ("plan_id", plan_id),
-            ("tbt", auth_token),
-            ("reference", reference),
+            ("auth_token", auth_token),
             ("cancel_url", cancel_url),
             ("redirect_url", redirect_url),
         ]
     )
-    checkout_url = f"{base_url}?{urlencode(params, doseq=False)}"
+    if reference:
+        params["reference"] = reference
+    checkout_url = f"{base_url}/checkout/subscribe?{urlencode(params, doseq=False)}"
     checkout_parts = urlsplit(checkout_url)
     logger.info(
         "Safepay subscription checkout generated base_url=%s param_keys=%s checkout_url=%s",
