@@ -71,9 +71,7 @@
       <input type="hidden" id="enrollment-payment-method-token" name="payment_method_token">
       <input type="hidden" id="enrollment-access-token" name="access_token">
       <input type="hidden" id="enrollment-device-data-url" name="device_data_collection_url">
-
-      <label style="display:block; margin-top:10px;">Device Fingerprint Session ID</label>
-      <input type="text" id="device-fingerprint-session-id" name="device_fingerprint_session_id" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+      <input type="hidden" id="device-fingerprint-session-id" name="device_fingerprint_session_id">
 
       <label style="display:block; margin-top:10px;">Billing Name</label>
       <input type="text" id="billing-name" name="billing_name" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
@@ -102,6 +100,8 @@
         </button>
       </div>
     </form>
+
+    <div id="device-collection-host" style="display:none;"></div>
   </div>
 
   <div style="margin-top: 20px;">
@@ -126,7 +126,48 @@
     const enrollmentPaymentMethodTokenField = document.getElementById("enrollment-payment-method-token");
     const enrollmentAccessTokenField = document.getElementById("enrollment-access-token");
     const enrollmentDeviceDataUrlField = document.getElementById("enrollment-device-data-url");
+    const deviceFingerprintSessionIdField = document.getElementById("device-fingerprint-session-id");
+    const deviceCollectionHost = document.getElementById("device-collection-host");
     if (!form || !statusBox) return;
+
+    function generateDeviceFingerprintSessionId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      return "dfp-" + Date.now() + "-" + Math.random().toString(16).slice(2, 10);
+    }
+
+    function startDeviceDataCollection(accessToken, deviceDataCollectionUrl, sessionId) {
+      if (!deviceCollectionHost || !accessToken || !deviceDataCollectionUrl || !sessionId) return;
+
+      deviceCollectionHost.innerHTML = "";
+
+      const iframe = document.createElement("iframe");
+      iframe.name = "cardinal-device-collection-frame";
+      iframe.style.display = "none";
+
+      const formEl = document.createElement("form");
+      formEl.method = "POST";
+      formEl.action = deviceDataCollectionUrl;
+      formEl.target = iframe.name;
+      formEl.style.display = "none";
+
+      const jwtInput = document.createElement("input");
+      jwtInput.type = "hidden";
+      jwtInput.name = "JWT";
+      jwtInput.value = accessToken;
+
+      const binInput = document.createElement("input");
+      binInput.type = "hidden";
+      binInput.name = "Bin";
+      binInput.value = sessionId;
+
+      formEl.appendChild(jwtInput);
+      formEl.appendChild(binInput);
+      deviceCollectionHost.appendChild(iframe);
+      deviceCollectionHost.appendChild(formEl);
+      formEl.submit();
+    }
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -179,6 +220,7 @@
           const action = ((data.raw_payer_auth_setup_response || {}).action || {});
           const payerAuthSetup = action.payer_authentication_setup || {};
           if (enrollmentForm && enrollmentTrackerField) {
+            const deviceFingerprintSessionId = generateDeviceFingerprintSessionId();
             enrollmentTrackerField.value = data.tracker || trackerField.value;
             if (enrollmentRequestIdField) enrollmentRequestIdField.value = action.token || "";
             if (enrollmentPaymentMethodTokenField) {
@@ -190,6 +232,14 @@
             if (enrollmentDeviceDataUrlField) {
               enrollmentDeviceDataUrlField.value = payerAuthSetup.device_data_collection_url || "";
             }
+            if (deviceFingerprintSessionIdField) {
+              deviceFingerprintSessionIdField.value = deviceFingerprintSessionId;
+            }
+            startDeviceDataCollection(
+              payerAuthSetup.access_token || "",
+              payerAuthSetup.device_data_collection_url || "",
+              deviceFingerprintSessionId
+            );
             enrollmentForm.style.display = "block";
           }
           return;
