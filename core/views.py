@@ -5816,6 +5816,132 @@ def subscription_checkout_payer_auth_setup(request):
         tx.save(update_fields=["request_payload", "updated_at"])
         return JsonResponse({"ok": False, "error": str(exc)}, status=502)
 
+
+@require_POST
+@resolve_tenant_context(require_company=True)
+@owner_required
+@staff_blocked
+def subscription_checkout_payer_auth_enrollment(request):
+    tracker = (request.POST.get("tracker") or "").strip()
+    request_id = (request.POST.get("request_id") or "").strip()
+    payment_method_token = (request.POST.get("payment_method_token") or "").strip()
+    access_token = (request.POST.get("access_token") or "").strip()
+    device_data_collection_url = (request.POST.get("device_data_collection_url") or "").strip()
+    device_fingerprint_session_id = (request.POST.get("device_fingerprint_session_id") or "").strip()
+    billing_name = (request.POST.get("billing_name") or "").strip()
+    billing_email = (request.POST.get("billing_email") or "").strip()
+    billing_phone = (request.POST.get("billing_phone") or "").strip()
+    billing_country = (request.POST.get("billing_country") or "").strip()
+    billing_city = (request.POST.get("billing_city") or "").strip()
+    billing_postal_code = (request.POST.get("billing_postal_code") or "").strip()
+    billing_address_1 = (request.POST.get("billing_address_1") or "").strip()
+
+    if not all([
+        tracker,
+        request_id,
+        payment_method_token,
+        access_token,
+        device_data_collection_url,
+        device_fingerprint_session_id,
+        billing_name,
+        billing_email,
+        billing_phone,
+        billing_country,
+        billing_city,
+        billing_postal_code,
+        billing_address_1,
+    ]):
+        return JsonResponse(
+            {"ok": False, "error": "Tracker, Safepay setup values, and billing details are required."},
+            status=400,
+        )
+
+    tx = SubscriptionTransaction.objects.filter(
+        owner=request.owner,
+        provider="SAFEPAY",
+        provider_txn_id=tracker,
+    ).first()
+    if not tx:
+        return JsonResponse({"ok": False, "error": "Tracker not found."}, status=404)
+
+    enrollment_payload = {
+        "payload": {
+            "request_id": request_id,
+            "payment_method": {
+                "token": payment_method_token,
+            },
+            "billing": {
+                "name": billing_name,
+                "email": billing_email,
+                "phone": billing_phone,
+                "country": billing_country,
+                "city": billing_city,
+                "postal_code": billing_postal_code,
+                "address_line1": billing_address_1,
+            },
+            "authorization": {
+                "currency": tx.currency,
+                "amount": int(tx.amount),
+            },
+            "authentication_setup": {
+                "access_token": access_token,
+                "device_data_collection_url": device_data_collection_url,
+                "device_fingerprint_session_id": device_fingerprint_session_id,
+            },
+        }
+    }
+
+    try:
+        response_data = _safepay_post(
+            f"/order/payments/v3/{tracker}",
+            enrollment_payload,
+            auth_mode="merchant_secret",
+        )
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "payer_auth_enrollment_request": {
+                "tracker": tracker,
+                "request_id": request_id,
+                "payment_method_token": _mask_safepay_value(payment_method_token),
+                "device_fingerprint_session_id": device_fingerprint_session_id,
+                "billing": {
+                    "name": billing_name,
+                    "email": billing_email,
+                    "phone": billing_phone,
+                    "country": billing_country,
+                    "city": billing_city,
+                    "postal_code": billing_postal_code,
+                    "address_line1": billing_address_1,
+                },
+                "authorization": {
+                    "currency": tx.currency,
+                    "amount": int(tx.amount),
+                },
+            },
+            "payer_auth_enrollment_response": response_data,
+        }
+        tx.save(update_fields=["request_payload", "updated_at"])
+        return JsonResponse(
+            {
+                "ok": True,
+                "tracker": tracker,
+                "raw_payer_auth_enrollment_response": response_data,
+            }
+        )
+    except Exception as exc:
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "payer_auth_enrollment_request": {
+                "tracker": tracker,
+                "request_id": request_id,
+                "payment_method_token": _mask_safepay_value(payment_method_token),
+                "device_fingerprint_session_id": device_fingerprint_session_id,
+            },
+            "payer_auth_enrollment_error": str(exc),
+        }
+        tx.save(update_fields=["request_payload", "updated_at"])
+        return JsonResponse({"ok": False, "error": str(exc)}, status=502)
+
 @login_required
 @resolve_tenant_context(require_company=True)
 def tenant_check(request):

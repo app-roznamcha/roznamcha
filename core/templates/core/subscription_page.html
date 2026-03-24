@@ -63,6 +63,45 @@
         </button>
       </div>
     </form>
+
+    <form id="subscription-enrollment-form" method="post" action="{% url 'subscription_checkout_payer_auth_enrollment' %}" style="display:none;margin-top:16px;">
+      {% csrf_token %}
+      <input type="hidden" id="enrollment-tracker" name="tracker">
+      <input type="hidden" id="enrollment-request-id" name="request_id">
+      <input type="hidden" id="enrollment-payment-method-token" name="payment_method_token">
+      <input type="hidden" id="enrollment-access-token" name="access_token">
+      <input type="hidden" id="enrollment-device-data-url" name="device_data_collection_url">
+
+      <label style="display:block; margin-top:10px;">Device Fingerprint Session ID</label>
+      <input type="text" id="device-fingerprint-session-id" name="device_fingerprint_session_id" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing Name</label>
+      <input type="text" id="billing-name" name="billing_name" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing Email</label>
+      <input type="email" id="billing-email" name="billing_email" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing Phone</label>
+      <input type="text" id="billing-phone" name="billing_phone" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing Country</label>
+      <input type="text" id="billing-country" name="billing_country" value="PK" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing City</label>
+      <input type="text" id="billing-city" name="billing_city" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing Postal Code</label>
+      <input type="text" id="billing-postal-code" name="billing_postal_code" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Billing Address 1</label>
+      <input type="text" id="billing-address-1" name="billing_address_1" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <div style="margin-top: 15px;">
+        <button id="subscription-enrollment-submit" type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #065f46;background:#065f46;color:#fff;font-weight:800;cursor:pointer;">
+          Start Payer Auth Enrollment
+        </button>
+      </div>
+    </form>
   </div>
 
   <div style="margin-top: 20px;">
@@ -76,10 +115,17 @@
   (function () {
     const form = document.getElementById("subscription-checkout-form");
     const payerAuthForm = document.getElementById("subscription-payer-auth-form");
+    const enrollmentForm = document.getElementById("subscription-enrollment-form");
     const statusBox = document.getElementById("subscription-checkout-status");
     const submitBtn = document.getElementById("subscription-checkout-submit");
     const payerAuthSubmitBtn = document.getElementById("subscription-payer-auth-submit");
+    const enrollmentSubmitBtn = document.getElementById("subscription-enrollment-submit");
     const trackerField = document.getElementById("payer-auth-tracker");
+    const enrollmentTrackerField = document.getElementById("enrollment-tracker");
+    const enrollmentRequestIdField = document.getElementById("enrollment-request-id");
+    const enrollmentPaymentMethodTokenField = document.getElementById("enrollment-payment-method-token");
+    const enrollmentAccessTokenField = document.getElementById("enrollment-access-token");
+    const enrollmentDeviceDataUrlField = document.getElementById("enrollment-device-data-url");
     if (!form || !statusBox) return;
 
     form.addEventListener("submit", async function (e) {
@@ -130,6 +176,22 @@
         const data = await response.json();
         if (response.ok && data.ok) {
           statusBox.textContent = JSON.stringify(data, null, 2) + "\n\nPayer auth setup completed. Awaiting next step.";
+          const action = ((data.raw_payer_auth_setup_response || {}).action || {});
+          const payerAuthSetup = action.payer_authentication_setup || {};
+          if (enrollmentForm && enrollmentTrackerField) {
+            enrollmentTrackerField.value = data.tracker || trackerField.value;
+            if (enrollmentRequestIdField) enrollmentRequestIdField.value = action.token || "";
+            if (enrollmentPaymentMethodTokenField) {
+              enrollmentPaymentMethodTokenField.value = ((action.payment_method || {}).token || "");
+            }
+            if (enrollmentAccessTokenField) {
+              enrollmentAccessTokenField.value = payerAuthSetup.access_token || "";
+            }
+            if (enrollmentDeviceDataUrlField) {
+              enrollmentDeviceDataUrlField.value = payerAuthSetup.device_data_collection_url || "";
+            }
+            enrollmentForm.style.display = "block";
+          }
           return;
         }
         statusBox.textContent = JSON.stringify(data, null, 2);
@@ -137,6 +199,34 @@
       } catch (err) {
         statusBox.textContent = "Could not start Safepay payer auth setup.";
         if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = false;
+      }
+    });
+
+    if (!enrollmentForm) return;
+
+    enrollmentForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      statusBox.style.display = "block";
+      statusBox.textContent = "Starting Safepay payer auth enrollment...";
+      if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(enrollmentForm);
+        const response = await fetch(enrollmentForm.action, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+          },
+          body: formData
+        });
+        const data = await response.json();
+        statusBox.textContent = JSON.stringify(data, null, 2);
+        if (!response.ok || !data.ok) {
+          if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = false;
+        }
+      } catch (err) {
+        statusBox.textContent = "Could not start Safepay payer auth enrollment.";
+        if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = false;
       }
     });
   })();
