@@ -66,12 +66,12 @@
 
     <form id="subscription-enrollment-form" method="post" action="{% url 'subscription_checkout_payer_auth_enrollment' %}" style="display:none;margin-top:16px;">
       {% csrf_token %}
-      <input type="hidden" id="enrollment-tracker" name="tracker">
-      <input type="hidden" id="enrollment-request-id" name="request_id">
-      <input type="hidden" id="enrollment-payment-method-token" name="payment_method_token">
-      <input type="hidden" id="enrollment-access-token" name="access_token">
-      <input type="hidden" id="enrollment-device-data-url" name="device_data_collection_url">
-      <input type="hidden" id="device-fingerprint-session-id" name="device_fingerprint_session_id">
+      <input type="hidden" name="tracker" id="tracker">
+      <input type="hidden" name="request_id" id="request_id">
+      <input type="hidden" name="payment_method_token" id="payment_method_token">
+      <input type="hidden" name="access_token" id="access_token">
+      <input type="hidden" name="device_data_collection_url" id="device_data_collection_url">
+      <input type="hidden" name="device_fingerprint_session_id" id="device_fingerprint_session_id">
 
       <label style="display:block; margin-top:10px;">Billing Name</label>
       <input type="text" id="billing-name" name="billing_name" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
@@ -121,12 +121,12 @@
     const payerAuthSubmitBtn = document.getElementById("subscription-payer-auth-submit");
     const enrollmentSubmitBtn = document.getElementById("subscription-enrollment-submit");
     const trackerField = document.getElementById("payer-auth-tracker");
-    const enrollmentTrackerField = document.getElementById("enrollment-tracker");
-    const enrollmentRequestIdField = document.getElementById("enrollment-request-id");
-    const enrollmentPaymentMethodTokenField = document.getElementById("enrollment-payment-method-token");
-    const enrollmentAccessTokenField = document.getElementById("enrollment-access-token");
-    const enrollmentDeviceDataUrlField = document.getElementById("enrollment-device-data-url");
-    const deviceFingerprintSessionIdField = document.getElementById("device-fingerprint-session-id");
+    const enrollmentTrackerField = document.getElementById("tracker");
+    const enrollmentRequestIdField = document.getElementById("request_id");
+    const enrollmentPaymentMethodTokenField = document.getElementById("payment_method_token");
+    const enrollmentAccessTokenField = document.getElementById("access_token");
+    const enrollmentDeviceDataUrlField = document.getElementById("device_data_collection_url");
+    const deviceFingerprintSessionIdField = document.getElementById("device_fingerprint_session_id");
     const deviceCollectionHost = document.getElementById("device-collection-host");
     if (!form || !statusBox) return;
 
@@ -217,28 +217,45 @@
         const data = await response.json();
         if (response.ok && data.ok) {
           statusBox.textContent = JSON.stringify(data, null, 2) + "\n\nPayer auth setup completed. Awaiting next step.";
-          const action = ((data.raw_payer_auth_setup_response || {}).action || {});
+          const responseData = ((data.raw_payer_auth_setup_response || {}).data || {});
+          const trackerObj = responseData.tracker || {};
+          const nextActions = trackerObj.next_actions || {};
+          const cybersourceAction = nextActions.CYBERSOURCE || {};
+          const action = (responseData.action || {});
           const payerAuthSetup = action.payer_authentication_setup || {};
           if (enrollmentForm && enrollmentTrackerField) {
-            const deviceFingerprintSessionId = generateDeviceFingerprintSessionId();
-            enrollmentTrackerField.value = data.tracker || trackerField.value;
-            if (enrollmentRequestIdField) enrollmentRequestIdField.value = action.token || "";
+            const trackerToken = trackerObj.token || data.tracker || trackerField.value || "";
+            const requestId = cybersourceAction.request_id || "";
+            const paymentMethodToken = ((action.payment_method || {}).token || "");
+            const accessToken = payerAuthSetup.access_token || "";
+            const deviceUrl = payerAuthSetup.device_data_collection_url || "";
+            const deviceSessionId = generateDeviceFingerprintSessionId();
+
+            document.getElementById("tracker").value = trackerToken;
+            document.getElementById("request_id").value = requestId;
+            document.getElementById("payment_method_token").value = paymentMethodToken;
+            document.getElementById("access_token").value = accessToken;
+            document.getElementById("device_data_collection_url").value = deviceUrl;
+            document.getElementById("device_fingerprint_session_id").value = deviceSessionId;
+
+            enrollmentTrackerField.value = trackerToken;
+            if (enrollmentRequestIdField) enrollmentRequestIdField.value = requestId;
             if (enrollmentPaymentMethodTokenField) {
-              enrollmentPaymentMethodTokenField.value = ((action.payment_method || {}).token || "");
+              enrollmentPaymentMethodTokenField.value = paymentMethodToken;
             }
             if (enrollmentAccessTokenField) {
-              enrollmentAccessTokenField.value = payerAuthSetup.access_token || "";
+              enrollmentAccessTokenField.value = accessToken;
             }
             if (enrollmentDeviceDataUrlField) {
-              enrollmentDeviceDataUrlField.value = payerAuthSetup.device_data_collection_url || "";
+              enrollmentDeviceDataUrlField.value = deviceUrl;
             }
             if (deviceFingerprintSessionIdField) {
-              deviceFingerprintSessionIdField.value = deviceFingerprintSessionId;
+              deviceFingerprintSessionIdField.value = deviceSessionId;
             }
             startDeviceDataCollection(
-              payerAuthSetup.access_token || "",
-              payerAuthSetup.device_data_collection_url || "",
-              deviceFingerprintSessionId
+              accessToken,
+              deviceUrl,
+              deviceSessionId
             );
             enrollmentForm.style.display = "block";
           }
