@@ -114,19 +114,52 @@
     const enrollmentTrackerField = document.getElementById("tracker");
     const deviceFingerprintSessionIdField = document.getElementById("device_fingerprint_session_id");
     const deviceCollectionHost = document.getElementById("device-collection-host");
+    let deviceCollectionTriggered = false;
+    let deviceFingerprintSource = "";
     if (!form || !statusBox) return;
 
-    function generateDeviceFingerprintSessionId() {
-      // TODO: replace this fallback with the actual Cardinal device-data session id
-      // produced by the full device collection flow once that step is implemented.
-      if (window.crypto && typeof window.crypto.randomUUID === "function") {
-        return window.crypto.randomUUID();
+    function setDeviceFingerprintStatus(message) {
+      console.log(message);
+      if (statusBox) {
+        statusBox.style.display = "block";
+        statusBox.textContent += "\n" + message;
       }
-      return "dfp-" + Date.now() + "-" + Math.random().toString(16).slice(2, 10);
+    }
+
+    function extractDeviceFingerprintSessionId(payload) {
+      if (!payload || typeof payload !== "object") return "";
+      const directKeys = [
+        "SessionId",
+        "sessionId",
+        "session_id",
+        "deviceFingerprintSessionId",
+        "device_fingerprint_session_id"
+      ];
+      for (const key of directKeys) {
+        const value = payload[key];
+        if (typeof value === "string" && value.trim()) {
+          return value.trim();
+        }
+      }
+      return "";
     }
 
     function startDeviceDataCollection(accessToken, deviceDataCollectionUrl, sessionId) {
       if (!deviceCollectionHost || !accessToken || !deviceDataCollectionUrl || !sessionId) return;
+
+      deviceCollectionTriggered = true;
+      deviceFingerprintSource = "";
+      if (deviceFingerprintSessionIdField) {
+        deviceFingerprintSessionIdField.value = "";
+      }
+      setDeviceFingerprintStatus(
+        "Cardinal device collection triggered: " +
+        JSON.stringify({
+          triggered: true,
+          source: "cardinal_iframe_post",
+          sessionIdLength: sessionId.length
+        })
+      );
 
       deviceCollectionHost.innerHTML = "";
 
@@ -156,6 +189,31 @@
       deviceCollectionHost.appendChild(formEl);
       formEl.submit();
     }
+
+    window.addEventListener("message", function (event) {
+      const payload = event && event.data;
+      const sessionId = extractDeviceFingerprintSessionId(payload);
+      console.log("Cardinal device collection message", {
+        origin: event.origin,
+        payloadType: typeof payload,
+        payloadKeys: payload && typeof payload === "object" ? Object.keys(payload) : [],
+        extractedSessionIdLength: sessionId ? sessionId.length : 0,
+      });
+      if (!sessionId) return;
+
+      deviceFingerprintSource = "cardinal_postmessage";
+      if (deviceFingerprintSessionIdField) {
+        deviceFingerprintSessionIdField.value = sessionId;
+      }
+      setDeviceFingerprintStatus(
+        "Device fingerprint session captured: " +
+        JSON.stringify({
+          triggered: deviceCollectionTriggered,
+          source: deviceFingerprintSource,
+          sessionIdLength: sessionId.length
+        })
+      );
+    });
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -213,19 +271,14 @@
             const trackerToken = trackerObj.token || data.tracker || trackerField.value || "";
             const accessToken = payerAuthSetup.access_token || "";
             const deviceUrl = payerAuthSetup.device_data_collection_url || "";
-            const deviceSessionId = generateDeviceFingerprintSessionId();
 
             document.getElementById("tracker").value = trackerToken;
-            document.getElementById("device_fingerprint_session_id").value = deviceSessionId;
 
             enrollmentTrackerField.value = trackerToken;
-            if (deviceFingerprintSessionIdField) {
-              deviceFingerprintSessionIdField.value = deviceSessionId;
-            }
             startDeviceDataCollection(
               accessToken,
               deviceUrl,
-              deviceSessionId
+              trackerToken
             );
             enrollmentForm.style.display = "block";
           }
@@ -243,6 +296,18 @@
 
     enrollmentForm.addEventListener("submit", async function (e) {
       e.preventDefault();
+      const deviceFingerprintSessionId = (deviceFingerprintSessionIdField && deviceFingerprintSessionIdField.value || "").trim();
+      console.log("Enrollment device fingerprint check", {
+        triggered: deviceCollectionTriggered,
+        source: deviceFingerprintSource || "none",
+        sessionIdLength: deviceFingerprintSessionId.length,
+      });
+      if (!deviceCollectionTriggered || !deviceFingerprintSource || !deviceFingerprintSessionId) {
+        statusBox.style.display = "block";
+        statusBox.textContent = "Enrollment blocked: device_fingerprint_session_id was not populated by the Cardinal device-data step.";
+        if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = false;
+        return;
+      }
       statusBox.style.display = "block";
       statusBox.textContent = "Starting Safepay payer auth enrollment...";
       if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = true;

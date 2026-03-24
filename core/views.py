@@ -5889,6 +5889,21 @@ def subscription_checkout_payer_auth_enrollment(request):
             bool(device_fingerprint_session_id),
             list(enrollment_payload["payload"]["billing"].keys()),
         )
+        logger.info(
+            "Safepay enrollment sanitized body=%s",
+            {
+                "top_level_keys": list(enrollment_payload.keys()),
+                "payload": {
+                    "billing": enrollment_payload.get("payload", {}).get("billing", {}),
+                    "authorization": enrollment_payload.get("payload", {}).get("authorization", {}),
+                    "authentication_setup_keys": list(
+                        enrollment_payload.get("payload", {}).get("authentication_setup", {}).keys()
+                    ),
+                    "device_fingerprint_present": bool(device_fingerprint_session_id),
+                    "device_fingerprint_length": len(device_fingerprint_session_id or ""),
+                },
+            },
+        )
         logger.info("Safepay enrollment payload top-level keys=%s", list(enrollment_payload.keys()))
         logger.info("Safepay enrollment payload.payload keys=%s", list(enrollment_payload.get("payload", {}).keys()))
         logger.info(
@@ -5898,6 +5913,13 @@ def subscription_checkout_payer_auth_enrollment(request):
         logger.info(
             "Safepay enrollment authentication_setup keys=%s",
             list(enrollment_payload.get("payload", {}).get("authentication_setup", {}).keys()),
+        )
+        logger.info(
+            "Safepay enrollment forbidden field presence request_id=%s payment_method=%s access_token=%s device_data_collection_url=%s",
+            "request_id" in enrollment_payload,
+            "payment_method" in enrollment_payload.get("payload", {}),
+            "access_token" in enrollment_payload.get("payload", {}).get("authentication_setup", {}),
+            "device_data_collection_url" in enrollment_payload.get("payload", {}).get("authentication_setup", {}),
         )
         response_data = _safepay_post(
             f"/order/payments/v3/{tracker}",
