@@ -40,6 +40,29 @@
     </form>
 
     <pre id="subscription-checkout-status" style="display:none;margin-top:16px;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;white-space:pre-wrap;font-family:monospace;overflow:auto;"></pre>
+
+    <form id="subscription-payer-auth-form" method="post" action="{% url 'subscription_checkout_payer_auth_setup' %}" style="display:none;margin-top:16px;">
+      {% csrf_token %}
+      <input type="hidden" id="payer-auth-tracker" name="tracker">
+
+      <label style="display:block; margin-top:10px;">Card Number</label>
+      <input type="text" id="card-number" name="card_number" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Expiration Month</label>
+      <input type="text" id="expiration-month" name="expiration_month" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">Expiration Year</label>
+      <input type="text" id="expiration-year" name="expiration_year" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <label style="display:block; margin-top:10px;">CVV</label>
+      <input type="text" id="cvv" name="cvv" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
+      <div style="margin-top: 15px;">
+        <button id="subscription-payer-auth-submit" type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #111827;background:#111827;color:#fff;font-weight:800;cursor:pointer;">
+          Start Payer Auth Setup
+        </button>
+      </div>
+    </form>
   </div>
 
   <div style="margin-top: 20px;">
@@ -52,8 +75,11 @@
 <script>
   (function () {
     const form = document.getElementById("subscription-checkout-form");
+    const payerAuthForm = document.getElementById("subscription-payer-auth-form");
     const statusBox = document.getElementById("subscription-checkout-status");
     const submitBtn = document.getElementById("subscription-checkout-submit");
+    const payerAuthSubmitBtn = document.getElementById("subscription-payer-auth-submit");
+    const trackerField = document.getElementById("payer-auth-tracker");
     if (!form || !statusBox) return;
 
     form.addEventListener("submit", async function (e) {
@@ -73,10 +99,40 @@
         });
         const data = await response.json();
         statusBox.textContent = JSON.stringify(data, null, 2);
+        if (response.ok && data.ok && data.tracker && payerAuthForm && trackerField) {
+          trackerField.value = data.tracker;
+          payerAuthForm.style.display = "block";
+        }
       } catch (err) {
         statusBox.textContent = "Could not start Safepay tracker.";
       } finally {
         if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+
+    if (!payerAuthForm) return;
+
+    payerAuthForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      statusBox.style.display = "block";
+      statusBox.textContent = "Starting Safepay payer auth setup...";
+      if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(payerAuthForm);
+        const response = await fetch(payerAuthForm.action, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+          },
+          body: formData
+        });
+        const data = await response.json();
+        statusBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        statusBox.textContent = "Could not start Safepay payer auth setup.";
+      } finally {
+        if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = false;
       }
     });
   })();

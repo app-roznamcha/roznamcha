@@ -150,6 +150,7 @@ urlpatterns = [
     # =========================
     path("subscription/", staff_blocked(views.subscription_page), name="subscription_page"),
     path("subscription/checkout/start/", staff_blocked(views.subscription_checkout_start), name="subscription_checkout_start"),
+    path("subscription/checkout/payer-auth-setup/", staff_blocked(views.subscription_checkout_payer_auth_setup), name="subscription_checkout_payer_auth_setup"),
     path("profile/", staff_blocked(views.owner_profile_page), name="owner_profile_page"),
     path("company/", staff_blocked(views.company_page), name="company_page"),
 

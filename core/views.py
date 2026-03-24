@@ -5661,35 +5661,26 @@ def subscription_checkout_start(request):
 
     try:
         tracker_response = _safepay_post("/order/payments/v3/", tracker_request)
-        tracker_root = tracker_response if isinstance(tracker_response, dict) else {}
-        logger.info("Safepay tracker response keys: %s", list(tracker_root.keys()))
-        if isinstance(tracker_root.get("data"), dict):
-            logger.info("Safepay tracker response data keys: %s", list(tracker_root["data"].keys()))
+        tracker_data = tracker_response if isinstance(tracker_response, dict) else {}
+        logger.info("Safepay tracker response keys: %s", list(tracker_data.keys()))
+        if isinstance(tracker_data.get("data"), dict):
+            logger.info("Safepay tracker response data keys: %s", list(tracker_data["data"].keys()))
 
-        tracker_data = tracker_root
-        for key in ("data", "payload"):
-            if isinstance(tracker_data.get(key), dict):
-                tracker_data = tracker_data[key]
-
-        tracker_token = (
-            ((tracker_data.get("tracker") or {}).get("token"))
-            or tracker_data.get("tracker_token")
-            or tracker_data.get("token")
-            or ""
-        )
-        tracker_token = tracker_token.strip()
+        tracker_obj = ((tracker_data.get("data") or {}).get("tracker") or {})
+        tracker_token = (tracker_obj.get("token") or "").strip()
         if not tracker_token:
             raise ValueError("Safepay did not return a tracker token.")
 
-        next_actions = tracker_data.get("next_actions") or []
+        next_actions = tracker_obj.get("next_actions") or {}
+        quote_amount = ((tracker_obj.get("purchase_totals") or {}).get("quote_amount") or {})
         safepay_response = {
-            "intent": tracker_data.get("intent"),
-            "mode": tracker_data.get("mode"),
-            "entry_mode": tracker_data.get("entry_mode"),
-            "currency": tracker_data.get("currency"),
-            "amount": tracker_data.get("amount"),
-            "status": tracker_data.get("status"),
-            "payment_method": tracker_data.get("payment_method"),
+            "intent": tracker_obj.get("intent"),
+            "mode": tracker_obj.get("mode"),
+            "entry_mode": tracker_obj.get("entry_mode"),
+            "currency": quote_amount.get("currency"),
+            "amount": quote_amount.get("amount"),
+            "status": tracker_obj.get("state"),
+            "payment_method": tracker_obj.get("payment_method_kind"),
         }
 
         tx.provider_txn_id = tracker_token
@@ -5725,7 +5716,7 @@ def subscription_checkout_start(request):
                 "tracker": tracker_token,
                 "next_actions": next_actions,
                 "safepay_response": safepay_response,
-                "raw_tracker_response": tracker_root,
+                "raw_tracker_response": tracker_data,
             }
         )
     except Exception as exc:
@@ -5737,6 +5728,77 @@ def subscription_checkout_start(request):
             "error": str(exc),
         }
         tx.save(update_fields=["status", "failure_reason", "request_payload", "updated_at"])
+        return JsonResponse({"ok": False, "error": str(exc)}, status=502)
+
+
+@require_POST
+@resolve_tenant_context(require_company=True)
+@owner_required
+@staff_blocked
+def subscription_checkout_payer_auth_setup(request):
+    tracker = (request.POST.get("tracker") or "").strip()
+    card_number = (request.POST.get("card_number") or "").strip()
+    expiration_month = (request.POST.get("expiration_month") or "").strip()
+    expiration_year = (request.POST.get("expiration_year") or "").strip()
+    cvv = (request.POST.get("cvv") or "").strip()
+
+    if not all([tracker, card_number, expiration_month, expiration_year, cvv]):
+        return JsonResponse(
+            {"ok": False, "error": "Tracker and full card details are required."},
+            status=400,
+        )
+
+    tx = SubscriptionTransaction.objects.filter(
+        owner=request.owner,
+        provider="SAFEPAY",
+        provider_txn_id=tracker,
+    ).first()
+    if not tx:
+        return JsonResponse({"ok": False, "error": "Tracker not found."}, status=404)
+
+    payer_auth_payload = {
+        "payload": {
+            "payment_method": {
+                "card": {
+                    "card_number": card_number,
+                    "expiration_month": expiration_month,
+                    "expiration_year": expiration_year,
+                    "cvv": cvv,
+                }
+            }
+        }
+    }
+
+    try:
+        response_data = _safepay_post(f"/order/payments/v3/{tracker}", payer_auth_payload)
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "payer_auth_setup_request": {
+                "tracker": tracker,
+                "expiration_month": expiration_month,
+                "expiration_year": expiration_year,
+            },
+            "payer_auth_setup_response": response_data,
+        }
+        tx.save(update_fields=["request_payload", "updated_at"])
+        return JsonResponse(
+            {
+                "ok": True,
+                "tracker": tracker,
+                "raw_payer_auth_setup_response": response_data,
+            }
+        )
+    except Exception as exc:
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "payer_auth_setup_request": {
+                "tracker": tracker,
+                "expiration_month": expiration_month,
+                "expiration_year": expiration_year,
+            },
+            "payer_auth_setup_error": str(exc),
+        }
+        tx.save(update_fields=["request_payload", "updated_at"])
         return JsonResponse({"ok": False, "error": str(exc)}, status=502)
 
 @login_required
