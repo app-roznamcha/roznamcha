@@ -5832,14 +5832,8 @@ def subscription_checkout_payer_auth_setup(request):
 @staff_blocked
 def subscription_checkout_payer_auth_enrollment(request):
     tracker = (request.POST.get("tracker") or "").strip()
-    request_id = (request.POST.get("request_id") or "").strip()
-    payment_method_token = (request.POST.get("payment_method_token") or "").strip()
-    access_token = (request.POST.get("access_token") or "").strip()
-    device_data_collection_url = (request.POST.get("device_data_collection_url") or "").strip()
     device_fingerprint_session_id = (request.POST.get("device_fingerprint_session_id") or "").strip()
-    billing_name = (request.POST.get("billing_name") or "").strip()
-    billing_email = (request.POST.get("billing_email") or "").strip()
-    billing_phone = (request.POST.get("billing_phone") or "").strip()
+    billing_state = (request.POST.get("billing_state") or "").strip()
     billing_country = (request.POST.get("billing_country") or "").strip()
     billing_city = (request.POST.get("billing_city") or "").strip()
     billing_postal_code = (request.POST.get("billing_postal_code") or "").strip()
@@ -5847,13 +5841,7 @@ def subscription_checkout_payer_auth_enrollment(request):
 
     if not all([
         tracker,
-        request_id,
-        payment_method_token,
-        access_token,
         device_fingerprint_session_id,
-        billing_name,
-        billing_email,
-        billing_phone,
         billing_country,
         billing_city,
         billing_postal_code,
@@ -5873,32 +5861,34 @@ def subscription_checkout_payer_auth_enrollment(request):
         return JsonResponse({"ok": False, "error": "Tracker not found."}, status=404)
 
     enrollment_payload = {
-        "request_id": request_id,
         "payload": {
-            "payment_method": {
-                "token": payment_method_token,
-            },
             "billing": {
-                "name": billing_name,
-                "email": billing_email,
-                "phone": billing_phone,
-                "country": billing_country,
+                "street_1": billing_address_1,
+                "street_2": "",
                 "city": billing_city,
+                "state": billing_state or "",
                 "postal_code": billing_postal_code,
-                "address_line1": billing_address_1,
+                "country": billing_country,
             },
             "authorization": {
-                "currency": tx.currency,
-                "amount": int(tx.amount),
+                "do_capture": False,
             },
             "authentication_setup": {
-                "access_token": access_token,
+                "success_url": request.build_absolute_uri(f"{reverse('subscription_page')}?enrollment=success"),
+                "failure_url": request.build_absolute_uri(f"{reverse('subscription_page')}?enrollment=failure"),
                 "device_fingerprint_session_id": device_fingerprint_session_id,
             },
         }
     }
 
     try:
+        logger.info(
+            "Safepay enrollment request tracker=%s auth_mode=%s device_fingerprint_present=%s billing_keys=%s",
+            _mask_safepay_value(tracker),
+            "merchant_secret",
+            bool(device_fingerprint_session_id),
+            list(enrollment_payload["payload"]["billing"].keys()),
+        )
         response_data = _safepay_post(
             f"/order/payments/v3/{tracker}",
             enrollment_payload,
@@ -5908,22 +5898,16 @@ def subscription_checkout_payer_auth_enrollment(request):
             **(tx.request_payload or {}),
             "payer_auth_enrollment_request": {
                 "tracker": tracker,
-                "request_id": request_id,
-                "payment_method_token": _mask_safepay_value(payment_method_token),
                 "device_fingerprint_session_id": device_fingerprint_session_id,
                 "billing": {
-                    "name": billing_name,
-                    "email": billing_email,
-                    "phone": billing_phone,
-                    "country": billing_country,
+                    "street_1": billing_address_1,
+                    "street_2": "",
                     "city": billing_city,
+                    "state": billing_state or "",
                     "postal_code": billing_postal_code,
-                    "address_line1": billing_address_1,
+                    "country": billing_country,
                 },
-                "authorization": {
-                    "currency": tx.currency,
-                    "amount": int(tx.amount),
-                },
+                "authorization": {"do_capture": False},
             },
             "payer_auth_enrollment_response": response_data,
         }
@@ -5940,9 +5924,15 @@ def subscription_checkout_payer_auth_enrollment(request):
             **(tx.request_payload or {}),
             "payer_auth_enrollment_request": {
                 "tracker": tracker,
-                "request_id": request_id,
-                "payment_method_token": _mask_safepay_value(payment_method_token),
                 "device_fingerprint_session_id": device_fingerprint_session_id,
+                "billing": {
+                    "street_1": billing_address_1,
+                    "street_2": "",
+                    "city": billing_city,
+                    "state": billing_state or "",
+                    "postal_code": billing_postal_code,
+                    "country": billing_country,
+                },
             },
             "payer_auth_enrollment_error": str(exc),
         }
