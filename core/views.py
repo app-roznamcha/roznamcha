@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 from functools import wraps
 from io import StringIO
 from pathlib import Path
+from urllib.parse import urlencode, urlsplit
 import requests
 
 # =========================
@@ -120,7 +121,6 @@ from django.db.models.functions import Cast
 logger = logging.getLogger(__name__)
 from django.db.models import IntegerField
 import asyncio
-from urllib.parse import urlencode
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import DailyExpense, CashBankTransfer
@@ -5604,12 +5604,6 @@ def _safepay_checkout_environment() -> str:
     return "sandbox" if env == "sandbox" else "production"
 
 
-def _safepay_checkout_base_url() -> str:
-    if _safepay_checkout_environment() == "sandbox":
-        return "https://sandbox.api.getsafepay.com/checkout"
-    return "https://api.getsafepay.com/checkout"
-
-
 def _safepay_create_auth_token() -> str:
     response_data = _safepay_post("/client/passport/v1/token", auth_mode="merchant_secret")
     logger.info(
@@ -5634,25 +5628,39 @@ def _safepay_create_auth_token() -> str:
     return token
 
 
-def _safepay_subscription_checkout_url(*, plan_id: str, reference: str, auth_token: str, redirect_url: str, cancel_url: str) -> str:
-    base_url = _safepay_checkout_base_url()
-    safepay_environment = _safepay_checkout_environment()
+def _safepay_checkout_subscription_with_token(
+    *,
+    plan_id: str,
+    reference: str,
+    auth_token: str,
+    redirect_url: str,
+    cancel_url: str,
+) -> str:
+    """
+    Local shim for Safepay's documented SDK contract:
+    checkout.createSubscriptionWithToken({ planId, reference, cancelUrl, redirectUrl, authToken })
+    """
+    environment = _safepay_checkout_environment()
+    base_url = (
+        "https://sandbox.api.getsafepay.com/checkout"
+        if environment == "sandbox"
+        else "https://api.getsafepay.com/checkout"
+    )
     params = {
+        "environment": environment,
         "plan_id": plan_id,
-        "reference": reference,
         "tbt": auth_token,
-        "redirect_url": redirect_url,
+        "reference": reference,
         "cancel_url": cancel_url,
-        "environment": safepay_environment,
+        "redirect_url": redirect_url,
     }
-    query = urlencode(params)
-    checkout_url = f"{base_url}?{query}"
+    checkout_url = f"{base_url}?{urlencode(params)}"
+    checkout_parts = urlsplit(checkout_url)
     logger.info(
-        "Safepay checkout URL generated base_url=%s param_keys=%s environment=%s checkout_url=%s",
-        base_url,
-        list(params.keys()),
-        safepay_environment,
-        checkout_url,
+        "Safepay subscription checkout generated environment=%s redirect_host=%s redirect_path=%s",
+        environment,
+        checkout_parts.netloc,
+        checkout_parts.path,
     )
     return checkout_url
 
@@ -5783,7 +5791,7 @@ def subscription_checkout_start(request):
 
     try:
         auth_token = _safepay_create_auth_token()
-        checkout_url = _safepay_subscription_checkout_url(
+        checkout_url = _safepay_checkout_subscription_with_token(
             plan_id=resolved_plan_id,
             reference=merchant_ref,
             auth_token=auth_token,
@@ -5792,7 +5800,7 @@ def subscription_checkout_start(request):
         )
     except ValueError as exc:
         logger.error(
-            "Safepay hosted checkout auth failed plan=%s merchant_ref=%s plan_id=%s error=%s",
+            "Safepay hosted checkout generation failed plan=%s merchant_ref=%s plan_id=%s error=%s",
             plan["plan_code"],
             merchant_ref,
             resolved_plan_id,
@@ -5836,8 +5844,6 @@ def subscription_checkout_start(request):
     return JsonResponse(
         {
             "ok": True,
-            "plan_code": plan["plan_code"],
-            "plan_id": resolved_plan_id,
             "checkout_url": checkout_url,
         },
     )
