@@ -5478,14 +5478,14 @@ def _subscription_plan_config(plan_code):
         return {
             "plan_code": "MONTHLY",
             "duration_days": 30,
-            "amount": Decimal("1000.00"),
+            "amount": 100000,
             "currency": "PKR",
         }
     if plan_code == "YEARLY":
         return {
             "plan_code": "YEARLY",
             "duration_days": 365,
-            "amount": Decimal("9000.00"),
+            "amount": 900000,
             "currency": "PKR",
         }
     return None
@@ -5655,7 +5655,7 @@ def subscription_checkout_start(request):
         "intent": "CYBERSOURCE",
         "entry_mode": "raw",
         "currency": plan["currency"],
-        "amount": str(plan["amount"]),
+        "amount": plan["amount"],
         "metadata": {
             "merchant_reference": merchant_ref,
         },
