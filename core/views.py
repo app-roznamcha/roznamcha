@@ -5531,8 +5531,16 @@ def _safepay_post(path: str, payload: dict | None = None):
         raise ValueError(f"Safepay returned a non-JSON response from {path}.") from exc
 
     if not response.ok:
-        detail = data.get("message") if isinstance(data, dict) else None
-        raise ValueError(detail or f"Safepay request failed for {path}.")
+        logger.error(
+            "Safepay error path=%s status_code=%s response=%s",
+            path,
+            response.status_code,
+            data,
+        )
+        raise ValueError(
+            f"Safepay request failed for {path} "
+            f"(status {response.status_code}): {json.dumps(data, ensure_ascii=True)}"
+        )
 
     return data
 
