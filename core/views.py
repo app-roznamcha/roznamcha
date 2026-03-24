@@ -5889,6 +5889,16 @@ def subscription_checkout_payer_auth_enrollment(request):
             bool(device_fingerprint_session_id),
             list(enrollment_payload["payload"]["billing"].keys()),
         )
+        logger.info("Safepay enrollment payload top-level keys=%s", list(enrollment_payload.keys()))
+        logger.info("Safepay enrollment payload.payload keys=%s", list(enrollment_payload.get("payload", {}).keys()))
+        logger.info(
+            "Safepay enrollment billing keys=%s",
+            list(enrollment_payload.get("payload", {}).get("billing", {}).keys()),
+        )
+        logger.info(
+            "Safepay enrollment authentication_setup keys=%s",
+            list(enrollment_payload.get("payload", {}).get("authentication_setup", {}).keys()),
+        )
         response_data = _safepay_post(
             f"/order/payments/v3/{tracker}",
             enrollment_payload,
