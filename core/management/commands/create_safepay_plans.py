@@ -11,10 +11,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             monthly_payload = {
+                "name": "Roznamcha Monthly",
                 "product": "Roznamcha Monthly",
                 "amount": 100000,
                 "currency": "PKR",
                 "interval": "MONTH",
+                "type": "RECURRING",
                 "interval_count": 1,
                 "active": True,
             }
@@ -28,10 +30,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"SAFEPAY_MONTHLY_PLAN_ID={monthly_id or 'UNKNOWN'}"))
 
             yearly_payload = {
+                "name": "Roznamcha Yearly",
                 "product": "Roznamcha Yearly",
                 "amount": 900000,
                 "currency": "PKR",
                 "interval": "YEAR",
+                "type": "RECURRING",
                 "interval_count": 1,
                 "active": True,
             }

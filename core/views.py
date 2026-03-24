@@ -5568,23 +5568,33 @@ def _safepay_post(path: str, payload: dict | None = None, auth_mode: str = "bear
     return data
 
 
-def _safepay_create_plan(*, product: str, amount: int, currency: str, interval: str, interval_count: int, active: bool = True):
+def _safepay_create_plan(
+    *,
+    name: str,
+    product: str,
+    amount: int,
+    currency: str,
+    interval: str,
+    type: str,
+    interval_count: int,
+    active: bool = True,
+):
     payload = {
+        "name": name,
         "product": product,
         "amount": amount,
         "currency": currency,
         "interval": interval,
+        "type": type,
         "interval_count": interval_count,
         "active": active,
     }
     logger.info(
-        "Safepay plan create product=%s amount=%s currency=%s interval=%s interval_count=%s active=%s",
+        "Safepay plan create product=%s interval=%s type=%s amount=%s",
         product,
-        amount,
-        currency,
         interval,
-        interval_count,
-        active,
+        type,
+        amount,
     )
     return _safepay_post("/client/plans/v1/", payload, auth_mode="merchant_secret")
 
