@@ -73,6 +73,9 @@
       <input type="hidden" name="device_data_collection_url" id="device_data_collection_url">
       <input type="hidden" name="device_fingerprint_session_id" id="device_fingerprint_session_id">
 
+      <label style="display:block; margin-top:10px;">Guest JWT</label>
+      <input type="text" id="guest-jwt" name="guest_jwt" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
+
       <label style="display:block; margin-top:10px;">Billing Name</label>
       <input type="text" id="billing-name" name="billing_name" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
 
@@ -131,6 +134,8 @@
     if (!form || !statusBox) return;
 
     function generateDeviceFingerprintSessionId() {
+      // TODO: replace this fallback with the actual Cardinal device-data session id
+      // produced by the full device collection flow once that step is implemented.
       if (window.crypto && typeof window.crypto.randomUUID === "function") {
         return window.crypto.randomUUID();
       }

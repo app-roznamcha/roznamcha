@@ -5501,17 +5501,26 @@ def _subscription_merchant_ref(owner, plan_code: str) -> str:
     raise ValueError("Could not generate a unique merchant reference.")
 
 
-def _safepay_post(path: str, payload: dict | None = None, auth_mode: str = "bearer"):
+def _safepay_post(path: str, payload: dict | None = None, auth_mode: str = "bearer", auth_token: str = ""):
     base_url = (getattr(settings, "SAFEPAY_BASE_URL", "") or "").rstrip("/")
     secret_key = (getattr(settings, "SAFEPAY_SECRET_API_KEY", "") or "").strip()
     if not base_url:
         raise ValueError("Safepay base URL is not configured.")
-    if not secret_key:
+    if auth_mode != "guest_jwt" and not secret_key:
         raise ValueError("Safepay secret API key is not configured.")
 
     if auth_mode == "merchant_secret":
         headers = {
             "X-SFPY-MERCHANT-SECRET": secret_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+    elif auth_mode == "guest_jwt":
+        guest_jwt = (auth_token or "").strip()
+        if not guest_jwt:
+            raise ValueError("Guest JWT is required for this Safepay request.")
+        headers = {
+            "Authorization": f"Bearer {guest_jwt}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
@@ -5828,6 +5837,7 @@ def subscription_checkout_payer_auth_enrollment(request):
     access_token = (request.POST.get("access_token") or "").strip()
     device_data_collection_url = (request.POST.get("device_data_collection_url") or "").strip()
     device_fingerprint_session_id = (request.POST.get("device_fingerprint_session_id") or "").strip()
+    guest_jwt = (request.POST.get("guest_jwt") or "").strip()
     billing_name = (request.POST.get("billing_name") or "").strip()
     billing_email = (request.POST.get("billing_email") or "").strip()
     billing_phone = (request.POST.get("billing_phone") or "").strip()
@@ -5843,6 +5853,7 @@ def subscription_checkout_payer_auth_enrollment(request):
         access_token,
         device_data_collection_url,
         device_fingerprint_session_id,
+        guest_jwt,
         billing_name,
         billing_email,
         billing_phone,
@@ -5895,7 +5906,8 @@ def subscription_checkout_payer_auth_enrollment(request):
         response_data = _safepay_post(
             f"/order/payments/v3/{tracker}",
             enrollment_payload,
-            auth_mode="merchant_secret",
+            auth_mode="guest_jwt",
+            auth_token=guest_jwt,
         )
         tx.request_payload = {
             **(tx.request_payload or {}),
