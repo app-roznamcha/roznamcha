@@ -6,7 +6,7 @@ import re
 import tempfile
 import logging
 import json
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from functools import wraps
@@ -5654,15 +5654,18 @@ def _safepay_checkout_subscription_with_token(
         if environment == "sandbox"
         else "https://api.getsafepay.com/checkout"
     )
-    params = {
-        "environment": environment,
-        "plan_id": plan_id,
-        "tbt": auth_token,
-        "reference": reference,
-        "cancel_url": cancel_url,
-        "redirect_url": redirect_url,
-    }
-    checkout_url = f"{base_url}?{urlencode(params)}"
+    # Built to mirror Safepay PHP SDK subscription checkout contract.
+    params = OrderedDict(
+        [
+            ("environment", environment),
+            ("plan_id", plan_id),
+            ("tbt", auth_token),
+            ("reference", reference),
+            ("cancel_url", cancel_url),
+            ("redirect_url", redirect_url),
+        ]
+    )
+    checkout_url = f"{base_url}?{urlencode(params, doseq=False)}"
     checkout_parts = urlsplit(checkout_url)
     logger.info(
         "Safepay subscription checkout generated base_url=%s param_keys=%s checkout_url=%s",
