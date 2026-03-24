@@ -5657,7 +5657,7 @@ def _safepay_checkout_subscription_with_token(
     # Built to mirror Safepay PHP SDK subscription checkout contract.
     params = OrderedDict(
         [
-            ("environment", environment),
+            ("env", environment),
             ("plan_id", plan_id),
             ("tbt", auth_token),
             ("reference", reference),
