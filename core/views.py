@@ -5647,11 +5647,12 @@ def subscription_checkout_start(request):
     owner = request.owner
     merchant_ref = _subscription_merchant_ref(owner, plan["plan_code"])
     logger.info(
-        "Safepay checkout start env=%s public_key_present=%s secret_key_present=%s base_url=%s",
+        "Safepay hosted checkout start plan=%s merchant_ref=%s env=%s public_key_present=%s secret_key_present=%s",
+        plan["plan_code"],
+        merchant_ref,
         getattr(settings, "SAFEPAY_ENV", ""),
         bool(public_key),
         bool(secret_key),
-        getattr(settings, "SAFEPAY_BASE_URL", ""),
     )
 
     tx = SubscriptionTransaction.objects.create(
@@ -5667,309 +5668,22 @@ def subscription_checkout_start(request):
             "plan": plan["plan_code"],
             "amount": str(plan["amount"]),
             "currency": plan["currency"],
+            "checkout_mode": "hosted_placeholder",
         },
     )
-
-    tracker_request = {
-        "merchant_api_key": public_key,
-        "mode": "payment",
-        "intent": "CYBERSOURCE",
-        "entry_mode": "raw",
-        "currency": plan["currency"],
-        "amount": plan["amount"],
-    }
-
-    try:
-        tracker_response = _safepay_post("/order/payments/v3/", tracker_request)
-        tracker_data = tracker_response if isinstance(tracker_response, dict) else {}
-        logger.info("Safepay tracker response keys: %s", list(tracker_data.keys()))
-        if isinstance(tracker_data.get("data"), dict):
-            logger.info("Safepay tracker response data keys: %s", list(tracker_data["data"].keys()))
-
-        tracker_obj = ((tracker_data.get("data") or {}).get("tracker") or {})
-        tracker_token = (tracker_obj.get("token") or "").strip()
-        if not tracker_token:
-            raise ValueError("Safepay did not return a tracker token.")
-
-        next_actions = tracker_obj.get("next_actions") or {}
-        quote_amount = ((tracker_obj.get("purchase_totals") or {}).get("quote_amount") or {})
-        safepay_response = {
-            "intent": tracker_obj.get("intent"),
-            "mode": tracker_obj.get("mode"),
-            "entry_mode": tracker_obj.get("entry_mode"),
-            "currency": quote_amount.get("currency"),
-            "amount": quote_amount.get("amount"),
-            "status": tracker_obj.get("state"),
-            "payment_method": tracker_obj.get("payment_method_kind"),
-        }
-
-        tx.provider_txn_id = tracker_token
-        tx.status = SubscriptionTransaction.STATUS_PENDING
-        tx.request_payload = {
-            **(tx.request_payload or {}),
-            "tracker_request": tracker_request,
-            "tracker_response": {
-                "tracker": _mask_safepay_value(tracker_token),
-                "next_actions": next_actions,
-                "intent": safepay_response["intent"],
-                "mode": safepay_response["mode"],
-                "entry_mode": safepay_response["entry_mode"],
-                "amount": safepay_response["amount"],
-                "currency": safepay_response["currency"],
-                "status": safepay_response["status"],
-            },
-        }
-        tx.save(update_fields=["provider_txn_id", "status", "request_payload", "updated_at"])
-
-        logger.info(
-            "Safepay tracker created merchant_ref=%s path=%s tracker=%s next_actions_count=%s",
-            merchant_ref,
-            "/order/payments/v3/",
-            _mask_safepay_value(tracker_token),
-            len(next_actions),
-        )
-
-        return JsonResponse(
-            {
-                "ok": True,
-                "merchant_ref": merchant_ref,
-                "tracker": tracker_token,
-                "next_actions": next_actions,
-                "safepay_response": safepay_response,
-                "raw_tracker_response": tracker_data,
-            }
-        )
-    except Exception as exc:
-        tx.status = SubscriptionTransaction.STATUS_FAILED
-        tx.failure_reason = str(exc)[:2000]
-        tx.request_payload = {
-            **(tx.request_payload or {}),
-            "tracker_request": tracker_request,
-            "error": str(exc),
-        }
-        tx.save(update_fields=["status", "failure_reason", "request_payload", "updated_at"])
-        return JsonResponse({"ok": False, "error": str(exc)}, status=502)
-
-
-@require_POST
-@resolve_tenant_context(require_company=True)
-@owner_required
-@staff_blocked
-def subscription_checkout_payer_auth_setup(request):
-    tracker = (request.POST.get("tracker") or "").strip()
-    card_number = (request.POST.get("card_number") or "").strip()
-    expiration_month = (request.POST.get("expiration_month") or "").strip()
-    expiration_year = (request.POST.get("expiration_year") or "").strip()
-    cvv = (request.POST.get("cvv") or "").strip()
-
-    if not all([tracker, card_number, expiration_month, expiration_year, cvv]):
-        return JsonResponse(
-            {"ok": False, "error": "Tracker and full card details are required."},
-            status=400,
-        )
-
-    tx = SubscriptionTransaction.objects.filter(
-        owner=request.owner,
-        provider="SAFEPAY",
-        provider_txn_id=tracker,
-    ).first()
-    if not tx:
-        return JsonResponse({"ok": False, "error": "Tracker not found."}, status=404)
-
-    payer_auth_payload = {
-        "payload": {
-            "payment_method": {
-                "card": {
-                    "card_number": card_number,
-                    "expiration_month": expiration_month,
-                    "expiration_year": expiration_year,
-                    "cvv": cvv,
-                }
-            }
-        }
-    }
-
-    try:
-        response_data = _safepay_post(
-            f"/order/payments/v3/{tracker}",
-            payer_auth_payload,
-            auth_mode="merchant_secret",
-        )
-        tx.request_payload = {
-            **(tx.request_payload or {}),
-            "payer_auth_setup_request": {
-                "tracker": tracker,
-                "expiration_month": expiration_month,
-                "expiration_year": expiration_year,
-            },
-            "payer_auth_setup_response": response_data,
-        }
-        tx.save(update_fields=["request_payload", "updated_at"])
-        return JsonResponse(
-            {
-                "ok": True,
-                "tracker": tracker,
-                "raw_payer_auth_setup_response": response_data,
-            }
-        )
-    except Exception as exc:
-        tx.request_payload = {
-            **(tx.request_payload or {}),
-            "payer_auth_setup_request": {
-                "tracker": tracker,
-                "expiration_month": expiration_month,
-                "expiration_year": expiration_year,
-            },
-            "payer_auth_setup_error": str(exc),
-        }
-        tx.save(update_fields=["request_payload", "updated_at"])
-        return JsonResponse({"ok": False, "error": str(exc)}, status=502)
-
-
-@require_POST
-@resolve_tenant_context(require_company=True)
-@owner_required
-@staff_blocked
-def subscription_checkout_payer_auth_enrollment(request):
-    tracker = (request.POST.get("tracker") or "").strip()
-    device_fingerprint_session_id = (request.POST.get("device_fingerprint_session_id") or "").strip()
-    billing_state = (request.POST.get("billing_state") or "").strip()
-    billing_country = (request.POST.get("billing_country") or "").strip()
-    billing_city = (request.POST.get("billing_city") or "").strip()
-    billing_postal_code = (request.POST.get("billing_postal_code") or "").strip()
-    billing_address_1 = (request.POST.get("billing_address_1") or "").strip()
-
-    if not all([
-        tracker,
-        device_fingerprint_session_id,
-        billing_country,
-        billing_city,
-        billing_postal_code,
-        billing_address_1,
-    ]):
-        return JsonResponse(
-            {"ok": False, "error": "Tracker, Safepay setup values, and billing details are required."},
-            status=400,
-        )
-
-    tx = SubscriptionTransaction.objects.filter(
-        owner=request.owner,
-        provider="SAFEPAY",
-        provider_txn_id=tracker,
-    ).first()
-    if not tx:
-        return JsonResponse({"ok": False, "error": "Tracker not found."}, status=404)
-
-    enrollment_payload = {
-        "payload": {
-            "billing": {
-                "street_1": billing_address_1,
-                "street_2": "",
-                "city": billing_city,
-                "state": billing_state or "",
-                "postal_code": billing_postal_code,
-                "country": billing_country,
-            },
-            "authorization": {
-                "do_capture": False,
-            },
-            "authentication_setup": {
-                "success_url": request.build_absolute_uri(f"{reverse('subscription_page')}?enrollment=success"),
-                "failure_url": request.build_absolute_uri(f"{reverse('subscription_page')}?enrollment=failure"),
-                "device_fingerprint_session_id": device_fingerprint_session_id,
-            },
-        }
-    }
-
-    try:
-        logger.info(
-            "Safepay enrollment request tracker=%s auth_mode=%s device_fingerprint_present=%s billing_keys=%s",
-            _mask_safepay_value(tracker),
-            "merchant_secret",
-            bool(device_fingerprint_session_id),
-            list(enrollment_payload["payload"]["billing"].keys()),
-        )
-        logger.info(
-            "Safepay enrollment sanitized body=%s",
-            {
-                "top_level_keys": list(enrollment_payload.keys()),
-                "payload": {
-                    "billing": enrollment_payload.get("payload", {}).get("billing", {}),
-                    "authorization": enrollment_payload.get("payload", {}).get("authorization", {}),
-                    "authentication_setup_keys": list(
-                        enrollment_payload.get("payload", {}).get("authentication_setup", {}).keys()
-                    ),
-                    "device_fingerprint_present": bool(device_fingerprint_session_id),
-                    "device_fingerprint_length": len(device_fingerprint_session_id or ""),
-                },
-            },
-        )
-        logger.info("Safepay enrollment payload top-level keys=%s", list(enrollment_payload.keys()))
-        logger.info("Safepay enrollment payload.payload keys=%s", list(enrollment_payload.get("payload", {}).keys()))
-        logger.info(
-            "Safepay enrollment billing keys=%s",
-            list(enrollment_payload.get("payload", {}).get("billing", {}).keys()),
-        )
-        logger.info(
-            "Safepay enrollment authentication_setup keys=%s",
-            list(enrollment_payload.get("payload", {}).get("authentication_setup", {}).keys()),
-        )
-        logger.info(
-            "Safepay enrollment forbidden field presence request_id=%s payment_method=%s access_token=%s device_data_collection_url=%s",
-            "request_id" in enrollment_payload,
-            "payment_method" in enrollment_payload.get("payload", {}),
-            "access_token" in enrollment_payload.get("payload", {}).get("authentication_setup", {}),
-            "device_data_collection_url" in enrollment_payload.get("payload", {}).get("authentication_setup", {}),
-        )
-        response_data = _safepay_post(
-            f"/order/payments/v3/{tracker}",
-            enrollment_payload,
-            auth_mode="merchant_secret",
-        )
-        tx.request_payload = {
-            **(tx.request_payload or {}),
-            "payer_auth_enrollment_request": {
-                "tracker": tracker,
-                "device_fingerprint_session_id": device_fingerprint_session_id,
-                "billing": {
-                    "street_1": billing_address_1,
-                    "street_2": "",
-                    "city": billing_city,
-                    "state": billing_state or "",
-                    "postal_code": billing_postal_code,
-                    "country": billing_country,
-                },
-                "authorization": {"do_capture": False},
-            },
-            "payer_auth_enrollment_response": response_data,
-        }
-        tx.save(update_fields=["request_payload", "updated_at"])
-        return JsonResponse(
-            {
-                "ok": True,
-                "tracker": tracker,
-                "raw_payer_auth_enrollment_response": response_data,
-            }
-        )
-    except Exception as exc:
-        tx.request_payload = {
-            **(tx.request_payload or {}),
-            "payer_auth_enrollment_request": {
-                "tracker": tracker,
-                "device_fingerprint_session_id": device_fingerprint_session_id,
-                "billing": {
-                    "street_1": billing_address_1,
-                    "street_2": "",
-                    "city": billing_city,
-                    "state": billing_state or "",
-                    "postal_code": billing_postal_code,
-                    "country": billing_country,
-                },
-            },
-            "payer_auth_enrollment_error": str(exc),
-        }
-        tx.save(update_fields=["request_payload", "updated_at"])
-        return JsonResponse({"ok": False, "error": str(exc)}, status=502)
+    logger.info(
+        "Safepay hosted checkout placeholder transaction created merchant_ref=%s tx_id=%s",
+        merchant_ref,
+        tx.id,
+    )
+    return JsonResponse(
+        {
+            "ok": False,
+            "merchant_ref": merchant_ref,
+            "error": "Hosted checkout wiring pending exact Safepay endpoint confirmation.",
+        },
+        status=501,
+    )
 
 @login_required
 @resolve_tenant_context(require_company=True)

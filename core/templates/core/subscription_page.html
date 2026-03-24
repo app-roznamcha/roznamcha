@@ -19,7 +19,7 @@
   <div style="padding:14px 16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
     <h4>Renew / Activate Subscription</h4>
     <p style="color: #666;">
-      Start Safepay tracker creation for the selected subscription plan.
+      Continue with Safepay hosted checkout for the selected subscription plan.
     </p>
 
     <form id="subscription-checkout-form" method="post" action="{% url 'subscription_checkout_start' %}">
@@ -34,69 +34,12 @@
 
       <div style="margin-top: 15px;">
         <button id="subscription-checkout-submit" type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">
-          Start Safepay Payment
+          Continue to Safepay Checkout
         </button>
       </div>
     </form>
 
-    <pre id="subscription-checkout-status" style="display:none;margin-top:16px;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;white-space:pre-wrap;font-family:monospace;overflow:auto;"></pre>
-
-    <form id="subscription-payer-auth-form" method="post" action="{% url 'subscription_checkout_payer_auth_setup' %}" style="display:none;margin-top:16px;">
-      {% csrf_token %}
-      <input type="hidden" id="payer-auth-tracker" name="tracker">
-
-      <label style="display:block; margin-top:10px;">Card Number</label>
-      <input type="text" id="card-number" name="card_number" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">Expiration Month</label>
-      <input type="text" id="expiration-month" name="expiration_month" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">Expiration Year</label>
-      <input type="text" id="expiration-year" name="expiration_year" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">CVV</label>
-      <input type="text" id="cvv" name="cvv" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <div style="margin-top: 15px;">
-        <button id="subscription-payer-auth-submit" type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #111827;background:#111827;color:#fff;font-weight:800;cursor:pointer;">
-          Start Payer Auth Setup
-        </button>
-      </div>
-    </form>
-
-    <form id="subscription-enrollment-form" method="post" action="{% url 'subscription_checkout_payer_auth_enrollment' %}" style="display:none;margin-top:16px;">
-      {% csrf_token %}
-      <input type="hidden" name="tracker" id="tracker">
-      <input type="hidden" name="device_fingerprint_session_id" id="device_fingerprint_session_id">
-
-      <label style="display:block; margin-top:10px;">Billing Country</label>
-      <input type="text" id="billing-country" name="billing_country" value="PK" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">Billing City</label>
-      <input type="text" id="billing-city" name="billing_city" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">Billing State</label>
-      <input type="text" id="billing-state" name="billing_state" style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">Billing Postal Code</label>
-      <input type="text" id="billing-postal-code" name="billing_postal_code" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <label style="display:block; margin-top:10px;">Billing Address 1</label>
-      <input type="text" id="billing-address-1" name="billing_address_1" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
-
-      <div style="margin-top: 15px;">
-        <button id="subscription-enrollment-submit" type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #065f46;background:#065f46;color:#fff;font-weight:800;cursor:pointer;">
-          Start Payer Auth Enrollment
-        </button>
-      </div>
-    </form>
-
-    <div id="device-collection-host" style="display:none;">
-      <iframe id="cardinal_device_iframe" name="cardinal_device_iframe" style="display:none;"></iframe>
-      <form id="cardinal-device-form" method="POST" target="cardinal_device_iframe" style="display:none;">
-        <input type="hidden" name="JWT" id="cardinal-device-jwt">
-      </form>
-    </div>
+    <div id="subscription-checkout-status" style="display:none;margin-top:16px;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;color:#374151;"></div>
   </div>
 
   <div style="margin-top: 20px;">
@@ -109,114 +52,14 @@
 <script>
   (function () {
     const form = document.getElementById("subscription-checkout-form");
-    const payerAuthForm = document.getElementById("subscription-payer-auth-form");
-    const enrollmentForm = document.getElementById("subscription-enrollment-form");
     const statusBox = document.getElementById("subscription-checkout-status");
     const submitBtn = document.getElementById("subscription-checkout-submit");
-    const payerAuthSubmitBtn = document.getElementById("subscription-payer-auth-submit");
-    const enrollmentSubmitBtn = document.getElementById("subscription-enrollment-submit");
-    const trackerField = document.getElementById("payer-auth-tracker");
-    const enrollmentTrackerField = document.getElementById("tracker");
-    const deviceFingerprintSessionIdField = document.getElementById("device_fingerprint_session_id");
-    const deviceCollectionHost = document.getElementById("device-collection-host");
-    const cardinalDeviceForm = document.getElementById("cardinal-device-form");
-    const cardinalDeviceJwtField = document.getElementById("cardinal-device-jwt");
-    let deviceCollectionTriggered = false;
-    let deviceFingerprintSource = "";
     if (!form || !statusBox) return;
-
-    function setDeviceFingerprintStatus(message) {
-      console.log(message);
-      if (statusBox) {
-        statusBox.style.display = "block";
-        statusBox.textContent += "\n" + message;
-      }
-    }
-
-    function extractDeviceFingerprintSessionId(payload) {
-      if (!payload || typeof payload !== "object") return "";
-      const directKeys = [
-        "SessionId",
-        "sessionId",
-        "session_id",
-        "deviceFingerprintSessionId",
-        "device_fingerprint_session_id"
-      ];
-      for (const key of directKeys) {
-        const value = payload[key];
-        if (typeof value === "string" && value.trim()) {
-          return value.trim();
-        }
-      }
-      for (const key of Object.keys(payload)) {
-        const value = payload[key];
-        if (value && typeof value === "object") {
-          const nested = extractDeviceFingerprintSessionId(value);
-          if (nested) return nested;
-        }
-      }
-      return "";
-    }
-
-    function startDeviceDataCollection(accessToken, deviceDataCollectionUrl) {
-      if (!deviceCollectionHost || !cardinalDeviceForm || !cardinalDeviceJwtField || !accessToken || !deviceDataCollectionUrl) return;
-
-      deviceCollectionTriggered = true;
-      deviceFingerprintSource = "";
-      if (deviceFingerprintSessionIdField) {
-        deviceFingerprintSessionIdField.value = "";
-      }
-      setDeviceFingerprintStatus(
-        "Cardinal device collection triggered: " +
-        JSON.stringify({
-          triggered: true,
-          source: "cardinal_iframe_post",
-          jwtLength: accessToken.length
-        })
-      );
-
-      cardinalDeviceForm.action = deviceDataCollectionUrl;
-      cardinalDeviceJwtField.value = accessToken;
-      cardinalDeviceForm.submit();
-
-      window.setTimeout(function () {
-        const currentValue = (deviceFingerprintSessionIdField && deviceFingerprintSessionIdField.value || "").trim();
-        if (!currentValue) {
-          setDeviceFingerprintStatus("Cardinal device-data did not return a usable session id.");
-        }
-      }, 8000);
-    }
-
-    window.addEventListener("message", function (event) {
-      const payload = event && event.data;
-      console.log("Cardinal device collection message", {
-        origin: event.origin,
-        payloadType: typeof payload,
-        payloadKeys: payload && typeof payload === "object" ? Object.keys(payload) : [],
-      });
-      setDeviceFingerprintStatus("Cardinal device-data response received.");
-      const sessionId = extractDeviceFingerprintSessionId(payload);
-      if (!sessionId) return;
-
-      deviceFingerprintSource = "cardinal_postmessage";
-      if (deviceFingerprintSessionIdField) {
-        deviceFingerprintSessionIdField.value = sessionId;
-      }
-      setDeviceFingerprintStatus(
-        "Device fingerprint session captured: " +
-        JSON.stringify({
-          triggered: deviceCollectionTriggered,
-          source: deviceFingerprintSource,
-          sessionIdLength: sessionId.length,
-          sessionIdPrefix: sessionId.slice(0, 8)
-        })
-      );
-    });
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       statusBox.style.display = "block";
-      statusBox.textContent = "Creating Safepay tracker...";
+      statusBox.textContent = "Starting Safepay checkout...";
       if (submitBtn) submitBtn.disabled = true;
 
       try {
@@ -229,103 +72,15 @@
           body: formData
         });
         const data = await response.json();
-        statusBox.textContent = JSON.stringify(data, null, 2);
-        if (response.ok && data.ok && data.tracker && payerAuthForm && trackerField) {
-          trackerField.value = data.tracker;
-          payerAuthForm.style.display = "block";
-        }
-      } catch (err) {
-        statusBox.textContent = "Could not start Safepay tracker.";
-      } finally {
-        if (submitBtn) submitBtn.disabled = false;
-      }
-    });
-
-    if (!payerAuthForm) return;
-
-    payerAuthForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      statusBox.style.display = "block";
-      statusBox.textContent = "Starting Safepay payer auth setup...";
-      if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = true;
-
-      try {
-        const formData = new FormData(payerAuthForm);
-        const response = await fetch(payerAuthForm.action, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
-          },
-          body: formData
-        });
-        const data = await response.json();
-        if (response.ok && data.ok) {
-          statusBox.textContent = JSON.stringify(data, null, 2) + "\n\nPayer auth setup completed. Awaiting next step.";
-          const responseData = ((data.raw_payer_auth_setup_response || {}).data || {});
-          const trackerObj = responseData.tracker || {};
-          const action = (responseData.action || {});
-          const payerAuthSetup = action.payer_authentication_setup || {};
-          if (enrollmentForm && enrollmentTrackerField) {
-            const trackerToken = trackerObj.token || data.tracker || trackerField.value || "";
-            const accessToken = payerAuthSetup.access_token || "";
-            const deviceUrl = payerAuthSetup.device_data_collection_url || "";
-
-            document.getElementById("tracker").value = trackerToken;
-
-            enrollmentTrackerField.value = trackerToken;
-            startDeviceDataCollection(
-              accessToken,
-              deviceUrl
-            );
-            enrollmentForm.style.display = "block";
-          }
+        statusBox.textContent = data.error || JSON.stringify(data, null, 2);
+        if (response.ok && data.ok && data.checkout_url) {
+          window.location.href = data.checkout_url;
           return;
         }
-        statusBox.textContent = JSON.stringify(data, null, 2);
-        if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = false;
       } catch (err) {
-        statusBox.textContent = "Could not start Safepay payer auth setup.";
-        if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = false;
-      }
-    });
-
-    if (!enrollmentForm) return;
-
-    enrollmentForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const deviceFingerprintSessionId = (deviceFingerprintSessionIdField && deviceFingerprintSessionIdField.value || "").trim();
-      console.log("Enrollment device fingerprint check", {
-        triggered: deviceCollectionTriggered,
-        source: deviceFingerprintSource || "none",
-        sessionIdLength: deviceFingerprintSessionId.length,
-      });
-      if (!deviceCollectionTriggered || !deviceFingerprintSource || !deviceFingerprintSessionId) {
-        statusBox.style.display = "block";
-        statusBox.textContent = "Enrollment blocked: device_fingerprint_session_id was not populated by the Cardinal device-data step.";
-        if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = false;
-        return;
-      }
-      statusBox.style.display = "block";
-      statusBox.textContent = "Starting Safepay payer auth enrollment...";
-      if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = true;
-
-      try {
-        const formData = new FormData(enrollmentForm);
-        const response = await fetch(enrollmentForm.action, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
-          },
-          body: formData
-        });
-        const data = await response.json();
-        statusBox.textContent = JSON.stringify(data, null, 2);
-        if (!response.ok || !data.ok) {
-          if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = false;
-        }
-      } catch (err) {
-        statusBox.textContent = "Could not start Safepay payer auth enrollment.";
-        if (enrollmentSubmitBtn) enrollmentSubmitBtn.disabled = false;
+        statusBox.textContent = "Could not start Safepay checkout.";
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     });
   })();
