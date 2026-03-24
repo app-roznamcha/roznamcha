@@ -5,6 +5,7 @@ import os
 import re
 import tempfile
 import logging
+import json
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -5656,9 +5657,6 @@ def subscription_checkout_start(request):
         "entry_mode": "raw",
         "currency": plan["currency"],
         "amount": plan["amount"],
-        "metadata": {
-            "merchant_reference": merchant_ref,
-        },
     }
 
     try:
