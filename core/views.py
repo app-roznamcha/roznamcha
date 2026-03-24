@@ -5481,6 +5481,7 @@ def _subscription_plan_config(plan_code):
             "duration_days": 30,
             "amount": 100000,
             "currency": "PKR",
+            "plan_id": (getattr(settings, "SAFEPAY_MONTHLY_PLAN_ID", "") or "").strip(),
         }
     if plan_code == "YEARLY":
         return {
@@ -5488,6 +5489,7 @@ def _subscription_plan_config(plan_code):
             "duration_days": 365,
             "amount": 900000,
             "currency": "PKR",
+            "plan_id": (getattr(settings, "SAFEPAY_YEARLY_PLAN_ID", "") or "").strip(),
         }
     return None
 
@@ -5564,6 +5566,27 @@ def _safepay_post(path: str, payload: dict | None = None, auth_mode: str = "bear
         )
 
     return data
+
+
+def _safepay_create_plan(*, product: str, amount: int, currency: str, interval: str, interval_count: int, active: bool = True):
+    payload = {
+        "product": product,
+        "amount": amount,
+        "currency": currency,
+        "interval": interval,
+        "interval_count": interval_count,
+        "active": active,
+    }
+    logger.info(
+        "Safepay plan create product=%s amount=%s currency=%s interval=%s interval_count=%s active=%s",
+        product,
+        amount,
+        currency,
+        interval,
+        interval_count,
+        active,
+    )
+    return _safepay_post("/client/plans/v1/", payload, auth_mode="merchant_secret")
 
 
 @login_required
@@ -5646,13 +5669,15 @@ def subscription_checkout_start(request):
 
     owner = request.owner
     merchant_ref = _subscription_merchant_ref(owner, plan["plan_code"])
+    resolved_plan_id = (plan.get("plan_id") or "").strip()
     logger.info(
-        "Safepay hosted checkout start plan=%s merchant_ref=%s env=%s public_key_present=%s secret_key_present=%s",
+        "Safepay hosted checkout start plan=%s merchant_ref=%s env=%s public_key_present=%s secret_key_present=%s plan_id_present=%s",
         plan["plan_code"],
         merchant_ref,
         getattr(settings, "SAFEPAY_ENV", ""),
         bool(public_key),
         bool(secret_key),
+        bool(resolved_plan_id),
     )
 
     tx = SubscriptionTransaction.objects.create(
@@ -5669,6 +5694,7 @@ def subscription_checkout_start(request):
             "amount": str(plan["amount"]),
             "currency": plan["currency"],
             "checkout_mode": "hosted_placeholder",
+            "resolved_plan_id": resolved_plan_id,
         },
     )
     logger.info(
@@ -5676,13 +5702,24 @@ def subscription_checkout_start(request):
         merchant_ref,
         tx.id,
     )
+    if not resolved_plan_id:
+        logger.info("Safepay hosted checkout plan id missing plan=%s merchant_ref=%s", plan["plan_code"], merchant_ref)
+        return JsonResponse(
+            {
+                "ok": False,
+                "merchant_ref": merchant_ref,
+                "error": f"Safepay plan ID is not configured for {plan['plan_code']}.",
+            },
+            status=400,
+        )
+
     return JsonResponse(
         {
-            "ok": False,
-            "merchant_ref": merchant_ref,
-            "error": "Hosted checkout wiring pending exact Safepay endpoint confirmation.",
+            "ok": True,
+            "plan_code": plan["plan_code"],
+            "plan_id": resolved_plan_id,
+            "message": "Safepay plan resolved. Checkout URL generation is the next step.",
         },
-        status=501,
     )
 
 @login_required
