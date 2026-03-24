@@ -5501,7 +5501,7 @@ def _subscription_merchant_ref(owner, plan_code: str) -> str:
     raise ValueError("Could not generate a unique merchant reference.")
 
 
-def _safepay_post(path: str, payload: dict | None = None):
+def _safepay_post(path: str, payload: dict | None = None, auth_mode: str = "bearer"):
     base_url = (getattr(settings, "SAFEPAY_BASE_URL", "") or "").rstrip("/")
     secret_key = (getattr(settings, "SAFEPAY_SECRET_API_KEY", "") or "").strip()
     if not base_url:
@@ -5509,21 +5509,32 @@ def _safepay_post(path: str, payload: dict | None = None):
     if not secret_key:
         raise ValueError("Safepay secret API key is not configured.")
 
+    if auth_mode == "merchant_secret":
+        headers = {
+            "X-SFPY-MERCHANT-SECRET": secret_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+    else:
+        headers = {
+            "Authorization": f"Bearer {secret_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+
     logger.info(
-        "Safepay POST path=%s env=%s secret_key_present=%s",
+        "Safepay POST path=%s env=%s auth_mode=%s secret_key_present=%s merchant_secret_header_present=%s",
         path,
         getattr(settings, "SAFEPAY_ENV", ""),
+        auth_mode,
         bool(secret_key),
+        auth_mode == "merchant_secret",
     )
 
     response = requests.post(
         f"{base_url}{path}",
         json=payload or {},
-        headers={
-            "Authorization": f"Bearer {secret_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
+        headers=headers,
         timeout=20,
     )
     try:
@@ -5770,7 +5781,11 @@ def subscription_checkout_payer_auth_setup(request):
     }
 
     try:
-        response_data = _safepay_post(f"/order/payments/v3/{tracker}", payer_auth_payload)
+        response_data = _safepay_post(
+            f"/order/payments/v3/{tracker}",
+            payer_auth_payload,
+            auth_mode="merchant_secret",
+        )
         tx.request_payload = {
             **(tx.request_payload or {}),
             "payer_auth_setup_request": {
