@@ -128,10 +128,14 @@
           body: formData
         });
         const data = await response.json();
+        if (response.ok && data.ok) {
+          statusBox.textContent = JSON.stringify(data, null, 2) + "\n\nPayer auth setup completed. Awaiting next step.";
+          return;
+        }
         statusBox.textContent = JSON.stringify(data, null, 2);
+        if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = false;
       } catch (err) {
         statusBox.textContent = "Could not start Safepay payer auth setup.";
-      } finally {
         if (payerAuthSubmitBtn) payerAuthSubmitBtn.disabled = false;
       }
     });
