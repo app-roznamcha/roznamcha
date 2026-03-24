@@ -5640,14 +5640,12 @@ def _safepay_checkout_subscription_with_token(
     Local shim for Safepay's documented SDK contract:
     checkout.createSubscriptionWithToken({ planId, reference, cancelUrl, redirectUrl, authToken })
     """
-    environment = _safepay_checkout_environment()
     base_url = (
         "https://sandbox.api.getsafepay.com/checkout"
-        if environment == "sandbox"
+        if _safepay_checkout_environment() == "sandbox"
         else "https://api.getsafepay.com/checkout"
     )
     params = {
-        "environment": environment,
         "plan_id": plan_id,
         "tbt": auth_token,
         "reference": reference,
@@ -5657,10 +5655,10 @@ def _safepay_checkout_subscription_with_token(
     checkout_url = f"{base_url}?{urlencode(params)}"
     checkout_parts = urlsplit(checkout_url)
     logger.info(
-        "Safepay subscription checkout generated environment=%s redirect_host=%s redirect_path=%s",
-        environment,
-        checkout_parts.netloc,
-        checkout_parts.path,
+        "Safepay subscription checkout generated base_url=%s param_keys=%s checkout_url=%s",
+        base_url,
+        list(params.keys()),
+        checkout_url,
     )
     return checkout_url
 
