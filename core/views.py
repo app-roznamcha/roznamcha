@@ -5661,8 +5661,23 @@ def subscription_checkout_start(request):
 
     try:
         tracker_response = _safepay_post("/order/payments/v3/", tracker_request)
-        tracker_data = tracker_response.get("data") or {}
-        tracker_token = (((tracker_data.get("tracker") or {}).get("token")) or "").strip()
+        tracker_root = tracker_response if isinstance(tracker_response, dict) else {}
+        logger.info("Safepay tracker response keys: %s", list(tracker_root.keys()))
+        if isinstance(tracker_root.get("data"), dict):
+            logger.info("Safepay tracker response data keys: %s", list(tracker_root["data"].keys()))
+
+        tracker_data = tracker_root
+        for key in ("data", "payload"):
+            if isinstance(tracker_data.get(key), dict):
+                tracker_data = tracker_data[key]
+
+        tracker_token = (
+            ((tracker_data.get("tracker") or {}).get("token"))
+            or tracker_data.get("tracker_token")
+            or tracker_data.get("token")
+            or ""
+        )
+        tracker_token = tracker_token.strip()
         if not tracker_token:
             raise ValueError("Safepay did not return a tracker token.")
 
@@ -5710,6 +5725,7 @@ def subscription_checkout_start(request):
                 "tracker": tracker_token,
                 "next_actions": next_actions,
                 "safepay_response": safepay_response,
+                "raw_tracker_response": tracker_root,
             }
         )
     except Exception as exc:
