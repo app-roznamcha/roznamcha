@@ -5612,13 +5612,25 @@ def _safepay_checkout_base_url() -> str:
 
 def _safepay_create_auth_token() -> str:
     response_data = _safepay_post("/client/passport/v1/token", auth_mode="merchant_secret")
-    token = (
-        (response_data.get("data") or {}).get("token")
-        or response_data.get("token")
-        or ""
-    ).strip()
+    logger.info(
+        "Safepay passport token response structure type=%s keys=%s data_type=%s",
+        type(response_data).__name__,
+        list(response_data.keys()) if isinstance(response_data, dict) else [],
+        type(response_data.get("data")).__name__ if isinstance(response_data, dict) else "n/a",
+    )
+    if isinstance(response_data, dict):
+        data = response_data.get("data")
+        if isinstance(data, dict):
+            token = (data.get("token") or data.get("access_token") or "").strip()
+        elif isinstance(data, str):
+            token = data.strip()
+        else:
+            token = (response_data.get("token") or response_data.get("access_token") or "").strip()
+    else:
+        token = ""
+    logger.info("Safepay passport token parsed token_present=%s", bool(token))
     if not token:
-        raise ValueError("Safepay auth token response did not include a token.")
+        raise ValueError("Safepay passport token response did not include a usable token.")
     return token
 
 
