@@ -4,12 +4,14 @@
 import os
 import re
 import tempfile
+import logging
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from functools import wraps
 from io import StringIO
 from pathlib import Path
+import requests
 
 # =========================
 # Django core
@@ -73,6 +75,7 @@ from .models import (
     SalesReturn,
     SalesReturnItem,
     StockAdjustment,
+    SubscriptionTransaction,
     UserProfile,
     get_company_owner,
     peek_next_sequence,   # ✅ ADD THIS
@@ -112,6 +115,8 @@ from .tax_pack import (
     build_tax_pack_zip,
 )
 from django.db.models.functions import Cast
+
+logger = logging.getLogger(__name__)
 from django.db.models import IntegerField
 import asyncio
 from urllib.parse import urlencode
@@ -5458,6 +5463,80 @@ def subscription_forbidden(request, exception=None):
     return render(request, "403.html", context, status=403)
 
 
+def _mask_safepay_value(value):
+    value = (value or "").strip()
+    if not value:
+        return ""
+    if len(value) <= 8:
+        return value
+    return f"{value[:4]}...{value[-4:]}"
+
+
+def _subscription_plan_config(plan_code):
+    plan_code = (plan_code or "").upper().strip()
+    if plan_code == "MONTHLY":
+        return {
+            "plan_code": "MONTHLY",
+            "duration_days": 30,
+            "amount": Decimal("1000.00"),
+            "currency": "PKR",
+        }
+    if plan_code == "YEARLY":
+        return {
+            "plan_code": "YEARLY",
+            "duration_days": 365,
+            "amount": Decimal("9000.00"),
+            "currency": "PKR",
+        }
+    return None
+
+
+def _subscription_merchant_ref(owner, plan_code: str) -> str:
+    prefix = f"SUB-{owner.id}-{plan_code[:3]}-"
+    for _ in range(10):
+        ref = f"{prefix}{get_random_string(10).upper()}"
+        if not SubscriptionTransaction.objects.filter(merchant_ref=ref).exists():
+            return ref
+    raise ValueError("Could not generate a unique merchant reference.")
+
+
+def _safepay_post(path: str, payload: dict | None = None):
+    base_url = (getattr(settings, "SAFEPAY_BASE_URL", "") or "").rstrip("/")
+    secret_key = (getattr(settings, "SAFEPAY_SECRET_API_KEY", "") or "").strip()
+    if not base_url:
+        raise ValueError("Safepay base URL is not configured.")
+    if not secret_key:
+        raise ValueError("Safepay secret API key is not configured.")
+
+    logger.info(
+        "Safepay POST path=%s env=%s secret_key_present=%s",
+        path,
+        getattr(settings, "SAFEPAY_ENV", ""),
+        bool(secret_key),
+    )
+
+    response = requests.post(
+        f"{base_url}{path}",
+        json=payload or {},
+        headers={
+            "Authorization": f"Bearer {secret_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        timeout=20,
+    )
+    try:
+        data = response.json()
+    except ValueError as exc:
+        raise ValueError(f"Safepay returned a non-JSON response from {path}.") from exc
+
+    if not response.ok:
+        detail = data.get("message") if isinstance(data, dict) else None
+        raise ValueError(detail or f"Safepay request failed for {path}.")
+
+    return data
+
+
 @login_required
 @resolve_tenant_context(require_company=True)
 @owner_required
@@ -5514,6 +5593,129 @@ def subscription_page(request):
         "is_active": (status == "ACTIVE"),
     }
     return render(request, "core/subscription_page.html", context)
+
+
+@require_POST
+@resolve_tenant_context(require_company=True)
+@owner_required
+@staff_blocked
+def subscription_checkout_start(request):
+    plan = _subscription_plan_config(request.POST.get("plan"))
+    if not plan:
+        return JsonResponse(
+            {"ok": False, "error": "Please select a valid plan (Monthly/Yearly)."},
+            status=400,
+        )
+
+    public_key = (getattr(settings, "SAFEPAY_PUBLIC_API_KEY", "") or "").strip()
+    secret_key = (getattr(settings, "SAFEPAY_SECRET_API_KEY", "") or "").strip()
+    if not public_key or not secret_key:
+        return JsonResponse(
+            {"ok": False, "error": "Safepay configuration is incomplete."},
+            status=400,
+        )
+
+    owner = request.owner
+    merchant_ref = _subscription_merchant_ref(owner, plan["plan_code"])
+    logger.info(
+        "Safepay checkout start env=%s public_key_present=%s secret_key_present=%s base_url=%s",
+        getattr(settings, "SAFEPAY_ENV", ""),
+        bool(public_key),
+        bool(secret_key),
+        getattr(settings, "SAFEPAY_BASE_URL", ""),
+    )
+
+    tx = SubscriptionTransaction.objects.create(
+        owner=owner,
+        plan_code=plan["plan_code"],
+        duration_days=plan["duration_days"],
+        amount=plan["amount"],
+        currency=plan["currency"],
+        provider="SAFEPAY",
+        merchant_ref=merchant_ref,
+        status=SubscriptionTransaction.STATUS_INITIATED,
+        request_payload={
+            "plan": plan["plan_code"],
+            "amount": str(plan["amount"]),
+            "currency": plan["currency"],
+        },
+    )
+
+    tracker_request = {
+        "merchant_api_key": public_key,
+        "mode": "payment",
+        "intent": "CYBERSOURCE",
+        "entry_mode": "raw",
+        "currency": plan["currency"],
+        "amount": str(plan["amount"]),
+        "metadata": {
+            "merchant_reference": merchant_ref,
+        },
+    }
+
+    try:
+        tracker_response = _safepay_post("/order/payments/v3/", tracker_request)
+        tracker_data = tracker_response.get("data") or {}
+        tracker_token = (((tracker_data.get("tracker") or {}).get("token")) or "").strip()
+        if not tracker_token:
+            raise ValueError("Safepay did not return a tracker token.")
+
+        next_actions = tracker_data.get("next_actions") or []
+        safepay_response = {
+            "intent": tracker_data.get("intent"),
+            "mode": tracker_data.get("mode"),
+            "entry_mode": tracker_data.get("entry_mode"),
+            "currency": tracker_data.get("currency"),
+            "amount": tracker_data.get("amount"),
+            "status": tracker_data.get("status"),
+            "payment_method": tracker_data.get("payment_method"),
+        }
+
+        tx.provider_txn_id = tracker_token
+        tx.status = SubscriptionTransaction.STATUS_PENDING
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "tracker_request": tracker_request,
+            "tracker_response": {
+                "tracker": _mask_safepay_value(tracker_token),
+                "next_actions": next_actions,
+                "intent": safepay_response["intent"],
+                "mode": safepay_response["mode"],
+                "entry_mode": safepay_response["entry_mode"],
+                "amount": safepay_response["amount"],
+                "currency": safepay_response["currency"],
+                "status": safepay_response["status"],
+            },
+        }
+        tx.save(update_fields=["provider_txn_id", "status", "request_payload", "updated_at"])
+
+        logger.info(
+            "Safepay tracker created merchant_ref=%s path=%s tracker=%s next_actions_count=%s",
+            merchant_ref,
+            "/order/payments/v3/",
+            _mask_safepay_value(tracker_token),
+            len(next_actions),
+        )
+
+        return JsonResponse(
+            {
+                "ok": True,
+                "merchant_ref": merchant_ref,
+                "tracker": tracker_token,
+                "next_actions": next_actions,
+                "safepay_response": safepay_response,
+            }
+        )
+    except Exception as exc:
+        tx.status = SubscriptionTransaction.STATUS_FAILED
+        tx.failure_reason = str(exc)[:2000]
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "tracker_request": tracker_request,
+            "error": str(exc),
+        }
+        tx.save(update_fields=["status", "failure_reason", "request_payload", "updated_at"])
+        return JsonResponse({"ok": False, "error": str(exc)}, status=502)
 
 @login_required
 @resolve_tenant_context(require_company=True)

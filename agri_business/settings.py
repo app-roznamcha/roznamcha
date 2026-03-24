@@ -245,3 +245,13 @@ ANDROID_SHA256_CERT_FINGERPRINTS = [
     for item in os.environ.get("ANDROID_SHA256_CERT_FINGERPRINTS", "").split(",")
     if item.strip()
 ]
+
+# Safepay Order API
+SAFEPAY_ENV = os.getenv("SAFEPAY_ENV", "sandbox").lower()
+SAFEPAY_PUBLIC_API_KEY = os.getenv("SAFEPAY_PUBLIC_API_KEY", "")
+SAFEPAY_SECRET_API_KEY = os.getenv("SAFEPAY_SECRET_API_KEY", "")
+SAFEPAY_BASE_URL = (
+    "https://sandbox.api.getsafepay.com"
+    if SAFEPAY_ENV == "sandbox"
+    else "https://api.getsafepay.com"
+)
