@@ -5637,15 +5637,25 @@ def _safepay_checkout_subscription_with_token(
     cancel_url: str,
 ) -> str:
     """
-    Local shim for Safepay's documented SDK contract:
-    checkout.createSubscriptionWithToken({ planId, reference, cancelUrl, redirectUrl, authToken })
+    Local shim for Safepay's documented subscription checkout contract from the
+    official PHP SDK:
+    SubscriptionsCheckout::constructURL({
+        environment,
+        plan_id,
+        tbt,
+        reference,
+        cancel_url,
+        redirect_url,
+    })
     """
+    environment = _safepay_checkout_environment()
     base_url = (
         "https://sandbox.api.getsafepay.com/checkout"
-        if _safepay_checkout_environment() == "sandbox"
+        if environment == "sandbox"
         else "https://api.getsafepay.com/checkout"
     )
     params = {
+        "environment": environment,
         "plan_id": plan_id,
         "tbt": auth_token,
         "reference": reference,
