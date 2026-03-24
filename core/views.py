@@ -5635,17 +5635,26 @@ def _safepay_create_auth_token() -> str:
 
 
 def _safepay_subscription_checkout_url(*, plan_id: str, reference: str, auth_token: str, redirect_url: str, cancel_url: str) -> str:
-    query = urlencode(
-        {
-            "plan_id": plan_id,
-            "reference": reference,
-            "tbt": auth_token,
-            "redirect_url": redirect_url,
-            "cancel_url": cancel_url,
-            "environment": _safepay_checkout_environment(),
-        }
+    base_url = _safepay_checkout_base_url()
+    safepay_environment = _safepay_checkout_environment()
+    params = {
+        "plan_id": plan_id,
+        "reference": reference,
+        "tbt": auth_token,
+        "redirect_url": redirect_url,
+        "cancel_url": cancel_url,
+        "environment": safepay_environment,
+    }
+    query = urlencode(params)
+    checkout_url = f"{base_url}?{query}"
+    logger.info(
+        "Safepay checkout URL generated base_url=%s param_keys=%s environment=%s checkout_url=%s",
+        base_url,
+        list(params.keys()),
+        safepay_environment,
+        checkout_url,
     )
-    return f"{_safepay_checkout_base_url()}?{query}"
+    return checkout_url
 
 
 @login_required
