@@ -5599,6 +5599,43 @@ def _safepay_create_plan(
     return _safepay_post("/client/plans/v1/", payload, auth_mode="merchant_secret")
 
 
+def _safepay_checkout_environment() -> str:
+    env = (getattr(settings, "SAFEPAY_ENV", "sandbox") or "sandbox").strip().lower()
+    return "sandbox" if env == "sandbox" else "production"
+
+
+def _safepay_checkout_base_url() -> str:
+    if _safepay_checkout_environment() == "sandbox":
+        return "https://sandbox.api.getsafepay.com/checkout"
+    return "https://api.getsafepay.com/checkout"
+
+
+def _safepay_create_auth_token() -> str:
+    response_data = _safepay_post("/client/passport/v1/token", auth_mode="merchant_secret")
+    token = (
+        (response_data.get("data") or {}).get("token")
+        or response_data.get("token")
+        or ""
+    ).strip()
+    if not token:
+        raise ValueError("Safepay auth token response did not include a token.")
+    return token
+
+
+def _safepay_subscription_checkout_url(*, plan_id: str, reference: str, auth_token: str, redirect_url: str, cancel_url: str) -> str:
+    query = urlencode(
+        {
+            "plan_id": plan_id,
+            "reference": reference,
+            "tbt": auth_token,
+            "redirect_url": redirect_url,
+            "cancel_url": cancel_url,
+            "environment": _safepay_checkout_environment(),
+        }
+    )
+    return f"{_safepay_checkout_base_url()}?{query}"
+
+
 @login_required
 @resolve_tenant_context(require_company=True)
 @owner_required
@@ -5723,12 +5760,64 @@ def subscription_checkout_start(request):
             status=400,
         )
 
+    try:
+        auth_token = _safepay_create_auth_token()
+        checkout_url = _safepay_subscription_checkout_url(
+            plan_id=resolved_plan_id,
+            reference=merchant_ref,
+            auth_token=auth_token,
+            redirect_url=(getattr(settings, "SAFEPAY_RETURN_URL", "") or "").strip(),
+            cancel_url=(getattr(settings, "SAFEPAY_CANCEL_URL", "") or "").strip(),
+        )
+    except ValueError as exc:
+        logger.error(
+            "Safepay hosted checkout auth failed plan=%s merchant_ref=%s plan_id=%s error=%s",
+            plan["plan_code"],
+            merchant_ref,
+            resolved_plan_id,
+            str(exc),
+        )
+        tx.status = SubscriptionTransaction.STATUS_FAILED
+        tx.failure_reason = str(exc)
+        tx.request_payload = {
+            **(tx.request_payload or {}),
+            "checkout_mode": "hosted_subscription",
+            "resolved_plan_id": resolved_plan_id,
+            "checkout_error": str(exc),
+        }
+        tx.save(update_fields=["status", "failure_reason", "request_payload", "updated_at"])
+        return JsonResponse(
+            {
+                "ok": False,
+                "merchant_ref": merchant_ref,
+                "error": "Could not generate Safepay checkout URL.",
+            },
+            status=502,
+        )
+
+    tx.status = SubscriptionTransaction.STATUS_PENDING
+    tx.request_payload = {
+        **(tx.request_payload or {}),
+        "checkout_mode": "hosted_subscription",
+        "resolved_plan_id": resolved_plan_id,
+        "auth_token": _mask_safepay_value(auth_token),
+        "checkout_url_generated": True,
+    }
+    tx.save(update_fields=["status", "request_payload", "updated_at"])
+    logger.info(
+        "Safepay hosted checkout generated plan=%s merchant_ref=%s plan_id=%s checkout_url_generated=%s",
+        plan["plan_code"],
+        merchant_ref,
+        resolved_plan_id,
+        True,
+    )
+
     return JsonResponse(
         {
             "ok": True,
             "plan_code": plan["plan_code"],
             "plan_id": resolved_plan_id,
-            "message": "Safepay plan resolved. Checkout URL generation is the next step.",
+            "checkout_url": checkout_url,
         },
     )
 

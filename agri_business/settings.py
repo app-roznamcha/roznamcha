@@ -252,6 +252,8 @@ SAFEPAY_PUBLIC_API_KEY = os.getenv("SAFEPAY_PUBLIC_API_KEY", "")
 SAFEPAY_SECRET_API_KEY = os.getenv("SAFEPAY_SECRET_API_KEY", "")
 SAFEPAY_MONTHLY_PLAN_ID = os.getenv("SAFEPAY_MONTHLY_PLAN_ID", "")
 SAFEPAY_YEARLY_PLAN_ID = os.getenv("SAFEPAY_YEARLY_PLAN_ID", "")
+SAFEPAY_RETURN_URL = os.getenv("SAFEPAY_RETURN_URL", "https://roznamcha.app/subscription/payment/return/")
+SAFEPAY_CANCEL_URL = os.getenv("SAFEPAY_CANCEL_URL", "https://roznamcha.app/subscription/payment/cancel/")
 SAFEPAY_BASE_URL = (
     "https://sandbox.api.getsafepay.com"
     if SAFEPAY_ENV == "sandbox"

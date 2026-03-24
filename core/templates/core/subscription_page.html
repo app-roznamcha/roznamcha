@@ -74,6 +74,7 @@
         const data = await response.json();
         statusBox.textContent = data.error || JSON.stringify(data, null, 2);
         if (response.ok && data.ok && data.checkout_url) {
+          statusBox.textContent = "Redirecting to Safepay Checkout...";
           window.location.href = data.checkout_url;
           return;
         }
