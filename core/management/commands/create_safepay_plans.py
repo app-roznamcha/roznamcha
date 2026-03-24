@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 "active": True,
             }
             monthly_response = _safepay_create_plan(**monthly_payload)
-            monthly_id = ((monthly_response.get("data") or {}).get("id")) or ((monthly_response.get("data") or {}).get("token")) or ""
+            monthly_id = (monthly_response.get("data") or {}).get("plan_id") or ""
 
             self.stdout.write("MONTHLY payload:")
             self.stdout.write(json.dumps(monthly_payload, indent=2))
@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 "active": True,
             }
             yearly_response = _safepay_create_plan(**yearly_payload)
-            yearly_id = ((yearly_response.get("data") or {}).get("id")) or ((yearly_response.get("data") or {}).get("token")) or ""
+            yearly_id = (yearly_response.get("data") or {}).get("plan_id") or ""
 
             self.stdout.write("")
             self.stdout.write("YEARLY payload:")
