@@ -5864,12 +5864,10 @@ def subscription_checkout_start(request):
 
 @require_GET
 def safepay_subscription_return(request):
-    plan_id = (request.GET.get("plan_id") or "").strip()
-    auth_token = (request.GET.get("auth_token") or "").strip()
     logger.info(
-        "Safepay subscription return received plan_id_present=%s auth_token_present=%s",
-        bool(plan_id),
-        bool(auth_token),
+        "Safepay subscription return received full_path=%s query_params=%s",
+        request.get_full_path(),
+        dict(request.GET),
     )
     return HttpResponse(
         "Safepay redirect received. Subscription confirmation is pending.",
@@ -5880,13 +5878,17 @@ def safepay_subscription_return(request):
 @csrf_exempt
 @require_POST
 def safepay_subscription_webhook(request):
+    raw_body = request.body.decode("utf-8", errors="replace")
     try:
-        payload = json.loads(request.body.decode("utf-8") or "{}")
+        payload = json.loads(raw_body or "{}")
     except (UnicodeDecodeError, json.JSONDecodeError):
         payload = {}
 
     logger.info(
-        "Safepay subscription webhook received keys=%s",
+        "Safepay subscription webhook received full_path=%s content_type=%s body=%s keys=%s",
+        request.get_full_path(),
+        request.META.get("CONTENT_TYPE", ""),
+        raw_body[:2000],
         list(payload.keys()) if isinstance(payload, dict) else [],
     )
     return JsonResponse({"ok": True})
