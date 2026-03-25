@@ -5875,6 +5875,20 @@ def safepay_subscription_return(request):
         content_type="text/plain; charset=utf-8",
     )
 
+
+@require_POST
+def safepay_subscription_webhook(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        payload = {}
+
+    logger.info(
+        "Safepay subscription webhook received keys=%s",
+        list(payload.keys()) if isinstance(payload, dict) else [],
+    )
+    return JsonResponse({"ok": True})
+
 @login_required
 @resolve_tenant_context(require_company=True)
 def tenant_check(request):

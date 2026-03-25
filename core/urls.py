@@ -155,6 +155,11 @@ urlpatterns = [
         views.safepay_subscription_return,
         name="safepay_subscription_return",
     ),
+    path(
+        "subscription/payment/webhook/",
+        views.safepay_subscription_webhook,
+        name="safepay_subscription_webhook",
+    ),
     path("profile/", staff_blocked(views.owner_profile_page), name="owner_profile_page"),
     path("company/", staff_blocked(views.company_page), name="company_page"),
 
