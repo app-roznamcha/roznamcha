@@ -5700,11 +5700,12 @@ def _find_first_nested_value(data, keys):
 
 def _apply_subscription_transaction(tx_id: int) -> bool:
     with transaction.atomic():
-        tx = SubscriptionTransaction.objects.select_for_update().select_related("owner__profile").get(pk=tx_id)
+        tx = SubscriptionTransaction.objects.select_for_update().get(pk=tx_id)
         if tx.subscription_applied:
             return False
 
-        profile = tx.owner.profile
+        owner = tx.owner
+        profile = owner.profile
         now = timezone.now()
         current_expiry = profile.get_effective_expires_at()
         anchor = current_expiry if current_expiry and current_expiry > now else now
