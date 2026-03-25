@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container" style="max-width:760px;margin:30px auto 60px;padding:0 16px;">
+  <div style="padding:20px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;">
+    <h2 style="margin:0 0 10px;font-size:28px;font-weight:800;">{{ status_title }}</h2>
+    <p style="margin:0 0 18px;color:#4b5563;">{{ status_message }}</p>
+
+    {% if transaction %}
+      <div style="padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px;"><strong>Merchant Reference:</strong> {{ transaction.merchant_ref }}</p>
+        <p style="margin:0 0 8px;"><strong>Plan:</strong> {{ transaction.plan_code }}</p>
+        <p style="margin:0 0 8px;"><strong>Status:</strong> {{ transaction.status }}</p>
+        <p style="margin:0;"><strong>Subscription Applied:</strong> {{ transaction.subscription_applied|yesno:"Yes,No" }}</p>
+      </div>
+    {% elif plan_id or reference %}
+      <div style="padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        {% if plan_id %}
+          <p style="margin:0 0 8px;"><strong>Plan ID:</strong> {{ plan_id }}</p>
+        {% endif %}
+        {% if reference %}
+          <p style="margin:0;"><strong>Reference:</strong> {{ reference }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div style="margin-top:18px;">
+      <a href="{% url 'subscription_page' %}" class="btn-primary">Back to Subscription</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

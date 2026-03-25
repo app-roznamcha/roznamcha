@@ -5506,6 +5506,17 @@ def _subscription_merchant_ref(owner, plan_code: str) -> str:
     raise ValueError("Could not generate a unique merchant reference.")
 
 
+def _subscription_plan_code_from_plan_id(plan_id: str) -> str:
+    plan_id = (plan_id or "").strip()
+    if not plan_id:
+        return ""
+    if plan_id == (getattr(settings, "SAFEPAY_MONTHLY_PLAN_ID", "") or "").strip():
+        return "MONTHLY"
+    if plan_id == (getattr(settings, "SAFEPAY_YEARLY_PLAN_ID", "") or "").strip():
+        return "YEARLY"
+    return ""
+
+
 def _safepay_post(path: str, payload: dict | None = None, auth_mode: str = "bearer", auth_token: str = ""):
     base_url = (getattr(settings, "SAFEPAY_BASE_URL", "") or "").rstrip("/")
     secret_key = (getattr(settings, "SAFEPAY_SECRET_API_KEY", "") or "").strip()
@@ -5918,14 +5929,55 @@ def subscription_checkout_start(request):
 
 @require_GET
 def safepay_subscription_return(request):
+    reference = (request.GET.get("reference") or "").strip()
+    plan_id = (request.GET.get("plan_id") or "").strip()
+    plan_code = _subscription_plan_code_from_plan_id(plan_id)
+    owner = None
+    if getattr(request, "user", None) and request.user.is_authenticated:
+        try:
+            owner = get_owner_user(request.user)
+        except Exception:
+            owner = request.user
+
+    tx_qs = SubscriptionTransaction.objects.filter(provider="SAFEPAY")
+    if reference:
+        tx_qs = tx_qs.filter(merchant_ref=reference)
+    elif owner and plan_code:
+        tx_qs = tx_qs.filter(owner=owner, plan_code=plan_code)
+    elif owner:
+        tx_qs = tx_qs.filter(owner=owner)
+    tx = tx_qs.order_by("-created_at").first()
+
     logger.info(
         "Safepay subscription return received full_path=%s query_params=%s",
         request.get_full_path(),
         dict(request.GET),
     )
-    return HttpResponse(
-        "Safepay redirect received. Subscription confirmation is pending.",
-        content_type="text/plain; charset=utf-8",
+    if tx:
+        tx.return_payload = dict(request.GET)
+        tx.return_received_at = timezone.now()
+        tx.save(update_fields=["return_payload", "return_received_at", "updated_at"])
+
+    if tx and (tx.subscription_applied or tx.status == SubscriptionTransaction.STATUS_SUCCESS):
+        status_title = "Subscription Active"
+        status_message = "Your subscription has been activated successfully."
+    elif tx:
+        status_title = "Confirmation Pending"
+        status_message = "Payment received. Subscription confirmation is still pending."
+    else:
+        status_title = "Payment Status Pending"
+        status_message = "We could not match this payment return yet. Please check again shortly."
+
+    return render(
+        request,
+        "core/subscription_payment_return.html",
+        {
+            "status_title": status_title,
+            "status_message": status_message,
+            "transaction": tx,
+            "plan_id": plan_id,
+            "reference": reference,
+        },
     )
 
 
