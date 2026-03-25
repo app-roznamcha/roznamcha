@@ -53,6 +53,7 @@ from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_date
 from django.utils.text import slugify
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 # =========================
 # Local app imports (core)
@@ -5876,6 +5877,7 @@ def safepay_subscription_return(request):
     )
 
 
+@csrf_exempt
 @require_POST
 def safepay_subscription_webhook(request):
     try:
