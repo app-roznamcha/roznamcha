@@ -10,6 +10,9 @@
         <p style="margin:0 0 8px;"><strong>Merchant Reference:</strong> {{ transaction.merchant_ref }}</p>
         <p style="margin:0 0 8px;"><strong>Plan:</strong> {{ transaction.plan_code }}</p>
         <p style="margin:0 0 8px;"><strong>Status:</strong> {{ transaction.status }}</p>
+        {% if subscription_expires_at %}
+          <p style="margin:0 0 8px;"><strong>Expires On:</strong> {{ subscription_expires_at|date:"F j, Y" }}</p>
+        {% endif %}
         <p style="margin:0;"><strong>Subscription Applied:</strong> {{ transaction.subscription_applied|yesno:"Yes,No" }}</p>
       </div>
     {% elif plan_id or reference %}
@@ -26,6 +29,14 @@
     <div style="margin-top:18px;">
       <a href="{% url 'subscription_page' %}" class="btn-primary">Back to Subscription</a>
     </div>
+    {% if success %}
+      <p style="margin:12px 0 0;color:#4b5563;">Redirecting to dashboard in 5 seconds...</p>
+      <script>
+      setTimeout(function () {
+          window.location.href = "/dashboard/";
+      }, 5000);
+      </script>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

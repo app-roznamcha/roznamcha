@@ -5961,12 +5961,20 @@ def safepay_subscription_return(request):
     if tx and (tx.subscription_applied or tx.status == SubscriptionTransaction.STATUS_SUCCESS):
         status_title = "Subscription Active"
         status_message = "Your subscription has been activated successfully."
+        success = True
     elif tx:
         status_title = "Confirmation Pending"
         status_message = "Payment received. Subscription confirmation is still pending."
+        success = False
     else:
         status_title = "Payment Status Pending"
         status_message = "We could not match this payment return yet. Please check again shortly."
+        success = False
+
+    subscription_expires_at = None
+    if tx and success:
+        owner_profile = getattr(tx.owner, "profile", None)
+        subscription_expires_at = getattr(owner_profile, "subscription_expires_at", None)
 
     return render(
         request,
@@ -5974,6 +5982,8 @@ def safepay_subscription_return(request):
         {
             "status_title": status_title,
             "status_message": status_message,
+            "success": success,
+            "subscription_expires_at": subscription_expires_at,
             "transaction": tx,
             "plan_id": plan_id,
             "reference": reference,
