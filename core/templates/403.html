@@ -35,14 +35,61 @@
         Renew Subscription
       </a>
 
-      <form method="post" action="{% url 'logout' %}" style="margin:0;">
+      <form id="logoutForm403" method="post" action="{% url 'logout' %}" style="margin:0;">
         {% csrf_token %}
-        <button type="submit" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#ef4444; color:#fff; border:none;">
+        <button id="logoutBtn403" type="submit" style="display:inline-block; padding:10px 14px; border-radius:10px; background:#ef4444; color:#fff; border:none;">
           Logout
         </button>
       </form>
 
     </div>
   </div>
+  <script>
+    (function () {
+      const logoutForm = document.getElementById("logoutForm403");
+      const logoutBtn = document.getElementById("logoutBtn403");
+      if (!logoutForm || !logoutBtn) return;
+
+      function getCookie(name) {
+        const cookies = document.cookie ? document.cookie.split(";") : [];
+        for (const cookie of cookies) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(name + "=")) {
+            return decodeURIComponent(trimmed.slice(name.length + 1));
+          }
+        }
+        return "";
+      }
+
+      logoutForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        logoutBtn.disabled = true;
+
+        try {
+          const response = await fetch(logoutForm.action, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": getCookie("csrftoken"),
+            },
+            credentials: "same-origin",
+          });
+
+          if (response.redirected && response.url) {
+            window.location.href = response.url;
+            return;
+          }
+
+          if (response.ok) {
+            window.location.href = "/";
+            return;
+          }
+        } catch (err) {
+          console.log("Logout failed:", err);
+        }
+
+        logoutBtn.disabled = false;
+      });
+    })();
+  </script>
 </body>
 </html>
