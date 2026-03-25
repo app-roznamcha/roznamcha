@@ -6,6 +6,8 @@ import re
 import tempfile
 import logging
 import json
+import hashlib
+import hmac
 from collections import OrderedDict, defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -5678,6 +5680,57 @@ def _safepay_checkout_subscription_with_token(
     return checkout_url
 
 
+def _find_first_nested_value(data, keys):
+    if isinstance(data, dict):
+        for key in keys:
+            value = data.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        for value in data.values():
+            found = _find_first_nested_value(value, keys)
+            if found:
+                return found
+    elif isinstance(data, list):
+        for item in data:
+            found = _find_first_nested_value(item, keys)
+            if found:
+                return found
+    return ""
+
+
+def _apply_subscription_transaction(tx_id: int) -> bool:
+    with transaction.atomic():
+        tx = SubscriptionTransaction.objects.select_for_update().select_related("owner__profile").get(pk=tx_id)
+        if tx.subscription_applied:
+            return False
+
+        profile = tx.owner.profile
+        now = timezone.now()
+        current_expiry = profile.get_effective_expires_at()
+        anchor = current_expiry if current_expiry and current_expiry > now else now
+
+        profile.subscription_status = "ACTIVE"
+        profile.subscription_expires_at = anchor + timedelta(days=tx.duration_days)
+        if not profile.trial_started_at:
+            profile.trial_started_at = now
+        profile.save(update_fields=["subscription_status", "subscription_expires_at", "trial_started_at"])
+
+        tx.subscription_applied = True
+        tx.applied_at = now
+        tx.save(update_fields=["subscription_applied", "applied_at", "updated_at"])
+        return True
+
+
+def _safepay_webhook_hash_ok(payload: bytes, signature: str) -> bool | None:
+    secret = (getattr(settings, "SAFEPAY_WEBHOOK_SECRET", "") or "").strip()
+    if not secret:
+        return None
+    if not signature:
+        return False
+    expected = hmac.new(secret.encode("utf-8"), payload, hashlib.sha512).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
 @login_required
 @resolve_tenant_context(require_company=True)
 @owner_required
@@ -5884,14 +5937,120 @@ def safepay_subscription_webhook(request):
     except (UnicodeDecodeError, json.JSONDecodeError):
         payload = {}
 
+    signature = (request.headers.get("X-SFPY-SIGNATURE") or "").strip()
+    hash_ok = _safepay_webhook_hash_ok(request.body, signature)
+    event_type = payload.get("type") if isinstance(payload, dict) else ""
+    event_id = payload.get("token") if isinstance(payload, dict) else ""
+    merchant_ref = _find_first_nested_value(
+        payload,
+        ["reference", "merchant_ref", "merchant_reference", "order_id"],
+    )
+    failure_reason = _find_first_nested_value(
+        payload,
+        ["error", "message", "reason", "failure_reason"],
+    )
+
     logger.info(
-        "Safepay subscription webhook received full_path=%s content_type=%s body=%s keys=%s",
+        "Safepay subscription webhook received full_path=%s content_type=%s body=%s keys=%s event_type=%s event_id=%s merchant_ref=%s hash_ok=%s",
         request.get_full_path(),
         request.META.get("CONTENT_TYPE", ""),
         raw_body[:2000],
         list(payload.keys()) if isinstance(payload, dict) else [],
+        event_type,
+        event_id,
+        merchant_ref,
+        hash_ok,
     )
-    return JsonResponse({"ok": True})
+    if not isinstance(payload, dict):
+        return JsonResponse({"ok": False, "error": "Invalid webhook payload."}, status=400)
+
+    if hash_ok is False:
+        return JsonResponse({"ok": False, "error": "Invalid webhook signature."}, status=400)
+
+    if not merchant_ref:
+        return JsonResponse({"ok": False, "error": "Merchant reference not found."}, status=400)
+
+    tx = SubscriptionTransaction.objects.filter(merchant_ref=merchant_ref).select_related("owner__profile").first()
+    if not tx:
+        return JsonResponse({"ok": False, "error": "Subscription transaction not found."}, status=404)
+
+    tx.ipn_payload = payload
+    tx.ipn_received_at = timezone.now()
+    tx.last_event_id = event_id or tx.last_event_id
+    tx.hash_ok = hash_ok
+
+    success_events = {
+        "payment.succeeded",
+        "subscription.created",
+        "subscription.payment.succeeded",
+    }
+    failed_events = {
+        "payment.failed",
+        "subscription.canceled",
+        "subscription.ended",
+    }
+
+    if event_type in success_events:
+        tx.status = SubscriptionTransaction.STATUS_SUCCESS
+        tx.verified_at = timezone.now()
+        tx.failure_reason = ""
+        tx.save(
+            update_fields=[
+                "ipn_payload",
+                "ipn_received_at",
+                "last_event_id",
+                "hash_ok",
+                "status",
+                "verified_at",
+                "failure_reason",
+                "updated_at",
+            ]
+        )
+        applied_now = _apply_subscription_transaction(tx.id)
+        logger.info(
+            "Safepay subscription webhook success merchant_ref=%s event_type=%s applied_now=%s",
+            merchant_ref,
+            event_type,
+            applied_now,
+        )
+        return JsonResponse({"ok": True, "status": tx.status, "subscription_applied": True})
+
+    if event_type in failed_events:
+        tx.status = SubscriptionTransaction.STATUS_FAILED
+        tx.failure_reason = failure_reason or tx.failure_reason
+        tx.save(
+            update_fields=[
+                "ipn_payload",
+                "ipn_received_at",
+                "last_event_id",
+                "hash_ok",
+                "status",
+                "failure_reason",
+                "updated_at",
+            ]
+        )
+        logger.info(
+            "Safepay subscription webhook failure merchant_ref=%s event_type=%s",
+            merchant_ref,
+            event_type,
+        )
+        return JsonResponse({"ok": True, "status": tx.status})
+
+    tx.save(
+        update_fields=[
+            "ipn_payload",
+            "ipn_received_at",
+            "last_event_id",
+            "hash_ok",
+            "updated_at",
+        ]
+    )
+    logger.info(
+        "Safepay subscription webhook ignored merchant_ref=%s event_type=%s",
+        merchant_ref,
+        event_type,
+    )
+    return JsonResponse({"ok": True, "ignored": True})
 
 @login_required
 @resolve_tenant_context(require_company=True)
