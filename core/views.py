@@ -5860,6 +5860,21 @@ def subscription_checkout_start(request):
         },
     )
 
+
+@require_GET
+def safepay_subscription_return(request):
+    plan_id = (request.GET.get("plan_id") or "").strip()
+    auth_token = (request.GET.get("auth_token") or "").strip()
+    logger.info(
+        "Safepay subscription return received plan_id_present=%s auth_token_present=%s",
+        bool(plan_id),
+        bool(auth_token),
+    )
+    return HttpResponse(
+        "Safepay redirect received. Subscription confirmation is pending.",
+        content_type="text/plain; charset=utf-8",
+    )
+
 @login_required
 @resolve_tenant_context(require_company=True)
 def tenant_check(request):
