@@ -105,16 +105,6 @@ def sitemap_xml(request):
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://roznamcha.app/login/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://roznamcha.app/signup/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
     <loc>https://roznamcha.app/privacy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
