@@ -10,11 +10,16 @@ from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 from .views import run_backup_job
 from .views_public import (
+    accounting_software_traders,
     assetlinks_json,
     google_verify,
+    inventory_software_wholesalers,
+    ledger_software,
     pwa_manifest,
     robots_txt,
+    small_business_accounting_software,
     sitemap_xml,
+    wholesale_accounting_software,
 )
 
 
@@ -26,6 +31,31 @@ urlpatterns = [
     # Public pages
     # =========================
     path("", views.landing_page, name="landing"),
+    path(
+        "accounting-software-for-traders/",
+        accounting_software_traders,
+        name="accounting_software_traders"
+    ),
+    path(
+        "inventory-software-for-wholesalers/",
+        inventory_software_wholesalers,
+        name="inventory_software_wholesalers"
+    ),
+    path(
+        "wholesale-accounting-software/",
+        wholesale_accounting_software,
+        name="wholesale_accounting_software"
+    ),
+    path(
+        "ledger-software/",
+        ledger_software,
+        name="ledger_software"
+    ),
+    path(
+        "small-business-accounting-software/",
+        small_business_accounting_software,
+        name="small_business_accounting_software"
+    ),
     path("signup/", views.signup_page, name="signup"),
     path("signup/submit/", views.signup_submit, name="signup_submit"),
 

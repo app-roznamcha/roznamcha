@@ -21,6 +21,26 @@ def google_verify(request):
     return render(request, "googlea8d36177338cf4b5.html")
 
 
+def accounting_software_traders(request):
+    return render(request, "core/seo/accounting_software_traders.html")
+
+
+def inventory_software_wholesalers(request):
+    return render(request, "core/seo/inventory_software_wholesalers.html")
+
+
+def wholesale_accounting_software(request):
+    return render(request, "core/seo/wholesale_accounting_software.html")
+
+
+def ledger_software(request):
+    return render(request, "core/seo/ledger_software.html")
+
+
+def small_business_accounting_software(request):
+    return render(request, "core/seo/small_business_accounting_software.html")
+
+
 @require_GET
 def pwa_manifest(request):
     manifest = {
@@ -123,6 +143,31 @@ def sitemap_xml(request):
     <loc>https://roznamcha.app/service/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://roznamcha.app/accounting-software-for-traders/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://roznamcha.app/inventory-software-for-wholesalers/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://roznamcha.app/wholesale-accounting-software/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://roznamcha.app/ledger-software/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://roznamcha.app/small-business-accounting-software/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
 """
