@@ -7772,6 +7772,11 @@ def cash_bank_transfer_page(request):
 
     total_amount = qs.aggregate(models.Sum("amount"))["amount__sum"] or Decimal("0")
     error = None
+    form_date = today.isoformat()
+    form_from_account = ""
+    form_to_account = ""
+    form_amount = ""
+    form_notes = ""
 
     if request.method == "POST":
         date_str = request.POST.get("date") or ""
@@ -7779,6 +7784,11 @@ def cash_bank_transfer_page(request):
         to_id = request.POST.get("to_account") or ""
         amount_str = (request.POST.get("amount") or "0").strip()
         notes = (request.POST.get("notes") or "").strip()
+        form_date = date_str or today.isoformat()
+        form_from_account = from_id
+        form_to_account = to_id
+        form_amount = amount_str if amount_str != "0" else ""
+        form_notes = notes
 
         try:
             tx_date = date.fromisoformat(date_str) if date_str else today
@@ -7815,22 +7825,39 @@ def cash_bank_transfer_page(request):
                 allow_for_payments=True,
             )
 
-            kwargs = {
-                "owner": request.owner,
-                "date": tx_date,
-                "from_account": from_account,
-                "to_account": to_account,
-                "amount": amount,
-                "notes": notes,
-                "posted": False,
-            }
-            kwargs = set_tenant_on_create_kwargs(request, kwargs, CashBankTransfer)
+            available_balance = get_account_balance(
+                owner=request.owner,
+                account=from_account,
+                as_of=tx_date,
+            )
+            if available_balance < amount:
+                error = "Insufficient balance in the selected From account."
 
-            with transaction.atomic():
-                obj = CashBankTransfer.objects.create(**kwargs)
-                obj.post()
+            if not error:
+                kwargs = {
+                    "owner": request.owner,
+                    "date": tx_date,
+                    "from_account": from_account,
+                    "to_account": to_account,
+                    "amount": amount,
+                    "notes": notes,
+                    "posted": False,
+                }
+                kwargs = set_tenant_on_create_kwargs(request, kwargs, CashBankTransfer)
 
-            return redirect("cash_bank_transfer_page")
+                try:
+                    with transaction.atomic():
+                        obj = CashBankTransfer.objects.create(**kwargs)
+                        obj.post()
+                except ValidationError as exc:
+                    if hasattr(exc, "messages") and exc.messages:
+                        error = exc.messages[0]
+                    else:
+                        error = "Unable to post the transfer."
+                except (IntegrityError, PermissionDenied, ValueError) as exc:
+                    error = str(exc) or "Unable to post the transfer."
+                else:
+                    return redirect("cash_bank_transfer_page")
 
     context = {
         "cash_bank_accounts": cash_bank_accounts,
@@ -7838,6 +7865,11 @@ def cash_bank_transfer_page(request):
         "total_amount": total_amount,
         "error": error,
         "today": today.isoformat(),
+        "form_date": form_date,
+        "form_from_account": form_from_account,
+        "form_to_account": form_to_account,
+        "form_amount": form_amount,
+        "form_notes": form_notes,
         "period": period,
         "from_date": date_from.isoformat() if date_from else "",
         "to_date": date_to.isoformat() if date_to else "",

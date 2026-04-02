@@ -2155,6 +2155,16 @@ class CashBankTransfer(OwnerRequiredMixin, TimeStampedModel):
         if self.from_account_id == self.to_account_id:
             raise PermissionDenied("From and To accounts cannot be the same.")
 
+        from core.services.ledger import get_account_balance
+
+        available_balance = get_account_balance(
+            owner=self.owner,
+            account=self.from_account,
+            as_of=self.date,
+        )
+        if available_balance < self.amount:
+            raise ValidationError("Insufficient balance in the selected From account.")
+
         with transaction.atomic():
             locked = CashBankTransfer.objects.select_for_update().get(pk=self.pk)
             if locked.posted:

@@ -428,7 +428,7 @@
 
       <div class="tf-field">
         <label data-i18n="date_label">Date</label>
-        <input type="date" name="date" value="{{ today }}"
+        <input type="date" name="date" value="{{ form_date|default:today }}"
                >
       </div>
 
@@ -439,7 +439,7 @@
         <select name="from_account" id="fromAccountSelect" required>
           <option value="" data-i18n="select_from_opt">-- Select From Account --</option>
           {% for acc in cash_bank_accounts %}
-            <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
+            <option value="{{ acc.id }}" {% if form_from_account == acc.id|stringformat:"s" %}selected{% endif %}>{{ acc.code }} - {{ acc.name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -451,7 +451,7 @@
         <select name="to_account" id="toAccountSelect" required>
           <option value="" data-i18n="select_to_opt">-- Select To Account --</option>
           {% for acc in cash_bank_accounts %}
-            <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
+            <option value="{{ acc.id }}" {% if form_to_account == acc.id|stringformat:"s" %}selected{% endif %}>{{ acc.code }} - {{ acc.name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -460,7 +460,7 @@
         <label data-i18n="amount_label">
           Amount (Rs)
         </label>
-        <input type="number" id="transferAmountInput" name="amount" step="0.01" min="0" required>
+        <input type="number" id="transferAmountInput" name="amount" value="{{ form_amount }}" step="0.01" min="0" required>
         <div class="tf-amount-tools">
           <button type="button" class="tf-chip" data-set-amount="500">+500</button>
           <button type="button" class="tf-chip" data-set-amount="1000">+1000</button>
@@ -473,7 +473,7 @@
         <label data-i18n="notes_label">
           Notes (optional)
         </label>
-        <input type="text" name="notes" maxlength="255">
+        <input type="text" name="notes" value="{{ form_notes }}" maxlength="255">
       </div>
 
       <div class="tf-transfer-hint">
