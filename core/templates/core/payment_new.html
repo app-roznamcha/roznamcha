@@ -115,7 +115,11 @@
     .np-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-      gap:16px;
+      gap:18px;
+    }
+
+    .np-field.span-2{
+      grid-column:span 2;
     }
 
     .np-field label{
@@ -129,12 +133,17 @@
     .np-field input,
     .np-field select{
       width:100%;
-      padding:10px 12px;
-      border-radius:10px;
+      min-height:48px;
+      padding:11px 13px;
+      border-radius:12px;
       border:1px solid #cbd5e1;
-      font-size:14px;
+      font-size:15px;
       background:#fff;
       transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .np-field input::placeholder{
+      color:#94a3b8;
     }
 
     .np-field input:focus,
@@ -144,43 +153,97 @@
       box-shadow:0 0 0 3px rgba(37,99,235,.14);
     }
 
-    .np-radio-box{
+    .np-direction-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .np-direction{
+      position:relative;
+    }
+
+    .np-direction input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .np-direction-card{
+      min-height:86px;
+      border:1px solid #dbe3ee;
+      background:#f8fafc;
+      border-radius:16px;
+      padding:12px 14px;
       display:flex;
       flex-direction:column;
-      gap:8px;
-      font-size:14px;
-      border:1px solid #e2e8f0;
-      background:#f8fafc;
-      border-radius:10px;
-      padding:10px 12px;
+      justify-content:center;
+      gap:5px;
+      cursor:pointer;
+      transition:border-color .14s ease, box-shadow .14s ease, transform .14s ease, background .14s ease;
+    }
+
+    .np-direction-card:hover{
+      transform:translateY(-1px);
+    }
+
+    .np-direction-card strong{
+      font-size:15px;
+      color:#0f172a;
+    }
+
+    .np-direction-card span{
+      font-size:12px;
+      color:#64748b;
+      line-height:1.4;
+    }
+
+    .np-direction.in input:checked + .np-direction-card{
+      border-color:#22c55e;
+      background:#ecfdf5;
+      box-shadow:0 0 0 3px rgba(34,197,94,.12);
+    }
+
+    .np-direction.out input:checked + .np-direction-card{
+      border-color:#f59e0b;
+      background:#fff7ed;
+      box-shadow:0 0 0 3px rgba(245,158,11,.12);
     }
 
     .np-help{
-      margin:6px 0 0;
+      margin:7px 0 0;
       font-size:13px;
       color:#64748b;
+      line-height:1.45;
     }
 
     .np-amount-tools{
-      margin-top:8px;
+      margin-top:10px;
       display:flex;
       gap:8px;
       flex-wrap:wrap;
     }
 
     .np-chip{
-      border:1px solid #dbeafe;
-      background:#eff6ff;
-      color:#1d4ed8;
+      border:1px solid #dbe3ee;
+      background:#f8fafc;
+      color:#334155;
       border-radius:999px;
       font-size:12px;
       font-weight:700;
-      padding:4px 10px;
+      padding:5px 10px;
       cursor:pointer;
     }
 
+    .np-amount-field input{
+      min-height:56px;
+      font-size:18px;
+      font-weight:700;
+    }
+
     .np-summary{
-      margin-top:16px;
+      margin-top:18px;
       display:flex;
       gap:8px;
       flex-wrap:wrap;
@@ -194,8 +257,8 @@
       border:1px solid #e2e8f0;
       background:#f8fafc;
       color:#0f172a;
-      border-radius:999px;
-      padding:6px 10px;
+      border-radius:12px;
+      padding:8px 12px;
       font-size:13px;
       font-weight:700;
     }
@@ -230,6 +293,9 @@
       }
       .np-grid{
         grid-template-columns:1fr !important;
+      }
+      .np-direction-grid{
+        grid-template-columns:1fr;
       }
       .np-summary-chip{
         width:100%;
@@ -276,32 +342,29 @@
       {% csrf_token %}
 
       <div class="np-grid">
-
-        <div class="np-field">
-          <label data-i18n="label_date">Date</label>
-          <input type="date"
-                 name="date"
-                 value="{{ today }}"
-                 >
-        </div>
-
-        <div class="np-field">
+        <div class="np-field span-2">
           <label data-i18n="label_direction">Direction</label>
-          <div class="np-radio-box">
-            <label>
+          <div class="np-direction-grid">
+            <label class="np-direction in">
               <input type="radio" name="direction" value="IN" checked>
-              <span data-i18n="direction_in">Receipt (money coming IN)</span>
+              <span class="np-direction-card">
+                <strong data-i18n="direction_in">Receive money</strong>
+                <span data-i18n="direction_in_help">money coming in</span>
+              </span>
             </label>
-            <label>
+            <label class="np-direction out">
               <input type="radio" name="direction" value="OUT">
-              <span data-i18n="direction_out">Payment (money going OUT)</span>
+              <span class="np-direction-card">
+                <strong data-i18n="direction_out">Pay money</strong>
+                <span data-i18n="direction_out_help">money going out</span>
+              </span>
             </label>
           </div>
         </div>
 
         <div class="np-field">
           <label data-i18n="label_party">
-            Party (Customer / Supplier)
+            Customer / Supplier
           </label>
           <select name="party" required
                   >
@@ -313,7 +376,7 @@
         </div>
 
         <div class="np-field">
-          <label data-i18n="label_account">
+          <label data-i18n="label_account" id="accountLabel">
             Cash / Bank Account
           </label>
           <select name="account" required
@@ -328,7 +391,7 @@
           </p>
         </div>
 
-        <div class="np-field">
+        <div class="np-field np-amount-field">
           <label data-i18n="label_amount">
             Amount (Rs)
           </label>
@@ -342,8 +405,17 @@
             <button type="button" class="np-chip" data-set-amount="500">+500</button>
             <button type="button" class="np-chip" data-set-amount="1000">+1000</button>
             <button type="button" class="np-chip" data-set-amount="5000">+5000</button>
+            <button type="button" class="np-chip" data-set-amount="10000">+10000</button>
             <button type="button" class="np-chip" data-set-amount="0">Clear</button>
           </div>
+        </div>
+
+        <div class="np-field">
+          <label data-i18n="label_date">Date</label>
+          <input type="date"
+                 name="date"
+                 value="{{ today }}"
+                 >
         </div>
 
         <div class="np-field">
@@ -359,8 +431,8 @@
       </div>
 
       <div class="np-summary">
-        <span class="np-summary-chip"><span data-i18n="summary_direction">Direction</span>: <span id="directionPreview" data-i18n="direction_in">Receipt (money coming IN)</span></span>
-        <span class="np-summary-chip amount"><span data-i18n="summary_amount">Amount Preview</span>: Rs <span id="amountPreview">0.00</span></span>
+        <span class="np-summary-chip"><span data-i18n="summary_direction">Direction</span>: <span id="directionPreview" data-i18n="direction_in">Receive money</span></span>
+        <span class="np-summary-chip amount"><span data-i18n="summary_amount">You will record</span>: Rs <span id="amountPreview">0.00</span></span>
       </div>
 
       <div class="np-actions">
@@ -390,17 +462,21 @@
     back_to_payments: "← Back to Payments",
     label_date: "Date",
     label_direction: "Direction",
-    direction_in: "Receipt (money coming IN)",
-    direction_out: "Payment (money going OUT)",
-    label_party: "Party (Customer / Supplier)",
+    direction_in: "Receive money",
+    direction_out: "Pay money",
+    direction_in_help: "money coming in",
+    direction_out_help: "money going out",
+    label_party: "Customer / Supplier",
     opt_select_party: "-- Select Party --",
     label_account: "Cash / Bank Account",
+    label_account_in: "Received in account",
+    label_account_out: "Paid from account",
     opt_select_account: "-- Select Account --",
     account_help: "Only accounts marked as Cash/Bank and allowed for payments are shown.",
     label_amount: "Amount (Rs)",
     label_description: "Description (optional)",
     summary_direction: "Direction",
-    summary_amount: "Amount Preview",
+    summary_amount: "You will record",
     save_post: "💾 Save & Post",
     cancel: "Cancel"
   });
@@ -412,17 +488,21 @@
     back_to_payments: "← ادائیگیوں پر واپس",
     label_date: "تاریخ",
     label_direction: "سمت",
-    direction_in: "رسید (رقم آ رہی ہے)",
-    direction_out: "ادائیگی (رقم جا رہی ہے)",
-    label_party: "فریق (گاہک / سپلائر)",
+    direction_in: "رقم وصول کریں",
+    direction_out: "رقم ادا کریں",
+    direction_in_help: "رقم آ رہی ہے",
+    direction_out_help: "رقم جا رہی ہے",
+    label_party: "گاہک / سپلائر",
     opt_select_party: "-- فریق منتخب کریں --",
     label_account: "کیش / بینک اکاؤنٹ",
+    label_account_in: "رقم کس اکاؤنٹ میں وصول ہوئی",
+    label_account_out: "رقم کس اکاؤنٹ سے ادا ہوئی",
     opt_select_account: "-- اکاؤنٹ منتخب کریں --",
     account_help: "صرف وہ اکاؤنٹس دکھائے جاتے ہیں جو کیش/بینک مارک ہوں اور ادائیگی کے لیے اجازت یافتہ ہوں۔",
     label_amount: "رقم (روپے)",
     label_description: "تفصیل (اختیاری)",
     summary_direction: "سمت",
-    summary_amount: "رقم پیش نظارہ",
+    summary_amount: "آپ یہ ریکارڈ کریں گے",
     save_post: "💾 محفوظ کریں اور پوسٹ کریں",
     cancel: "منسوخ کریں"
   });
@@ -431,6 +511,7 @@
     const amountInput = document.getElementById("amountInput");
     const amountPreview = document.getElementById("amountPreview");
     const directionPreview = document.getElementById("directionPreview");
+    const accountLabel = document.getElementById("accountLabel");
     const directionRadios = document.querySelectorAll('input[name="direction"]');
     const chips = document.querySelectorAll("[data-set-amount]");
 
@@ -445,13 +526,17 @@
     }
 
     function updateDirectionPreview() {
-      if (!directionPreview) return;
       const selected = document.querySelector('input[name="direction"]:checked');
-      const key = selected && selected.value === "OUT" ? "direction_out" : "direction_in";
+      const isOut = selected && selected.value === "OUT";
+      const key = isOut ? "direction_out" : "direction_in";
       const lang = localStorage.getItem("roz_lang") || "en";
       const pack = (window.ROZ_I18N && window.ROZ_I18N[lang]) ? window.ROZ_I18N[lang] : {};
       const fallback = (window.ROZ_I18N.en && window.ROZ_I18N.en[key]) || "";
-      directionPreview.textContent = pack[key] || fallback;
+      if (directionPreview) directionPreview.textContent = pack[key] || fallback;
+
+      const accountKey = isOut ? "label_account_out" : "label_account_in";
+      const accountFallback = (window.ROZ_I18N.en && window.ROZ_I18N.en[accountKey]) || "";
+      if (accountLabel) accountLabel.textContent = pack[accountKey] || accountFallback;
     }
 
     if (amountInput) amountInput.addEventListener("input", updateAmountPreview);
