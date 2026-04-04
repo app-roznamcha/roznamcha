@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load humanize %}
 
 {% block title %}Daily Expenses{% endblock %}
 
@@ -94,9 +95,9 @@
       background:#ffffff;
       border-radius:16px;
       border:1px solid #d1d5db;
-      padding:18px 20px 20px;
+      padding:16px 18px 18px;
       box-shadow:0 8px 18px rgba(15,23,42,.06);
-      margin-bottom:18px;
+      margin-bottom:14px;
     }
 
     .exp-card-title{
@@ -138,6 +139,37 @@
       border-color:#93c5fd;
       box-shadow:0 0 0 3px rgba(37,99,235,.14);
     }
+    .exp-field-amount input{
+      min-height:46px;
+      font-size:16px;
+      font-weight:700;
+      border-color:#94a3b8;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    .exp-field-amount input:focus{
+      border-color:#60a5fa;
+      box-shadow:0 0 0 3px rgba(37,99,235,.16);
+    }
+    .exp-actions-row{
+      grid-column:1 / -1;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:4px;
+      align-items:center;
+    }
+    .exp-preview-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid #dbeafe;
+      background:#eff6ff;
+      color:#1d4ed8;
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+    }
 
     .exp-amount-tools{
       margin-top:8px;
@@ -160,12 +192,12 @@
     .exp-filter-form{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
+      gap:10px;
       align-items:flex-end;
     }
 
     .exp-filter-form .field{
-      min-width:180px;
+      min-width:170px;
       flex:1;
     }
 
@@ -180,7 +212,7 @@
       flex-wrap:wrap;
       gap:8px;
       align-items:center;
-      margin-bottom:12px;
+      margin-bottom:10px;
     }
 
     .exp-stat-chip{
@@ -188,12 +220,13 @@
       align-items:center;
       gap:6px;
       border:1px solid #e2e8f0;
-      background:#f8fafc;
+      background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
       color:#0f172a;
-      padding:6px 10px;
+      padding:7px 11px;
       border-radius:999px;
       font-size:13px;
       font-weight:700;
+      box-shadow:0 1px 2px rgba(15,23,42,.04);
     }
 
     .exp-stat-chip.total{
@@ -208,7 +241,7 @@
       flex-wrap:wrap;
       align-items:flex-end;
       justify-content:space-between;
-      margin-bottom:10px;
+      margin-bottom:8px;
     }
 
     .exp-search{
@@ -257,7 +290,7 @@
     .exp-table th,
     .exp-table td{
       border-bottom:1px solid #e5e7eb;
-      padding:9px 10px;
+      padding:10px 12px;
       font-size:14px;
       vertical-align:middle;
     }
@@ -273,6 +306,8 @@
       position:sticky;
       top:0;
       z-index:1;
+      padding-top:11px;
+      padding-bottom:11px;
     }
 
     .exp-table tbody tr:nth-child(even){ background:#fcfdff; }
@@ -361,19 +396,6 @@
       </div>
 
       <div class="exp-field">
-        <label data-i18n="paid_from_label">
-          Paid From (Cash/Bank)
-        </label>
-        <select name="paid_from" required
-                >
-          <option value="" data-i18n="select_account_opt">-- Select Account --</option>
-          {% for acc in cash_bank_accounts %}
-            <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="exp-field">
         <label data-i18n="expense_head_label">
           Expense Head
         </label>
@@ -387,6 +409,19 @@
       </div>
 
       <div class="exp-field">
+        <label data-i18n="paid_from_label">
+          Paid From (Cash/Bank)
+        </label>
+        <select name="paid_from" required
+                >
+          <option value="" data-i18n="select_account_opt">-- Select Account --</option>
+          {% for acc in cash_bank_accounts %}
+            <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="exp-field exp-field-amount">
         <label data-i18n="amount_label">
           Amount (Rs)
         </label>
@@ -400,11 +435,11 @@
         <input type="text" name="notes" maxlength="255">
       </div>
 
-      <div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+      <div class="exp-actions-row">
         <button type="submit" class="exp-btn exp-btn-primary">
-          <span data-i18n="save_posted_btn">💾 Save (Posted)</span>
+          <span data-i18n="save_posted_btn">💾 Save Expense</span>
         </button>
-        <span class="exp-stat-chip total"><span data-i18n="amount_preview">Amount Preview</span>: Rs <strong id="amountPreview">0.00</strong></span>
+        <span class="exp-preview-badge"><span data-i18n="amount_preview">Preview</span>: Rs <strong id="amountPreview">0.00</strong></span>
       </div>
     </form>
   </div>
@@ -458,9 +493,9 @@
   {# ---------- Expenses List ---------- #}
   <div class="exp-card">
     <div class="exp-mini-stats">
-      <span class="exp-stat-chip">Server Rows: <span id="server-row-count">{{ expenses|length }}</span></span>
-      <span class="exp-stat-chip">Visible Rows: <span id="visible-row-count">{{ expenses|length }}</span></span>
-      <span class="exp-stat-chip total"><span data-i18n="total">Total</span>: <strong>{{ total_amount|floatformat:2 }}</strong></span>
+      <span class="exp-stat-chip"><span data-i18n="server_rows">Server Rows</span>: <span id="server-row-count">{{ expenses|length }}</span></span>
+      <span class="exp-stat-chip"><span data-i18n="visible_rows">Visible Rows</span>: <span id="visible-row-count">{{ expenses|length }}</span></span>
+      <span class="exp-stat-chip total"><span data-i18n="total">Total</span>: <strong>Rs {{ total_amount|floatformat:2|intcomma }}</strong></span>
     </div>
 
     <div class="exp-toolbar">
@@ -468,7 +503,7 @@
         Expenses List
       </h2>
       <div class="exp-search">
-        <label data-i18n="quick_search">Quick Search (head / account / notes)</label>
+        <label data-i18n="quick_search">Search expenses</label>
         <input type="text" id="quickSearchInput" placeholder="Type to filter visible rows...">
       </div>
     </div>
@@ -493,7 +528,7 @@
               <td>{{ e.date|date:"d M Y" }}</td>
               <td>{{ e.paid_from.name }}</td>
               <td>{{ e.expense_head.name }}</td>
-              <td class="right">{{ e.amount|floatformat:2 }}</td>
+              <td class="right">{{ e.amount|floatformat:2|intcomma }}</td>
               <td>{{ e.notes|default:"—" }}</td>
               <td class="center">
                 {% if e.posted %}
@@ -534,7 +569,7 @@
     notes_label: "Notes (optional)",
     select_account_opt: "-- Select Account --",
     select_head_opt: "-- Select Head --",
-    save_posted_btn: "💾 Save (Posted)",
+    save_posted_btn: "💾 Save Expense",
 
     filters: "Filters",
     period_label: "Period",
@@ -546,8 +581,10 @@
     to_date: "To date",
     apply: "Apply",
     reset: "Reset",
-    amount_preview: "Amount Preview",
-    quick_search: "Quick Search (head / account / notes)",
+    amount_preview: "Preview",
+    quick_search: "Search expenses",
+    server_rows: "Server Rows",
+    visible_rows: "Visible Rows",
 
     expenses_list: "Expenses List",
     total: "Total",
@@ -578,7 +615,7 @@
     notes_label: "تفصیل (اختیاری)",
     select_account_opt: "-- اکاؤنٹ منتخب کریں --",
     select_head_opt: "-- مد منتخب کریں --",
-    save_posted_btn: "💾 محفوظ کریں (پوسٹڈ)",
+    save_posted_btn: "💾 اخراجات محفوظ کریں",
 
     filters: "فلٹرز",
     period_label: "مدت",
@@ -590,8 +627,10 @@
     to_date: "اختتام",
     apply: "لاگو کریں",
     reset: "ری سیٹ",
-    amount_preview: "رقم پیش نظارہ",
-    quick_search: "فوری تلاش (مد / اکاؤنٹ / نوٹس)",
+    amount_preview: "پیش نظارہ",
+    quick_search: "اخراجات تلاش کریں",
+    server_rows: "سرور قطاریں",
+    visible_rows: "نظر آنے والی قطاریں",
 
     expenses_list: "اخراجات کی فہرست",
     total: "کل",
