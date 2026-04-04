@@ -373,15 +373,20 @@
   .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
+      gap: 22px;
       align-items: start;
+  }
+  @media (min-width: 1120px) {
+    .dashboard-grid {
+      grid-template-columns: 0.98fr 1.08fr 0.98fr;
+    }
   }
 
   .dashboard-section {
       background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
       border-radius: 22px;
       border: 1px solid #dbe6f4;
-      padding: 20px 20px 18px;
+      padding: 20px 20px 19px;
       box-shadow: 0 10px 18px rgba(15, 23, 42, 0.045);
       position: relative;
       overflow: hidden;
@@ -422,13 +427,29 @@
       line-height: 1.45;
       font-weight: 500;
   }
+  .dashboard-section-heading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+  }
+  .dashboard-section-icon{
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:15px;
+      flex:0 0 30px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  }
 
   /* --- Button layout --- */
   .button-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
   }
 
   .btn-pill {
@@ -436,10 +457,10 @@
       justify-content: flex-start;
       align-items: center;
       width: 100%;
-      min-height: 48px;
-      padding: 11px 14px;
+      min-height: 44px;
+      padding: 10px 13px;
       border-radius: 14px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       text-decoration: none;
       border: 1px solid #d8e1ed;
@@ -448,12 +469,13 @@
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
       transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
       line-height: 1.25;
+      gap:10px;
   }
 
   .btn-pill:hover {
       background: #f8fafc;
-      box-shadow: 0 8px 14px rgba(15, 23, 42, 0.09);
-      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.095);
+      transform: translateY(-2px);
       border-color: #b8c6d8;
   }
 
@@ -465,22 +487,48 @@
   .button-row .btn-pill:only-child {
       grid-column: 1 / -1;
   }
+  .btn-icon{
+      width:24px;
+      height:24px;
+      border-radius:8px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:13px;
+      flex:0 0 24px;
+      background:rgba(255,255,255,.82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.92);
+  }
+  .btn-text{
+      display:block;
+      min-width:0;
+  }
 
   /* ========= Column colour themes ========= */
 
   /* Column 1: Master Data – Blue */
   .section-master .dashboard-section-title-indicator { background: #2563eb; }
   .section-master.dashboard-section::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+  .section-master .dashboard-section-icon { color:#1d4ed8; background:#eaf3ff; }
   .section-master .btn-pill {
       border-color: #bfdbfe;
       color: #1e40af;
       background: linear-gradient(180deg, #eff6ff 0%, #e7f0ff 100%);
+  }
+  .section-master .btn-pill .btn-icon{
+      color:#1d4ed8;
+      background:#f8fbff;
   }
   .section-master .btn-pill-primary {
       background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
       border-color: #1d4ed8;
       color: #ffffff;
       font-weight: 800;
+      box-shadow: 0 10px 16px rgba(37,99,235,.18);
+  }
+  .section-master .btn-pill-primary .btn-icon{
+      color:#1d4ed8;
+      background:rgba(255,255,255,.94);
   }
   .section-master .btn-pill-primary:hover {
       background: #1d4ed8;
@@ -490,16 +538,31 @@
   /* Column 2: Transactions – Green */
   .section-transactions .dashboard-section-title-indicator { background: #059669; }
   .section-transactions.dashboard-section::before { background: linear-gradient(90deg, #059669, #34d399); }
+  .section-transactions{
+      box-shadow: 0 14px 24px rgba(15, 23, 42, 0.065);
+      border-color:#cfe9de;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fffb 100%);
+    }
+  .section-transactions .dashboard-section-icon { color:#047857; background:#e8fbf2; }
   .section-transactions .btn-pill {
       border-color: #a7f3d0;
       color: #047857;
       background: linear-gradient(180deg, #ecfdf5 0%, #ddfaee 100%);
+  }
+  .section-transactions .btn-pill .btn-icon{
+      color:#047857;
+      background:#f7fefb;
   }
   .section-transactions .btn-pill-primary {
       background: linear-gradient(180deg, #059669 0%, #047857 100%);
       border-color: #047857;
       color: #ffffff;
       font-weight: 800;
+      box-shadow: 0 10px 16px rgba(5,150,105,.18);
+  }
+  .section-transactions .btn-pill-primary .btn-icon{
+      color:#047857;
+      background:rgba(255,255,255,.94);
   }
   .section-transactions .btn-pill-primary:hover {
       background: #047857;
@@ -509,10 +572,15 @@
   /* Column 3: Reports – Orange */
   .section-reports .dashboard-section-title-indicator { background: #f97316; }
   .section-reports.dashboard-section::before { background: linear-gradient(90deg, #f97316, #fdba74); }
+  .section-reports .dashboard-section-icon { color:#c2410c; background:#fff0e2; }
   .section-reports .btn-pill {
       border-color: #fed7aa;
       color: #c2410c;
       background: linear-gradient(180deg, #fff7ed 0%, #ffedd8 100%);
+  }
+  .section-reports .btn-pill .btn-icon{
+      color:#c2410c;
+      background:#fffaf5;
   }
   .section-reports .btn-pill-primary {
       background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
@@ -523,6 +591,24 @@
   .section-reports .btn-pill-primary:hover {
       background: #ea580c;
       border-color: #ea580c;
+  }
+  .report-group{
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid #f1e1cf;
+  }
+  .report-group:first-of-type{
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+  }
+  .report-group-title{
+      margin:0 0 10px;
+      font-size:11.5px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#9a5b2a;
   }
 
   /* Small screens: tighten spacing */
@@ -538,6 +624,7 @@
     .dash-card-value{ white-space:normal; }
     .meta-line{ width:100%; justify-content:center; }
     .welcome-name{ font-size:16px; }
+    .dashboard-section{ padding:18px 16px 16px; }
   }
 
   /* =========================
@@ -892,37 +979,39 @@ html[dir="rtl"] .dashboard-section{
         <section class="dashboard-section section-master">
             <h2>
                 <span class="dashboard-section-title-indicator"></span>
-                <span data-i18n="master_data">📁 Master Data</span>
+                <span class="dashboard-section-icon" aria-hidden="true">📁</span>
+                <span data-i18n="master_data">Master Data</span>
               </h2>
               <p data-i18n="master_desc">Create and manage customers, suppliers, products and accounts.</p>
     
             <div class="button-row">
                 <a href="{% url 'customer_create' %}" class="btn-pill btn-pill-primary">
-                    <span data-i18n="new_customer">➕ New Customer</span>
+                    <span class="btn-icon" aria-hidden="true">➕</span>
+                    <span class="btn-text" data-i18n="new_customer">New Customer</span>
                   </a>
                 {% if not is_staff %}
-                  <a href="{% url 'customer_list' %}" class="btn-pill"><span data-i18n="customer_list">👥 Customer List</span></a>
+                  <a href="{% url 'customer_list' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">👥</span><span class="btn-text" data-i18n="customer_list">Customer List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'supplier_create' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_supplier">➕ New Supplier</span></a>
+                <a href="{% url 'supplier_create' %}" class="btn-pill btn-pill-primary"><span class="btn-icon" aria-hidden="true">➕</span><span class="btn-text" data-i18n="new_supplier">New Supplier</span></a>
                 {% if not is_staff %}
-                  <a href="{% url 'supplier_list' %}" class="btn-pill"><span data-i18n="supplier_list">🏭 Supplier List</span></a>
+                  <a href="{% url 'supplier_list' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">🏭</span><span class="btn-text" data-i18n="supplier_list">Supplier List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'product_create' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_product">➕ New Product</span></a>
+                <a href="{% url 'product_create' %}" class="btn-pill btn-pill-primary"><span class="btn-icon" aria-hidden="true">➕</span><span class="btn-text" data-i18n="new_product">New Product</span></a>
                 {% if not is_staff %}
-                  <a href="{% url 'product_list' %}" class="btn-pill"><span data-i18n="product_list">📦 Product List</span></a>
+                  <a href="{% url 'product_list' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📦</span><span class="btn-text" data-i18n="product_list">Product List</span></a>
                 {% endif %}
             </div>
     
             {% if not is_staff %}
             <div class="button-row">
-                <a href="{% url 'user_accounts' %}" class="btn-pill"><span data-i18n="bank_cash_accounts">🏦 Bank &amp; Cash Accounts</span></a>
-                <a href="{% url 'account_ledger' %}" class="btn-pill"><span data-i18n="account_ledger">📒 Account Ledger</span></a>
+                <a href="{% url 'user_accounts' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">🏦</span><span class="btn-text" data-i18n="bank_cash_accounts">Bank &amp; Cash Accounts</span></a>
+                <a href="{% url 'account_ledger' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📒</span><span class="btn-text" data-i18n="account_ledger">Account Ledger</span></a>
             </div>
             {% endif %}
         </section>
@@ -931,46 +1020,49 @@ html[dir="rtl"] .dashboard-section{
         <section class="dashboard-section section-transactions">
             <h2>
                 <span class="dashboard-section-title-indicator"></span>
-                <span data-i18n="transactions">💳 Transactions</span>
+                <span class="dashboard-section-icon" aria-hidden="true">💳</span>
+                <span data-i18n="transactions">Transactions</span>
             </h2>
             <p data-i18n="transactions_desc">Record daily sales, purchases, customer receipts and supplier payments.</p>
     
             <div class="button-row">
-                <a href="{% url 'sales_new' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_sale">➕ New Sale</span></a>
+                <a href="{% url 'sales_new' %}" class="btn-pill btn-pill-primary"><span class="btn-icon" aria-hidden="true">➕</span><span class="btn-text" data-i18n="new_sale">New Sale</span></a>
                 {% if not is_staff %}
-                <a href="{% url 'sales_list' %}" class="btn-pill"><span data-i18n="sales_list">📄 Sales List</span></a>
+                <a href="{% url 'sales_list' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📄</span><span class="btn-text" data-i18n="sales_list">Sales List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'purchase_new' %}" class="btn-pill btn-pill-primary"><span data-i18n="new_purchase">➕ New Purchase</span></a>
+                <a href="{% url 'purchase_new' %}" class="btn-pill btn-pill-primary"><span class="btn-icon" aria-hidden="true">➕</span><span class="btn-text" data-i18n="new_purchase">New Purchase</span></a>
                 {% if not is_staff %}
-                <a href="{% url 'purchase_list' %}" class="btn-pill"><span data-i18n="purchase_list">📥 Purchase List</span></a>
+                <a href="{% url 'purchase_list' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📥</span><span class="btn-text" data-i18n="purchase_list">Purchase List</span></a>
                 {% endif %}
             </div>
     
             <div class="button-row">
-                <a href="{% url 'sales_return_new' %}" class="btn-pill"><span data-i18n="sales_return">↩️ Sales Return (Customer)</span></a>
-                <a href="{% url 'purchase_return_new' %}" class="btn-pill"><span data-i18n="purchase_return">↩️ Purchase Return (Supplier)</span></a>
+                <a href="{% url 'sales_return_new' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">↩️</span><span class="btn-text" data-i18n="sales_return">Sales Return (Customer)</span></a>
+                <a href="{% url 'purchase_return_new' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">↩️</span><span class="btn-text" data-i18n="purchase_return">Purchase Return (Supplier)</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'payment_new' %}" class="btn-pill"><span data-i18n="new_payment">💰 New Payment / Receipt</span></a>
+                <a href="{% url 'payment_new' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">💰</span><span class="btn-text" data-i18n="new_payment">New Payment / Receipt</span></a>
 
                 {% if not is_staff %}
-                <a href="{% url 'payments_list' %}" class="btn-pill"><span data-i18n="payments_list">📃 Payments &amp; Receipts</span></a>
+                <a href="{% url 'payments_list' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📃</span><span class="btn-text" data-i18n="payments_list">Payments &amp; Receipts</span></a>
                 {% endif %}
 
                 <a href="{% url 'expenses_page' %}" class="btn-pill">
-                  <span data-i18n="daily_expenses">🧾 Daily Expenses</span>
+                  <span class="btn-icon" aria-hidden="true">🧾</span>
+                  <span class="btn-text" data-i18n="daily_expenses">Daily Expenses</span>
                 </a>
                 <a href="{% url 'cash_bank_transfer_page' %}" class="btn-pill">
-                  <span data-i18n="cash_bank_transfer">🔁 Cash/Bank Transfer</span>
+                  <span class="btn-icon" aria-hidden="true">🔁</span>
+                  <span class="btn-text" data-i18n="cash_bank_transfer">Cash/Bank Transfer</span>
                 </a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'adjustments_page' %}" class="btn-pill"><span data-i18n="adjustments">🧾 Adjustments (Party + Stock)</span></a>
+                <a href="{% url 'adjustments_page' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">🧾</span><span class="btn-text" data-i18n="adjustments">Adjustments (Party + Stock)</span></a>
               </div>
         </section>
     
@@ -979,46 +1071,63 @@ html[dir="rtl"] .dashboard-section{
         <section class="dashboard-section section-reports">
             <h2>
                 <span class="dashboard-section-title-indicator"></span>
-                <span data-i18n="reports">📊 Reports &amp; Utilities</span>
+                <span class="dashboard-section-icon" aria-hidden="true">📊</span>
+                <span data-i18n="reports">Reports &amp; Utilities</span>
             </h2>
             <p data-i18n="reports_desc">View key reports for stock, balances and financial performance.</p>
     
+            <div class="report-group">
+              <div class="report-group-title">Inventory</div>
             <div class="button-row">
-                <a href="{% url 'stock_report' %}" class="btn-pill"><span data-i18n="stock_report">📦 Stock Report</span></a>
-                <a href="{% url 'product_ledger' %}" class="btn-pill"><span data-i18n="product_ledger">📊 Product Ledger</span></a>
+                <a href="{% url 'stock_report' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📦</span><span class="btn-text" data-i18n="stock_report">Stock Report</span></a>
+                <a href="{% url 'product_ledger' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📊</span><span class="btn-text" data-i18n="product_ledger">Product Ledger</span></a>
+            </div>
+            </div>
+    
+            <div class="report-group">
+              <div class="report-group-title">Daily Summary</div>
+            <div class="button-row">
+                <a href="{% url 'day_summary' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📅</span><span class="btn-text" data-i18n="day_summary">Day Summary</span></a>
+            </div>
+            </div>
+    
+            <div class="report-group">
+              <div class="report-group-title">Party Accounts</div>
+            <div class="button-row">
+                <a href="{% url 'customer_balances' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">👤</span><span class="btn-text" data-i18n="customer_balances">Customer Balances</span></a>
+                <a href="{% url 'supplier_balances' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">🏭</span><span class="btn-text" data-i18n="supplier_balances">Supplier Balances</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'day_summary' %}" class="btn-pill"><span data-i18n="day_summary">📅 Day Summary</span></a>
+                <a href="{% url 'customer_ledger' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📒</span><span class="btn-text" data-i18n="customer_ledger">Customer Ledger</span></a>
+                <a href="{% url 'supplier_ledger' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📕</span><span class="btn-text" data-i18n="supplier_ledger">Supplier Ledger</span></a>
+            </div>
+            </div>
+    
+            <div class="report-group">
+              <div class="report-group-title">Financial Reports</div>
+            <div class="button-row">
+                <a href="{% url 'trial_balance' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">⚖️</span><span class="btn-text" data-i18n="trial_balance">Trial Balance</span></a>
+                <a href="{% url 'profit_loss' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">📈</span><span class="btn-text" data-i18n="profit_loss">Profit &amp; Loss</span></a>
             </div>
     
             <div class="button-row">
-                <a href="{% url 'customer_balances' %}" class="btn-pill"><span data-i18n="customer_balances">👤 Customer Balances</span></a>
-                <a href="{% url 'supplier_balances' %}" class="btn-pill"><span data-i18n="supplier_balances">🏭 Supplier Balances</span></a>
+                <a href="{% url 'balance_sheet' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">🧮</span><span class="btn-text" data-i18n="balance_sheet">Balance Sheet</span></a>
+            </div>
             </div>
     
-            <div class="button-row">
-                <a href="{% url 'customer_ledger' %}" class="btn-pill"><span data-i18n="customer_ledger">📒 Customer Ledger</span></a>
-                <a href="{% url 'supplier_ledger' %}" class="btn-pill"><span data-i18n="supplier_ledger">📕 Supplier Ledger</span></a>
-            </div>
-    
-            <div class="button-row">
-                <a href="{% url 'trial_balance' %}" class="btn-pill"><span data-i18n="trial_balance">⚖️ Trial Balance</span></a>
-                <a href="{% url 'profit_loss' %}" class="btn-pill"><span data-i18n="profit_loss">📈 Profit &amp; Loss</span></a>
-            </div>
-    
-            <div class="button-row">
-                <a href="{% url 'balance_sheet' %}" class="btn-pill"><span data-i18n="balance_sheet">🧮 Balance Sheet</span></a>
-            </div>
-    
+            <div class="report-group">
+              <div class="report-group-title">System</div>
             <div class="button-row">
                 <a href="{% url 'tax_pack_page' %}" class="btn-pill">
-                    <span data-i18n="tax_pack">🧾 Tax Pack</span>
+                    <span class="btn-icon" aria-hidden="true">🧾</span>
+                    <span class="btn-text" data-i18n="tax_pack">Tax Pack</span>
                 </a>
             </div>
 
             <div class="button-row">
-                <a href="{% url 'backup_dashboard' %}" class="btn-pill"><span data-i18n="backups">🗂️ Backups</span></a>
+                <a href="{% url 'backup_dashboard' %}" class="btn-pill"><span class="btn-icon" aria-hidden="true">🗂️</span><span class="btn-text" data-i18n="backups">Backups</span></a>
+            </div>
             </div>
         </section>
         {% endif %}
@@ -1049,27 +1158,27 @@ html[dir="rtl"] .dashboard-section{
       customer_receivable: "Customer Receivable (Current)",
       supplier_payable: "Supplier Payable (Current)",
 
-      new_sale: "➕ New Sale",
-      sales_list: "📄 Sales List",
-      new_purchase: "➕ New Purchase",
-      purchase_list: "📥 Purchase List",
-      sales_return: "↩️ Sales Return (Customer)",
-      purchase_return: "↩️ Purchase Return (Supplier)",
-      new_payment: "💰 New Payment / Receipt",
-      payments_list: "📃 New Payment / Receipt List",
-      adjustments: "🧾 Adjustments (Party + Stock)",
+      new_sale: "New Sale",
+      sales_list: "Sales List",
+      new_purchase: "New Purchase",
+      purchase_list: "Purchase List",
+      sales_return: "Sales Return (Customer)",
+      purchase_return: "Purchase Return (Supplier)",
+      new_payment: "New Payment / Receipt",
+      payments_list: "Payments & Receipts",
+      adjustments: "Adjustments (Party + Stock)",
 
-      stock_report: "📦 Stock Report",
-      product_ledger: "📊 Product Ledger",
-      day_summary: "📅 Day Summary",
-      customer_balances: "👤 Customer Balances",
-      supplier_balances: "🏭 Supplier Balances",
-      customer_ledger: "📒 Customer Ledger",
-      supplier_ledger: "📕 Supplier Ledger",
-      trial_balance: "⚖️ Trial Balance",
-      profit_loss: "📈 Profit & Loss",
-      balance_sheet: "🧮 Balance Sheet",
-      backups: "🗂️ Backups",
+      stock_report: "Stock Report",
+      product_ledger: "Product Ledger",
+      day_summary: "Day Summary",
+      customer_balances: "Customer Balances",
+      supplier_balances: "Supplier Balances",
+      customer_ledger: "Customer Ledger",
+      supplier_ledger: "Supplier Ledger",
+      trial_balance: "Trial Balance",
+      profit_loss: "Profit & Loss",
+      balance_sheet: "Balance Sheet",
+      backups: "Backups",
       main_menu: "Main Menu",
       master_data: "Master Data",
       transactions: "Transactions",
@@ -1079,21 +1188,21 @@ html[dir="rtl"] .dashboard-section{
       transactions_desc: "Record daily sales, purchases, customer receipts and supplier payments.",
       reports_desc: "View key reports for stock, balances and financial performance.",
 
-      new_customer: "➕ New Customer",
-      customer_list: "👥 Customer List",
-      new_supplier: "➕ New Supplier",
-      supplier_list: "🏭 Supplier List",
-      new_product: "➕ New Product",
-      product_list: "📦 Product List",
+      new_customer: "New Customer",
+      customer_list: "Customer List",
+      new_supplier: "New Supplier",
+      supplier_list: "Supplier List",
+      new_product: "New Product",
+      product_list: "Product List",
 
-      bank_cash_accounts: "🏦 Bank & Cash Accounts",
-      account_ledger: "📒 Account Ledger",
+      bank_cash_accounts: "Bank & Cash Accounts",
+      account_ledger: "Account Ledger",
       time: "Time",
       show_summary: "👁️ Show Summary",
       hide_summary: "🙈 Hide Summary",
-      tax_pack: "🧾 Tax Pack",
-      daily_expenses: "🧾 Daily Expenses",
-      cash_bank_transfer: "🔁 Cash/Bank Transfer",
+      tax_pack: "Tax Pack",
+      daily_expenses: "Daily Expenses",
+      cash_bank_transfer: "Cash/Bank Transfer",
     },
     ur: {
       dash_suffix: "— ڈیش بورڈ",
@@ -1112,27 +1221,27 @@ html[dir="rtl"] .dashboard-section{
       customer_receivable: "کسٹمر سے موجودہ وصولی",
       supplier_payable: "سپلائر کو موجودہ ادائیگی",
 
-      new_sale: "➕ نئی سیل",
-      sales_list: "📄 سیلز لسٹ",
-      new_purchase: "➕ نئی پرچیز",
-      purchase_list: "📥 پرچیز لسٹ",
-      sales_return: "↩️ سیلز ریٹرن (کسٹمر)",
-      purchase_return: "↩️ پرچیز ریٹرن (سپلائر)",
-      new_payment: "💰 نئی ادائیگی / رسید",
-      payments_list: "📃 ادائیگیاں اور رسیدیں",
-      adjustments: "🧾 ایڈجسٹمنٹس (پارٹی + اسٹاک)",
+      new_sale: "نئی سیل",
+      sales_list: "سیلز لسٹ",
+      new_purchase: "نئی پرچیز",
+      purchase_list: "پرچیز لسٹ",
+      sales_return: "سیلز ریٹرن (کسٹمر)",
+      purchase_return: "پرچیز ریٹرن (سپلائر)",
+      new_payment: "نئی ادائیگی / رسید",
+      payments_list: "ادائیگیاں اور رسیدیں",
+      adjustments: "ایڈجسٹمنٹس (پارٹی + اسٹاک)",
 
-      stock_report: "📦 اسٹاک رپورٹ",
-      product_ledger: "📊 پروڈکٹ لیجر",
-      day_summary: "📅 روزانہ خلاصہ",
-      customer_balances: "👤 کسٹمر بیلنس",
-      supplier_balances: "🏭 سپلائر بیلنس",
-      customer_ledger: "📒 کسٹمر لیجر",
-      supplier_ledger: "📕 سپلائر لیجر",
-      trial_balance: "⚖️ ٹرائل بیلنس",
-      profit_loss: "📈 منافع و نقصان",
-      balance_sheet: "🧮 بیلنس شیٹ",
-      backups: "🗂️ بیک اپس",
+      stock_report: "اسٹاک رپورٹ",
+      product_ledger: "پروڈکٹ لیجر",
+      day_summary: "روزانہ خلاصہ",
+      customer_balances: "کسٹمر بیلنس",
+      supplier_balances: "سپلائر بیلنس",
+      customer_ledger: "کسٹمر لیجر",
+      supplier_ledger: "سپلائر لیجر",
+      trial_balance: "ٹرائل بیلنس",
+      profit_loss: "منافع و نقصان",
+      balance_sheet: "بیلنس شیٹ",
+      backups: "بیک اپس",
       main_menu: "مین مینو",
       master_data: "ماسٹر ڈیٹا",
       transactions: "ٹرانزیکشنز",
@@ -1142,21 +1251,21 @@ html[dir="rtl"] .dashboard-section{
       transactions_desc: "سیلز، پرچیز، کسٹمر رسید اور سپلائر پیمنٹس درج کریں۔",
       reports_desc: "اسٹاک، بیلنس اور مالی کارکردگی کی رپورٹس دیکھیں۔",
 
-      new_customer: "➕ نیا کسٹمر",
-      customer_list: "👥 کسٹمر لسٹ",
-      new_supplier: "➕ نیا سپلائر",
-      supplier_list: "🏭 سپلائر لسٹ",
-      new_product: "➕ نیا پروڈکٹ",
-      product_list: "📦 پروڈکٹ لسٹ",
+      new_customer: "نیا کسٹمر",
+      customer_list: "کسٹمر لسٹ",
+      new_supplier: "نیا سپلائر",
+      supplier_list: "سپلائر لسٹ",
+      new_product: "نیا پروڈکٹ",
+      product_list: "پروڈکٹ لسٹ",
 
-      bank_cash_accounts: "🏦 بینک / کیش اکاؤنٹس",
-      account_ledger: "📒 اکاؤنٹ لیجر",
+      bank_cash_accounts: "بینک / کیش اکاؤنٹس",
+      account_ledger: "اکاؤنٹ لیجر",
       time: "وقت",
       show_summary: "👁️ خلاصہ دکھائیں",
       hide_summary: "🙈 خلاصہ چھپائیں",
-      tax_pack: "🧾 ٹیکس پیک",
-      daily_expenses: "🧾 روزانہ اخراجات",
-      cash_bank_transfer: "🔁 کیش/بینک ٹرانسفر",
+      tax_pack: "ٹیکس پیک",
+      daily_expenses: "روزانہ اخراجات",
+      cash_bank_transfer: "کیش/بینک ٹرانسفر",
     }
   };
 
