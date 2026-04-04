@@ -148,8 +148,7 @@
     .ua-field{ grid-column:span 12; }
     .ua-col-name{ grid-column:span 12; }
     .ua-col-code{ grid-column:span 5; }
-    .ua-col-opening{ grid-column:span 4; }
-    .ua-col-side{ grid-column:span 3; }
+    .ua-col-opening{ grid-column:span 7; }
 
     .ua-field label{
       display:block;
@@ -407,18 +406,9 @@
           <input type="number" step="0.01" name="opening_amount" id="opening_amount" placeholder="e.g. 50000.00">
           <div class="ua-hint">Leave blank if this is a new account with no starting balance.</div>
         </div>
-
-        <div class="ua-field ua-col-side">
-          <label for="opening_side">Balance Type</label>
-          <select name="opening_side" id="opening_side">
-            <option value="DEBIT" selected>This account has money</option>
-            <option value="CREDIT">This account is overdrawn</option>
-          </select>
-          <div class="ua-hint">Choose whether the starting balance is available money or an overdraft.</div>
-        </div>
       </div>
 
-      <div class="ua-preview">Starting balance: <span id="openingPreview">0.00</span> (<span id="openingSidePreview">DEBIT</span>)</div>
+      <div class="ua-preview">Starting balance: <span id="openingPreview">0.00</span></div>
 
       <div style="margin-top:14px;">
         <button type="submit" class="ua-btn ua-btn-primary">💾 Save Account</button>
@@ -499,9 +489,7 @@
 <script>
   (function () {
     const openingInput = document.getElementById("opening_amount");
-    const sideSelect = document.getElementById("opening_side");
     const openingPreview = document.getElementById("openingPreview");
-    const sidePreview = document.getElementById("openingSidePreview");
     const chips = document.querySelectorAll("[data-set-opening]");
     const searchInput = document.getElementById("accountQuickSearch");
     const rows = Array.from(document.querySelectorAll("tr.account-row"));
@@ -514,7 +502,6 @@
 
     function updateOpeningPreview() {
       if (openingPreview) openingPreview.textContent = fmt(openingInput && openingInput.value);
-      if (sidePreview && sideSelect) sidePreview.textContent = sideSelect.value;
     }
 
     function applyQuickFilter() {
@@ -539,7 +526,6 @@
     });
 
     if (openingInput) openingInput.addEventListener("input", updateOpeningPreview);
-    if (sideSelect) sideSelect.addEventListener("change", updateOpeningPreview);
     if (searchInput) searchInput.addEventListener("input", applyQuickFilter);
 
     updateOpeningPreview();

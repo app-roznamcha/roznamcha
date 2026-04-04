@@ -386,9 +386,6 @@
               <option value="{{ acc.id }}">{{ acc.code }} - {{ acc.name }}</option>
             {% endfor %}
           </select>
-          <p class="np-help" data-i18n="account_help">
-            Only accounts marked as Cash/Bank and allowed for payments are shown.
-          </p>
         </div>
 
         <div class="np-field np-amount-field">
@@ -401,13 +398,6 @@
                  step="0.01"
                  min="0"
                  >
-          <div class="np-amount-tools">
-            <button type="button" class="np-chip" data-set-amount="500">+500</button>
-            <button type="button" class="np-chip" data-set-amount="1000">+1000</button>
-            <button type="button" class="np-chip" data-set-amount="5000">+5000</button>
-            <button type="button" class="np-chip" data-set-amount="10000">+10000</button>
-            <button type="button" class="np-chip" data-set-amount="0">Clear</button>
-          </div>
         </div>
 
         <div class="np-field">

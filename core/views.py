@@ -3786,7 +3786,6 @@ def user_accounts(request):
         name = (request.POST.get("name") or "").strip()
 
         opening_amount_str = (request.POST.get("opening_amount") or "").strip()
-        opening_side = (request.POST.get("opening_side") or "DR").upper()
 
         try:
             opening_amount = Decimal(opening_amount_str) if opening_amount_str else Decimal("0")
@@ -3795,9 +3794,6 @@ def user_accounts(request):
 
         if opening_amount < 0:
             opening_amount = -opening_amount
-
-        if opening_side not in ("DR", "CR"):
-            opening_side = "DR"
 
         if not code or not name:
             error = "Code and Name are required."
@@ -3855,12 +3851,11 @@ def user_accounts(request):
                 message = "Account created successfully."
 
                 if opening_amount > 0:
-                    side = "CR" if opening_side == "CR" else "DR"
                     create_opening_entry_for_cash_account(
                         request,
                         acc,
                         opening_amount,
-                        side,
+                        "DR",
                     )
 
         if not error:
