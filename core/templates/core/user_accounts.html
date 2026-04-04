@@ -142,34 +142,38 @@
     .ua-form-grid{
       display:grid;
       grid-template-columns:repeat(12, minmax(0,1fr));
-      gap:12px;
+      gap:14px;
     }
 
     .ua-field{ grid-column:span 12; }
-    .ua-col-code{ grid-column:span 4; }
-    .ua-col-opening{ grid-column:span 4; }
-    .ua-col-side{ grid-column:span 4; }
     .ua-col-name{ grid-column:span 12; }
+    .ua-col-code{ grid-column:span 5; }
+    .ua-col-opening{ grid-column:span 4; }
+    .ua-col-side{ grid-column:span 3; }
 
     .ua-field label{
       display:block;
       font-size:14px;
       font-weight:700;
-      margin-bottom:5px;
+      margin-bottom:6px;
       color:var(--ink-700);
     }
 
     .ua-field input,
     .ua-field select{
       width:100%;
-      min-height:42px;
+      min-height:46px;
       border:1px solid #cbd5e1;
-      border-radius:10px;
-      padding:9px 11px;
-      font-size:14px;
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:15px;
       color:#0f172a;
       background:var(--surface-soft);
       transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .ua-field input::placeholder{
+      color:#94a3b8;
     }
 
     .ua-field input:focus,
@@ -183,37 +187,38 @@
     .ua-hint{
       font-size:12px;
       color:#6b7280;
-      margin-top:3px;
+      margin-top:5px;
+      line-height:1.45;
     }
 
     .ua-tools{
-      margin-top:8px;
+      margin-top:10px;
       display:flex;
       gap:8px;
       flex-wrap:wrap;
     }
 
     .ua-chip{
-      border:1px solid #dbeafe;
-      background:#eff6ff;
-      color:#1d4ed8;
+      border:1px solid #dbe3ee;
+      background:#f8fafc;
+      color:#475569;
       border-radius:999px;
       font-size:12px;
       font-weight:700;
-      padding:4px 10px;
+      padding:5px 10px;
       cursor:pointer;
     }
 
     .ua-preview{
-      margin-top:8px;
+      margin-top:12px;
       display:inline-flex;
       align-items:center;
       gap:6px;
       border:1px solid #e2e8f0;
       background:#f8fafc;
       color:#0f172a;
-      border-radius:999px;
-      padding:6px 10px;
+      border-radius:12px;
+      padding:8px 12px;
       font-size:13px;
       font-weight:700;
     }
@@ -262,20 +267,7 @@
       gap:8px;
       flex-wrap:wrap;
       align-items:center;
-      margin-bottom:10px;
-    }
-
-    .ua-stat{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      border:1px solid #e2e8f0;
-      background:#f8fafc;
-      color:#0f172a;
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:700;
+      margin-bottom:6px;
     }
 
     .ua-table-wrap{
@@ -348,10 +340,10 @@
       background:none;
       color:#b91c1c;
       font-size:13px;
-      text-decoration:underline;
       cursor:pointer;
       padding:0;
       font-weight:700;
+      text-decoration:underline;
     }
 
     @media (max-width:840px){
@@ -395,7 +387,7 @@
   <div class="ua-card">
     <h2 class="ua-card-title">Add / Update Account</h2>
     <p class="ua-card-sub">
-      Create a new bank or cash account. You can later adjust its code or name if required.
+      Add a bank, wallet, or cash account that can be used in payment screens.
     </p>
 
     <form method="post">
@@ -403,16 +395,22 @@
       <input type="hidden" name="account_id" id="account_id">
 
       <div class="ua-form-grid">
+        <div class="ua-field ua-col-name">
+          <label for="name">Account Name</label>
+          <input type="text" name="name" id="name" required placeholder="e.g. HBL Main Branch, Easypaisa Wallet">
+          <div class="ua-hint">Use a name your team can recognize quickly.</div>
+        </div>
+
         <div class="ua-field ua-col-code">
           <label for="code">Code</label>
-          <input type="text" name="code" id="code" required placeholder="e.g. HBL01, CASH1">
-          <div class="ua-hint">Short unique code for this account.</div>
+          <input type="text" name="code" id="code" required placeholder="e.g. HBL01, CASH1, EASY1">
+          <div class="ua-hint">Short code for search and reports.</div>
         </div>
 
         <div class="ua-field ua-col-opening">
           <label for="opening_amount">Opening Balance (optional)</label>
           <input type="number" step="0.01" name="opening_amount" id="opening_amount" placeholder="e.g. 50000.00">
-          <div class="ua-hint">Leave blank for zero. Applied only when creating a new account.</div>
+          <div class="ua-hint">Leave blank if this is a new account with no starting balance.</div>
           <div class="ua-tools">
             <button type="button" class="ua-chip" data-set-opening="10000">+10,000</button>
             <button type="button" class="ua-chip" data-set-opening="50000">+50,000</button>
@@ -422,20 +420,16 @@
         </div>
 
         <div class="ua-field ua-col-side">
-          <label for="opening_side">Dr / Cr</label>
+          <label for="opening_side">Balance Type</label>
           <select name="opening_side" id="opening_side">
-            <option value="DEBIT" selected>Debit (positive balance)</option>
-            <option value="CREDIT">Credit (overdraft)</option>
+            <option value="DEBIT" selected>This account has money</option>
+            <option value="CREDIT">This account is overdrawn</option>
           </select>
-        </div>
-
-        <div class="ua-field ua-col-name">
-          <label for="name">Account Name</label>
-          <input type="text" name="name" id="name" required placeholder="e.g. HBL Main Branch, Easypaisa Wallet">
+          <div class="ua-hint">Choose whether the starting balance is available money or an overdraft.</div>
         </div>
       </div>
 
-      <div class="ua-preview">Opening Preview: <span id="openingPreview">0.00</span> (<span id="openingSidePreview">DEBIT</span>)</div>
+      <div class="ua-preview">Starting balance: <span id="openingPreview">0.00</span> (<span id="openingSidePreview">DEBIT</span>)</div>
 
       <div style="margin-top:14px;">
         <button type="submit" class="ua-btn ua-btn-primary">💾 Save Account</button>
@@ -449,18 +443,17 @@
       <div>
         <h2 class="ua-card-title">Existing Bank &amp; Cash Accounts</h2>
         <p class="ua-card-sub" style="margin-bottom:0;">
-          These accounts will appear when recording receipts, payments, purchases and sales.
+          These accounts appear in receipts, payments, sales, purchases, and transfers.
         </p>
       </div>
       <div class="ua-search">
-        <label for="accountQuickSearch">Quick Search (code / name / type)</label>
-        <input id="accountQuickSearch" type="text" placeholder="Type to filter visible rows...">
+        <label for="accountQuickSearch">Search accounts</label>
+        <input id="accountQuickSearch" type="text" placeholder="Search by code, name, or type...">
       </div>
     </div>
 
     <div class="ua-stats">
-      <span class="ua-stat">Server Rows: <span id="server-row-count">{{ accounts|length }}</span></span>
-      <span class="ua-stat">Visible Rows: <span id="visible-row-count">{{ accounts|length }}</span></span>
+      <span class="ua-hint">Showing <strong id="visible-row-count">{{ accounts|length }}</strong> of <strong id="server-row-count">{{ accounts|length }}</strong> accounts</span>
     </div>
 
     <div class="ua-table-wrap">
@@ -470,8 +463,8 @@
             <th style="width:13%;">Code</th>
             <th>Name</th>
             <th style="width:15%;">Type</th>
-            <th class="center" style="width:18%;">Used for Payments?</th>
-            <th class="center" style="width:12%;">Action</th>
+            <th class="center" style="width:18%;">Payment Screens</th>
+            <th class="center" style="width:12%;">Remove</th>
           </tr>
         </thead>
         <tbody>
@@ -493,9 +486,9 @@
                 <button
                   type="submit"
                   class="ua-delete"
-                  title="Delete account"
-                  onclick="return confirm('Delete {{ acc.code }} – {{ acc.name }}?\n\nIf this account is used in transactions, deletion will be blocked.');">
-                  Delete
+                  title="Remove account"
+                  onclick="return confirm('Remove {{ acc.code }} – {{ acc.name }}?\n\nIf this account is used in transactions, deletion will be blocked.');">
+                  Remove
                 </button>
               </form>
             </td>
