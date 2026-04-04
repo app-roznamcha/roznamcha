@@ -87,6 +87,12 @@
       background:linear-gradient(180deg,var(--primary),var(--primary-dark));
       color:#fff;
     }
+    .adj-btn-soft{
+      background:#fff;
+      color:#334155;
+      border-color:#dbe3ee;
+      box-shadow:0 1px 2px rgba(15,23,42,.04);
+    }
 
     .adj-card{
       background:#ffffff;
@@ -99,11 +105,51 @@
     .adj-card + .adj-card{
       margin-top:22px;
     }
+    .adj-card-form{
+      border-color:#cfd9e6;
+      box-shadow:0 10px 24px rgba(15,23,42,.065);
+    }
+    .adj-card-history{
+      margin-top:26px;
+      border-color:#e2e8f0;
+      background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+    }
+    .adj-card-head{
+      margin-bottom:16px;
+    }
+    .adj-card-title{
+      margin:0 0 6px;
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+    .adj-card-subtitle{
+      margin:0;
+      font-size:14px;
+      color:#64748b;
+      line-height:1.5;
+      max-width:760px;
+    }
 
     .adj-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
       gap:16px;
+    }
+    .adj-field-primary label{
+      font-weight:700;
+      color:#0f172a;
+    }
+    .adj-field-secondary label{
+      color:#475569;
+    }
+    .adj-field-secondary input,
+    .adj-field-secondary select{
+      background:#fbfcfe !important;
+    }
+    .adj-span-2{
+      grid-column:1 / -1;
     }
 
     .adj-page input,
@@ -128,6 +174,40 @@
       font-size:13px;
       color:#6b7280;
     }
+    .adj-note{
+      margin-top:14px;
+      padding:10px 12px;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      background:#f8fafc;
+      font-size:12.5px;
+      color:#64748b;
+      line-height:1.5;
+    }
+    .adj-preview{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg,#eff6ff 0%, #f8fbff 100%);
+      border:1px solid #cfe0fb;
+      color:#0f172a;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.92);
+    }
+    .adj-preview-label{
+      display:block;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-weight:800;
+      color:#64748b;
+      margin-bottom:4px;
+    }
+    .adj-preview-line{
+      font-size:14px;
+      font-weight:700;
+      line-height:1.45;
+      color:#0f172a;
+    }
 
     .adj-amount-tools{
       margin-top:8px;
@@ -145,6 +225,7 @@
       font-weight:700;
       padding:4px 10px;
       cursor:pointer;
+      opacity:.9;
     }
 
     .adj-toolbar{
@@ -201,7 +282,7 @@
     .adj-table th,
     .adj-table td{
       border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
+      padding:10px 12px;
       font-size:14px;
       vertical-align:middle;
     }
@@ -217,6 +298,8 @@
       position:sticky;
       top:0;
       z-index:1;
+      padding-top:11px;
+      padding-bottom:11px;
     }
 
     .adj-table tbody tr:nth-child(even){ background:#fcfdff; }
@@ -252,7 +335,7 @@
       <a href="{% url 'dashboard' %}" class="adj-btn">
         <span data-i18n="back_dashboard">← Dashboard</span>
       </a>
-      <a href="{% url 'payments_list' %}" class="adj-btn adj-btn-primary">
+      <a href="{% url 'payments_list' %}" class="adj-btn adj-btn-soft">
         <span data-i18n="payments">Payments</span>
       </a>
     </div>
@@ -291,9 +374,14 @@
   <!-- =========================
        PARTY ADJUSTMENT (FORM)
        ========================= -->
-  <div class="adj-card">
+  <div class="adj-card adj-card-form">
 
-    <h2 style="margin:0 0 14px;font-size:20px;font-weight:700;" data-i18n="new_adj">New Adjustment</h2>
+    <div class="adj-card-head">
+      <h2 class="adj-card-title" data-i18n="new_adj">Party Balance Correction</h2>
+      <p class="adj-card-subtitle" data-i18n="party_adjust_desc">
+        Use this when you need to correct a customer or supplier opening balance without recording cash or bank movement.
+      </p>
+    </div>
 
     <form method="post">
       {% csrf_token %}
@@ -301,13 +389,7 @@
 
       <div class="adj-grid">
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
-          <input type="date" name="date" value="{{ today }}"
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-        </div>
-
-        <div>
+        <div class="adj-field-primary">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="party">Party</label>
           <select name="party" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
@@ -318,7 +400,7 @@
           </select>
         </div>
 
-        <div>
+        <div class="adj-field-primary">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="amount_rs">Amount (Rs)</label>
           <input type="number" id="pa_amount" name="amount" step="0.01" min="0" required>
           <div class="adj-amount-tools">
@@ -329,8 +411,8 @@
           </div>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="effect">Effect</label>
+        <div class="adj-field-primary">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="what_should_change">What should change?</label>
 
           <select name="side" id="pa_side"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
@@ -339,21 +421,30 @@
             <option value="CR" data-i18n="effect_opt_2">Option 2</option>
           </select>
 
-          <div id="pa_effect_line" style="margin-top:8px;font-size:13px;color:#0f172a;font-weight:700;" data-i18n="after_adjustment_dash">
-            After this adjustment, —
-          </div>
-
-          <div class="adj-help" data-i18n="tip_opening_only">
-            Tip: This is only an opening balance correction (no cash/bank).
+          <div class="adj-preview">
+            <span class="adj-preview-label" data-i18n="preview_result">After this adjustment</span>
+            <div id="pa_effect_line" class="adj-preview-line" data-i18n="after_adjustment_dash">
+              After this adjustment, —
+            </div>
           </div>
         </div>
 
-        <div style="grid-column:1/-1;">
+        <div class="adj-field-secondary">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
+          <input type="date" name="date" value="{{ today }}"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div class="adj-field-secondary adj-span-2">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="note_reason_opt">Note / Reason (optional)</label>
           <input type="text" name="note" maxlength="255"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
 
+      </div>
+
+      <div class="adj-note" data-i18n="tip_opening_only">
+        Tip: This is only an opening balance correction (no cash/bank).
       </div>
 
       <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
@@ -367,7 +458,7 @@
   <!-- =========================
        PARTY ADJUSTMENT (HISTORY)
        ========================= -->
-  <div class="adj-card">
+  <div class="adj-card adj-card-history">
     <div class="adj-toolbar">
       <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="adj_history">Adjustment History</h2>
       <div style="font-size:14px;color:#475569;">
@@ -425,7 +516,7 @@
       </table>
     </div>
 
-    <p style="margin:12px 0 0;font-size:13px;color:#6b7280;">
+    <p class="adj-note" style="margin-bottom:0;">
       <span data-i18n="posting_rule_party">
         Posting rule: hits Customer Control (1300) or Supplier Control (2100) vs Opening Balances (3000).
       </span>
@@ -433,12 +524,14 @@
   </div>
 
   {# ===================== STOCK ADJUSTMENT CARD ===================== #}
-  <div class="adj-card">
+  <div class="adj-card adj-card-form">
 
-    <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;" data-i18n="stock_adj">Stock Adjustment</h2>
-    <p style="margin:0 0 18px;font-size:15px;color:#475569;" data-i18n="stock_adj_desc">
-      Damage/expiry or correction of stock with accounting impact.
-    </p>
+    <div class="adj-card-head">
+      <h2 class="adj-card-title" data-i18n="stock_adj">Stock Correction</h2>
+      <p class="adj-card-subtitle" data-i18n="stock_adj_desc">
+        Record stock loss or stock increase corrections with the same accounting impact as today.
+      </p>
+    </div>
 
     <form method="post">
       {% csrf_token %}
@@ -446,13 +539,7 @@
 
       <div class="adj-grid">
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
-          <input type="date" name="date" value="{{ today }}"
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-        </div>
-
-        <div>
+        <div class="adj-field-primary">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="product">Product</label>
           <select name="product" id="sa_product" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
@@ -466,8 +553,14 @@
           </select>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="direction">Direction</label>
+        <div class="adj-field-primary">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="quantity">Quantity</label>
+          <input type="number" name="qty" id="sa_qty" step="0.001" min="0"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div class="adj-field-primary">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="stock_change">Stock Change</label>
           <select name="direction" id="sa_direction"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
             <option value="DOWN" selected data-i18n="down_damage">DOWN (Damage / Expiry / Loss)</option>
@@ -475,13 +568,7 @@
           </select>
         </div>
 
-        <div>
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="quantity">Quantity</label>
-          <input type="number" name="qty" id="sa_qty" step="0.001" min="0"
-                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
-        </div>
-
-        <div>
+        <div class="adj-field-secondary">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="unit_cost_rs">Unit Cost (Rs)</label>
           <input type="number" name="unit_cost" id="sa_unit_cost" step="0.01" min="0"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
@@ -490,13 +577,19 @@
           </div>
         </div>
 
-        <div>
+        <div class="adj-field-primary">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="total_rs">Total (Rs)</label>
           <input type="text" id="sa_total" readonly
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;background:#f9fafb;">
         </div>
 
-        <div style="grid-column:1/-1;">
+        <div class="adj-field-secondary">
+          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
+          <input type="date" name="date" value="{{ today }}"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
+        </div>
+
+        <div class="adj-field-secondary adj-span-2">
           <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="reason_opt">Reason (optional)</label>
           <input type="text" name="reason" maxlength="255"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
@@ -641,7 +734,7 @@
   <!-- =========================
        STOCK ADJUSTMENT (HISTORY)
        ========================= -->
-  <div class="adj-card">
+  <div class="adj-card adj-card-history">
     <div class="adj-toolbar" style="margin-bottom:0;">
       <h2 style="margin:0;font-size:20px;font-weight:700;" data-i18n="stock_history">Stock Adjustment History</h2>
       <div class="adj-count">Visible: <span id="stockVisibleCount">{{ stock_adjustments|length }}</span></div>
@@ -691,7 +784,7 @@
       </table>
     </div>
 
-    <p style="margin:12px 0 0;font-size:13px;color:#6b7280;" data-i18n="posting_rule_stock">
+    <p class="adj-note" style="margin-bottom:0;" data-i18n="posting_rule_stock">
       Posting rule: DOWN → Dr Inventory Write-off (5100) / Cr Inventory (1200), UP → Dr Inventory (1200) / Cr Opening Balances (3000).
     </p>
   </div>
@@ -709,12 +802,15 @@
     back_dashboard: "← Dashboard",
     payments: "Payments",
 
-    new_adj: "New Adjustment",
+    new_adj: "Party Balance Correction",
+    party_adjust_desc: "Use this when you need to correct a customer or supplier opening balance without recording cash or bank movement.",
     date: "Date",
     party: "Party",
     select_party: "-- Select Party --",
     amount_rs: "Amount (Rs)",
     effect: "Effect",
+    what_should_change: "What should change?",
+    preview_result: "After this adjustment",
     increase_adds: "Increase (adds to balance)",
     decrease_reduces: "Decrease (reduces balance)",
     after_adjustment_dash: "After this adjustment, —",
@@ -732,11 +828,12 @@
     posting_rule_party: "Posting rule: hits Customer Control (1300) or Supplier Control (2100) vs Opening Balances (3000).",
     quick_search_adj: "Quick Search (party / type / note)",
 
-    stock_adj: "Stock Adjustment",
-    stock_adj_desc: "Damage/expiry or correction of stock with accounting impact.",
+    stock_adj: "Stock Correction",
+    stock_adj_desc: "Record stock loss or stock increase corrections with the same accounting impact as today.",
     product: "Product",
     select_product: "-- Select Product --",
     direction: "Direction",
+    stock_change: "Stock Change",
     down_damage: "DOWN (Damage / Expiry / Loss)",
     up_correction: "UP (Extra / Found / Correction)",
     quantity: "Quantity",
@@ -779,12 +876,15 @@
     back_dashboard: "← ڈیش بورڈ",
     payments: "ادائیگیاں",
 
-    new_adj: "نئی ایڈجسٹمنٹ",
+    new_adj: "پارٹی بیلنس کی درستگی",
+    party_adjust_desc: "اس کا استعمال تب کریں جب آپ کو کسٹمر یا سپلائر کا اوپننگ بیلنس درست کرنا ہو اور کیش یا بینک موومنٹ ریکارڈ نہ کرنی ہو۔",
     date: "تاریخ",
     party: "پارٹی",
     select_party: "-- پارٹی منتخب کریں --",
     amount_rs: "رقم (روپے)",
     effect: "اثر",
+    what_should_change: "کیا تبدیل ہونا چاہیے؟",
+    preview_result: "اس ایڈجسٹمنٹ کے بعد",
     increase_adds: "اضافہ (بیلنس بڑھتا ہے)",
     decrease_reduces: "کمی (بیلنس گھٹتا ہے)",
     after_adjustment_dash: "اس ایڈجسٹمنٹ کے بعد —",
@@ -802,11 +902,12 @@
     posting_rule_party: "پوسٹنگ رول: کسٹمر کنٹرول (1300) یا سپلائر کنٹرول (2100) بمقابلہ اوپننگ بیلنس (3000)۔",
     quick_search_adj: "فوری تلاش (پارٹی / قسم / نوٹ)",
 
-    stock_adj: "اسٹاک ایڈجسٹمنٹ",
-    stock_adj_desc: "نقصان/ایکسپائری یا اسٹاک کی درستگی (اکاؤنٹنگ اثر کے ساتھ)۔",
+    stock_adj: "اسٹاک کی درستگی",
+    stock_adj_desc: "اسٹاک کی کمی یا اضافے کی درستگی کو اسی موجودہ اکاؤنٹنگ اثر کے ساتھ ریکارڈ کریں۔",
     product: "پروڈکٹ",
     select_product: "-- پروڈکٹ منتخب کریں --",
     direction: "ڈائریکشن",
+    stock_change: "اسٹاک میں تبدیلی",
     down_damage: "DOWN (نقصان / ایکسپائری / کمی)",
     up_correction: "UP (اضافی / ملا / درستگی)",
     quantity: "مقدار",
