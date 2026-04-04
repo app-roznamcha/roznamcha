@@ -10,6 +10,8 @@
   <meta name="description" content="Manage sales, purchases, inventory, ledgers, and reports with Roznamcha accounting software for traders, wholesalers, and distributors.">
   <meta name="keywords" content="accounting software, inventory software, trader software, wholesale accounting software, distributor software, stock management, ledger software">
   <link rel="canonical" href="https://roznamcha.app/">
+  <link rel="manifest" href="{% url 'pwa_manifest' %}">
+  <meta name="theme-color" content="#2563eb">
   <link rel="icon" type="image/png" href="{% static 'core/pwa/icons/favicon-32.png' %}">
   <link rel="apple-touch-icon" href="{% static 'core/pwa/icons/apple-touch-icon.png' %}">
 
@@ -776,6 +778,17 @@
   <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="sticky_wa">WhatsApp</a>
   <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="sticky_start">Create Account</a>
 </div>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("{% url 'service_worker' %}")
+        .catch(function (err) {
+          console.log("SW registration failed:", err);
+        });
+    });
+  }
+</script>
 
 </body>
 </html>

@@ -48,7 +48,7 @@ def pwa_manifest(request):
         "name": "Roznamcha",
         "short_name": "Roznamcha",
         "description": "Smart Khata & Hisab System",
-        "start_url": "/?source=pwa",
+        "start_url": "/",
         "scope": "/",
         "display": "standalone",
         "display_override": ["standalone", "minimal-ui"],
