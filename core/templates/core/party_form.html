@@ -218,59 +218,23 @@
       color:var(--ink-500);
     }
 
-    .party-details{
+    .party-secondary-block{
       border:1px solid var(--line);
       border-radius:16px;
       background:linear-gradient(180deg,#fcfdff,#f8fafc);
-      overflow:hidden;
+      padding:14px 15px 15px;
+      display:grid;
+      gap:14px;
     }
 
-    .party-details summary{
-      list-style:none;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      cursor:pointer;
-      padding:14px 15px;
-      font-weight:700;
-      color:var(--ink-700);
-    }
-
-    .party-details summary::-webkit-details-marker{
-      display:none;
-    }
-
-    .party-details-copy{
+    .party-secondary-head{
       display:flex;
       align-items:center;
       gap:10px;
     }
 
-    .party-details-hint{
-      font-size:13px;
-      color:var(--ink-500);
-      font-weight:600;
-    }
-
-    .party-details-chevron{
-      font-size:18px;
-      color:var(--ink-500);
-      transition:transform .16s ease;
-    }
-
-    .party-details[open] .party-details-chevron{
-      transform:rotate(180deg);
-    }
-
-    .party-details-body{
-      padding:0 15px 15px;
-      display:grid;
-      gap:14px;
-    }
-
     .party-balance-card{
-      padding:16px;
+      padding:14px;
       border:1px solid var(--line);
       border-radius:18px;
       background:
@@ -282,7 +246,7 @@
       display:flex;
       align-items:flex-start;
       gap:12px;
-      margin-bottom:14px;
+      margin-bottom:12px;
     }
 
     .party-balance-title{
@@ -302,8 +266,8 @@
     .party-balance-choices{
       display:grid;
       grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:12px;
-      margin-top:12px;
+      gap:10px;
+      margin-top:10px;
     }
 
     .party-choice{
@@ -318,14 +282,14 @@
     }
 
     .party-choice-card{
-      min-height:108px;
-      border-radius:18px;
+      min-height:84px;
+      border-radius:16px;
       border:1px solid var(--line);
-      padding:14px 14px 13px;
+      padding:11px 12px 10px;
       background:var(--surface-soft);
       display:flex;
       flex-direction:column;
-      gap:8px;
+      gap:6px;
       cursor:pointer;
       transition:border-color .14s ease, box-shadow .14s ease, transform .14s ease, background .14s ease;
     }
@@ -335,25 +299,25 @@
     }
 
     .party-choice-card strong{
-      font-size:15px;
+      font-size:14px;
       color:var(--ink-900);
     }
 
     .party-choice-card span{
-      font-size:13px;
-      line-height:1.45;
+      font-size:12px;
+      line-height:1.35;
       color:var(--ink-500);
     }
 
     .party-choice-card em{
-      width:34px;
-      height:34px;
-      border-radius:12px;
+      width:28px;
+      height:28px;
+      border-radius:10px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       font-style:normal;
-      font-size:16px;
+      font-size:14px;
       background:#fff;
       border:1px solid rgba(148,163,184,.35);
     }
@@ -473,6 +437,40 @@
                  value="{% if request.POST.phone %}{{ request.POST.phone }}{% else %}{{ party.phone|default_if_none:'' }}{% endif %}"
                  placeholder="e.g. 03001234567">
         </div>
+
+        <div class="party-secondary-block">
+          <div class="party-secondary-head">
+            <span class="party-icon">⋯</span>
+            <div>
+              <div>More details</div>
+              <div class="party-details-hint">City and address are optional.</div>
+            </div>
+          </div>
+
+          <div class="party-field">
+            <label for="city">
+              <span class="party-icon">⌂</span>
+              City
+            </label>
+            <input type="text"
+                   id="city"
+                   name="city"
+                   value="{% if request.POST.city %}{{ request.POST.city }}{% else %}{{ party.city|default_if_none:'' }}{% endif %}"
+                   placeholder="e.g. Lahore, Dhaka, Mumbai">
+          </div>
+
+          <div class="party-field">
+            <label for="address">
+              <span class="party-icon">📝</span>
+              Address
+            </label>
+            <textarea id="address"
+                      name="address"
+                      rows="3"
+                      placeholder="Optional address or area details">{% if request.POST.address %}{{ request.POST.address }}{% else %}{{ party.address|default_if_none:'' }}{% endif %}</textarea>
+          </div>
+        </div>
+
         {% if not is_edit %}
         <div class="party-balance-card">
           <div class="party-balance-head">
@@ -486,7 +484,6 @@
           </div>
 
           <div class="party-field">
-            
             <input type="number"
                    step="0.01"
                    min="0"
@@ -524,44 +521,6 @@
           </div>
         </div>
       {% endif %} 
-
-        <details class="party-details" {% if request.POST.city or request.POST.address or party.city or party.address %}open{% endif %}>
-          <summary>
-            <div class="party-details-copy">
-              <span class="party-icon">⋯</span>
-              <div>
-                <div>More details</div>
-                <div class="party-details-hint">City and address are optional.</div>
-              </div>
-            </div>
-            <span class="party-details-chevron">⌄</span>
-          </summary>
-
-          <div class="party-details-body">
-            <div class="party-field">
-              <label for="city">
-                <span class="party-icon">⌂</span>
-                City
-              </label>
-              <input type="text"
-                     id="city"
-                     name="city"
-                     value="{% if request.POST.city %}{{ request.POST.city }}{% else %}{{ party.city|default_if_none:'' }}{% endif %}"
-                     placeholder="e.g. Lahore, Dhaka, Mumbai">
-            </div>
-
-            <div class="party-field">
-              <label for="address">
-                <span class="party-icon">📝</span>
-                Address
-              </label>
-              <textarea id="address"
-                        name="address"
-                        rows="3"
-                        placeholder="Optional address or area details">{% if request.POST.address %}{{ request.POST.address }}{% else %}{{ party.address|default_if_none:'' }}{% endif %}</textarea>
-            </div>
-          </div>
-        </details>
 
       </div>
 
