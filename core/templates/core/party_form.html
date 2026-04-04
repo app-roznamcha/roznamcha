@@ -404,9 +404,7 @@
           Create {{ party_type_label }}
         {% endif %}
       </h1>
-      <p class="party-subtitle">
-        Keep it simple. Start with the main details now and add extra details only if needed.
-      </p>
+      
     </div>
 
     <div>
@@ -448,10 +446,7 @@
       {% csrf_token %}
 
       <div class="party-form-grid">
-        <div class="party-section-label">
-          <span class="party-icon">✦</span>
-          Main details
-        </div>
+        
 
         <div class="party-field">
           <label for="name">
@@ -462,7 +457,7 @@
                  id="name"
                  name="name"
                  value="{% if request.POST.name %}{{ request.POST.name }}{% else %}{{ party.name|default_if_none:'' }}{% endif %}"
-                 placeholder="{% if party_type == 'CUSTOMER' %}e.g. Ahmed Traders or John Stores{% else %}e.g. City Wholesale or Metro Supply{% endif %}"
+                 placeholder="{% if party_type == 'CUSTOMER' %}e.g. Ahmed Traders or John Stores{% else %}e.g. Ahmed Traders or Noor Supplies{% endif %}"
                  required>
         </div>
 
@@ -476,7 +471,7 @@
                  name="phone"
                  inputmode="tel"
                  value="{% if request.POST.phone %}{{ request.POST.phone }}{% else %}{{ party.phone|default_if_none:'' }}{% endif %}"
-                 placeholder="e.g. 03001234567 or 9876543210">
+                 placeholder="e.g. 03001234567">
         </div>
         {% if not is_edit %}
         <div class="party-balance-card">
@@ -491,10 +486,7 @@
           </div>
 
           <div class="party-field">
-            <label for="opening_balance">
-              <span class="party-icon">¤</span>
-              Opening Balance
-            </label>
+            
             <input type="number"
                    step="0.01"
                    min="0"
@@ -511,8 +503,8 @@
                      {% if request.POST.opening_side == "CR" %}{% else %}checked{% endif %}>
               <span class="party-choice-card">
                 <em>↙</em>
-                <strong>{% if party_type == "CUSTOMER" %}Customer will pay me{% else %}I already paid supplier{% endif %}</strong>
-                <span>{% if party_type == "CUSTOMER" %}Use this when this customer already owes you money.{% else %}Use this when you already have money paid or pending with this supplier.{% endif %}</span>
+                <strong>{% if party_type == "CUSTOMER" %}Customer will pay me{% else %}I paid supplier in advance{% endif %}</strong>
+                <span>{% if party_type == "CUSTOMER" %}Use this when this customer already owes you money.{% else %}Use this when you already paid the supplier and want to record that balance.{% endif %}</span>
               </span>
             </label>
 
@@ -521,8 +513,8 @@
                      {% if request.POST.opening_side == "CR" %}checked{% endif %}>
               <span class="party-choice-card">
                 <em>↗</em>
-                <strong>{% if party_type == "CUSTOMER" %}I will pay customer{% else %}I will pay supplier{% endif %}</strong>
-                <span>{% if party_type == "CUSTOMER" %}Use this when you already owe money or advance to this customer.{% else %}Use this when you already owe money to this supplier.{% endif %}</span>
+                <strong>{% if party_type == "CUSTOMER" %}I will pay customer{% else %}I need to pay supplier{% endif %}</strong>
+                <span>{% if party_type == "CUSTOMER" %}Use this when you already owe money or advance to this customer.{% else %}Use this when there is still money you need to pay to the supplier.{% endif %}</span>
               </span>
             </label>
           </div>
