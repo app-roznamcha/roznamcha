@@ -246,8 +246,8 @@
 
     .exp-search{
       min-width:260px;
-      max-width:360px;
-      flex:1;
+      max-width:420px;
+      flex:1 1 320px;
     }
 
     .exp-search label{
@@ -271,6 +271,17 @@
       outline:none;
       border-color:#93c5fd;
       box-shadow:0 0 0 3px rgba(37,99,235,.14);
+    }
+    .exp-search-row{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      justify-content:flex-end;
+      width:100%;
+    }
+    .exp-search .field{
+      min-width:220px;
+      flex:1;
     }
 
     .exp-table-wrap{
@@ -351,6 +362,8 @@
       .exp-filter-form .field,
       .exp-filter-form .field.small{min-width:100%;max-width:100%;}
       .exp-search{min-width:100%;max-width:100%;}
+      .exp-search-row{justify-content:stretch;}
+      .exp-search .field{min-width:100%;}
     }
   </style>
 
@@ -503,8 +516,12 @@
         Expenses List
       </h2>
       <div class="exp-search">
-        <label data-i18n="quick_search">Search expenses</label>
-        <input type="text" id="quickSearchInput" placeholder="Type to filter visible rows...">
+        <div class="exp-search-row">
+          <div class="field">
+            <label data-i18n="quick_search">Search expenses</label>
+            <input type="text" id="quickSearchInput" placeholder="Type to filter visible rows...">
+          </div>
+        </div>
       </div>
     </div>
 
