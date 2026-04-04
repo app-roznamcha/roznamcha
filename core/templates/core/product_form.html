@@ -132,6 +132,13 @@
       color:var(--ink-700);
     }
 
+    .pf-hint{
+      margin-top:6px;
+      font-size:12px;
+      color:#64748b;
+      line-height:1.45;
+    }
+
     .pf-field input,
     .pf-field select{
       width:100%;
@@ -143,6 +150,10 @@
       color:#0f172a;
       background:var(--surface-soft);
       transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .pf-field input::placeholder{
+      color:#94a3b8;
     }
 
     .pf-field input:focus,
@@ -186,12 +197,13 @@
       align-items:center;
       gap:6px;
       border:1px solid #e2e8f0;
-      background:#f8fafc;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
       color:#0f172a;
-      border-radius:999px;
-      padding:6px 10px;
+      border-radius:14px;
+      padding:8px 12px;
       font-size:13px;
       font-weight:700;
+      box-shadow:0 6px 14px rgba(15,23,42,.05);
     }
 
     .pf-actions{
@@ -202,6 +214,69 @@
     }
 
     .req{ color:#b91c1c; }
+
+    .pf-details{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:linear-gradient(180deg,#fcfdff,#f8fafc);
+      overflow:hidden;
+    }
+
+    .pf-details summary{
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      cursor:pointer;
+      padding:14px 15px;
+      font-size:14px;
+      font-weight:700;
+      color:#0f172a;
+    }
+
+    .pf-details summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .pf-details-copy{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .pf-toggle-badge{
+      width:28px;
+      height:28px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
+      background:#e2e8f0;
+      color:#334155;
+      font-size:15px;
+      flex:0 0 auto;
+    }
+
+    .pf-details-hint{
+      font-size:12px;
+      color:#64748b;
+      font-weight:600;
+    }
+
+    .pf-details-chevron{
+      font-size:18px;
+      color:#64748b;
+      transition:transform .16s ease;
+    }
+
+    .pf-details[open] .pf-details-chevron{
+      transform:rotate(180deg);
+    }
+
+    .pf-details-body{
+      padding:0 15px 15px;
+    }
 
     @media (max-width:640px){
       .product-form-page{ padding:0 14px !important; margin:22px auto 52px; }
@@ -216,10 +291,10 @@
   <div class="pf-hero">
     <div>
       <h1 class="pf-title">
-        {% if product %}Edit Product{% else %}New Product{% endif %}
+        {% if product %}Edit Product{% else %}Create Product{% endif %}
       </h1>
       <p class="pf-sub">
-        Define base unit, packing, and prices for this product.
+        Add the main product details first. Packing is optional and can be added only when needed.
       </p>
     </div>
     <div>
@@ -243,19 +318,9 @@
     {# ---------- Basic Details Card ---------- #}
     <div class="pf-card">
       <h2 class="pf-card-title">Basic Details</h2>
-      <p class="pf-card-sub">Set product identity and unit configuration used across sales and stock.</p>
+      <p class="pf-card-sub">Set the product name, short code, and base unit used in sales, purchases, and stock.</p>
 
       <div class="pf-grid">
-        <div class="pf-field">
-          <label>
-            Code <span class="req">*</span>
-          </label>
-          <input type="text"
-                 name="code"
-                 value="{{ product.code|default_if_none:'' }}"
-                 required>
-        </div>
-
         <div class="pf-field">
           <label>
             Name <span class="req">*</span>
@@ -263,7 +328,21 @@
           <input type="text"
                  name="name"
                  value="{{ product.name|default_if_none:'' }}"
+                 placeholder="e.g. Cement Bag, Pepsi Bottle, Rice 25kg"
                  required>
+          <div class="pf-hint">Use the name customers and staff will recognize quickly.</div>
+        </div>
+
+        <div class="pf-field">
+          <label>
+            Code <span class="req">*</span>
+          </label>
+          <input type="text"
+                 name="code"
+                 value="{{ product.code|default_if_none:'' }}"
+                 placeholder="e.g. CEMENT50, PEPSI1L, RICE25"
+                 required>
+          <div class="pf-hint">Short code for search and reports.</div>
         </div>
 
         <div class="pf-field">
@@ -278,43 +357,7 @@
             </option>
             {% endfor %}
           </select>
-        </div>
-      </div>
-    </div>
-
-    {# ---------- Packing Card ---------- #}
-    <div class="pf-card">
-      <h2 class="pf-card-title">Packing</h2>
-      <p class="pf-card-sub">
-        Base unit = the smallest unit you sell (bottle, kg, piece). Packing = outer carton/bag/container.
-        Example: weedicide bottle as base unit, 12 bottles in one carton.
-      </p>
-
-      <div class="pf-grid">
-        <div class="pf-field">
-          <label>
-            Packing Type
-          </label>
-          <select name="packing_type">
-                  {% for value,label in PACKING_CHOICES %}
-                  <option value="{{ value }}"
-                    {% if product and product.packing_type == value %}selected{% endif %}>
-                    {{ label }}
-                  </option>
-                {% endfor %}
-          </select>
-        </div>
-
-        <div class="pf-field">
-          <label>
-            Pieces per Pack
-          </label>
-          <input type="number"
-                 step="0.001"
-                 min="1"
-                 id="piecesPerPackInput"
-                 name="pieces_per_pack"
-                 value="{% if product %}{{ product.pieces_per_pack }}{% else %}1{% endif %}">
+          <div class="pf-hint">Base unit: piece, kg, bottle, bag.</div>
         </div>
       </div>
     </div>
@@ -322,7 +365,7 @@
     {# ---------- Prices Card ---------- #}
     <div class="pf-card">
       <h2 class="pf-card-title">Prices</h2>
-      <p class="pf-card-sub">Set per-unit prices. Pack-level preview updates live from packing quantity.</p>
+      <p class="pf-card-sub">Set per-unit prices. Pack preview updates automatically when packing is used.</p>
 
       <div class="pf-grid">
         <div class="pf-field">
@@ -331,9 +374,11 @@
           </label>
           <input type="number"
                  step="0.01"
+                 inputmode="decimal"
                  id="purchaseUnitPriceInput"
                  name="purchase_price_per_unit"
-                 value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}">
+                 value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}"
+                 placeholder="e.g. 1200">
         </div>
 
         <div class="pf-field">
@@ -342,9 +387,11 @@
           </label>
           <input type="number"
                  step="0.01"
+                 inputmode="decimal"
                  id="saleUnitPriceInput"
                  name="sale_price_per_unit"
-                 value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}">
+                 value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}"
+                 placeholder="e.g. 1350">
         </div>
 
         <div class="pf-pack-preview">
@@ -352,6 +399,53 @@
           <span class="pf-chip">Sale / Pack: Rs <strong id="salePackPreview">0.00</strong></span>
         </div>
 
+        <details class="pf-details" {% if product or request.POST.packing_type or request.POST.pieces_per_pack %}open{% endif %}>
+          <summary>
+            <div class="pf-details-copy">
+              <span class="pf-toggle-badge">+</span>
+              <div>
+                <div>Use packing</div>
+                <div class="pf-details-hint">Example: 12 bottles = 1 carton.</div>
+              </div>
+            </div>
+            <span class="pf-details-chevron">⌄</span>
+          </summary>
+
+          <div class="pf-details-body">
+            <div class="pf-grid">
+              <div class="pf-field">
+                <label>
+                  Packing Type
+                </label>
+                <select name="packing_type">
+                        {% for value,label in PACKING_CHOICES %}
+                        <option value="{{ value }}"
+                          {% if product and product.packing_type == value %}selected{% elif request.POST.packing_type == value %}selected{% endif %}>
+                          {{ label }}
+                        </option>
+                      {% endfor %}
+                </select>
+                <div class="pf-hint">Choose carton, bag, box, bottle, or another outer pack.</div>
+              </div>
+
+              <div class="pf-field">
+                <label>
+                  Pieces per Pack
+                </label>
+                <input type="number"
+                       step="0.001"
+                       min="1"
+                       inputmode="decimal"
+                       id="piecesPerPackInput"
+                       name="pieces_per_pack"
+                       value="{% if request.POST.pieces_per_pack %}{{ request.POST.pieces_per_pack }}{% elif product %}{{ product.pieces_per_pack }}{% else %}1{% endif %}">
+                <div class="pf-hint">How many base units are inside one pack.</div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        {% if product %}
         <div class="pf-inline-check">
           <label class="pf-inline-check">
             <input type="checkbox"
@@ -360,6 +454,7 @@
             <span>Active (show in dropdowns)</span>
           </label>
         </div>
+        {% endif %}
       </div>
     </div>
 

@@ -1057,7 +1057,7 @@ def product_create(request):
 
         purchase_price_raw = (request.POST.get("purchase_price_per_unit") or "0").strip()
         sale_price_raw = (request.POST.get("sale_price_per_unit") or "0").strip()
-        is_active = bool(request.POST.get("is_active"))
+        is_active = True if request.POST.get("is_active") is None else bool(request.POST.get("is_active"))
 
         packing_type = request.POST.get("packing_type") or "NONE"
         pieces_per_pack_raw = (request.POST.get("pieces_per_pack") or "1").strip()
