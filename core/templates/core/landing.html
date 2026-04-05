@@ -165,6 +165,16 @@
 
     .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
     .cta-row .btn{padding:13px 20px;font-size:15px}
+    .btn-install{
+      display:none;
+      background:linear-gradient(180deg,#0f172a,#111827);
+      border-color:#0f172a;
+      color:#fff;
+    }
+    .btn-install:hover{
+      background:#111827;
+      border-color:#111827;
+    }
 
     .fineprint{
       margin:14px 0 0;color:#64748b;font-size:13.5px;line-height:1.65;
@@ -477,6 +487,7 @@
 
       <div class="cta-row">
         <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="cta_primary">Create Account</a>
+        <button class="btn btn-install" id="landingInstallBtn" type="button">Install Roznamcha App</button>
       </div>
 
       <p class="fineprint" data-i18n="hero_note">
@@ -788,6 +799,67 @@
         });
     });
   }
+</script>
+
+<script>
+  (function () {
+    let deferredPrompt = null;
+    const btn = document.getElementById("landingInstallBtn");
+    if (!btn) return;
+
+    function isStandaloneMode() {
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    async function isAppInstalled() {
+      if (isStandaloneMode()) return true;
+
+      if (navigator.getInstalledRelatedApps) {
+        try {
+          const related = await navigator.getInstalledRelatedApps();
+          if (related && related.length > 0) return true;
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      return false;
+    }
+
+    async function syncInstallButton() {
+      const installed = await isAppInstalled();
+      if (installed || !deferredPrompt) {
+        btn.style.display = "none";
+        return;
+      }
+      btn.style.display = "inline-flex";
+    }
+
+    document.addEventListener("DOMContentLoaded", syncInstallButton);
+
+    window.addEventListener("beforeinstallprompt", async (e) => {
+      const installed = await isAppInstalled();
+      if (installed) return;
+
+      e.preventDefault();
+      deferredPrompt = e;
+      syncInstallButton();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      btn.style.display = "none";
+    });
+
+    btn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      syncInstallButton();
+    });
+  })();
 </script>
 
 </body>
