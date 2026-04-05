@@ -137,6 +137,11 @@
       grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
       gap:16px;
     }
+    .adj-party-grid{
+      grid-template-columns:minmax(240px,1.2fr) minmax(180px,.8fr) minmax(260px,1.05fr) minmax(180px,.75fr);
+      align-items:start;
+      gap:14px 16px;
+    }
     .adj-field-primary label{
       font-weight:700;
       color:#0f172a;
@@ -144,12 +149,27 @@
     .adj-field-secondary label{
       color:#475569;
     }
+    .adj-field-primary label,
+    .adj-field-secondary label{
+      display:block;
+      font-size:15px;
+      margin-bottom:6px;
+      line-height:1.2;
+    }
     .adj-field-secondary input,
     .adj-field-secondary select{
       background:#fbfcfe !important;
     }
     .adj-span-2{
       grid-column:1 / -1;
+    }
+    .adj-party-party{grid-column:span 1;}
+    .adj-party-amount{grid-column:span 1;}
+    .adj-party-effect{grid-column:span 1;}
+    .adj-party-date{grid-column:span 1;}
+    .adj-party-note{
+      grid-column:1 / -1;
+      margin-top:-2px;
     }
 
     .adj-page input,
@@ -207,6 +227,26 @@
       font-weight:700;
       line-height:1.45;
       color:#0f172a;
+    }
+    @media (max-width: 980px){
+      .adj-party-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+      .adj-party-effect{
+        grid-column:1 / -1;
+      }
+    }
+    @media (max-width: 640px){
+      .adj-party-grid{
+        grid-template-columns:1fr;
+      }
+      .adj-party-party,
+      .adj-party-amount,
+      .adj-party-effect,
+      .adj-party-date,
+      .adj-party-note{
+        grid-column:1 / -1;
+      }
     }
 
     .adj-amount-tools{
@@ -387,10 +427,10 @@
       {% csrf_token %}
       <input type="hidden" name="form_type" value="party_adjust">
 
-      <div class="adj-grid">
+      <div class="adj-grid adj-party-grid">
 
-        <div class="adj-field-primary">
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="party">Party</label>
+        <div class="adj-field-primary adj-party-party">
+          <label data-i18n="party">Party</label>
           <select name="party" required
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
             <option value="" data-i18n="select_party">-- Select Party --</option>
@@ -400,13 +440,13 @@
           </select>
         </div>
 
-        <div class="adj-field-primary">
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="amount_rs">Amount (Rs)</label>
+        <div class="adj-field-primary adj-party-amount">
+          <label data-i18n="amount_rs">Amount (Rs)</label>
           <input type="number" id="pa_amount" name="amount" step="0.01" min="0" required>
         </div>
 
-        <div class="adj-field-primary">
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="what_should_change">What should change?</label>
+        <div class="adj-field-primary adj-party-effect">
+          <label data-i18n="what_should_change">What should change?</label>
 
           <select name="side" id="pa_side"
                   style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:48px;">
@@ -423,14 +463,14 @@
           </div>
         </div>
 
-        <div class="adj-field-secondary">
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="date">Date</label>
+        <div class="adj-field-secondary adj-party-date">
+          <label data-i18n="date">Date</label>
           <input type="date" name="date" value="{{ today }}"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
 
-        <div class="adj-field-secondary adj-span-2">
-          <label style="display:block;font-size:15px;margin-bottom:6px;" data-i18n="note_reason_opt">Note / Reason (optional)</label>
+        <div class="adj-field-secondary adj-span-2 adj-party-note">
+          <label data-i18n="note_reason_opt">Note / Reason (optional)</label>
           <input type="text" name="note" maxlength="255"
                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;">
         </div>
