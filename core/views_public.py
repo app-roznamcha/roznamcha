@@ -55,30 +55,75 @@ def pwa_manifest(request):
         "background_color": "#f3f4f6",
         "theme_color": "#2563eb",
         "orientation": "portrait",
+        "categories": ["business", "finance", "productivity"],
         "icons": [
             {
-                "src": static("core/pwa/icons/icon-192.png"),
+                "src": static("core/pwa/icons/icon-192-v2.png"),
                 "sizes": "192x192",
                 "type": "image/png",
                 "purpose": "any",
             },
             {
-                "src": static("core/pwa/icons/icon-512.png"),
+                "src": static("core/pwa/icons/icon-512-v2.png"),
                 "sizes": "512x512",
                 "type": "image/png",
                 "purpose": "any",
             },
             {
-                "src": static("core/pwa/icons/maskable-192.png"),
+                "src": static("core/pwa/icons/maskable-192-v2.png"),
                 "sizes": "192x192",
                 "type": "image/png",
                 "purpose": "maskable",
             },
             {
-                "src": static("core/pwa/icons/maskable-512.png"),
+                "src": static("core/pwa/icons/maskable-512-v2.png"),
                 "sizes": "512x512",
                 "type": "image/png",
                 "purpose": "maskable",
+            },
+        ],
+        "screenshots": [
+            {
+                "src": static("core/pwa/screenshots/dashboard-wide.svg"),
+                "sizes": "1280x720",
+                "type": "image/svg+xml",
+                "form_factor": "wide",
+                "label": "Roznamcha dashboard with reports and control panels",
+            },
+            {
+                "src": static("core/pwa/screenshots/dashboard-narrow.svg"),
+                "sizes": "720x1280",
+                "type": "image/svg+xml",
+                "form_factor": "narrow",
+                "label": "Roznamcha mobile-style overview with business cards and actions",
+            },
+        ],
+        "shortcuts": [
+            {
+                "name": "Login",
+                "short_name": "Login",
+                "description": "Sign in to your Roznamcha workspace",
+                "url": "/login/",
+                "icons": [
+                    {
+                        "src": static("core/pwa/icons/icon-192-v2.png"),
+                        "sizes": "192x192",
+                        "type": "image/png",
+                    }
+                ],
+            },
+            {
+                "name": "Create Account",
+                "short_name": "Sign Up",
+                "description": "Start a new Roznamcha account",
+                "url": "/signup/",
+                "icons": [
+                    {
+                        "src": static("core/pwa/icons/icon-192-v2.png"),
+                        "sizes": "192x192",
+                        "type": "image/png",
+                    }
+                ],
             },
         ],
     }
