@@ -409,10 +409,19 @@
 
           {# ✅ Use effective subscription context (works for OWNER + STAFF) #}
           {% if subscription_is_trial %}
-            <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;">
-              You are on <b>Trial</b>{% if subscription_days_left != None %} ({{ subscription_days_left }} days left){% endif %}.
-              Please activate subscription before trial ends.
-              <a href="{% url 'subscription_page' %}" style="margin-left:10px;font-weight:700;color:#92400e;">View</a>
+            <div style="max-width:1100px;margin:14px auto 0;padding:14px 16px;border-radius:14px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:240px;">
+                <div style="font-size:16px;font-weight:800;line-height:1.2;">🎁 Free Trial Active</div>
+                <div style="font-size:14px;line-height:1.5;">
+                  You have {% if subscription_days_left != None %}<b>{{ subscription_days_left }} days</b>{% else %}<b>trial time</b>{% endif %} remaining in your trial.
+                </div>
+                <div style="font-size:13px;line-height:1.45;color:#a16207;">
+                  Upgrade anytime to continue using Roznamcha after the trial ends{% if subscription_expires_at %}. Trial expires on <b>{{ subscription_expires_at|date:"d M Y, h:i A" }}</b>{% endif %}.
+                </div>
+              </div>
+              <a href="{% url 'subscription_page' %}" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;border:1px solid #f59e0b;background:#f59e0b;color:#fff;font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 8px 16px rgba(245,158,11,.2);">
+                View Subscription Plans
+              </a>
             </div>
           {% elif subscription_is_expired %}
             <div style="max-width:1100px;margin:14px auto 0;padding:10px 14px;border-radius:12px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;">

@@ -28,9 +28,13 @@
       <label style="display:block; margin-top:10px;">Select Plan</label>
       <select name="plan" required style="width:100%;max-width:320px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;">
         <option value="">-- Select --</option>
-        <option value="MONTHLY">Monthly</option>
-        <option value="YEARLY">Yearly</option>
+        <option value="MONTHLY">Monthly — Rs 1,000 / month</option>
+        <option value="YEARLY">Yearly — Rs 9,000 / year (Save 25%)</option>
       </select>
+      <div style="margin-top:10px;max-width:460px;font-size:13px;line-height:1.55;color:#6b7280;">
+        <div>Monthly plan: <strong style="color:#111827;">Rs 1,000</strong> per month.</div>
+        <div>Yearly plan: <strong style="color:#111827;">Rs 9,000</strong> per year <span style="color:#059669;font-weight:700;">(25% discount compared to monthly)</span>.</div>
+      </div>
 
       <div style="margin-top: 15px;">
         <button id="subscription-checkout-submit" type="submit" style="width:100%;max-width:320px;padding:12px 16px;border-radius:12px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">
