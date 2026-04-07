@@ -5713,7 +5713,9 @@ def _apply_subscription_transaction(tx_id: int) -> bool:
         owner = tx.owner
         profile = owner.profile
         now = timezone.now()
-        current_expiry = profile.get_effective_expires_at()
+        # Paid subscriptions should only stack on existing paid time.
+        # Trial time must not delay the start of a paid plan.
+        current_expiry = profile.subscription_expires_at
         anchor = current_expiry if current_expiry and current_expiry > now else now
 
         profile.subscription_status = "ACTIVE"
@@ -7126,8 +7128,10 @@ def superadmin_subscription_update(request, owner_id):
                 days = 30
 
         now = timezone.now()
+        current_expiry = prof.subscription_expires_at
+        anchor = current_expiry if current_expiry and current_expiry > now else now
         prof.subscription_status = "ACTIVE"
-        prof.subscription_expires_at = now + timedelta(days=days)
+        prof.subscription_expires_at = anchor + timedelta(days=days)
 
         # if trial never started, set it (keeps your system consistent)
         if not prof.trial_started_at:
