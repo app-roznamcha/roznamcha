@@ -6025,6 +6025,12 @@ def safepay_subscription_webhook(request):
         return JsonResponse({"ok": False, "error": "Invalid webhook payload."}, status=400)
 
     if hash_ok is False:
+        logger.warning(
+            "Safepay subscription webhook signature failed full_path=%s event_type=%s merchant_ref=%s",
+            request.get_full_path(),
+            event_type,
+            merchant_ref,
+        )
         return JsonResponse({"ok": False, "error": "Invalid webhook signature."}, status=400)
 
     if not merchant_ref:
@@ -6044,10 +6050,15 @@ def safepay_subscription_webhook(request):
         "subscription.created",
         "subscription.payment.succeeded",
     }
-    failed_events = {
+    failure_events = {
         "payment.failed",
+        "subscription.payment.failed",
+        "subscription.unpaid",
         "subscription.canceled",
         "subscription.ended",
+    }
+    informational_events = {
+        "subscription.updated",
     }
 
     if event_type in success_events:
@@ -6075,9 +6086,9 @@ def safepay_subscription_webhook(request):
         )
         return JsonResponse({"ok": True, "status": tx.status, "subscription_applied": True})
 
-    if event_type in failed_events:
+    if event_type in failure_events:
         tx.status = SubscriptionTransaction.STATUS_FAILED
-        tx.failure_reason = failure_reason or tx.failure_reason
+        tx.failure_reason = failure_reason or event_type or tx.failure_reason
         tx.save(
             update_fields=[
                 "ipn_payload",
@@ -6095,6 +6106,23 @@ def safepay_subscription_webhook(request):
             event_type,
         )
         return JsonResponse({"ok": True, "status": tx.status})
+
+    if event_type in informational_events:
+        tx.save(
+            update_fields=[
+                "ipn_payload",
+                "ipn_received_at",
+                "last_event_id",
+                "hash_ok",
+                "updated_at",
+            ]
+        )
+        logger.info(
+            "Safepay subscription webhook informational merchant_ref=%s event_type=%s",
+            merchant_ref,
+            event_type,
+        )
+        return JsonResponse({"ok": True, "ignored": True, "event_type": event_type})
 
     tx.save(
         update_fields=[
