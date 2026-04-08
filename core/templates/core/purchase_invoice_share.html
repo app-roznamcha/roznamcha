@@ -1,0 +1,780 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Purchase Invoice #{{ invoice.invoice_number }} — {{ company_name }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .wrap{
+      max-width: 900px;
+      margin: 18px auto 28px;
+      padding: 0 14px;
+    }
+
+    .card{
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      border-radius:16px;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+      overflow:hidden;
+      position: relative;
+    }
+
+    .topbar{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap:16px;
+      padding: 22px 22px 18px;
+      border-bottom:1px solid #e5e7eb;
+      background:
+        radial-gradient(520px 180px at 0% 0%, rgba(219,234,254,.55) 0%, transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    }
+    .masthead-main{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      min-width:0;
+    }
+
+    .brand-primary{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      min-width:0;
+    }
+    .company-logo{
+      width:68px;
+      height:68px;
+      border-radius:16px;
+      border:1px solid #d1deec;
+      object-fit:cover;
+      background:#ffffff;
+      box-shadow:0 10px 18px rgba(15,23,42,0.08);
+    }
+    .company-logo-fallback{
+      width:68px;
+      height:68px;
+      border-radius:16px;
+      border:1px solid #d1deec;
+      background:linear-gradient(160deg, #e8f1ff 0%, #f8fbff 100%);
+      color:#2563eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:26px;
+      font-weight:900;
+      letter-spacing:.04em;
+      box-shadow:0 10px 18px rgba(15,23,42,0.08);
+      flex:0 0 auto;
+    }
+    .company-copy{
+      min-width:0;
+    }
+    .company-copy h1{
+      margin:0;
+      font-size:30px;
+      font-weight:900;
+      line-height:1.05;
+      letter-spacing:-0.02em;
+    }
+    .company-meta{
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 10px;
+      font-size:12px;
+      color:#475569;
+      font-weight:700;
+    }
+
+    .brand-secondary{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:flex-start;
+      gap:10px;
+      min-width:0;
+    }
+    .powered-by{
+      width:100%;
+      padding:4px 0 0;
+      text-align:right;
+    }
+    .powered-by img{
+      width:28px;
+      height:28px;
+      border-radius:8px;
+      display:block;
+      margin-left:auto;
+      margin-bottom:6px;
+      opacity:.85;
+    }
+    .powered-by .k{
+      font-size:10px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:#6b7280;
+      font-weight:800;
+      margin-bottom:2px;
+    }
+    .powered-by .v{
+      font-size:13px;
+      color:#334155;
+      font-weight:800;
+    }
+    .powered-by .sub{
+      margin-top:2px;
+      font-size:11px;
+      color:#64748b;
+      font-weight:600;
+    }
+    .doc-heading{
+      padding:0 22px 18px;
+      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      border-bottom:1px solid #e5e7eb;
+      text-align:center;
+    }
+    .doc-heading h2{
+      margin:0;
+      font-size:30px;
+      font-weight:900;
+      line-height:1.05;
+      color:#0f172a;
+      letter-spacing:-0.03em;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 12px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      font-weight:700;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .pill.ok{ background:#ecfdf5; border-color:#10b981; color:#065f46; }
+    .pill.warn{ background:#fffbeb; border-color:#f59e0b; color:#92400e; }
+
+    .watermark{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      opacity:0.11;
+      transform: rotate(-18deg);
+      font-size: 84px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color:#ef4444;
+      user-select:none;
+    }
+
+    .section{
+      padding: 16px 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+
+    .box{
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:12px 12px;
+      background:#ffffff;
+    }
+    .box .label{
+      font-size:12px;
+      color:#6b7280;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    .box .value{
+      font-size:14px;
+      font-weight:800;
+      color:#111827;
+      word-break: break-word;
+    }
+    .box .muted{
+      font-weight:600;
+      color:#374151;
+      font-size:13px;
+      margin-top:4px;
+      line-height:1.35;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout: fixed;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      overflow:hidden;
+      background:#ffffff;
+    }
+    th, td{
+      border-bottom:1px solid #e5e7eb;
+      padding:10px 10px;
+      font-size:13px;
+      vertical-align:middle;
+    }
+    th{
+      background:#f9fafb;
+      text-align:left;
+      font-weight:800;
+      color:#111827;
+    }
+    td.right, th.right{ text-align:right; }
+    td.center, th.center{ text-align:center; }
+    .truncate{
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
+    .totals{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:12px;
+    }
+    .totals .sum{
+      width: 340px;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:12px;
+      background:#f9fafb;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:6px 0;
+      font-size:13px;
+      font-weight:800;
+    }
+    .row .k{ color:#374151; font-weight:800; }
+    .row .v{ color:#111827; }
+    .row.total{
+      border-top:1px dashed #d1d5db;
+      padding-top:8px;
+      margin-top:8px;
+      font-size:15px;
+    }
+    .row.total .v{
+      color:#0f172a;
+    }
+
+    .ledger-title{
+      margin: 14px 0 6px;
+      font-size: 16px;
+      font-weight: 900;
+      color:#111827;
+    }
+    .ledger-note{
+      margin: 0 0 10px;
+      font-size:12px;
+      color:#6b7280;
+      font-weight:700;
+    }
+    .ledger-summary{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:10px;
+      margin: 10px 0 12px;
+    }
+    .ledger-summary .mini{
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:10px;
+      background:#f9fafb;
+    }
+    .ledger-summary .mini .k{
+      font-size:11px;
+      color:#6b7280;
+      font-weight:800;
+      margin-bottom:5px;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+    .ledger-summary .mini .v{
+      font-size:13px;
+      color:#111827;
+      font-weight:900;
+    }
+    .ledger-summary .mini.primary{
+      background:linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+      border-color:#bfdbfe;
+      box-shadow:0 8px 16px rgba(37,99,235,0.08);
+    }
+    .ledger-summary .mini.primary .k{
+      color:#1d4ed8;
+    }
+    .ledger-summary .mini.primary .v{
+      font-size:16px;
+      color:#0f172a;
+    }
+    .ledger-wrap{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ledger-table{
+      min-width: 760px;
+    }
+    .ledger-row-this{
+      background:#eff6ff;
+    }
+    .ledger-row-this td{
+      border-bottom-color:#bfdbfe;
+      font-weight:800;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding: 14px 18px 18px;
+      border-top:1px solid #e5e7eb;
+      background:#ffffff;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:13px;
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      color:#111827;
+      text-decoration:none;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn:hover{ background:#f3f4f6; }
+    .btn-primary{
+      background:#2563eb;
+      border-color:#2563eb;
+      color:#ffffff;
+    }
+    .btn-primary:hover{
+      background:#1d4ed8;
+      border-color:#1d4ed8;
+    }
+    .btn-wa{
+      background:#16a34a;
+      border-color:#16a34a;
+      color:#ffffff;
+    }
+    .btn-wa:hover{
+      background:#15803d;
+      border-color:#15803d;
+    }
+
+    .footer{
+      padding: 0 18px 18px;
+      color:#6b7280;
+      font-size:12px;
+      text-align:center;
+    }
+
+    {% if png_mode %}
+      .actions{ display:none !important; }
+      body{ background:#ffffff; }
+      .wrap{ margin:0 auto; padding:0; }
+      .card{ box-shadow:none; border-radius:0; border:0; }
+    {% endif %}
+
+    @media (max-width: 720px){
+      .topbar{
+        grid-template-columns: 1fr;
+      }
+      .masthead-main{
+        flex-direction:column;
+      }
+      .brand-secondary{
+        align-items:stretch;
+      }
+      .powered-by{
+        text-align:left;
+      }
+      .powered-by img{
+        margin-left:0;
+      }
+      .grid{ grid-template-columns: 1fr; }
+      .watermark{ font-size: 62px; }
+      .totals .sum{ width:100%; }
+      .ledger-summary{ grid-template-columns: 1fr 1fr; }
+      .company-copy h1{ font-size:24px; }
+      .doc-heading{
+        padding:0 18px 16px;
+      }
+      .doc-heading h2{
+        font-size:24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card" id="invoiceCanvas">
+
+      {% if is_draft %}
+        <div class="watermark">DRAFT</div>
+      {% endif %}
+
+      <div class="topbar">
+        <div class="masthead-main">
+          <div class="brand-primary">
+            {% if company and company.logo %}
+              <img class="company-logo" src="{{ company.logo.url }}" alt="{{ company_name }}">
+            {% else %}
+              <div class="company-logo-fallback">
+                {{ company_name|default:"C"|slice:":2"|upper }}
+              </div>
+            {% endif %}
+            <div class="company-copy">
+              <h1>{{ company_name }}</h1>
+              <div class="company-meta">
+                {% if company_phone %}<span>📞 {{ company_phone }}</span>{% endif %}
+                {% if company_email %}<span>✉️ {{ company_email }}</span>{% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-secondary">
+            {% if is_draft %}
+              <div class="pill warn">UNPOSTED / DRAFT</div>
+            {% else %}
+              <div class="pill ok">POSTED</div>
+            {% endif %}
+            <div class="powered-by">
+              <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
+              <div class="k">Powered by</div>
+              <div class="v">Roznamcha</div>
+              <div class="sub">Accounting software platform</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="doc-heading">
+        <h2>Purchase Invoice</h2>
+      </div>
+
+      <div class="section">
+        <div class="grid">
+          <div class="box">
+            <div class="label">Supplier</div>
+            <div class="value">{{ supplier.name }}</div>
+            {% if supplier.phone or supplier.city or supplier.address %}
+              <div class="muted">
+                {% if supplier.phone %}📞 {{ supplier.phone }}{% endif %}
+                {% if supplier.phone and supplier.city %} • {% endif %}
+                {% if supplier.city %}🏙️ {{ supplier.city }}{% endif %}
+                {% if supplier.address %}<br>📍 {{ supplier.address }}{% endif %}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="box">
+            <div class="label">Invoice Details</div>
+            <div class="muted">
+              <b>Invoice #:</b> {{ invoice.invoice_number }}<br>
+              <b>Date:</b> {{ invoice.invoice_date|date:"d M Y" }}<br>
+              {% if invoice.date_received %}
+                <b>Date Received:</b> {{ invoice.date_received|date:"d M Y" }}<br>
+              {% endif %}
+              <b>Payment:</b>
+              {% if invoice.payment_type == "CREDIT" %}Credit{% endif %}
+              {% if invoice.payment_type == "FULL" %}Full Payment{% endif %}
+              {% if invoice.payment_type == "PARTIAL" %}Partial Payment{% endif %}
+              {% if invoice.payment_type != "CREDIT" %}
+                <br><b>Invoice Payment:</b> {{ paid|floatformat:2 }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:0;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:42%;">Product</th>
+              <th class="center" style="width:16%;">Unit</th>
+              <th class="right" style="width:14%;">Qty</th>
+              <th class="right" style="width:14%;">Rate</th>
+              <th class="right" style="width:14%;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for it in items %}
+              <tr>
+                <td class="truncate" title="{{ it.product.name }}">{{ it.product.name }}</td>
+                <td class="center">{{ it.unit_type }}</td>
+                <td class="right">{{ it.quantity_units|floatformat:3 }}</td>
+                <td class="right">{{ it.unit_price|floatformat:2 }}</td>
+                <td class="right">{{ it.line_total|floatformat:2 }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" style="text-align:center;color:#6b7280;padding:14px;">
+                  No items found.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="sum">
+            <div class="row">
+              <span class="k">Invoice Total</span>
+              <span class="v">PKR {{ total|add:"-0"|floatformat:2 }}</span>
+            </div>
+            {% if invoice.freight_charges %}
+              <div class="row">
+                <span class="k">Freight Charges</span>
+                <span class="v">PKR {{ invoice.freight_charges|floatformat:2 }}</span>
+              </div>
+            {% endif %}
+            {% if invoice.other_charges %}
+              <div class="row">
+                <span class="k">Other Charges</span>
+                <span class="v">PKR {{ invoice.other_charges|floatformat:2 }}</span>
+              </div>
+            {% endif %}
+            <div class="row">
+              <span class="k">Invoice Payment</span>
+              <span class="v">PKR {{ paid|floatformat:2 }}</span>
+            </div>
+            <div class="row total">
+              <span class="k">{% if is_draft %}Amount Payable (Preview){% else %}Amount Payable{% endif %}</span>
+              <span class="v">PKR {{ invoice_due|floatformat:2 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ledger-title">Supplier Ledger (Recent)</div>
+        {% if show_ledger_note %}
+          <div class="ledger-note">
+            Showing last {{ ledger_limit }} entries. View full ledger in app.
+          </div>
+        {% endif %}
+        {% if draft_balance_note %}
+          <div class="ledger-note">
+            {{ draft_balance_note }}
+          </div>
+        {% endif %}
+
+        <div class="ledger-summary">
+          <div class="mini">
+            <div class="k">Previous Payable</div>
+            <div class="v">PKR {{ opening_balance|floatformat:2 }}</div>
+          </div>
+          <div class="mini">
+            <div class="k">{% if is_draft %}This Purchase (Preview){% else %}This Purchase{% endif %}</div>
+            <div class="v">PKR {{ total|floatformat:2 }}</div>
+          </div>
+          <div class="mini primary">
+            <div class="k">{% if is_draft %}Current Posted Payable{% else %}Current Payable{% endif %}</div>
+            <div class="v">PKR {{ current_due|floatformat:2 }}</div>
+          </div>
+        </div>
+
+        <div class="ledger-wrap">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th style="width:14%;">Date</th>
+                <th style="width:14%;">Type</th>
+                <th style="width:22%;">Ref</th>
+                <th class="right" style="width:16%;">Debit</th>
+                <th class="right" style="width:16%;">Credit</th>
+                <th class="right" style="width:18%;">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in ledger_rows %}
+                <tr class="{% if row.is_this_invoice %}ledger-row-this{% endif %}">
+                  <td>{{ row.date|date:"d M Y" }}</td>
+                  <td>{{ row.type }}</td>
+                  <td class="truncate" title="{{ row.ref }}{% if row.note %} • {{ row.note }}{% endif %}">
+                    {{ row.ref }}{% if row.is_this_invoice %} (This invoice){% endif %}
+                  </td>
+                  <td class="right">{% if row.debit %}{{ row.debit|floatformat:2 }}{% else %}—{% endif %}</td>
+                  <td class="right">{% if row.credit %}{{ row.credit|floatformat:2 }}{% else %}—{% endif %}</td>
+                  <td class="right">{{ row.running_balance_side }} {{ row.running_balance|floatformat:2 }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" style="text-align:center;color:#6b7280;padding:14px;">
+                    No recent ledger entries.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="actions" id="actionBar">
+        <a class="btn" href="{% url 'dashboard' %}">← Back</a>
+
+        <div id="shareControls" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" onclick="downloadInvoicePNG()">
+            ⬇️ Take Screenshot
+          </button>
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <button type="button" class="btn btn-wa" onclick="shareOnWhatsApp()">
+              🟢 Open WhatsApp chat
+            </button>
+          </div>
+        </div>
+
+        {% if is_draft %}
+          <span class="pill warn">Draft invoice (not posted)</span>
+        {% endif %}
+      </div>
+
+      <div class="footer">
+        Invoice generated by {{ company_name }} using Roznamcha • https://www.roznamcha.app
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    const SUPPLIER_PHONE_RAW = "{{ supplier.phone|default:'' }}";
+    const INVOICE_NO = "{{ invoice.invoice_number|default:invoice.id }}";
+    const COMPANY_NAME = "{{ company_name|default:'Roznamcha'|escapejs }}";
+    const TOTAL_DISPLAY = "{{ total|floatformat:2 }}";
+
+    function normalizePkPhone(raw) {
+      if (!raw) return "";
+      let p = String(raw).replace(/[^\d]/g, "");
+      if (p.length === 11 && p.startsWith("0")) p = "92" + p.slice(1);
+      if (p.startsWith("92") && p.length >= 12) return p;
+      return p;
+    }
+
+    async function makeInvoicePngFile() {
+      const node = document.getElementById("invoiceCanvas");
+      if (!node) throw new Error("Invoice container not found.");
+
+      const actionBar = document.getElementById("actionBar");
+      const oldDisplay = actionBar ? actionBar.style.display : "";
+      if (actionBar) actionBar.style.display = "none";
+
+      try {
+        const canvas = await html2canvas(node, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+        });
+
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) throw new Error("Failed to create PNG blob.");
+
+        const fileName = `${INVOICE_NO}-purchase-invoice.png`;
+        return new File([blob], fileName, { type: "image/png" });
+      } finally {
+        if (actionBar) actionBar.style.display = oldDisplay;
+      }
+    }
+
+    async function downloadInvoicePNG() {
+      const actionBar = document.getElementById("actionBar");
+      const oldDisplay = actionBar ? actionBar.style.display : "";
+
+      if (actionBar) actionBar.style.display = "none";
+
+      try {
+        const node = document.getElementById("invoiceCanvas");
+        if (!node) return alert("Invoice container not found.");
+
+        const canvas = await html2canvas(node, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+        });
+
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!blob) return alert("Failed to generate PNG. Try again.");
+
+        const fileName = "{{ invoice.invoice_number|default:invoice.id }}-purchase-invoice.png";
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error(e);
+        alert("Failed to generate PNG. Try again.");
+      } finally {
+        if (actionBar) actionBar.style.display = oldDisplay;
+      }
+    }
+
+    let waWindowRef = null;
+
+    function shareOnWhatsApp() {
+      const phone = normalizePkPhone(SUPPLIER_PHONE_RAW);
+
+      if (!phone) {
+        alert("Supplier phone number not found. Please add phone number for this supplier.");
+        return;
+      }
+
+      const message =
+        `Assalam o Alaikum. Please find our purchase invoice ${INVOICE_NO} from ${COMPANY_NAME}. ` +
+        `Total amount: PKR ${TOTAL_DISPLAY}. Thank you.`;
+
+      const waUrl =
+        `https://web.whatsapp.com/send?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}`;
+
+      try {
+        if (waWindowRef && !waWindowRef.closed) {
+          waWindowRef.location.href = waUrl;
+          waWindowRef.focus();
+        } else {
+          waWindowRef = window.open(waUrl, "roznamcha_whatsapp");
+        }
+      } catch (e) {
+        window.open(waUrl, "_blank", "noopener");
+      }
+    }
+  </script>
+</body>
+</html>

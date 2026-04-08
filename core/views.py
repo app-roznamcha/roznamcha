@@ -7605,6 +7605,247 @@ def sales_invoice_share_png(request, pk):
 @resolve_tenant_context(require_company=True)
 @staff_allowed
 @subscription_required
+def purchase_invoice_share(request, pk):
+    """
+    Shareable purchase invoice preview:
+    - visible to OWNER + STAFF
+    - shows watermark if not posted
+    """
+    invoice = tenant_get_object_or_404(
+        request,
+        PurchaseInvoice.objects.select_related("supplier").prefetch_related("items__product"),
+        pk=pk,
+    )
+
+    is_draft = not bool(getattr(invoice, "posted", False))
+
+    total = Decimal(str(invoice.calculate_total() or 0))
+    paid = Decimal(str(getattr(invoice, "payment_amount", 0) or 0))
+
+    invoice_due = total - paid
+    if invoice_due < 0:
+        invoice_due = Decimal("0")
+
+    prof = getattr(request.user, "profile", None)
+    role = getattr(prof, "role", None)
+    is_staff_user = (role == "STAFF")
+
+    raw_limit = request.GET.get("ledger", "20")
+    try:
+        ledger_limit = int(raw_limit)
+    except (TypeError, ValueError):
+        ledger_limit = 20
+    ledger_limit = max(5, min(ledger_limit, 50))
+
+    def _d(val):
+        try:
+            return Decimal(str(val or 0))
+        except Exception:
+            return Decimal("0")
+
+    def _supplier_payable_from_balance(balance_abs, balance_side):
+        amt = _d(balance_abs)
+        return amt if str(balance_side or "").upper() == "CR" else Decimal("0")
+
+    def _supplier_signed_balance(balance_abs, balance_side):
+        amt = _d(balance_abs)
+        return amt if str(balance_side or "").upper() == "CR" else -amt
+
+    def _ledger_type_label(raw_type):
+        return {
+            "OPENING": "Opening",
+            "PurchaseInvoice": "Purchase",
+            "PurchaseReturn": "Return",
+            "Payment": "Payment",
+        }.get(raw_type, raw_type or "Journal")
+
+    def _ledger_ref(raw_type, raw_ref):
+        if raw_ref in (None, ""):
+            return ""
+        prefix = {
+            "PurchaseInvoice": "PI",
+            "PurchaseReturn": "PR",
+            "Payment": "PAY",
+        }.get(raw_type)
+        return f"{prefix}-{raw_ref}" if prefix else str(raw_ref)
+
+    supplier = invoice.supplier
+    owner = request.owner
+    ledger_data = build_party_ledger_for_owner(
+        owner=owner,
+        party=supplier,
+        date_from=None,
+        date_to=None,
+    )
+    helper_rows = ledger_data.get("rows", [])
+    tx_rows = [row for row in helper_rows if row.get("type") != "OPENING"]
+
+    previous_due = Decimal("0")
+    current_due = _supplier_payable_from_balance(
+        ledger_data.get("closing_balance"),
+        ledger_data.get("closing_side"),
+    )
+    draft_balance_note = ""
+
+    invoice_row_index = None
+    if not is_draft:
+        for idx, row in enumerate(tx_rows):
+            if row.get("type") == "PurchaseInvoice" and str(row.get("ref")) == str(invoice.id):
+                invoice_row_index = idx
+                break
+
+    if invoice_row_index is not None:
+        invoice_row = tx_rows[invoice_row_index]
+        current_due = _supplier_payable_from_balance(
+            invoice_row.get("balance"),
+            invoice_row.get("balance_side"),
+        )
+        signed_after = _supplier_signed_balance(
+            invoice_row.get("balance"),
+            invoice_row.get("balance_side"),
+        )
+        signed_before = signed_after - (_d(invoice_row.get("credit")) - _d(invoice_row.get("debit")))
+        previous_due = signed_before if signed_before > 0 else Decimal("0")
+    elif is_draft:
+        previous_due = _supplier_payable_from_balance(
+            ledger_data.get("closing_balance"),
+            ledger_data.get("closing_side"),
+        )
+        current_due = previous_due
+        draft_balance_note = "Draft invoice preview only. Supplier balance and ledger below include posted entries only."
+    else:
+        previous_due = _supplier_payable_from_balance(
+            ledger_data.get("closing_balance"),
+            ledger_data.get("closing_side"),
+        )
+
+    ledger_rows_raw = []
+    for row in tx_rows:
+        normalized_row = {
+            "date": parse_date(row.get("date")) if row.get("date") else None,
+            "type": _ledger_type_label(row.get("type")),
+            "ref": _ledger_ref(row.get("type"), row.get("ref")),
+            "debit": _d(row.get("debit")),
+            "credit": _d(row.get("credit")),
+            "note": row.get("description") or "",
+            "is_this_invoice": (
+                (not is_draft)
+                and row.get("type") == "Purchase"
+                and row.get("sort_pk", None) is None
+            ),
+            "sort_pk": int(row.get("ref") or 0) if str(row.get("ref") or "").isdigit() else 0,
+            "running_balance": _d(row.get("balance")),
+            "running_balance_side": str(row.get("balance_side") or ""),
+        }
+        normalized_row["is_this_invoice"] = (
+            (not is_draft)
+            and row.get("type") == "PurchaseInvoice"
+            and str(row.get("ref")) == str(invoice.id)
+        )
+        ledger_rows_raw.append(normalized_row)
+
+    total_rows = len(ledger_rows_raw)
+    if total_rows <= ledger_limit:
+        ledger_rows = ledger_rows_raw
+    else:
+        this_idx = None
+        for i, r in enumerate(ledger_rows_raw):
+            if r.get("type") == "Purchase" and r.get("sort_pk") == invoice.id:
+                this_idx = i
+                break
+        if this_idx is None:
+            for i, r in enumerate(ledger_rows_raw):
+                if r.get("is_this_invoice"):
+                    this_idx = i
+                    break
+        if this_idx is None:
+            this_idx = total_rows - 1
+
+        half = ledger_limit // 2
+        start = max(0, this_idx - half)
+        end = start + ledger_limit
+        if end > total_rows:
+            end = total_rows
+            start = max(0, end - ledger_limit)
+        ledger_rows = ledger_rows_raw[start:end]
+
+    last_payment_date = (
+        Payment.objects.filter(
+            owner=owner,
+            party=supplier,
+            posted=True,
+            is_adjustment=False,
+            direction="OUT",
+        )
+        .order_by("-date", "-id")
+        .values_list("date", flat=True)
+        .first()
+    )
+
+    company = getattr(request, "company", None)
+    if company is None:
+        company = getattr(request.owner, "company", None)
+
+    company_name = (
+        getattr(company, "name", None)
+        or getattr(company, "company_name", None)
+        or getattr(request.owner, "name", None)
+        or getattr(request.owner, "username", None)
+        or "Roznamcha"
+    )
+
+    company_phone = (
+        getattr(company, "phone", None)
+        or getattr(company, "phone_number", None)
+        or getattr(request.owner, "phone", None)
+        or getattr(request.owner, "phone_number", None)
+        or ""
+    )
+
+    company_email = (
+        getattr(company, "email", None)
+        or getattr(request.owner, "email", None)
+        or ""
+    )
+
+    context = {
+        "invoice": invoice,
+        "items": invoice.items.all(),
+        "supplier": invoice.supplier,
+        "total": total,
+        "paid": paid,
+        "invoice_due": invoice_due,
+        "previous_due": previous_due,
+        "current_due": current_due,
+        "is_draft": is_draft,
+        "is_staff_user": is_staff_user,
+        "company": company,
+        "company_name": company_name,
+        "company_phone": company_phone,
+        "company_email": company_email,
+        "ledger_rows": ledger_rows,
+        "ledger_limit": ledger_limit,
+        "opening_balance": previous_due,
+        "show_ledger_note": True,
+        "last_payment_date": last_payment_date,
+        "draft_balance_note": draft_balance_note,
+    }
+    return render(request, "core/purchase_invoice_share.html", context)
+
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@staff_allowed
+@subscription_required
+def purchase_invoice_share_png(request, pk):
+    # We intentionally generate PNG client-side (html2canvas) for Render compatibility.
+    # Redirect users to the share page.
+    return redirect(reverse("purchase_invoice_share", args=[pk]))
+
+@login_required
+@resolve_tenant_context(require_company=True)
+@staff_allowed
+@subscription_required
 def expenses_page(request):
     """
     One-page Daily Expenses:

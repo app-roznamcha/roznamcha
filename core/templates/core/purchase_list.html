@@ -482,6 +482,13 @@
               </td>
 
               <td class="center nowrap">
+                <a href="{% url 'purchase_invoice_share' inv.id %}"
+                   class="action-pill"
+                   style="margin-right:6px;"
+                   data-i18n="share">
+                  Share
+                </a>
+
                 {% if not inv.posted %}
                   <a href="{% url 'purchase_edit' inv.id %}" class="action-pill" style="margin-right:6px;" data-i18n="edit">Edit</a>
 
@@ -500,8 +507,6 @@
                     {% csrf_token %}
                     <button type="submit" class="action-pill" data-i18n="post">Post</button>
                   </form>
-                {% else %}
-                  —
                 {% endif %}
               </td>
             </tr>
@@ -555,6 +560,7 @@
 
     more_suffix: "more",
 
+    share: "Share",
     edit: "Edit",
     delete: "Delete",
     post: "Post",
@@ -595,6 +601,7 @@
 
     more_suffix: "مزید",
 
+    share: "شیئر",
     edit: "ترمیم",
     delete: "حذف کریں",
     post: "پوسٹ کریں",

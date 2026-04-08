@@ -116,6 +116,8 @@ urlpatterns = [
     path("purchases/<int:pk>/post/", staff_allowed(views.purchase_post), name="purchase_post"),
     path("purchases/<int:pk>/edit/", staff_blocked(views.purchase_edit), name="purchase_edit"),
     path("purchases/<int:pk>/delete/", staff_blocked(views.purchase_delete), name="purchase_delete"),
+    path("purchases/<int:pk>/share/", staff_allowed(views.purchase_invoice_share), name="purchase_invoice_share"),
+    path("purchases/<int:pk>/share.png", staff_allowed(views.purchase_invoice_share_png), name="purchase_invoice_share_png"),
 
     # =========================
     # Returns (staff allowed)
