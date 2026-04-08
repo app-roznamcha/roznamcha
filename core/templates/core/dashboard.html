@@ -41,6 +41,14 @@
     flex-wrap:wrap;
   }
 
+  .dashboard-hero-actions{
+    margin-left:auto;
+    display:flex;
+    align-items:flex-start;
+    justify-content:flex-end;
+    flex:0 0 auto;
+  }
+
   .dashboard-brand{
     display:flex;
     align-items:flex-start;
@@ -644,6 +652,24 @@
   gap: 8px;
   cursor: pointer;
   user-select: none;
+  border:1px solid #dbe5f2;
+  border-radius:999px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.9);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.92);
+  font: inherit;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.user-trigger:hover {
+  background:#f8fbff;
+}
+
+.user-trigger:focus-visible{
+  outline:none;
+  border-color:#93c5fd;
+  box-shadow:0 0 0 3px rgba(37,99,235,.14);
 }
 
 .user-trigger-name {
@@ -670,7 +696,7 @@
 .user-dropdown {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  right: 0;
   min-width: 220px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -683,6 +709,11 @@
 
 /* Show dropdown when hovering ANY part of menu (trigger+dropdown+bridge) */
 .user-menu:hover .user-dropdown {
+  display: block;
+}
+
+.user-menu.is-open .user-dropdown,
+.user-menu:focus-within .user-dropdown {
   display: block;
 }
 
@@ -803,6 +834,10 @@ html[dir="rtl"] .dashboard-section{
   .header-meta-bottom{gap:8px;}
   .meta-pill{font-size:12.5px;padding:7px 10px;}
   .dashboard-hero{padding:16px 14px 14px;}
+  .dashboard-hero-actions{
+    width:100%;
+    justify-content:flex-end;
+  }
   .summary-toggle-btn{
     width:100%;
     justify-content:center;
@@ -843,26 +878,7 @@ html[dir="rtl"] .dashboard-section{
                     <div class="dashboard-subtitle header-meta-top">
                       <div class="welcome-copy">
                         <span class="welcome-label" data-i18n="welcome_back">Welcome back,</span>
-                      {% if is_staff %}
                         <strong class="welcome-name">{{ request.user.get_full_name|default:request.user.username|title }}</strong>
-                      {% else %}
-                        <span class="user-menu">
-                          <span class="user-trigger">
-                            <span class="user-trigger-name welcome-name">{{ request.user.get_full_name|default:request.user.username|title }}</span>
-                            <span class="user-trigger-caret">▾</span>
-                          </span>
-                  
-                          <span class="user-dropdown">
-                            <a href="{% url 'owner_profile_page' %}"><span data-i18n="user_profile">👤 User Profile</span></a>
-                            <a href="{% url 'subscription_page' %}"><span data-i18n="subscription">💳 Subscription</span></a>
-                  
-                            {% if request.user.is_superuser %}
-                              <div style="height:1px;background:#e5e7eb;margin:8px 6px;"></div>
-                              <a href="{% url 'superadmin_dashboard' %}"><span data-i18n="superadmin_dash">🛡️ Super Admin Dashboard</span></a>
-                            {% endif %}
-                          </span>
-                        </span>
-                      {% endif %}
                       </div>
                     </div>
                   
@@ -876,8 +892,28 @@ html[dir="rtl"] .dashboard-section{
                       </span>
                     </div>
                   
-                  </div>
+                    </div>
                 </div>
+                {% if not is_staff %}
+                <div class="dashboard-hero-actions">
+                  <span class="user-menu" id="dashboardSettingsMenu">
+                    <button type="button" class="user-trigger" id="dashboardSettingsTrigger" aria-haspopup="true" aria-expanded="false">
+                      <span class="user-trigger-name" data-i18n="settings">⚙ Settings</span>
+                      <span class="user-trigger-caret">▾</span>
+                    </button>
+
+                    <span class="user-dropdown">
+                      <a href="{% url 'owner_profile_page' %}"><span data-i18n="user_profile">👤 User Profile</span></a>
+                      <a href="{% url 'subscription_page' %}"><span data-i18n="subscription">💳 Subscription</span></a>
+
+                      {% if request.user.is_superuser %}
+                        <div style="height:1px;background:#e5e7eb;margin:8px 6px;"></div>
+                        <a href="{% url 'superadmin_dashboard' %}"><span data-i18n="superadmin_dash">🛡️ Super Admin Dashboard</span></a>
+                      {% endif %}
+                    </span>
+                  </span>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -1145,6 +1181,7 @@ html[dir="rtl"] .dashboard-section{
       dash_suffix: "— Dashboard",
       welcome: "Welcome",
       welcome_back: "Welcome back,",
+      settings: "⚙ Settings",
       today: "Today",
 
       user_profile: "👤 User Profile",
@@ -1208,6 +1245,7 @@ html[dir="rtl"] .dashboard-section{
       dash_suffix: "— ڈیش بورڈ",
       welcome: "خوش آمدید",
       welcome_back: "واپس خوش آمدید،",
+      settings: "⚙ سیٹنگز",
       today: "آج",
 
       user_profile: "👤 یوزر پروفائل",
@@ -1316,6 +1354,34 @@ html[dir="rtl"] .dashboard-section{
         const cards = document.getElementById("metricsCards");
         const isHidden = !cards || cards.style.display === "none";
         setMetricsVisibility(isHidden);
+      });
+    }
+
+    const settingsMenu = document.getElementById("dashboardSettingsMenu");
+    const settingsTrigger = document.getElementById("dashboardSettingsTrigger");
+
+    if (settingsMenu && settingsTrigger) {
+      const setSettingsOpen = (open) => {
+        settingsMenu.classList.toggle("is-open", open);
+        settingsTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+      };
+
+      settingsTrigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setSettingsOpen(!settingsMenu.classList.contains("is-open"));
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!settingsMenu.contains(event.target)) {
+          setSettingsOpen(false);
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          setSettingsOpen(false);
+        }
       });
     }
   });
