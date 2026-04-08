@@ -220,6 +220,12 @@
       box-shadow:0 0 0 3px rgba(37,99,235,.14);
     }
 
+    .table-wrap{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+
     .action-pill{
       display:inline-flex;
       align-items:center;
@@ -244,7 +250,7 @@
       width:100%;
       border-collapse:collapse;
       table-layout:fixed;
-      min-width:1060px;
+      min-width:1040px;
       border:1px solid #e5e7eb;
       border-radius:12px;
       overflow:hidden;
@@ -331,6 +337,7 @@
         flex-wrap:wrap;
         justify-content:center;
         align-items:center;
+        gap:6px;
       }
     }
   </style>
@@ -430,13 +437,13 @@
       <table class="tbl">
         <colgroup>
           <col style="width:5%;">   {# # #}
-          <col style="width:11%;">  {# Date #}
-          <col style="width:11%;">  {# Invoice # #}
-          <col style="width:15%;">  {# Supplier #}
-          <col style="width:16%;">  {# Products #}
+          <col style="width:10%;">  {# Date #}
+          <col style="width:8%;">  {# Invoice # #}
+          <col style="width:13%;">  {# Supplier #}
+          <col style="width:14%;">  {# Products #}
           <col style="width:8%;">   {# Amount #}
           <col style="width:7%;">   {# Posted #}
-          <col style="width:17%;">  {# Action #}
+          <col style="width:20%;">  {# Action #}
         </colgroup>
 
         <thead>
