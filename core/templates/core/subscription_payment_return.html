@@ -36,6 +36,13 @@
           window.location.href = "/dashboard/";
       }, 5000);
       </script>
+    {% elif transaction %}
+      <p style="margin:12px 0 0;color:#4b5563;">We are confirming your subscription. This page will refresh automatically.</p>
+      <script>
+      setTimeout(function () {
+          window.location.href = window.location.href;
+      }, 3000);
+      </script>
     {% endif %}
   </div>
 </div>
