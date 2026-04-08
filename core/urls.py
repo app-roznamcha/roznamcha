@@ -111,7 +111,7 @@ urlpatterns = [
     # =========================
     # Purchases
     # =========================
-    path("purchases/", staff_blocked(views.purchase_list), name="purchase_list"),
+    path("purchases/", staff_allowed(views.purchase_list), name="purchase_list"),
     path("purchases/new/", staff_allowed(views.purchase_new), name="purchase_new"),
     path("purchases/<int:pk>/post/", staff_allowed(views.purchase_post), name="purchase_post"),
     path("purchases/<int:pk>/edit/", staff_blocked(views.purchase_edit), name="purchase_edit"),
