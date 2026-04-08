@@ -236,6 +236,10 @@
     }
     .action-pill:hover{ background:#f3f4f6; }
 
+    .action-cell{
+      white-space:normal;
+    }
+
     .tbl{
       width:100%;
       border-collapse:collapse;
@@ -314,6 +318,19 @@
       .pl-quick-search{
         min-width:100%;
         max-width:100%;
+      }
+      .action-cell{
+        min-width:220px;
+      }
+      .action-cell .action-pill,
+      .action-cell form{
+        margin:0 !important;
+      }
+      .action-cell{
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:center;
+        align-items:center;
       }
     }
   </style>
@@ -431,7 +448,7 @@
             <th data-i18n="col_products">Products</th>
             <th class="right nowrap" data-i18n="col_amount">Amount</th>
             <th class="center nowrap" data-i18n="col_posted">Posted?</th>
-            <th class="center nowrap" data-i18n="col_action">Action</th>
+            <th class="center action-cell" data-i18n="col_action">Action</th>
           </tr>
         </thead>
 
@@ -481,7 +498,7 @@
                 {% endif %}
               </td>
 
-              <td class="center nowrap">
+              <td class="center action-cell">
                 <a href="{% url 'purchase_invoice_share' inv.id %}"
                    class="action-pill"
                    style="margin-right:6px;"
@@ -489,24 +506,29 @@
                   Share
                 </a>
 
-                {% if not inv.posted %}
-                  <a href="{% url 'purchase_edit' inv.id %}" class="action-pill" style="margin-right:6px;" data-i18n="edit">Edit</a>
+                {% if request.user.profile.role != "STAFF" %}
 
-                  <form action="{% url 'purchase_delete' inv.id %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit"
-                            class="action-pill"
-                            style="margin-right:6px;"
-                            onclick="return confirm(window.ROZ_T ? window.ROZ_T('confirm_delete_purchase') : 'Delete this purchase? This action cannot be undone.');"
-                            data-i18n="delete">
-                      Delete
-                    </button>
-                  </form>
+                  {% if not inv.posted %}
+                    <a href="{% url 'purchase_edit' inv.id %}" class="action-pill" style="margin-right:6px;" data-i18n="edit">Edit</a>
 
-                  <form method="post" action="{% url 'purchase_post' pk=inv.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="action-pill" data-i18n="post">Post</button>
-                  </form>
+                    <form action="{% url 'purchase_delete' inv.id %}" method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="action-pill"
+                              style="margin-right:6px;"
+                              onclick="return confirm(window.ROZ_T ? window.ROZ_T('confirm_delete_purchase') : 'Delete this purchase? This action cannot be undone.');"
+                              data-i18n="delete">
+                        Delete
+                      </button>
+                    </form>
+
+                    <form method="post" action="{% url 'purchase_post' pk=inv.id %}" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="action-pill" data-i18n="post">Post</button>
+                    </form>
+                  {% else %}
+                    —
+                  {% endif %}
                 {% endif %}
               </td>
             </tr>
