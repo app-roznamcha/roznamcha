@@ -5,17 +5,14 @@
   <meta charset="utf-8">
   <title>Roznamcha — Accounting & Inventory Software for Traders, Wholesalers, and Distributors</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- SEO -->
   <meta name="description" content="Manage sales, purchases, inventory, ledgers, and reports with Roznamcha accounting software for traders, wholesalers, and distributors.">
   <meta name="keywords" content="accounting software, inventory software, trader software, wholesale accounting software, distributor software, stock management, ledger software">
   <link rel="canonical" href="https://roznamcha.app/">
   <link rel="manifest" href="{% url 'pwa_manifest' %}">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#123524">
   <link rel="icon" type="image/png" href="{% static 'core/pwa/icons/favicon-32.png' %}">
   <link rel="apple-touch-icon" href="{% static 'core/pwa/icons/apple-touch-icon.png' %}">
 
-  <!-- Open Graph -->
   <meta property="og:title" content="Roznamcha — Accounting & Inventory Software for Traders, Wholesalers, and Distributors">
   <meta property="og:description" content="Manage sales, purchases, inventory, ledgers, and reports with Roznamcha accounting software.">
   <meta property="og:url" content="https://roznamcha.app/">
@@ -27,9 +24,8 @@
   <meta name="twitter:image" content="https://roznamcha.app/static/core/branding/roznamcha.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 
-  <!-- Schema -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -43,913 +39,894 @@
   </script>
 
   <style>
+    :root{
+      --bg:#f4f2ea;
+      --surface:#fffdf9;
+      --surface-soft:#f8f5ee;
+      --surface-strong:#153528;
+      --text:#13211a;
+      --muted:#5f6b63;
+      --muted-strong:#415047;
+      --line:#ddd8ca;
+      --line-strong:#c8c1b1;
+      --primary:#1d5c42;
+      --primary-strong:#153f2e;
+      --accent:#c89d4a;
+      --accent-soft:#f5ead0;
+      --blue-soft:#e7eefb;
+      --shadow:0 24px 60px rgba(19,33,26,.10);
+      --radius-xl:32px;
+      --radius-lg:24px;
+      --radius-md:18px;
+      --radius-sm:14px;
+      --container:1180px;
+    }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
       margin:0;
       font-family:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:
-        radial-gradient(1200px 700px at 16% -12%, rgba(37,99,235,.15), transparent 60%),
-        radial-gradient(960px 560px at 90% -8%, rgba(5,150,105,.12), transparent 55%),
-        linear-gradient(180deg, #eef2ff 0%, #f8fafc 40%, #ffffff 100%);
-      color:#0f172a;
-      line-height:1.55;
+        radial-gradient(circle at top left, rgba(29,92,66,.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(200,157,74,.16), transparent 26%),
+        linear-gradient(180deg,#f7f4ed 0%,#f4f2ea 26%,#fbfaf6 100%);
+      color:var(--text);
+      line-height:1.6;
     }
     a{text-decoration:none;color:inherit}
-    img{max-width:100%;height:auto}
-    .container{max-width:1220px;margin:0 auto;padding:0 20px}
+    img{max-width:100%;display:block}
+    button,input,select,textarea{font:inherit}
+    .container{width:min(var(--container),calc(100% - 32px));margin:0 auto}
+    .section{padding:72px 0}
+    .section-compact{padding:56px 0}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 14px;border-radius:999px;
+      border:1px solid rgba(19,33,26,.10);
+      background:rgba(255,255,255,.72);
+      color:var(--muted-strong);
+      font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    }
+    .section-label{
+      margin:0 0 14px;
+      color:var(--muted-strong);
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    .section-heading{
+      margin:0;
+      font-family:"DM Serif Display",serif;
+      font-size:44px;
+      line-height:1.05;
+      letter-spacing:-.02em;
+      color:#13211a;
+    }
+    .section-copy{
+      margin:14px 0 0;
+      max-width:700px;
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.8;
+    }
 
-    /* Header */
-    .header{
+    .site-header{
       position:sticky;top:0;z-index:50;
-      background:rgba(255,255,255,.78);
-      backdrop-filter:saturate(160%) blur(10px);
-      border-bottom:1px solid #dbe4ef;
+      border-bottom:1px solid rgba(19,33,26,.08);
+      background:rgba(247,244,237,.86);
+      backdrop-filter:blur(14px) saturate(140%);
     }
-    .header-inner{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:12px 0;
+    .site-header__inner{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 0;
     }
-    .brand{display:flex;align-items:center;gap:12px;min-width:0}
-    .logo{
-      height:50px;width:auto;max-width:200px;object-fit:contain;
-      border-radius:14px;
+    .brandmark{display:flex;align-items:center;gap:12px;min-width:0}
+    .brandmark img{height:56px;width:auto;max-width:240px;border-radius:16px}
+    .header-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-link{
+      padding:10px 14px;border-radius:999px;
+      color:var(--muted-strong);font-weight:700;font-size:14px;
+      border:1px solid transparent;
     }
+    .nav-link:hover{background:rgba(255,255,255,.75);border-color:rgba(19,33,26,.08)}
+    .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
-    .nav{
-      display:flex;gap:8px;flex-wrap:wrap;align-items:center;
-      justify-content:center;
-    }
-    .chip{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:9px 13px;border-radius:999px;
-      border:1px solid #dce4ef;background:#fff;
-      font-weight:700;font-size:13px;color:#334155;
-      transition:transform .08s ease, box-shadow .08s ease, background .08s ease;
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      min-height:50px;padding:0 18px;border-radius:14px;
+      border:1px solid var(--line);background:#fff;color:var(--text);
+      font-weight:800;font-size:14px;cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
       white-space:nowrap;
     }
-    .chip:hover{
-      transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.08);
-      background:#f8fafc;
-    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(19,33,26,.10)}
+    .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-strong));border-color:var(--primary-strong);color:#fff}
+    .btn-primary:hover{box-shadow:0 18px 30px rgba(21,63,46,.22)}
+    .btn-secondary{background:rgba(255,255,255,.84);border-color:rgba(19,33,26,.12)}
+    .btn-dark{background:var(--surface-strong);border-color:var(--surface-strong);color:#fff}
+    .btn-wa{background:#1ea365;border-color:#1ea365;color:#fff}
 
-    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:10px 16px;border-radius:12px;border:1px solid #dde5f1;
-      font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;
-      background:linear-gradient(180deg,#ffffff,#f8fafc);
-      transition:transform .08s ease, box-shadow .08s ease, background .08s ease, border-color .08s ease;
-    }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 20px rgba(15,23,42,.09)}
-    .btn-primary{background:linear-gradient(180deg,#2563eb,#1d4ed8);border-color:#1d4ed8;color:#fff}
-    .btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
-    .btn-dark{background:#0f172a;border-color:#0f172a;color:#fff}
-    .btn-dark:hover{background:#111827;border-color:#111827}
-    .btn-ghost{background:transparent}
-    .btn-ghost:hover{background:#f8fafc}
-    .btn-wa{
-      background:#10b981;border-color:#10b981;color:#fff;
-      font-weight:850;
-    }
-    .btn-wa:hover{background:#059669;border-color:#059669}
-
-    /* Hero */
-    .hero-wrap{padding:34px 0 24px}
     .hero{
-      display:grid;
-      grid-template-columns: 1.08fr .92fr;
-      gap:24px;
-      align-items:stretch;
+      padding:34px 0 40px;
     }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(249,252,255,.96));
-      border:1px solid #dbe5f2;border-radius:24px;
-      box-shadow:0 24px 40px rgba(15,23,42,.12);
-      padding:28px;
+    .hero-shell{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(19,33,26,.08);
+      border-radius:36px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.95) 0%, rgba(255,252,244,.96) 42%, rgba(244,241,231,.94) 100%);
+      box-shadow:var(--shadow);
     }
-    .eyebrow{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:7px 10px;border-radius:999px;
-      border:1px solid #e5e7eb;background:#f8fafc;
-      font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-      color:#334155;
+    .hero-shell::before{
+      content:"";
+      position:absolute;inset:-20% auto auto 56%;
+      width:420px;height:420px;border-radius:50%;
+      background:radial-gradient(circle, rgba(200,157,74,.22), rgba(200,157,74,0) 68%);
+      pointer-events:none;
     }
-    .headline{
-      margin:14px 0 12px;
-      font-size:48px;
-      line-height:1.04;
-      font-weight:900;
-      letter-spacing:-.03em;
-      color:#0f172a;
+    .hero-shell::after{
+      content:"";
+      position:absolute;inset:auto auto -18% -10%;
+      width:420px;height:420px;border-radius:50%;
+      background:radial-gradient(circle, rgba(29,92,66,.18), rgba(29,92,66,0) 70%);
+      pointer-events:none;
     }
-    .subhead{
-      margin:0 0 14px;
-      color:#334155;font-size:17px;line-height:1.75;
+    .hero-grid{
+      position:relative;z-index:1;
+      display:grid;grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);
+      gap:28px;
+      padding:52px;
+      align-items:start;
     }
-    .subhead strong{font-weight:950;color:#0f172a}
+    .hero-copy{max-width:700px}
+    .hero-title{
+      margin:18px 0 16px;
+      font-family:"DM Serif Display",serif;
+      font-size:68px;
+      line-height:.98;
+      letter-spacing:-.04em;
+      color:#122119;
+    }
+    .hero-copy p{
+      margin:0;
+      color:var(--muted-strong);
+      font-size:18px;
+      line-height:1.85;
+      max-width:640px;
+    }
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+    .hero-actions .btn{min-width:180px}
+    .hero-proof{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;
+      margin-top:28px;
+    }
+    .proof-card{
+      padding:16px 18px;border-radius:18px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(19,33,26,.08);
+    }
+    .proof-card strong{display:block;font-size:14px;color:#13211a;margin-bottom:6px}
+    .proof-card span{display:block;font-size:13px;line-height:1.65;color:var(--muted)}
+    .hero-note{
+      margin-top:16px;
+      color:#607066;
+      font-size:13px;
+      line-height:1.7;
+    }
 
-    .micro-proof{
-      display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0;
+    .hero-aside{
+      display:grid;gap:16px;
     }
-    .proof{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:9px 12px;border-radius:999px;
-      border:1px solid #dfe7f2;background:#fff;
-      font-weight:800;font-size:13px;color:#334155;
+    .signal-card,
+    .metric-card,
+    .rail-card,
+    .feature-card,
+    .audience-card,
+    .workflow-step,
+    .pricing-card,
+    .cta-panel,
+    .contact-card,
+    .footer-card{
+      border:1px solid rgba(19,33,26,.08);
+      background:rgba(255,255,255,.86);
+      border-radius:24px;
+      box-shadow:0 18px 36px rgba(19,33,26,.08);
     }
-    .proof.green{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
-    .proof.blue{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
-    .proof.orange{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+    .signal-card{
+      padding:24px;
+      background:linear-gradient(180deg, rgba(21,53,40,.96), rgba(15,38,28,.96));
+      color:#f7f8f2;
+      border-color:rgba(19,33,26,.18);
+    }
+    .signal-card h3{margin:0 0 10px;font-size:28px;line-height:1.1;font-family:"DM Serif Display",serif;font-weight:400}
+    .signal-card p{margin:0;color:rgba(247,248,242,.82);font-size:15px;line-height:1.75}
+    .signal-list{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+    .signal-list li{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;color:#f7f8f2;font-size:14px;line-height:1.65}
+    .signal-list li span:first-child{color:#f2d89a}
+    .metric-card{padding:20px}
+    .metric-kicker{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-strong)}
+    .metric-value{margin:10px 0 8px;font-size:40px;font-weight:800;line-height:1;color:#122119}
+    .metric-copy{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
 
-    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-    .cta-row .btn{padding:13px 20px;font-size:15px}
-    .btn-install{
-      display:inline-flex;
-      background:linear-gradient(180deg,#0f172a,#111827);
-      border-color:#0f172a;
-      color:#fff;
+    .trust-grid,
+    .features-grid,
+    .audience-grid,
+    .pricing-grid,
+    .contact-grid{display:grid;gap:18px}
+    .trust-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .rail-card{padding:20px}
+    .rail-card h3{margin:0 0 8px;font-size:18px;font-weight:800;color:#13211a}
+    .rail-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.75}
+
+    .who-layout{
+      display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:22px;align-items:start;
+      margin-top:24px;
     }
-    .btn-install:hover{
-      background:#111827;
-      border-color:#111827;
+    .audience-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .audience-card{padding:24px}
+    .audience-card h3{margin:0 0 8px;font-size:20px;font-weight:800;color:#13211a}
+    .audience-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.75}
+    .audience-list{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+    .audience-list li{display:grid;grid-template-columns:14px 1fr;gap:10px;color:#314137;font-size:14px;line-height:1.65}
+    .audience-list li span:first-child{color:var(--primary)}
+
+    .features-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:24px}
+    .feature-card{padding:24px}
+    .feature-icon{
+      width:48px;height:48px;border-radius:14px;
+      display:grid;place-items:center;
+      background:var(--surface-soft);
+      border:1px solid rgba(19,33,26,.08);
+      font-size:22px;
+      margin-bottom:16px;
     }
+    .feature-card h3{margin:0 0 8px;font-size:18px;font-weight:800;color:#13211a}
+    .feature-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.78}
+    .feature-tag{
+      display:inline-flex;margin-top:14px;padding:6px 10px;border-radius:999px;
+      background:var(--accent-soft);border:1px solid #e6cf9d;color:#7a5a21;
+      font-size:12px;font-weight:800;
+    }
+
+    .workflow-shell{margin-top:24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+    .workflow-step{padding:22px;position:relative;overflow:hidden}
+    .workflow-step::before{
+      content:"";
+      position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;
+      background:rgba(29,92,66,.08);
+    }
+    .workflow-step small{display:block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-strong)}
+    .workflow-step h3{margin:12px 0 8px;font-size:18px;font-weight:800;color:#13211a}
+    .workflow-step p{margin:0;color:var(--muted);font-size:14px;line-height:1.75}
+
+    .pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:24px}
+    .pricing-card{padding:28px;position:relative;overflow:hidden}
+    .pricing-card--featured{
+      background:linear-gradient(180deg, rgba(21,53,40,.96), rgba(17,41,31,.96));
+      color:#f5f6ef;
+      border-color:rgba(19,33,26,.18);
+    }
+    .plan-badge{
+      display:inline-flex;padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(19,33,26,.10);background:rgba(255,255,255,.74);
+      color:var(--muted-strong);font-size:12px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
+    }
+    .pricing-card--featured .plan-badge{
+      background:rgba(242,216,154,.14);
+      border-color:rgba(242,216,154,.28);
+      color:#f2d89a;
+    }
+    .plan-price{margin:18px 0 8px;font-size:50px;line-height:.95;font-weight:800;letter-spacing:-.04em}
+    .plan-price small{font-size:16px;font-weight:700;letter-spacing:0;color:inherit;opacity:.72}
+    .plan-copy{margin:0;color:var(--muted);font-size:15px;line-height:1.75}
+    .pricing-card--featured .plan-copy,
+    .pricing-card--featured .plan-list li,
+    .pricing-card--featured .plan-note,
+    .pricing-card--featured .plan-legal{color:rgba(245,246,239,.82)}
+    .plan-list{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+    .plan-list li{display:grid;grid-template-columns:18px 1fr;gap:10px;color:#314137;font-size:14px;line-height:1.65}
+    .plan-list li span:first-child{color:var(--primary)}
+    .pricing-card--featured .plan-list li span:first-child{color:#f2d89a}
+    .plan-note,
+    .plan-legal{
+      margin-top:18px;padding:14px 16px;border-radius:16px;font-size:13px;line-height:1.7;
+      border:1px solid rgba(19,33,26,.08);
+      background:rgba(248,245,238,.92);color:#445348;
+    }
+    .pricing-card--featured .plan-note,
+    .pricing-card--featured .plan-legal{
+      background:rgba(255,255,255,.06);
+      border-color:rgba(242,216,154,.16);
+    }
+    .plan-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+    .plan-actions .btn{flex:1 1 180px}
+
+    .cta-panel{
+      margin-top:24px;
+      padding:24px 26px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+      background:linear-gradient(135deg, rgba(29,92,66,.12), rgba(200,157,74,.16));
+    }
+    .cta-panel strong{display:block;font-size:22px;line-height:1.2;color:#13211a}
+    .cta-panel span{display:block;margin-top:6px;color:var(--muted);font-size:15px}
+
+    .contact-grid{grid-template-columns:1.05fr .95fr;margin-top:24px}
+    .contact-card{padding:24px}
+    .contact-card h3{margin:0 0 10px;font-size:22px;font-weight:800;color:#13211a}
+    .contact-card p{margin:0;color:var(--muted);font-size:15px;line-height:1.78}
+    .contact-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .contact-actions .btn{flex:1 1 160px}
+
+    .solutions-strip{
+      margin-top:24px;
+      padding:22px 24px;
+      border-radius:24px;
+      border:1px solid rgba(19,33,26,.08);
+      background:rgba(255,255,255,.82);
+      box-shadow:0 16px 34px rgba(19,33,26,.06);
+    }
+    .solutions-strip h3{margin:0 0 14px;font-size:18px;font-weight:800;color:#13211a}
+    .solutions-links{display:flex;flex-wrap:wrap;gap:10px}
+    .solutions-links a{
+      display:inline-flex;align-items:center;padding:10px 14px;
+      border-radius:999px;border:1px solid rgba(19,33,26,.10);background:#fff;
+      color:var(--muted-strong);font-size:13px;font-weight:700;
+    }
+
+    .site-footer{padding:34px 0 48px}
+    .footer-card{padding:24px;background:rgba(255,255,255,.78)}
+    .footer-top{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+    .footer-title{margin:0 0 8px;font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-strong)}
+    .footer-brandline{margin:0;font-size:22px;font-weight:800;color:#13211a}
+    .footer-copy{margin:10px 0 0;color:var(--muted);font-size:14px;line-height:1.75;max-width:640px}
+    .footer-links{display:flex;gap:10px;flex-wrap:wrap}
+    .footer-links a{
+      display:inline-flex;align-items:center;padding:10px 14px;border-radius:999px;
+      border:1px solid rgba(19,33,26,.10);background:#fff;color:var(--muted-strong);font-size:13px;font-weight:700;
+    }
+    .footer-bottom{margin-top:18px;padding-top:18px;border-top:1px solid rgba(19,33,26,.08);color:#7d887f;font-size:12px}
+
     .install-help{
       display:none;
-      margin-top:14px;
-      padding:14px 16px;
-      border-radius:16px;
-      border:1px solid #dbe5f2;
-      background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,251,255,.98));
-      box-shadow:0 14px 24px rgba(15,23,42,.08);
-      color:#334155;
-      max-width:520px;
+      margin-top:16px;
+      padding:16px 18px;
+      border-radius:18px;
+      border:1px solid rgba(19,33,26,.10);
+      background:rgba(255,255,255,.92);
+      color:var(--muted-strong);
+      max-width:560px;
     }
-    .install-help.is-open{display:block;}
-    .install-help-title{
-      margin:0 0 6px;
-      font-size:15px;
-      font-weight:900;
-      color:#0f172a;
-    }
-    .install-help-text{
-      margin:0;
-      font-size:14px;
-      line-height:1.65;
-      color:#475569;
-    }
-    .install-help-actions{
-      display:flex;
-      justify-content:flex-end;
-      margin-top:12px;
-    }
+    .install-help.is-open{display:block}
+    .install-help-title{margin:0 0 6px;font-size:15px;font-weight:800;color:#13211a}
+    .install-help-text{margin:0;font-size:14px;line-height:1.7;color:var(--muted)}
+    .install-help-actions{display:flex;justify-content:flex-end;margin-top:12px}
     .install-help-close{
-      border:1px solid #dbe5f2;
-      background:#fff;
-      color:#334155;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:13px;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .install-help-close:hover{
-      background:#f8fafc;
-      border-color:#cbd5e1;
+      border:1px solid rgba(19,33,26,.12);background:#fff;color:var(--muted-strong);
+      border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer;
     }
 
-    .fineprint{
-      margin:14px 0 0;color:#64748b;font-size:13.5px;line-height:1.65;
-    }
-
-    /* Panel */
-    .panel{display:flex;flex-direction:column;gap:16px}
-    .mini{
-      background:#fff;border:1px solid #dde7f3;border-radius:20px;
-      padding:18px 18px 16px;
-      box-shadow:0 14px 24px rgba(15,23,42,.09);
-    }
-    .mini h3{margin:0 0 8px;font-size:17px;font-weight:900}
-    .mini p{margin:0;color:#5b6779;font-size:14px;line-height:1.68}
-    .list{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
-    .li{display:flex;gap:10px;align-items:flex-start}
-    .dot{width:10px;height:10px;border-radius:999px;background:#2563eb;margin-top:6px;flex:0 0 auto}
-    .dot.green{background:#10b981}
-    .dot.orange{background:#f97316}
-    .mini .btn{width:100%;margin-top:12px;padding:12px 16px}
-
-    /* Sections */
-    .section{padding:26px 0 40px}
-    .section-title{
-      margin:0 0 14px;
-      font-size:14px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;
-      color:#55637a;
-    }
-
-    .grid3{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:18px;
-    }
-    .feature{
-      background:#fff;border:1px solid #dde7f3;border-radius:20px;
-      padding:18px;
-      box-shadow:0 12px 20px rgba(15,23,42,.07);
-      transition:transform .10s ease, box-shadow .10s ease;
-    }
-    .feature:hover{transform:translateY(-3px);box-shadow:0 20px 30px rgba(15,23,42,.12)}
-    .icon{
-      width:42px;height:42px;border-radius:14px;
-      display:flex;align-items:center;justify-content:center;
-      background:#eff6ff;border:1px solid #bfdbfe;
-      font-size:18px;
-      margin-bottom:12px;
-    }
-    .feature h4{margin:0 0 8px;font-size:16px;font-weight:900}
-    .feature p{margin:0;color:#5e6b7f;font-size:14px;line-height:1.65}
-    .pill-note{
-      margin-top:10px;
-      font-size:12px;
-      color:#9a3412;
-      background:#fff7ed;
-      border:1px solid #fed7aa;
-      display:inline-flex;
-      padding:4px 8px;
-      border-radius:999px;
-      font-weight:950;
-    }
-
-    /* Fear/Ambition blocks */
-    .grid2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      margin-top:16px;
-    }
-    .block{
-      background:#fff;border:1px solid #dde7f3;border-radius:22px;
-      padding:18px;
-      box-shadow:0 12px 20px rgba(15,23,42,.07);
-    }
-    .block h4{margin:0 0 6px;font-size:15px;font-weight:950}
-    .block p{margin:0;color:#64748b;font-size:14px;line-height:1.65}
-    .kicker{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid #e5e7eb;background:#f8fafc;
-      font-weight:950;font-size:12px;color:#334155;
-      margin-bottom:10px;
-    }
-
-    /* Compare */
-    .compare{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-    }
-    .box{
-      background:#fff;border:1px solid #dde7f3;border-radius:22px;
-      padding:18px;
-      box-shadow:0 12px 20px rgba(15,23,42,.07);
-    }
-    .box h4{margin:0 0 8px;font-size:15px;font-weight:950}
-    .box ul{margin:0;padding-left:18px;color:#64748b;line-height:1.8}
-    /* Steps */
-    .step{
-      background:linear-gradient(90deg, rgba(37,99,235,.10), rgba(5,150,105,.08));
-      border:1px solid #dbe5f2;border-radius:22px;
-      padding:18px;
-    }
-    .step strong{font-weight:950}
-    .step p{margin:8px 0 0;color:#475569;line-height:1.6}
-
-    /* Pricing */
-    .pricing{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      margin-top:12px;
-    }
-    .price-card{
-      background:#fff;border:1px solid #dde7f3;border-radius:22px;
-      padding:20px;
-      box-shadow:0 14px 24px rgba(15,23,42,.09);
-    }
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:7px 10px;border-radius:999px;
-      border:1px solid #e5e7eb;background:#f8fafc;
-      font-weight:950;font-size:12px;color:#334155;
-    }
-    .price{
-      margin:10px 0 6px;
-      font-size:34px;font-weight:950;letter-spacing:-.03em;
-      color:#0f172a;
-    }
-    .price small{font-size:14px;color:#64748b;font-weight:900}
-    .muted{color:#64748b;line-height:1.6;font-size:14px}
-    .price-list{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
-    .price-list li{display:flex;gap:10px;align-items:flex-start;color:#334155;line-height:1.5}
-    .tick{width:18px;flex:0 0 auto}
-
-    .founder{
-      margin-top:12px;
-      font-size:13px;
-      color:#334155;
-      line-height:1.6;
-      background:#eff6ff;
-      border:1px solid #bfdbfe;
-      padding:10px 12px;
-      border-radius:14px;
-      font-weight:800;
-    }
-
-    .legal{
-      margin-top:12px;
-      font-size:12.5px;
-      color:#6b7280;
-      line-height:1.55;
-      background:#f8fafc;
-      border:1px solid #e5e7eb;
-      padding:10px 12px;
-      border-radius:14px;
-    }
-
-    /* CTA strip */
-    .bottom-cta{
-      margin-top:16px;
-      background:linear-gradient(90deg, rgba(37,99,235,.12), rgba(5,150,105,.10));
-      border:1px solid #dbe5f2;border-radius:22px;
-      padding:20px;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-    }
-    .bottom-cta strong{font-size:16px;font-weight:950}
-    .bottom-cta span{color:#64748b;font-size:14px}
-    .bottom-cta .btn{padding:12px 18px}
-
-    /* Footer */
-    .site-footer{
-      margin-top:30px;
-      background:rgba(255,255,255,.88);
-      border-top:1px solid #dbe5f2;
-      padding:24px 0;
-    }
-    .footer-inner{
-      display:flex;gap:14px;
-      align-items:flex-start;justify-content:space-between;flex-wrap:wrap;
-    }
-    .footer-brand{display:flex;flex-direction:column;gap:6px;min-width:240px}
-    .footer-title{font-weight:950;letter-spacing:-.02em;font-size:14px;color:#0f172a}
-    .footer-sub{color:#64748b;font-size:13px;line-height:1.5;max-width:520px}
-    .footer-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:#334155}
-    .footer-links a{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:6px 10px;border:1px solid #e5e7eb;background:#fff;border-radius:12px;width:fit-content;
-    }
-    .footer-links a:hover{
-      box-shadow:0 10px 18px rgba(15,23,42,.06);
-      transform:translateY(-1px);
-      transition:transform .08s ease, box-shadow .08s ease;
-    }
-    .footer-bottom{margin-top:12px;color:#94a3b8;font-size:12px}
-    .solutions-strip{
-      margin-top:26px;
-      padding:18px 20px;
-      border:1px solid #dbe5f2;
-      border-radius:18px;
-      background:rgba(255,255,255,.92);
-    }
-    .solutions-strip h3{
-      margin:0 0 12px;
-      font-size:16px;
-      font-weight:900;
-      color:#0f172a;
-    }
-    .solutions-links{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-    .solutions-links a{
-      display:inline-flex;
-      align-items:center;
-      padding:8px 12px;
-      border:1px solid #e5e7eb;
-      border-radius:999px;
-      background:#fff;
-      color:#334155;
-      font-size:13px;
-      font-weight:700;
-    }
-    .solutions-links a:hover{
-      transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.06);
-      transition:transform .08s ease, box-shadow .08s ease;
-    }
-
-    /* Sticky mobile CTA */
     .sticky-cta{
-      position:fixed;
-      left:12px; right:12px; bottom:12px;
-      z-index:80;
-      display:none;
-      gap:10px;
-      background:rgba(255,255,255,.92);
-      border:1px solid #e5e7eb;
-      border-radius:18px;
-      padding:10px;
-      box-shadow:0 18px 34px rgba(15,23,42,.14);
-      backdrop-filter:saturate(160%) blur(10px);
+      position:fixed;left:12px;right:12px;bottom:12px;z-index:70;
+      display:none;gap:10px;padding:10px;border-radius:18px;
+      background:rgba(255,255,255,.92);border:1px solid rgba(19,33,26,.10);
+      backdrop-filter:blur(12px) saturate(140%);
+      box-shadow:0 20px 36px rgba(19,33,26,.14);
     }
-    .sticky-cta .btn{flex:1; padding:12px 14px}
-    @media(max-width:620px){
-      .sticky-cta{display:flex}
-    }
+    .sticky-cta .btn{flex:1 1 0}
 
-    /* Responsive */
-    @media(max-width:980px){
-      .hero{grid-template-columns:1fr}
-      .headline{font-size:38px}
-      .grid3{grid-template-columns:1fr 1fr}
-      .compare{grid-template-columns:1fr}
-      .pricing{grid-template-columns:1fr}
-      .grid2{grid-template-columns:1fr}
+    @media (max-width: 1120px){
+      .hero-grid{grid-template-columns:1fr;padding:40px}
+      .hero-title{font-size:56px}
+      .trust-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .features-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .workflow-shell{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .contact-grid,.who-layout{grid-template-columns:1fr}
     }
-    @media(max-width:620px){
-      .headline{font-size:31px}
-      .header-inner{flex-direction:column;align-items:stretch}
-      .actions{justify-content:center}
-      .nav{justify-content:center}
-      .brand{justify-content:center}
-      .logo{height:46px}
-      .container{padding:0 14px}
-      .card{padding:20px}
+    @media (max-width: 760px){
+      .container{width:min(var(--container),calc(100% - 24px))}
+      .site-header__inner{flex-direction:column;align-items:stretch}
+      .brandmark{justify-content:center}
+      .header-nav,.header-actions{justify-content:center}
+      .section,.section-compact{padding:52px 0}
+      .hero{padding:18px 0 28px}
+      .hero-grid{padding:28px 20px;gap:20px}
+      .hero-title{font-size:42px}
+      .hero-copy p,.section-copy{font-size:16px}
+      .hero-proof,
+      .trust-grid,
+      .features-grid,
+      .pricing-grid,
+      .audience-grid,
+      .workflow-shell,
+      .contact-grid{grid-template-columns:1fr}
+      .section-heading{font-size:34px}
+      .cta-panel{padding:20px}
+      .footer-top{flex-direction:column}
+    }
+    @media (max-width: 540px){
+      .hero-title{font-size:36px}
+      .hero-actions .btn,.plan-actions .btn,.contact-actions .btn{width:100%}
+      .btn{min-height:48px}
+      .sticky-cta{display:flex}
     }
   </style>
 </head>
-
 <body>
-
-<header class="header">
-  <div class="container">
-    <div class="header-inner">
-      <div class="brand">
-        <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha" class="logo">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <div class="brandmark">
+        <img src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
       </div>
-
-      <div class="actions">
-        <a class="btn btn-ghost" href="{% url 'login' %}" data-i18n="login">Login</a>
+      <nav class="header-nav" aria-label="Primary">
+        <a class="nav-link" href="#who-it-is-for">Who It Is For</a>
+        <a class="nav-link" href="#capabilities">Capabilities</a>
+        <a class="nav-link" href="#pricing">Pricing</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="{% url 'login' %}" data-i18n="login">Login</a>
         <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="create_account">Create Account</a>
       </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<div class="container hero-wrap">
-  <div class="hero">
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-shell">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <span class="eyebrow" data-i18n="eyebrow">Built for wholesalers &amp; distributors</span>
+              <h1 class="hero-title" data-i18n="hero_title">Professional accounting and inventory control for serious trading businesses.</h1>
+              <p data-i18n="hero_sub">Roznamcha helps owners stay in control while staff handle daily entry. Record sales, purchases, stock, ledgers, and reports in one disciplined system built for traders, wholesalers, and distributors in Pakistan.</p>
 
-    <!-- Left -->
-    <div class="card">
-      <span class="eyebrow" data-i18n="eyebrow">Built for wholesalers & distributors</span>
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="cta_primary">Create Account</a>
+                <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
+                <button class="btn btn-dark" id="landingInstallBtn" type="button">Install Roznamcha App</button>
+              </div>
 
-      <h1 class="headline">
-        <span data-i18n="hero_title">Accounting &amp; Inventory Software for Traders and Wholesalers</span>
-      </h1>
+              <div class="install-help" id="installHelpBox" aria-live="polite">
+                <div class="install-help-title" id="installHelpTitle">Install Roznamcha</div>
+                <p class="install-help-text" id="installHelpText">To install Roznamcha, open your browser menu and choose the install option.</p>
+                <div class="install-help-actions">
+                  <button type="button" class="install-help-close" id="installHelpClose">Close</button>
+                </div>
+              </div>
 
-      <p class="subhead" data-i18n="hero_sub">
-        Staff at the counter, control in your hands.
-      </p>
+              <div class="hero-proof">
+                <div class="proof-card">
+                  <strong data-i18n="proof_1">Owner control</strong>
+                  <span>Staff can enter routine work, while owners keep control over sensitive actions and reporting.</span>
+                </div>
+                <div class="proof-card">
+                  <strong data-i18n="proof_2">Double-entry reporting</strong>
+                  <span>Trial Balance, Profit &amp; Loss, and Balance Sheet built from real posted entries.</span>
+                </div>
+                <div class="proof-card">
+                  <strong data-i18n="proof_3">Standardized exports</strong>
+                  <span>Download structured files and packs for consultants, reviews, and compliance workflows.</span>
+                </div>
+              </div>
 
-      <div class="micro-proof">
-        <span class="proof green" data-i18n="proof_1">✅ Owner controls edits (staff enters)</span>
-        <span class="proof blue" data-i18n="proof_2">📊 Double-entry reports (Trial Balance, P&L, Balance Sheet)</span>
-        <span class="proof orange" data-i18n="proof_3">🧾 Standardized Annex-C style exports</span>
-      </div>
+              <p class="hero-note" data-i18n="hero_note">Built for practical business use. Mobile-friendly, locally grounded, and supported through WhatsApp when your team needs help.</p>
+            </div>
 
-      <div class="cta-row">
-        <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="cta_primary">Create Account</a>
-        <button class="btn btn-install" id="landingInstallBtn" type="button">Install Roznamcha App</button>
-      </div>
-
-      <div class="install-help" id="installHelpBox" aria-live="polite">
-        <div class="install-help-title" id="installHelpTitle">Install Roznamcha</div>
-        <p class="install-help-text" id="installHelpText">
-          To install Roznamcha, open your browser menu and choose the install option.
-        </p>
-        <div class="install-help-actions">
-          <button type="button" class="install-help-close" id="installHelpClose">Close</button>
+            <aside class="hero-aside">
+              <div class="signal-card">
+                <h3>The owner stays informed.</h3>
+                <p>Roznamcha is designed for businesses where daily entry happens at the counter, but financial control stays with the owner.</p>
+                <ul class="signal-list">
+                  <li><span>•</span><span>Track sales, purchases, stock, customer balances, and supplier balances from one system.</span></li>
+                  <li><span>•</span><span>Maintain structured books instead of scattered registers, spreadsheets, and chat history.</span></li>
+                  <li><span>•</span><span>Move from daily uncertainty to reviewed ledgers and professionally presented reports.</span></li>
+                </ul>
+              </div>
+              <div class="metric-card">
+                <div class="metric-kicker">Business discipline</div>
+                <div class="metric-value">Daily entry. Clear books.</div>
+                <p class="metric-copy">A practical operating layer for Pakistani wholesale and distribution businesses that want cleaner records without enterprise complexity.</p>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
+    </section>
 
-      <p class="fineprint" data-i18n="hero_note">
-        Polished but locally grounded. Our team is available on WhatsApp to help with setup and daily use.
-      </p>
-    </div>
-
-    <!-- Right -->
-    <div class="panel">
-      <div class="mini">
-        <h3 data-i18n="panel_why_title">The 3-Layered Shield</h3>
-        <p data-i18n="panel_why_text">
-          Control (Security) → Protection (Compliance workflows) → Growth (Bank-ready reporting).
-          Roznamcha is the professional upgrade from handwritten notes to real accounting.
-        </p>
-
-        <ul class="list">
-          <li class="li">
-            <span class="dot"></span>
-            <span data-i18n="bullet_1"><strong>Control:</strong> activity logs + owner-level permissions (no silent edits).</span>
-          </li>
-          <li class="li">
-            <span class="dot orange"></span>
-            <span data-i18n="bullet_2"><strong>Protection:</strong> standardized exports for Pakistan compliance workflows.</span>
-          </li>
-          <li class="li">
-            <span class="dot green"></span>
-            <span data-i18n="bullet_3"><strong>Growth:</strong> audit-ready reports banks and partners respect.</span>
-          </li>
-        </ul>
-
-        <a class="btn btn-primary" href="#pricing" data-i18n="panel_btn">See Pricing</a>
+    <section class="section-compact">
+      <div class="container trust-grid">
+        <article class="rail-card">
+          <h3>Control at owner level</h3>
+          <p>Keep approvals, oversight, and important reports with the owner while staff continue routine entry.</p>
+        </article>
+        <article class="rail-card">
+          <h3>Serious reporting</h3>
+          <p>Use ledgers, Trial Balance, Profit &amp; Loss, and Balance Sheet to understand the business with more confidence.</p>
+        </article>
+        <article class="rail-card">
+          <h3>Compliance-ready exports</h3>
+          <p>Prepare standardized outputs for consultant review and regulatory workflows without retyping business records.</p>
+        </article>
+        <article class="rail-card">
+          <h3>Built for local trade</h3>
+          <p>Designed around the working reality of traders, wholesalers, distributors, and staff-operated counters in Pakistan.</p>
+        </article>
       </div>
+    </section>
 
-      <div class="mini">
-        <h3 data-i18n="panel_for_title">Made for real markets</h3>
-        <p data-i18n="panel_for_text">Fertilizers, pesticides, tools, general trade — with staff entry + owner oversight.</p>
-        <ul class="list">
-          <li class="li"><span class="dot green"></span><span data-i18n="for_1">Multi-device access (phone + laptop)</span></li>
-          <li class="li"><span class="dot"></span><span data-i18n="for_2">Fast daily entry: minimal clicks</span></li>
-          <li class="li"><span class="dot orange"></span><span data-i18n="for_3">Exports you can hand to a consultant</span></li>
-        </ul>
-      </div>
-    </div>
+    <section class="section" id="who-it-is-for">
+      <div class="container">
+        <p class="section-label">Who It Is For</p>
+        <h2 class="section-heading">For businesses that have outgrown notebooks, loose spreadsheets, and unclear stock.</h2>
+        <p class="section-copy">Roznamcha is positioned for owners who want better control over inventory, ledgers, and reporting without slowing down daily sales and purchase entry.</p>
 
-  </div>
-</div>
-
-<!-- HOOK / FEARS -->
-<div class="container section" id="features">
-  <div class="section-title" data-i18n="hook_title">What keeps owners worried</div>
-
-  <div class="grid2">
-    <div class="block">
-      <span class="kicker" data-i18n="fear_k1">🔒 CONTROL (Security)</span>
-      <h4 data-i18n="fear_1_title">Stop worrying about the counter</h4>
-      <p data-i18n="fear_1_text">Staff can enter sales/purchases — but owner controls edits and sensitive actions. Know who did what, and when.</p>
-    </div>
-
-    <div class="block" id="taxpack">
-      <span class="kicker" data-i18n="fear_k2">🧾 PROTECTION (Compliance workflows)</span>
-      <h4 data-i18n="fear_2_title">No more “surprise notice” fear</h4>
-      <p data-i18n="fear_2_text">Standardized exports & downloads (Level 1/2, per-file, full ZIP) so your data is prepared for professional portal workflows.</p>
-    </div>
-
-    <div class="block">
-      <span class="kicker" data-i18n="fear_k3">☁️ SAFETY (Data)</span>
-      <h4 data-i18n="fear_3_title">Your data is never hostage</h4>
-      <p data-i18n="fear_3_text">Controlled backups + multi-device access so business continues even if a phone is lost or replaced.</p>
-    </div>
-
-    <div class="block">
-      <span class="kicker" data-i18n="fear_k4">📉 CLARITY (Cash & Profit)</span>
-      <h4 data-i18n="fear_4_title">Fix cash drawer mismatches</h4>
-      <p data-i18n="fear_4_text">Real-time Profit & Loss and ledgers help you find leaks: expenses, bad debt, or pricing issues — early.</p>
-    </div>
-  </div>
-
-  <div class="section-title" style="margin-top:18px" data-i18n="features_title">Core capabilities</div>
-
-  <div class="grid3">
-    <div class="feature">
-      <div class="icon">🧾</div>
-      <h4 data-i18n="f1_title">Sales & Purchases</h4>
-      <p data-i18n="f1_text">Fast entry, clean lists, and proper posting that affects ledgers automatically.</p>
-    </div>
-
-    <div class="feature">
-      <div class="icon">👤</div>
-      <h4 data-i18n="f2_title">Customer & Supplier Ledgers</h4>
-      <p data-i18n="f2_text">Running balances, statements, and party-wise history — always updated.</p>
-    </div>
-
-    <div class="feature">
-      <div class="icon">📦</div>
-      <h4 data-i18n="f4_title">Stock & Product Reports</h4>
-      <p data-i18n="f4_text">Know what’s in stock and what moved today — with product ledger support.</p>
-    </div>
-
-    <div class="feature">
-      <div class="icon">⚖️</div>
-      <h4 data-i18n="f5_title">Audit-Ready Double-Entry Reports</h4>
-      <p data-i18n="f5_text">Trial Balance, Profit & Loss, Balance Sheet — built from real entries.</p>
-      <span class="pill-note" data-i18n="f5_note">Built for professional review</span>
-    </div>
-
-    <div class="feature">
-      <div class="icon">🛡️</div>
-      <h4 data-i18n="f6_title">Owner + Staff Controls</h4>
-      <p data-i18n="f6_text">Granular roles: staff enters, owner approves/controls sensitive actions.</p>
-      <span class="pill-note" data-i18n="f6_note">Activity log support</span>
-    </div>
-
-    <div class="feature">
-      <div class="icon">🧮</div>
-      <h4 data-i18n="f8_title">Tax Pack</h4>
-      <p data-i18n="f8_text">Standardized exports + downloads (Level 1 & 2, per-file, and full ZIP).</p>
-      <span class="pill-note" data-i18n="f8_note">Annex-C style structure</span>
-    </div>
-  </div>
-
-  <!-- Comparison -->
-  <div class="compare">
-    <div class="box">
-      <h4 data-i18n="cmp_left_title">Basic note-taking apps</h4>
-      <ul>
-        <li data-i18n="cmp_l1">Single-entry notes (easy to miss/fake)</li>
-        <li data-i18n="cmp_l2">Weak stock + weak reporting</li>
-        <li data-i18n="cmp_l3">No audit-ready statements</li>
-        <li data-i18n="cmp_l4">Everyone sees everything</li>
-      </ul>
-    </div>
-
-    <div class="box">
-      <h4 data-i18n="cmp_right_title">Roznamcha (Professional Upgrade)</h4>
-      <ul>
-        <li data-i18n="cmp_r1">Proper posting → ledgers & reports</li>
-        <li data-i18n="cmp_r2">Owner + staff permissions</li>
-        <li data-i18n="cmp_r3">Audit-ready Trial Balance / P&L / Balance Sheet</li>
-        <li data-i18n="cmp_r4">Standardized exports + downloads (Tax Pack)</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Bazaar workflow -->
-  <div class="grid2">
-    <div class="step">
-      <strong data-i18n="step1_title">1) Entry (Staff)</strong>
-      <p data-i18n="step1_text">Staff records sale/purchase. System posts it correctly so ledgers stay clean.</p>
-    </div>
-    <div class="step">
-      <strong data-i18n="step2_title">2) Control (Owner)</strong>
-      <p data-i18n="step2_text">Owner reviews summaries and makes sure cash collected matches the books.</p>
-    </div>
-    <div class="step">
-      <strong data-i18n="step3_title">3) Export (Tax Pack)</strong>
-      <p data-i18n="step3_text">Download standardized files/ZIP for your consultant — no manual retyping.</p>
-    </div>
-    <div class="step">
-      <strong data-i18n="step4_title">4) Growth (Bank-ready)</strong>
-      <p data-i18n="step4_text">Double-entry reporting supports financing and professional supplier/bank relationships.</p>
-    </div>
-  </div>
-
-</div>
-
-<!-- PRICING -->
-<div class="container section" id="pricing">
-  <div class="section-title" data-i18n="pricing_title">Pricing (Fixed fee, no surprises)</div>
-
-  <div class="pricing">
-    <div class="price-card">
-      <span class="badge" data-i18n="plan_monthly_badge">Wholesaler Plan (Monthly)</span>
-      <div class="price">Rs 1,000 <small data-i18n="per_month">/ month</small></div>
-      <div class="muted" data-i18n="plan_monthly_desc">No hidden charges. Owner + up to 3 Staff.</div>
-      <ul class="price-list">
-        <li><span class="tick">✅</span><span data-i18n="p1">Sales, Purchases, Stock, Ledgers</span></li>
-        <li><span class="tick">✅</span><span data-i18n="p2">Audit-ready Double-Entry Reports</span></li>
-        <li><span class="tick">✅</span><span data-i18n="p3">Tax Pack exports + downloads (Level 1/2 + ZIP)</span></li>
-        <li><span class="tick">✅</span><span data-i18n="p4">Owner + Staff controls</span></li>
-      </ul>
-      <div class="founder" data-i18n="founder_note">
-        Why Rs 1,000? We keep costs low so SMEs can go digital without “enterprise” pricing — no fancy offices, just solid workflows.
-      </div>
-      <div style="margin-top:14px;">
-        <a class="btn btn-primary" href="{% url 'signup' %}" style="width:100%;" data-i18n="pricing_cta">Create Account</a>
-      </div>
-    </div>
-
-    <div class="price-card">
-      <span class="badge" style="background:#ecfdf5;border-color:#a7f3d0;color:#065f46" data-i18n="plan_yearly_badge">Yearly (Best Value)</span>
-      <div class="price">Rs 9,000 <small data-i18n="per_year">/ year</small></div>
-      <div class="muted" data-i18n="plan_yearly_desc">25% discount — predictable cost for the full year.</div>
-      <ul class="price-list">
-        <li><span class="tick">✅</span><span data-i18n="y1">Save 25% vs monthly</span></li>
-        <li><span class="tick">✅</span><span data-i18n="y2">Best for compliance season peace of mind</span></li>
-        <li><span class="tick">✅</span><span data-i18n="y3">Same full features as monthly</span></li>
-        <li><span class="tick">✅</span><span data-i18n="y4">WhatsApp support available</span></li>
-      </ul>
-      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
-        <a class="btn btn-primary" href="{% url 'signup' %}" style="flex:1;" data-i18n="pricing_cta2">Start</a>
-        <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" style="flex:1;" data-i18n="pricing_wa">Chat on WhatsApp</a>
-      </div>
-
-      <!-- Anchor (trust builder) -->
-      <div class="legal" style="margin-top:12px;" data-i18n="anchor_note">
-        Optional future “Professional” plan (multi-branch / 10 staff) will be higher priced. Today’s plan is focused for wholesalers: control + reporting + exports.
-      </div>
-    </div>
-  </div>
-
-  <div class="legal" data-i18n="legal_note">
-    Roznamcha provides tools to facilitate record-keeping and standardized exports for Pakistan compliance workflows.
-    Final filing and compliance remain the responsibility of the business owner and their tax consultant.
-  </div>
-
-  <div class="bottom-cta">
-    <div>
-      <strong data-i18n="bottom_title">Start in minutes</strong><br>
-      <span data-i18n="bottom_text">Create your company and begin entering sales/purchases today.</span>
-    </div>
-    <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="bottom_btn">Create Account</a>
-  </div>
-</div>
-
-<!-- CONTACT / ABOUT -->
-<div class="container section" id="contact">
-  <div class="section-title" data-i18n="contact_title">About & Contact</div>
-
-  <div class="grid2">
-    <div class="box">
-      <h4 data-i18n="about_title">Built for Pakistan's wholesale markets</h4>
-      <p class="muted" data-i18n="about_text">
-        Polished but locally grounded. We understand how wholesale trade works on the ground and how professional accounting should support it.
-        Roznamcha is designed for wholesalers who want control, clean reporting, and professional exports without slow “enterprise” complexity.
-      </p>
-    </div>
-
-    <div class="box">
-      <h4 data-i18n="support_title">Support</h4>
-      <p class="muted" data-i18n="support_text">
-        Our team is available on WhatsApp to help with setup, daily workflow, and exports.
-      </p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
-        <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" style="flex:1;" data-i18n="support_wa">WhatsApp</a>
-        <a class="btn" href="mailto:app.roznamcha@gmail.com" style="flex:1;">Email</a>
-        <a class="btn" href="tel:+923495952363" style="flex:1;">Call</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <section class="solutions-strip" aria-labelledby="explore-solutions-title">
-    <h3 id="explore-solutions-title">Explore Solutions</h3>
-    <div class="solutions-links">
-      <a href="/accounting-software-for-traders/">Accounting Software for Traders</a>
-      <a href="/inventory-software-for-wholesalers/">Inventory Software for Wholesalers</a>
-      <a href="/wholesale-accounting-software/">Wholesale Accounting Software</a>
-      <a href="/ledger-software/">Ledger Software</a>
-      <a href="/small-business-accounting-software/">Small Business Accounting Software</a>
-    </div>
-  </section>
-</div>
-
-<!-- Footer -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <div class="footer-title" data-i18n="footer_title">Roznamcha — Smart Accounting System</div>
-        <div class="footer-sub" data-i18n="footer_addr">
-          Office No. 7, 2nd Floor, Shaheen View,<br>
-          Model Town, Quetta Cantt
-        </div>
-        <div class="footer-bottom">
-          © {% now "Y" %} Roznamcha. All rights reserved.
+        <div class="who-layout">
+          <div class="signal-card">
+            <h3>Practical fit for the market.</h3>
+            <p>Suitable for fertilizer dealers, pesticide and agri-input businesses, hardware and tools traders, general wholesalers, and distributors managing staff-led counter work.</p>
+            <ul class="signal-list">
+              <li><span>•</span><span>One owner with multiple staff users</span></li>
+              <li><span>•</span><span>Fast daily entry with reviewable financial outputs</span></li>
+              <li><span>•</span><span>Professional records for banks, consultants, and internal clarity</span></li>
+            </ul>
+          </div>
+          <div class="audience-grid">
+            <article class="audience-card">
+              <h3>Wholesalers</h3>
+              <p>Monitor stock movement, party ledgers, margin visibility, and end-of-day summaries without losing speed at the counter.</p>
+              <ul class="audience-list">
+                <li><span>•</span><span>Bulk stock visibility</span></li>
+                <li><span>•</span><span>Party balances and statements</span></li>
+                <li><span>•</span><span>Reliable reporting for business review</span></li>
+              </ul>
+            </article>
+            <article class="audience-card">
+              <h3>Distributors</h3>
+              <p>Keep daily sales and purchases organized while maintaining cleaner records for vendor relationships and financial oversight.</p>
+              <ul class="audience-list">
+                <li><span>•</span><span>Daily transaction discipline</span></li>
+                <li><span>•</span><span>Supplier and customer tracking</span></li>
+                <li><span>•</span><span>Operational clarity across devices</span></li>
+              </ul>
+            </article>
+            <article class="audience-card">
+              <h3>Trading businesses</h3>
+              <p>Move from ad hoc bookkeeping to a structured accounting and inventory workflow that can actually be reviewed.</p>
+              <ul class="audience-list">
+                <li><span>•</span><span>Sales and purchase records that stay connected</span></li>
+                <li><span>•</span><span>Cash, expense, and ledger visibility</span></li>
+                <li><span>•</span><span>Less dependence on memory and manual checking</span></li>
+              </ul>
+            </article>
+            <article class="audience-card">
+              <h3>Owner-led teams</h3>
+              <p>Give staff a cleaner daily-entry interface while retaining owner control over the parts that carry financial risk.</p>
+              <ul class="audience-list">
+                <li><span>•</span><span>Role-based use</span></li>
+                <li><span>•</span><span>Operational oversight</span></li>
+                <li><span>•</span><span>Stronger accountability</span></li>
+              </ul>
+            </article>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="footer-links">
-        <a href="mailto:app.roznamcha@gmail.com">✉️ app.roznamcha@gmail.com</a>
-        <a href="https://wa.me/923495952363" target="_blank" rel="noopener">💬 WhatsApp: +92 349 5952363</a>
-        <a href="tel:+923495952363">📞 +92 349 5952363</a>
+    <section class="section" id="capabilities">
+      <div class="container">
+        <p class="section-label">Key Capabilities</p>
+        <h2 class="section-heading">A cleaner operating system for daily trade, stock control, and financial review.</h2>
+        <p class="section-copy">The product message is straightforward: faster daily entry for staff, stronger control for owners, and records that stand up better when the business needs review, reporting, or export.</p>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">🧾</div>
+            <h3>Sales and purchases</h3>
+            <p>Enter transactions quickly and keep records aligned with ledgers and inventory instead of maintaining separate notes.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">📦</div>
+            <h3>Inventory awareness</h3>
+            <p>Know what stock is available, what moved, and how product activity is affecting the business day to day.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>Customer and supplier ledgers</h3>
+            <p>Keep receivable and payable positions visible with cleaner histories, running balances, and statements.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">⚖️</div>
+            <h3>Double-entry reports</h3>
+            <p>Review Trial Balance, Profit &amp; Loss, and Balance Sheet from structured postings rather than reconstructed data.</p>
+            <span class="feature-tag">Built for serious review</span>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Owner and staff controls</h3>
+            <p>Support staff-friendly entry without giving away full control over edits, approvals, and sensitive actions.</p>
+            <span class="feature-tag">Owner-led discipline</span>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🗂️</div>
+            <h3>Standardized exports</h3>
+            <p>Prepare structured files and packs that can be handed to a consultant instead of rebuilding data outside the system.</p>
+            <span class="feature-tag">Compliance workflows</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-compact">
+      <div class="container">
+        <p class="section-label">How Roznamcha Helps</p>
+        <h2 class="section-heading">The workflow stays simple, but the books become more dependable.</h2>
+        <p class="section-copy">The value is not in visual gimmicks. It is in making routine business work more consistent, reviewable, and professional.</p>
+
+        <div class="workflow-shell">
+          <article class="workflow-step">
+            <small>Step 01</small>
+            <h3>Daily entry</h3>
+            <p>Staff record sales and purchases without needing separate registers, side notes, or WhatsApp reminders.</p>
+          </article>
+          <article class="workflow-step">
+            <small>Step 02</small>
+            <h3>Owner review</h3>
+            <p>Owners check summaries, balances, and reports with more confidence because records are structured consistently.</p>
+          </article>
+          <article class="workflow-step">
+            <small>Step 03</small>
+            <h3>Exports and packs</h3>
+            <p>When a consultant or compliance workflow needs business data, the system can produce cleaner standardized outputs.</p>
+          </article>
+          <article class="workflow-step">
+            <small>Step 04</small>
+            <h3>Business seriousness</h3>
+            <p>Clearer books support better control, better conversations with banks and suppliers, and fewer surprises in review season.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing">
+      <div class="container">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-heading">Straightforward pricing for operational software, not enterprise theatre.</h2>
+        <p class="section-copy">The current offer is intentionally simple: one business owner, up to three staff users, and the workflows wholesalers need most.</p>
+
+        <div class="pricing-grid">
+          <article class="pricing-card">
+            <span class="plan-badge" data-i18n="plan_monthly_badge">Monthly Plan</span>
+            <div class="plan-price">Rs 1,000 <small data-i18n="per_month">/ month</small></div>
+            <p class="plan-copy" data-i18n="plan_monthly_desc">Owner + up to 3 staff users with the core accounting, inventory, reporting, and export workflows.</p>
+            <ul class="plan-list">
+              <li><span>•</span><span>Sales, purchases, stock, and ledgers</span></li>
+              <li><span>•</span><span>Double-entry reports for review</span></li>
+              <li><span>•</span><span>Tax Pack exports and structured downloads</span></li>
+              <li><span>•</span><span>Owner + staff operating model</span></li>
+            </ul>
+            <div class="plan-note" data-i18n="founder_note">The pricing is kept restrained so small and mid-sized trading businesses can adopt disciplined software without enterprise-level cost pressure.</div>
+            <div class="plan-actions">
+              <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="pricing_cta">Create Account</a>
+            </div>
+          </article>
+
+          <article class="pricing-card pricing-card--featured">
+            <span class="plan-badge" data-i18n="plan_yearly_badge">Yearly Plan</span>
+            <div class="plan-price">Rs 9,000 <small data-i18n="per_year">/ year</small></div>
+            <p class="plan-copy" data-i18n="plan_yearly_desc">Lower annual cost for businesses that want a cleaner commitment and a predictable operating setup for the full year.</p>
+            <ul class="plan-list">
+              <li><span>•</span><span>25% lower than paying monthly all year</span></li>
+              <li><span>•</span><span>Same complete feature coverage</span></li>
+              <li><span>•</span><span>Useful for businesses that want continuity through filing and review periods</span></li>
+              <li><span>•</span><span>WhatsApp support remains available</span></li>
+            </ul>
+            <div class="plan-actions">
+              <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="pricing_cta2">Start</a>
+              <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="pricing_wa">Chat on WhatsApp</a>
+            </div>
+            <div class="plan-legal" data-i18n="legal_note">Roznamcha provides tools for accounting records, exports, and workflow preparation. Final filing and compliance remain the responsibility of the business owner and their consultant.</div>
+          </article>
+        </div>
+
+        <div class="cta-panel">
+          <div>
+            <strong data-i18n="bottom_title">Start with a cleaner system now.</strong>
+            <span data-i18n="bottom_text">Create your company, add staff if needed, and begin recording sales and purchases with better control.</span>
+          </div>
+          <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="bottom_btn">Create Account</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-compact" id="contact">
+      <div class="container contact-grid">
+        <article class="contact-card">
+          <p class="section-label" data-i18n="about_title">About Roznamcha</p>
+          <h3>Grounded in how Pakistani wholesale businesses actually operate.</h3>
+          <p data-i18n="about_text">Roznamcha is positioned as serious business software for traders, wholesalers, and distributors who want more control, more reliable reporting, and less dependence on scattered manual systems.</p>
+        </article>
+        <article class="contact-card">
+          <p class="section-label" data-i18n="support_title">Support</p>
+          <h3>Direct help when your team needs it.</h3>
+          <p data-i18n="support_text">If you need guidance on setup, daily entry, or structured exports, the support channels stay straightforward and accessible.</p>
+          <div class="contact-actions">
+            <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="support_wa">WhatsApp</a>
+            <a class="btn btn-secondary" href="mailto:app.roznamcha@gmail.com">Email</a>
+            <a class="btn btn-secondary" href="tel:+923495952363">Call</a>
+          </div>
+        </article>
       </div>
 
-      <div class="footer-links">
-        <a href="{% url 'privacy_policy' %}" data-i18n="privacy">Privacy Policy</a>
-        <a href="{% url 'terms_conditions' %}" data-i18n="terms">Terms &amp; Conditions</a>
-        <a href="{% url 'refund_policy' %}" data-i18n="refund">Refund Policy</a>
-        <a href="{% url 'service_policy' %}" data-i18n="service">Service Policy</a>
+      <div class="container">
+        <section class="solutions-strip" aria-labelledby="explore-solutions-title">
+          <h3 id="explore-solutions-title">Explore Solutions</h3>
+          <div class="solutions-links">
+            <a href="/accounting-software-for-traders/">Accounting Software for Traders</a>
+            <a href="/inventory-software-for-wholesalers/">Inventory Software for Wholesalers</a>
+            <a href="/wholesale-accounting-software/">Wholesale Accounting Software</a>
+            <a href="/ledger-software/">Ledger Software</a>
+            <a href="/small-business-accounting-software/">Small Business Accounting Software</a>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-card">
+        <div class="footer-top">
+          <div>
+            <p class="footer-title" data-i18n="footer_title">Roznamcha — Smart Accounting System</p>
+            <p class="footer-brandline">Accounting and inventory control for serious trading businesses.</p>
+            <p class="footer-copy" data-i18n="footer_addr">Office No. 7, 2nd Floor, Shaheen View,<br>Model Town, Quetta Cantt</p>
+          </div>
+          <div class="footer-links">
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'terms_conditions' %}">Terms &amp; Conditions</a>
+            <a href="{% url 'refund_policy' %}">Refund Policy</a>
+            <a href="{% url 'service_policy' %}">Service Policy</a>
+          </div>
+        </div>
+        <div class="footer-bottom">© {% now "Y" %} Roznamcha. All rights reserved.</div>
       </div>
     </div>
+  </footer>
+
+  <div class="sticky-cta" aria-label="Quick actions">
+    <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
+    <a class="btn btn-primary" href="{% url 'signup' %}">Create Account</a>
   </div>
-</footer>
 
-<!-- Sticky CTA (mobile) -->
-<div class="sticky-cta" aria-label="Quick actions">
-  <a class="btn btn-wa" href="https://wa.me/923495952363" target="_blank" rel="noopener" data-i18n="sticky_wa">WhatsApp</a>
-  <a class="btn btn-primary" href="{% url 'signup' %}" data-i18n="sticky_start">Create Account</a>
-</div>
+  <script>
+    (function(){
+      const installBtn = document.getElementById('landingInstallBtn');
+      const helpBox = document.getElementById('installHelpBox');
+      const helpTitle = document.getElementById('installHelpTitle');
+      const helpText = document.getElementById('installHelpText');
+      const helpClose = document.getElementById('installHelpClose');
+      let deferredPrompt = null;
+      let installReady = false;
 
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("{% url 'service_worker' %}")
-        .catch(function (err) {
-          console.log("SW registration failed:", err);
-        });
-    });
-  }
-</script>
+      function openInstallHelp(title, text){
+        if (!helpBox) return;
+        if (helpTitle && title) helpTitle.textContent = title;
+        if (helpText && text) helpText.textContent = text;
+        helpBox.classList.add('is-open');
+      }
 
-<script>
-  (function () {
-    let deferredPrompt = null;
-    const btn = document.getElementById("landingInstallBtn");
-    const helpBox = document.getElementById("installHelpBox");
-    const helpTitle = document.getElementById("installHelpTitle");
-    const helpText = document.getElementById("installHelpText");
-    const helpClose = document.getElementById("installHelpClose");
-    if (!btn) return;
+      function closeInstallHelp(){
+        if (!helpBox) return;
+        helpBox.classList.remove('is-open');
+      }
 
-    function isStandaloneMode() {
-      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-    }
+      function setInstallButton(enabled, label){
+        if (!installBtn) return;
+        installBtn.disabled = !enabled;
+        installBtn.textContent = label;
+        installBtn.style.opacity = enabled ? '1' : '.75';
+        installBtn.style.cursor = enabled ? 'pointer' : 'default';
+      }
 
-    async function isAppInstalled() {
-      if (isStandaloneMode()) return true;
+      function isStandalone(){
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      }
 
-      if (navigator.getInstalledRelatedApps) {
+      async function hasInstalledRelatedApps(){
+        if (!('getInstalledRelatedApps' in navigator)) return false;
         try {
-          const related = await navigator.getInstalledRelatedApps();
-          if (related && related.length > 0) return true;
-        } catch (e) {
-          // ignore
+          const relatedApps = await navigator.getInstalledRelatedApps();
+          return Array.isArray(relatedApps) && relatedApps.length > 0;
+        } catch (error) {
+          return false;
         }
       }
 
-      return false;
-    }
+      async function refreshInstallState(){
+        if (!installBtn) return;
 
-    function isMobileDevice() {
-      return /android|iphone|ipad|ipod/i.test(navigator.userAgent || "");
-    }
+        if (isStandalone()) {
+          setInstallButton(false, 'Roznamcha Installed');
+          openInstallHelp('Roznamcha Installed', 'Roznamcha is already installed on this device. Open it from your home screen or app list.');
+          return;
+        }
 
-    function closeHelpBox() {
-      if (helpBox) helpBox.classList.remove("is-open");
-    }
+        if (await hasInstalledRelatedApps()) {
+          setInstallButton(false, 'Roznamcha Installed');
+          openInstallHelp('Roznamcha Installed', 'Roznamcha already appears as an installed app for this account or device.');
+          return;
+        }
 
-    function openHelpBox() {
-      if (!helpBox || !helpTitle || !helpText) return;
+        if (installReady && deferredPrompt) {
+          setInstallButton(true, 'Install Roznamcha App');
+          closeInstallHelp();
+          return;
+        }
 
-      if (isMobileDevice()) {
-        helpTitle.textContent = "Install on your phone";
-        helpText.textContent = "To install Roznamcha on your phone, open the browser menu and tap Add to Home Screen.";
-      } else {
-        helpTitle.textContent = "Install on desktop";
-        helpText.textContent = "To install Roznamcha on desktop, open your browser menu and choose Install Roznamcha.";
+        const isiOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+        if (isiOS) {
+          setInstallButton(true, 'How to Install on iPhone');
+          return;
+        }
+
+        setInstallButton(true, 'How to Install Roznamcha');
       }
 
-      helpBox.classList.add("is-open");
-    }
+      window.addEventListener('beforeinstallprompt', function(event){
+        event.preventDefault();
+        deferredPrompt = event;
+        installReady = true;
+        refreshInstallState();
+      });
 
-    async function syncInstallButton() {
-      const installed = await isAppInstalled();
-      if (installed) {
-        btn.style.display = "none";
-        closeHelpBox();
-        return;
-      }
-      btn.style.display = "inline-flex";
-    }
+      window.addEventListener('appinstalled', function(){
+        deferredPrompt = null;
+        installReady = false;
+        refreshInstallState();
+      });
 
-    document.addEventListener("DOMContentLoaded", syncInstallButton);
-
-    window.addEventListener("beforeinstallprompt", async (e) => {
-      const installed = await isAppInstalled();
-      if (installed) return;
-
-      e.preventDefault();
-      deferredPrompt = e;
-      syncInstallButton();
-    });
-
-    window.addEventListener("appinstalled", () => {
-      deferredPrompt = null;
-      btn.style.display = "none";
-      closeHelpBox();
-    });
-
-    if (helpClose) {
-      helpClose.addEventListener("click", closeHelpBox);
-    }
-
-    btn.addEventListener("click", async () => {
-      if (!deferredPrompt) {
-        openHelpBox();
-        return;
+      if (helpClose) {
+        helpClose.addEventListener('click', closeInstallHelp);
       }
 
-      closeHelpBox();
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      syncInstallButton();
-    });
-  })();
-</script>
+      if (installBtn) {
+        installBtn.addEventListener('click', async function(){
+          const isiOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 
+          if (installReady && deferredPrompt) {
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            installReady = false;
+            if (choice && choice.outcome === 'accepted') {
+              openInstallHelp('Install Requested', 'Roznamcha is being added to your device. If prompted again, confirm the installation.');
+            } else {
+              openInstallHelp('Install Not Confirmed', 'You can install Roznamcha later from this button or your browser menu.');
+            }
+            refreshInstallState();
+            return;
+          }
+
+          if (isiOS) {
+            openInstallHelp('Install on iPhone or iPad', 'Open Safari share menu, scroll down, and tap “Add to Home Screen”, then confirm.');
+            return;
+          }
+
+          openInstallHelp('Install Roznamcha', 'Open your browser menu and choose “Install app”, “Add to Home screen”, or “Install Roznamcha” if the prompt does not appear automatically.');
+        });
+      }
+
+      refreshInstallState();
+    })();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('{% url "service_worker" %}').catch(function(err) {
+          console.log('Service worker registration failed:', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
