@@ -317,6 +317,12 @@
       gap:16px;
       margin-bottom:20px;
     }
+    .breakdown-stack{
+      display:grid;
+      grid-template-columns:minmax(0,1fr);
+      gap:16px;
+      margin-bottom:20px;
+    }
     .report-table{
       width:100%;
       border-collapse:collapse;
@@ -358,23 +364,26 @@
     }
     .report-table.performance-table th,
     .report-table.performance-table td{
-      padding-top:11px;
-      padding-bottom:11px;
+      padding-top:13px;
+      padding-bottom:13px;
     }
     .report-table.performance-table th:first-child,
     .report-table.performance-table td:first-child{
-      width:24%;
-      padding-right:10px;
+      width:34%;
+      padding-right:14px;
     }
     .report-table.performance-table th:not(:first-child),
     .report-table.performance-table td:not(:first-child){
       text-align:right;
       white-space:nowrap;
     }
-    .report-table.performance-table th:last-child,
+    .report-table.performance-table th:last-child{
+      width:14%;
+      text-align:center;
+    }
     .report-table.performance-table td:last-child{
-      text-align:left;
-      white-space:normal;
+      text-align:center;
+      white-space:nowrap;
     }
     .product-cell{
       white-space:normal;
@@ -396,6 +405,7 @@
       align-items:center;
       justify-content:center;
       padding:4px 10px;
+      max-width:100%;
       border-radius:999px;
       font-size:12px;
       font-weight:700;
@@ -734,7 +744,7 @@
       <div class="opr-card-sub">Detail behind the operational totals shown above.</div>
     </div>
 
-    <div class="breakdown-grid">
+    <div class="breakdown-stack">
       <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
         <div class="opr-card-title" style="margin-bottom:10px;">Product Performance</div>
         {% if top_profitable_products %}
@@ -743,8 +753,6 @@
               <tr>
                 <th>Product</th>
                 <th>Revenue</th>
-                <th>Return %</th>
-                <th>COGS</th>
                 <th>Profit</th>
                 <th>Margin %</th>
                 <th>Qty Sold</th>
@@ -757,8 +765,6 @@
                 <tr>
                   <td class="product-cell">{{ row.product_name }}</td>
                   <td><span class="money-cell">PKR {{ row.sales_revenue|floatformat:"-2"|intcomma }}</span></td>
-                  <td>{% if row.return_rate_pct != None %}{{ row.return_rate_pct|floatformat:1 }}%{% else %}<span class="muted-cell">—</span>{% endif %}</td>
-                  <td>{% if row.cogs != None %}<span class="money-cell">PKR {{ row.cogs|floatformat:"-2"|intcomma }}</span>{% else %}<span class="muted-cell">—</span>{% endif %}</td>
                   <td>{% if row.gross_profit != None %}<span class="money-cell">PKR {{ row.gross_profit|floatformat:"-2"|intcomma }}</span>{% else %}<span class="muted-cell">—</span>{% endif %}</td>
                   <td>{% if row.gross_margin_pct != None %}{{ row.gross_margin_pct|floatformat:1 }}%{% else %}<span class="muted-cell">—</span>{% endif %}</td>
                   <td>{{ row.qty_sold|floatformat:3 }}</td>
@@ -776,9 +782,17 @@
           <div class="table-empty">No data available for this period.</div>
         {% endif %}
       </div>
+    </div>
+  </div>
 
+  <div class="opr-card">
+    <div class="opr-card-head">
+      <div class="opr-card-title">Expense Breakdown</div>
+      <div class="opr-card-sub">Operating expense categories recorded during the selected period.</div>
+    </div>
+
+    <div class="breakdown-stack">
       <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
-        <div class="opr-card-title" style="margin-bottom:10px;">Expense Breakdown</div>
         {% if expense_breakdown %}
           <table class="report-table">
             <thead>
