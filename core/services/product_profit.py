@@ -57,6 +57,7 @@ class ProductValuationState:
     gross_profit: Decimal = MONEY_ZERO
     confidence_label: str = CONFIDENCE_HIGH
     flags: set[str] = field(default_factory=set)
+    has_period_activity: bool = False
 
     def average_cost(self) -> Optional[Decimal]:
         if self.running_qty > 0:
@@ -334,6 +335,9 @@ def _apply_movement(
     *,
     in_period: bool,
 ) -> None:
+    if in_period:
+        state.has_period_activity = True
+
     if movement.movement_type == "PURCHASE":
         if "charge allocation unresolved" in movement.reference:
             state.mark_estimated("purchase_charge_allocation_unresolved")
@@ -447,7 +451,7 @@ def build_product_profit_summaries(owner, date_from, date_to) -> List[Dict[str, 
                 state.opening_qty = state.running_qty
                 state.opening_value = state.running_inventory_value
 
-        if state.sales_revenue == MONEY_ZERO and state.qty_sold == QTY_ZERO and state.cogs == MONEY_ZERO:
+        if not state.has_period_activity:
             continue
 
         summaries.append(_finalize_summary(state))
@@ -455,7 +459,7 @@ def build_product_profit_summaries(owner, date_from, date_to) -> List[Dict[str, 
     return summaries
 
 
-def get_top_profitable_products(owner, date_from, date_to, limit: int = 10):
+def get_top_profitable_products(owner, date_from, date_to, limit: Optional[int] = None):
     summaries = build_product_profit_summaries(owner, date_from, date_to)
     ranked = sorted(
         summaries,
@@ -465,6 +469,8 @@ def get_top_profitable_products(owner, date_from, date_to, limit: int = 10):
         ),
         reverse=True,
     )
+    if limit is None:
+        return ranked
     return ranked[:limit]
 
 

@@ -3031,7 +3031,7 @@ def profit_loss(request):
     date_from, date_to = _get_date_range(request)
     owner = request.owner
     current_metrics = get_operational_profit(owner, date_from, date_to)
-    top_profitable_products = get_top_profitable_products(owner, date_from, date_to, limit=10)
+    top_profitable_products = get_top_profitable_products(owner, date_from, date_to, limit=None)
     current_period_days = (date_to - date_from).days
     previous_date_to = date_from - timedelta(days=1)
     previous_date_from = previous_date_to - timedelta(days=current_period_days)

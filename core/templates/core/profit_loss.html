@@ -378,11 +378,10 @@
       white-space:nowrap;
     }
     .report-table.performance-table th:last-child{
-      width:14%;
-      text-align:center;
+      text-align:right;
     }
     .report-table.performance-table td:last-child{
-      text-align:center;
+      text-align:right;
       white-space:nowrap;
     }
     .product-cell{
@@ -399,33 +398,6 @@
     .muted-cell{
       color:var(--slate-500);
       white-space:nowrap;
-    }
-    .confidence-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:4px 10px;
-      max-width:100%;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      border:1px solid var(--slate-200);
-      white-space:nowrap;
-    }
-    .confidence-chip.high{
-      background:#dcfce7;
-      border-color:#86efac;
-      color:#166534;
-    }
-    .confidence-chip.estimated{
-      background:#ffedd5;
-      border-color:#fdba74;
-      color:#9a3412;
-    }
-    .confidence-chip.incomplete{
-      background:#fee2e2;
-      border-color:#fca5a5;
-      color:#991b1b;
     }
     .summary-table{
       width:100%;
@@ -757,7 +729,6 @@
                 <th>Margin %</th>
                 <th>Qty Sold</th>
                 <th>Avg Price</th>
-                <th>Confidence</th>
               </tr>
             </thead>
             <tbody>
@@ -769,11 +740,6 @@
                   <td>{% if row.gross_margin_pct != None %}{{ row.gross_margin_pct|floatformat:1 }}%{% else %}<span class="muted-cell">—</span>{% endif %}</td>
                   <td>{{ row.qty_sold|floatformat:3 }}</td>
                   <td>{% if row.avg_selling_price != None %}<span class="money-cell">PKR {{ row.avg_selling_price|floatformat:"-2"|intcomma }}</span>{% else %}<span class="muted-cell">—</span>{% endif %}</td>
-                  <td>
-                    <span class="confidence-chip {% if row.confidence_label == 'High Confidence' %}high{% elif row.confidence_label == 'Estimated' %}estimated{% else %}incomplete{% endif %}">
-                      {{ row.confidence_label }}
-                    </span>
-                  </td>
                 </tr>
               {% endfor %}
             </tbody>
