@@ -94,6 +94,7 @@ from .services.ledger import (
     get_party_ledger,
     get_trial_balance,
 )
+from .services.product_profit import get_top_profitable_products
 
 # =========================
 # Tenant utilities
@@ -3030,6 +3031,7 @@ def profit_loss(request):
     date_from, date_to = _get_date_range(request)
     owner = request.owner
     current_metrics = get_operational_profit(owner, date_from, date_to)
+    top_profitable_products = get_top_profitable_products(owner, date_from, date_to, limit=10)
     current_period_days = (date_to - date_from).days
     previous_date_to = date_from - timedelta(days=1)
     previous_date_from = previous_date_to - timedelta(days=current_period_days)
@@ -3534,6 +3536,7 @@ def profit_loss(request):
         "summary_chart_data": summary_chart_data,
         "trend_chart_data": trend_chart_data,
         "top_selling_products": top_selling_products,
+        "top_profitable_products": top_profitable_products,
         "purchase_basis_by_product": purchase_basis_by_product,
         "expense_breakdown": expense_breakdown,
         "stock_writeoff_breakdown": stock_writeoff_breakdown,

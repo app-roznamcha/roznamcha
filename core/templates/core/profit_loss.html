@@ -733,6 +733,44 @@
       </div>
 
       <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
+        <div class="opr-card-title" style="margin-bottom:10px;">Top Profitable Products</div>
+        {% if top_profitable_products %}
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Sales Revenue</th>
+                <th>COGS</th>
+                <th>Gross Profit</th>
+                <th>Gross Margin %</th>
+                <th>Qty Sold</th>
+                <th>Avg Selling Price</th>
+                <th>Avg Cost</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in top_profitable_products %}
+                <tr>
+                  <td>{{ row.product_name }}</td>
+                  <td>PKR {{ row.sales_revenue|floatformat:"-2"|intcomma }}</td>
+                  <td>{% if row.cogs != None %}PKR {{ row.cogs|floatformat:"-2"|intcomma }}{% else %}<span class="table-note">Incomplete</span>{% endif %}</td>
+                  <td>{% if row.gross_profit != None %}PKR {{ row.gross_profit|floatformat:"-2"|intcomma }}{% else %}<span class="table-note">Incomplete</span>{% endif %}</td>
+                  <td>{% if row.gross_margin_pct != None %}{{ row.gross_margin_pct|floatformat:2 }}%{% else %}<span class="table-note">Incomplete</span>{% endif %}</td>
+                  <td>{{ row.qty_sold|floatformat:3 }}</td>
+                  <td>{% if row.avg_selling_price != None %}PKR {{ row.avg_selling_price|floatformat:"-2"|intcomma }}{% else %}<span class="table-note">-</span>{% endif %}</td>
+                  <td>{% if row.avg_cost != None %}PKR {{ row.avg_cost|floatformat:"-2"|intcomma }}{% else %}<span class="table-note">Incomplete</span>{% endif %}</td>
+                  <td>{{ row.confidence_label }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="table-empty">No data available for this period.</div>
+        {% endif %}
+      </div>
+
+      <div class="opr-card" style="margin-bottom:0;box-shadow:none;">
         <div class="opr-card-title" style="margin-bottom:10px;">Expense Breakdown</div>
         {% if expense_breakdown %}
           <table class="report-table">
