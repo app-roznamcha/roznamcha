@@ -50,6 +50,8 @@ class ProductValuationState:
     opening_qty: Decimal = QTY_ZERO
     opening_value: Decimal = MONEY_ZERO
     qty_sold: Decimal = QTY_ZERO
+    gross_sales_revenue: Decimal = MONEY_ZERO
+    sales_return_revenue: Decimal = MONEY_ZERO
     sales_revenue: Decimal = MONEY_ZERO
     cogs: Decimal = MONEY_ZERO
     gross_profit: Decimal = MONEY_ZERO
@@ -356,6 +358,7 @@ def _apply_movement(
         cogs_value = _consume_sale_cost(state, movement.qty_out)
         if in_period:
             state.qty_sold += movement.qty_out
+            state.gross_sales_revenue += movement.revenue_value
             state.sales_revenue += movement.revenue_value
             state.cogs += cogs_value
             state.gross_profit += movement.revenue_value - cogs_value
@@ -372,6 +375,7 @@ def _apply_movement(
         state.running_inventory_value += reversal_cost
         if in_period:
             state.qty_sold -= movement.qty_in
+            state.sales_return_revenue += abs(movement.revenue_value)
             state.sales_revenue += movement.revenue_value
             state.cogs -= reversal_cost
             state.gross_profit += movement.revenue_value + reversal_cost
@@ -403,6 +407,13 @@ def _finalize_summary(state: ProductValuationState) -> Dict[str, Optional[Decima
         "product_code": state.product.code,
         "product_name": f"{state.product.code} - {state.product.name}",
         "qty_sold": state.qty_sold,
+        "gross_sales_revenue": state.gross_sales_revenue,
+        "sales_return_revenue": state.sales_return_revenue,
+        "return_rate_pct": (
+            (state.sales_return_revenue / state.gross_sales_revenue) * Decimal("100")
+            if state.gross_sales_revenue > MONEY_ZERO
+            else None
+        ),
         "sales_revenue": state.sales_revenue,
         "cogs": cogs,
         "gross_profit": gross_profit,
