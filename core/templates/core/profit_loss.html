@@ -531,7 +531,12 @@
     </div>
   </div>
   <div class="opr-note" style="margin-top:-6px;">
-    <strong>Note:</strong> Profit is based on actual cost of goods sold (inventory-aware).
+    <strong>Note:</strong> Headline profit and the daily profit trend use actual cost of goods sold (inventory-aware).
+    {% if estimated_products_count or incomplete_products_count %}
+      Some product rows may be estimated or incomplete.
+      {% if estimated_products_count %}Estimated: <strong>{{ estimated_products_count }}</strong>.{% endif %}
+      {% if incomplete_products_count %}Incomplete: <strong>{{ incomplete_products_count }}</strong>.{% endif %}
+    {% endif %}
   </div>
 
   {% if comparison_enabled %}
@@ -689,7 +694,7 @@
     </div>
 
     <div class="opr-card">
-      <div class="opr-card-title" style="margin-bottom:10px;">Cost</div>
+      <div class="opr-card-title" style="margin-bottom:10px;">Operational Summary</div>
       <table class="summary-table">
         <tr>
           <td>Purchases During Period</td>

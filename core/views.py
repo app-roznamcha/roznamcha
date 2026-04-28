@@ -3063,6 +3063,8 @@ def profit_loss(request):
     operating_expenses = current_metrics["operating_expenses"]
     stock_writeoff_expense = current_metrics["stock_writeoff_expense"]
     net_profit = current_metrics["net_profit"]
+    incomplete_products_count = current_metrics["incomplete_products_count"]
+    estimated_products_count = current_metrics["estimated_products_count"]
 
     zero = Decimal("0.00")
     money_field = DecimalField(max_digits=18, decimal_places=2)
@@ -3188,8 +3190,8 @@ def profit_loss(request):
     add_metric_insight(
         "purchase_basis",
         "Purchase Activity",
-        "Purchase activity was higher this period, which may reduce short-term profit.",
-        "Purchase activity was lower than the previous period.",
+        "Purchase activity was higher this period, indicating stronger inventory intake or stock replenishment.",
+        "Purchase activity was lower than the previous period, indicating lighter inventory intake or stock replenishment.",
         neutral_type="warning",
     )
     add_metric_insight(
@@ -3228,114 +3230,14 @@ def profit_loss(request):
         {"label": "Net Profit", "value": float(net_profit)},
     ]
 
-    sales_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        SalesInvoiceItem.objects.filter(
-            owner=owner,
-            sales_invoice__owner=owner,
-            sales_invoice__posted=True,
-            sales_invoice__invoice_date__range=(date_from, date_to),
-        )
-        .values("sales_invoice__invoice_date")
-        .annotate(total=Coalesce(Sum(line_total_expr), zero))
-    ):
-        sales_by_day[row["sales_invoice__invoice_date"]] = row["total"] or Decimal("0.00")
-
-    sales_returns_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        SalesReturnItem.objects.filter(
-            owner=owner,
-            sales_return__owner=owner,
-            sales_return__posted=True,
-            sales_return__return_date__range=(date_from, date_to),
-        )
-        .values("sales_return__return_date")
-        .annotate(total=Coalesce(Sum(line_total_expr), zero))
-    ):
-        sales_returns_by_day[row["sales_return__return_date"]] = row["total"] or Decimal("0.00")
-
-    purchase_items_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        PurchaseInvoiceItem.objects.filter(
-            owner=owner,
-            purchase_invoice__owner=owner,
-            purchase_invoice__posted=True,
-            purchase_invoice__invoice_date__range=(date_from, date_to),
-        )
-        .values("purchase_invoice__invoice_date")
-        .annotate(total=Coalesce(Sum(line_total_expr), zero))
-    ):
-        purchase_items_by_day[row["purchase_invoice__invoice_date"]] = row["total"] or Decimal("0.00")
-
-    purchase_charges_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        PurchaseInvoice.objects.filter(
-            owner=owner,
-            posted=True,
-            invoice_date__range=(date_from, date_to),
-        )
-        .values("invoice_date")
-        .annotate(total=Coalesce(Sum(purchase_charges_expr), zero))
-    ):
-        purchase_charges_by_day[row["invoice_date"]] = row["total"] or Decimal("0.00")
-
-    purchase_returns_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        PurchaseReturnItem.objects.filter(
-            owner=owner,
-            purchase_return__owner=owner,
-            purchase_return__posted=True,
-            purchase_return__return_date__range=(date_from, date_to),
-        )
-        .values("purchase_return__return_date")
-        .annotate(total=Coalesce(Sum(line_total_expr), zero))
-    ):
-        purchase_returns_by_day[row["purchase_return__return_date"]] = row["total"] or Decimal("0.00")
-
-    expenses_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        DailyExpense.objects.filter(
-            owner=owner,
-            posted=True,
-            date__range=(date_from, date_to),
-        )
-        .values("date")
-        .annotate(total=Coalesce(Sum("amount"), zero))
-    ):
-        expenses_by_day[row["date"]] = row["total"] or Decimal("0.00")
-
-    stock_writeoff_by_day = defaultdict(lambda: Decimal("0.00"))
-    for row in (
-        StockAdjustment.objects.filter(
-            owner=owner,
-            posted=True,
-            direction="DOWN",
-            date__range=(date_from, date_to),
-        )
-        .values("date")
-        .annotate(total=Coalesce(Sum(stock_adjustment_amount_expr), zero))
-    ):
-        stock_writeoff_by_day[row["date"]] = row["total"] or Decimal("0.00")
-
     trend_chart_data = []
     current_day = date_from
     while current_day <= date_to:
-        daily_net_sales = sales_by_day[current_day] - sales_returns_by_day[current_day]
-        daily_purchase_basis = (
-            purchase_items_by_day[current_day]
-            + purchase_charges_by_day[current_day]
-            - purchase_returns_by_day[current_day]
-        )
-        daily_profit = (
-            daily_net_sales
-            - daily_purchase_basis
-            - expenses_by_day[current_day]
-            - stock_writeoff_by_day[current_day]
-        )
+        daily_metrics = get_operational_profit(owner, current_day, current_day)
         trend_chart_data.append(
             {
                 "date": current_day.isoformat(),
-                "profit": float(daily_profit),
+                "profit": float(daily_metrics["net_profit"]),
             }
         )
         current_day += timedelta(days=1)
@@ -3545,6 +3447,8 @@ def profit_loss(request):
         "operating_expenses": operating_expenses,
         "stock_writeoff_expense": stock_writeoff_expense,
         "net_profit": net_profit,
+        "incomplete_products_count": incomplete_products_count,
+        "estimated_products_count": estimated_products_count,
         "comparison_enabled": True,
         "previous_date_from": previous_date_from,
         "previous_date_to": previous_date_to,
