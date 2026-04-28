@@ -94,7 +94,7 @@ from .services.ledger import (
     get_party_ledger,
     get_trial_balance,
 )
-from .services.product_profit import get_top_profitable_products
+from .services.product_profit import build_product_profit_summaries, get_top_profitable_products
 
 # =========================
 # Tenant utilities
@@ -506,7 +506,22 @@ def get_operational_profit(owner, date_from, date_to):
     )
 
     purchase_basis = purchase_items_total + purchase_charges_total - purchase_returns_total
-    gross_margin = net_sales - purchase_basis
+    product_summaries = build_product_profit_summaries(
+        owner,
+        date_from,
+        date_to,
+        include_all_products=True,
+    )
+    product_gross_profit = sum(
+        (item["gross_profit"] or Decimal("0.00"))
+        for item in product_summaries
+        if item["gross_profit"] is not None
+    )
+    incomplete_products_count = sum(1 for item in product_summaries if item["gross_profit"] is None)
+    estimated_products_count = sum(
+        1 for item in product_summaries if item["confidence_label"] == "Estimated"
+    )
+    gross_margin = product_gross_profit
 
     operating_expenses = (
         DailyExpense.objects.filter(
@@ -531,15 +546,18 @@ def get_operational_profit(owner, date_from, date_to):
         or Decimal("0.00")
     )
 
-    profit = net_sales - purchase_basis - operating_expenses - stock_writeoff_expense
+    profit = product_gross_profit - operating_expenses - stock_writeoff_expense
     return {
         "gross_sales": gross_sales,
         "sales_returns": sales_returns,
         "net_sales": net_sales,
         "purchase_basis": purchase_basis,
+        "product_gross_profit": product_gross_profit,
         "gross_margin": gross_margin,
         "operating_expenses": operating_expenses,
         "stock_writeoff_expense": stock_writeoff_expense,
+        "incomplete_products_count": incomplete_products_count,
+        "estimated_products_count": estimated_products_count,
         "profit": profit,
         "net_profit": profit,
     }

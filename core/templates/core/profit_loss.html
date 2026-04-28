@@ -522,13 +522,16 @@
       <div class="value">PKR {{ net_sales|floatformat:"-2"|intcomma }}</div>
     </div>
     <div class="kpi cost">
-      <div class="label">Purchase Basis</div>
+      <div class="label">Purchases During Period</div>
       <div class="value">PKR {{ purchase_basis|floatformat:"-2"|intcomma }}</div>
     </div>
     <div class="kpi net {% if net_profit >= 0 %}profit{% else %}loss{% endif %}">
       <div class="label">Net Operational Profit</div>
       <div class="value">PKR {{ net_profit|floatformat:"-2"|intcomma }}</div>
     </div>
+  </div>
+  <div class="opr-note" style="margin-top:-6px;">
+    <strong>Note:</strong> Profit is based on actual cost of goods sold (inventory-aware).
   </div>
 
   {% if comparison_enabled %}
@@ -545,7 +548,15 @@
       <div class="comparison-grid">
         {% for item in comparison_highlights %}
           <div class="comparison-kpi">
-            <div class="metric">{{ item.label }}</div>
+            <div class="metric">
+              {% if item.label == "Purchase Basis" %}
+                Purchases During Period
+              {% elif item.label == "Gross Operating Margin" %}
+                Product Gross Profit
+              {% else %}
+                {{ item.label }}
+              {% endif %}
+            </div>
             <div class="pair">
               <span>Current</span>
               <strong>PKR {{ item.current|floatformat:"-2"|intcomma }}</strong>
@@ -580,7 +591,15 @@
         <tbody>
           {% for row in comparison_rows %}
             <tr>
-              <td>{{ row.label }}</td>
+              <td>
+                {% if row.label == "Purchase Basis" %}
+                  Purchases During Period
+                {% elif row.label == "Gross Operating Margin" %}
+                  Product Gross Profit
+                {% else %}
+                  {{ row.label }}
+                {% endif %}
+              </td>
               <td>PKR {{ row.current|floatformat:"-2"|intcomma }}</td>
               <td>PKR {{ row.previous|floatformat:"-2"|intcomma }}</td>
               <td class="{% if row.change > 0 %}change-positive{% elif row.change < 0 %}change-negative{% else %}change-neutral{% endif %}">
@@ -621,7 +640,7 @@
     <div class="opr-card chart-card">
       <div class="opr-card-head">
         <div class="opr-card-title">Summary Comparison</div>
-        <div class="opr-card-sub">Gross sales, purchase basis, expenses, write-offs, and final result.</div>
+        <div class="opr-card-sub">Gross sales, purchases during period, product gross profit, expenses, write-offs, and final result.</div>
       </div>
       {% if summary_chart_data %}
         <div class="chart-wrap">
@@ -673,7 +692,7 @@
       <div class="opr-card-title" style="margin-bottom:10px;">Cost</div>
       <table class="summary-table">
         <tr>
-          <td>Purchase Basis</td>
+          <td>Purchases During Period</td>
           <td>PKR {{ purchase_basis|floatformat:"-2"|intcomma }}</td>
         </tr>
         <tr>
@@ -681,7 +700,7 @@
           <td></td>
         </tr>
         <tr class="total">
-          <td>Gross Operating Margin</td>
+          <td>Product Gross Profit</td>
           <td>PKR {{ gross_margin|floatformat:"-2"|intcomma }}</td>
         </tr>
       </table>
@@ -705,7 +724,7 @@
 
     <div class="opr-card final-card {% if net_profit < 0 %}loss{% endif %}">
       <div class="opr-card-title">Final</div>
-      <div class="opr-card-sub">Net result for the selected period after purchase basis and operating costs.</div>
+      <div class="opr-card-sub">Net result for the selected period after product gross profit, operating costs, and stock write-offs.</div>
       <div class="final-value">PKR {{ net_profit|floatformat:"-2"|intcomma }}</div>
     </div>
   </div>
@@ -842,7 +861,7 @@
       if (label === "Gross Sales") {
         return { background: "#34d399", border: "#059669" };
       }
-      if (label === "Purchase Basis") {
+      if (label === "Purchase Basis" || label === "Purchases During Period") {
         return { background: "#fdba74", border: "#ea580c" };
       }
       if (label === "Operating Expenses") {
@@ -864,11 +883,20 @@
     };
 
     if (summaryChartEl && summaryData.length) {
+      const displayLabel = function (label) {
+        if (label === "Purchase Basis") {
+          return "Purchases During Period";
+        }
+        if (label === "Gross Operating Margin") {
+          return "Product Gross Profit";
+        }
+        return label;
+      };
       const summaryColors = summaryData.map((item) => summaryBarColor(item.label, item.value));
       new Chart(summaryChartEl, {
         type: "bar",
         data: {
-          labels: summaryData.map((item) => item.label),
+          labels: summaryData.map((item) => displayLabel(item.label)),
           datasets: [{
             data: summaryData.map((item) => item.value),
             backgroundColor: summaryColors.map((item) => item.background),

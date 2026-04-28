@@ -432,16 +432,28 @@ def _finalize_summary(state: ProductValuationState) -> Dict[str, Optional[Decima
     }
 
 
-def build_product_profit_summaries(owner, date_from, date_to) -> List[Dict[str, Optional[Decimal]]]:
+def build_product_profit_summaries(
+    owner,
+    date_from,
+    date_to,
+    *,
+    include_all_products: bool = False,
+) -> List[Dict[str, Optional[Decimal]]]:
     products = Product.objects.filter(owner=owner)
     product_map = {product.id: product for product in products}
     movement_map = _build_product_movements(owner, date_to)
 
     summaries: List[Dict[str, Optional[Decimal]]] = []
-    for product_id, movements in movement_map.items():
+    if include_all_products:
+        product_ids = [product.id for product in products]
+    else:
+        product_ids = list(movement_map.keys())
+
+    for product_id in product_ids:
         product = product_map.get(product_id)
         if product is None:
             continue
+        movements = movement_map.get(product_id, [])
 
         state = ProductValuationState(product=product)
         for movement in movements:
@@ -451,7 +463,7 @@ def build_product_profit_summaries(owner, date_from, date_to) -> List[Dict[str, 
                 state.opening_qty = state.running_qty
                 state.opening_value = state.running_inventory_value
 
-        if not state.has_period_activity:
+        if not include_all_products and not state.has_period_activity:
             continue
 
         summaries.append(_finalize_summary(state))

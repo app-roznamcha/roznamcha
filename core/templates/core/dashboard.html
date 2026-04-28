@@ -966,12 +966,12 @@ html[dir="rtl"] .dashboard-section{
         <div class="dash-card dash-card-profit dash-card-primary">
             <div class="dash-card-top">
               <span class="dash-card-icon" aria-hidden="true">📈</span>
-              <div class="dash-card-label" data-i18n="month_profit" title="Based on operational profit calculation">This Month Profit</div>
+              <div class="dash-card-label" data-i18n="month_profit" title="Based on actual cost of goods sold (inventory-aware)">This Month Profit</div>
             </div>
             <div class="dash-card-value js-currency-format" data-value="{{ month_profit|default:0|floatformat:0 }}">
                 Rs {{ month_profit|default:0|floatformat:0 }}
             </div>
-            <div class="dash-card-meta">Month to Date</div>
+            <div class="dash-card-meta">Month to Date · Inventory-aware</div>
         </div>
 
         <a href="{% url 'customer_balances' %}" class="dash-card dash-card-receivable">
