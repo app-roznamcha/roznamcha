@@ -680,7 +680,7 @@ def dashboard(request):
     
     customer_receivable = Decimal("0.00")
     customer_advance = Decimal("0.00")
-    for customer in Party.objects.filter(owner=owner, party_type="CUSTOMER", is_active=True).only(
+    for customer in Party.objects.filter(owner=owner, party_type="CUSTOMER").only(
         "id", "name", "party_type", "opening_balance", "opening_balance_is_debit"
     ):
         ledger = build_party_ledger_for_owner(
