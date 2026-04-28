@@ -5710,11 +5710,18 @@ def subscription_page(request):
         messages.info(request, f"Renewal request received for {plan}. Payment integration will come in Phase 4.")
         return redirect("subscription_page")
 
+    reference_code = (request.session.get("manual_payment_ref") or "").strip()
+    if not reference_code:
+        random_digits = get_random_string(4, allowed_chars="0123456789")
+        reference_code = f"RZ-{owner.username}-{random_digits}"
+        request.session["manual_payment_ref"] = reference_code
+
     context = {
         "status": status,
         "expires_at": expires_at,
         "trial_started_at": trial_started,
         "owner_username": owner.username,
+        "manual_payment_ref": reference_code,
         "days_left": days_left,
         "is_expired": (status == "EXPIRED"),
         "is_trial": (status == "TRIAL"),
