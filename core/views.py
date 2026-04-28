@@ -3175,11 +3175,15 @@ def profit_loss(request):
             }
         )
 
+    profit_insight_caveat = ""
+    if incomplete_products_count > 0 or estimated_products_count > 0:
+        profit_insight_caveat = " Profit insight may be affected by estimated or incomplete product profit rows."
+
     add_metric_insight(
         "net_profit",
         "Profit Trend",
-        "Net operational profit improved by {percent}%.",
-        "Net operational profit declined by {percent}%.",
+        f"Net operational profit improved by {{percent}}%.{profit_insight_caveat}",
+        f"Net operational profit declined by {{percent}}%.{profit_insight_caveat}",
     )
     add_metric_insight(
         "net_sales",
@@ -3197,8 +3201,8 @@ def profit_loss(request):
     add_metric_insight(
         "operating_expenses",
         "Expense Trend",
-        "Operating expenses increased compared to the previous period.",
-        "Operating expenses decreased compared to the previous period.",
+        "Recorded operating expenses increased compared to the previous period.",
+        "Recorded operating expenses decreased compared to the previous period.",
         neutral_type="warning",
     )
     if len(smart_insights) < insight_limit and current_metrics["stock_writeoff_expense"] > 0:
@@ -3402,7 +3406,7 @@ def profit_loss(request):
             {
                 "type": "info",
                 "title": "Sales Driver",
-                "message": f'Sales activity was mainly driven by {top_selling_products[0]["product_name"]}.',
+                "message": f'Net sales revenue was mainly driven by {top_selling_products[0]["product_name"]}.',
             }
         )
     if purchase_basis_by_product and purchase_basis_by_product[0]["net_purchase_basis"] > 0 and len(root_cause_insights) < 3:
@@ -3410,7 +3414,7 @@ def profit_loss(request):
             {
                 "type": "info",
                 "title": "Purchase Driver",
-                "message": f'Purchase activity was highest for {purchase_basis_by_product[0]["product_name"]}.',
+                "message": f'Purchase activity was highest for {purchase_basis_by_product[0]["product_name"]}. This reflects inventory intake, not product cost sold.',
             }
         )
     if expense_breakdown and expense_breakdown[0]["amount"] > 0 and len(root_cause_insights) < 3:
@@ -3418,7 +3422,7 @@ def profit_loss(request):
             {
                 "type": "info",
                 "title": "Expense Driver",
-                "message": f'The largest expense category was {expense_breakdown[0]["label"]}.',
+                "message": f'Largest recorded operating expense category was {expense_breakdown[0]["label"]}.',
             }
         )
     if stock_writeoff_breakdown and stock_writeoff_breakdown[0]["amount"] > 0 and len(root_cause_insights) < 3:
