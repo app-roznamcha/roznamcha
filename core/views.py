@@ -698,7 +698,7 @@ def dashboard(request):
 
     supplier_payable = Decimal("0.00")
     supplier_advance = Decimal("0.00")
-    for supplier in Party.objects.filter(owner=owner, party_type="SUPPLIER", is_active=True).only(
+    for supplier in Party.objects.filter(owner=owner, party_type="SUPPLIER").only(
         "id", "name", "party_type", "opening_balance", "opening_balance_is_debit"
     ):
         ledger = build_party_ledger_for_owner(
