@@ -338,17 +338,20 @@
 
   <div class="summary-group">
     <div class="section-label">Cash Movement</div>
+    <div style="margin:-10px 0 14px;font-size:13px;color:#6b7280;">
+      This section shows customer/supplier payment records only. Daily expenses are shown separately.
+    </div>
     <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
       <div class="kpi in">
-        <div class="label">Money In</div>
+        <div class="label">Payments In</div>
         <div class="value">{{ total_payments_in|floatformat:2 }}</div>
       </div>
       <div class="kpi out">
-        <div class="label">Money Out</div>
+        <div class="label">Payments Out</div>
         <div class="value">{{ total_payments_out|floatformat:2 }}</div>
       </div>
       <div class="kpi net">
-        <div class="label">Net Cash Flow</div>
+        <div class="label">Net Payment Flow</div>
         <div class="value">{{ net_cash_flow|floatformat:2 }}</div>
       </div>
     </div>
@@ -654,7 +657,7 @@
 
   <div class="ds-card">
     <div class="ds-card-head">
-      <div class="ds-card-title">Payments (Money In)</div>
+      <div class="ds-card-title">Payments In</div>
       <div class="pill">Count: {{ payments_in_qs|length }}</div>
     </div>
 
@@ -696,7 +699,7 @@
         <tfoot>
           <tr>
             <th colspan="4" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
-              Total Money In
+              Total Payments In
             </th>
             <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
               {{ total_payments_in|floatformat:2 }}
@@ -708,7 +711,7 @@
         <div class="mini-box">
           <div class="mini-table">
             <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:#334155;">
-              Money In by Account
+              Payments In by Account
             </div>
             <table>
               {% for row in payments_in_by_account %}
@@ -726,7 +729,7 @@
 
   <div class="ds-card" style="margin-bottom:10px;">
     <div class="ds-card-head">
-      <div class="ds-card-title">Payments (Money Out)</div>
+      <div class="ds-card-title">Payments Out</div>
       <div class="pill">Count: {{ payments_out_qs|length }}</div>
     </div>
 
@@ -768,7 +771,7 @@
         <tfoot>
           <tr>
             <th colspan="4" style="border-top:2px solid #e5e7eb;padding:8px 10px;text-align:right;">
-              Total Money Out
+              Total Payments Out
             </th>
             <th class="right nowrap" style="border-top:2px solid #e5e7eb;padding:8px 10px;">
               {{ total_payments_out|floatformat:2 }}
@@ -780,7 +783,7 @@
         <div class="mini-box">
           <div class="mini-table">
             <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:#334155;">
-              Money Out by Account
+              Payments Out by Account
             </div>
             <table>
               {% for row in payments_out_by_account %}
@@ -914,8 +917,8 @@
 
   <div class="net-strip">
     <div>
-      <div style="font-size:14px;font-weight:600;">Net Cash Flow (Today)</div>
-      <small>Money In − Money Out</small>
+      <div style="font-size:14px;font-weight:600;">Net Payment Flow (Today)</div>
+      <small>Payments In − Payments Out</small>
     </div>
     <strong>{{ net_cash_flow|floatformat:2 }}</strong>
   </div>
