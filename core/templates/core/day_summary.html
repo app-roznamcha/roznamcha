@@ -3,67 +3,77 @@
 {% block title %}Day Summary{% endblock %}
 
 {% block content %}
-<div class="page day-summary-page" style="max-width:1280px;margin:40px auto 60px;padding:0 26px;">
+<div class="page day-summary-page" style="max-width:1280px;margin:40px auto 68px;padding:0 26px;">
   <style>
     .day-summary-page{
-      --slate-50:#f8fafc;
-      --slate-100:#f1f5f9;
-      --slate-200:#e2e8f0;
-      --slate-300:#cbd5e1;
-      --slate-500:#64748b;
-      --slate-700:#334155;
-      --slate-900:#0f172a;
-      --brand:#2563eb;
-      --brand-dark:#1d4ed8;
-      --ok:#047857;
-      --ok-soft:#d1fae5;
-      --out:#b91c1c;
-      --out-soft:#fee2e2;
-      --warn:#9a3412;
-      --warn-soft:#ffedd5;
+      --bg:#f8f5ef;
+      --surface:#fffdf9;
+      --surface-strong:#ffffff;
+      --line:#e7dfd1;
+      --line-soft:#efe7da;
+      --ink-900:#1d3528;
+      --ink-700:#405548;
+      --ink-500:#6d7c72;
+      --accent:#1f5134;
+      --accent-dark:#173c27;
+      --accent-soft:#edf4ee;
+      --ok:#1f6a3d;
+      --ok-soft:#edf7ef;
+      --out:#8a2e2e;
+      --out-soft:#fff3f1;
+      --warn:#9a6a16;
+      --warn-soft:#fdf5e7;
+      --neutral-soft:#f8f3eb;
+      --shadow:0 16px 36px rgba(29, 53, 40, .08);
+      color:var(--ink-900);
     }
 
     .day-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:14px;
-      padding:18px 20px;
-      border-radius:20px;
-      border:1px solid var(--slate-200);
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+      gap:18px;
+      padding:24px 26px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(760px 260px at -16% -90%, rgba(205, 223, 209, .7) 0%, transparent 58%),
+        radial-gradient(640px 240px at 115% -80%, rgba(243, 231, 212, .78) 0%, transparent 54%),
+        linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:var(--shadow);
     }
     .day-title{
-      margin:0 0 4px;
-      font-size:32px;
+      margin:0 0 8px;
+      font-size:35px;
       font-weight:800;
       letter-spacing:-0.02em;
-      color:var(--slate-900);
+      color:var(--ink-900);
+      line-height:1.08;
     }
     .day-sub{
       margin:0 0 12px;
       font-size:15px;
-      color:#475569;
-      line-height:1.55;
+      color:var(--ink-700);
+      line-height:1.65;
     }
     .day-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 18px;
+      padding:11px 18px;
       min-width:170px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#fff;
       white-space:nowrap;
       transition:transform .12s ease, box-shadow .12s ease;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
     }
     .day-btn:hover{
       transform:translateY(-1px);
@@ -71,11 +81,11 @@
     }
 
     .ds-card{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--slate-200);
-      padding:18px 20px 20px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      background:var(--surface-strong);
+      border-radius:20px;
+      border:1px solid var(--line);
+      padding:22px 24px 24px;
+      box-shadow:var(--shadow);
       margin-bottom:20px;
     }
     .ds-card-head{
@@ -84,12 +94,102 @@
       align-items:center;
       gap:12px;
       flex-wrap:wrap;
-      margin-bottom:10px;
+      margin-bottom:14px;
     }
     .ds-card-title{
-      font-size:18px;
+      font-size:20px;
       font-weight:800;
-      color:var(--slate-900);
+      color:var(--ink-900);
+      letter-spacing:-.01em;
+    }
+
+    .day-filter-card{
+      background:linear-gradient(180deg,#fffdf9 0%, #faf6ee 100%);
+    }
+    .day-filter-grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px 16px;
+      align-items:flex-end;
+    }
+    .day-filter-col{
+      min-width:220px;
+    }
+    .day-filter-label{
+      display:block;
+      font-size:13px;
+      margin-bottom:7px;
+      color:var(--ink-700);
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+    .day-input{
+      width:100%;
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid #d9d0c1;
+      font-size:14px;
+      color:var(--ink-900);
+      background:#fffdfa;
+      min-height:46px;
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
+    }
+    .day-input:focus{
+      outline:none;
+      border-color:#9cb7a5;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
+    }
+    .day-apply{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:11px 18px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+      color:#fff;
+      cursor:pointer;
+      white-space:nowrap;
+      min-height:46px;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .18);
+    }
+
+    .snapshot-section{
+      margin-bottom:22px;
+    }
+    .snapshot-shell{
+      background:var(--surface-strong);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:22px 24px 24px;
+      box-shadow:var(--shadow);
+    }
+    .snapshot-head{
+      margin-bottom:18px;
+    }
+    .snapshot-eyebrow{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--ink-500);
+      margin:0 0 8px;
+    }
+    .snapshot-title{
+      margin:0 0 6px;
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.01em;
+    }
+    .snapshot-sub{
+      margin:0;
+      font-size:14px;
+      line-height:1.6;
+      color:var(--ink-700);
     }
 
     .tbl{
@@ -97,27 +197,33 @@
       border-collapse:collapse;
       table-layout:fixed;
       min-width:980px;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
+      border:1px solid var(--line);
+      border-radius:16px;
       overflow:hidden;
     }
     .tbl th, .tbl td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
+      border-bottom:1px solid var(--line-soft);
+      padding:11px 12px;
       font-size:15px;
       vertical-align:middle;
     }
     .tbl th{
-      background:#f9fafb;
-      font-weight:600;
+      background:#f3ede2;
+      font-weight:700;
       text-align:left;
-      color:var(--slate-700);
+      color:var(--ink-700);
       position:sticky;
       top:0;
       z-index:1;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-size:12px;
     }
-    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
-    .tbl tbody tr:hover{ background:#f8fbff; }
+    .tbl td{
+      color:var(--ink-900);
+    }
+    .tbl tbody tr:nth-child(even){ background:#fdfbf7; }
+    .tbl tbody tr:hover{ background:#f5efe4; }
 
     .right{ text-align:right; }
     .center{ text-align:center; }
@@ -130,12 +236,12 @@
 
     .pill{
       display:inline-block;
-      padding:3px 10px;
+      padding:6px 11px;
       border-radius:999px;
       font-size:12px;
-      border:1px solid var(--slate-200);
-      background:#ffffff;
-      color:#111827;
+      border:1px solid var(--line);
+      background:#f8f3eb;
+      color:var(--ink-900);
       white-space:nowrap;
       font-weight:700;
     }
@@ -143,80 +249,94 @@
     .search-input{
       width:290px;
       max-width:100%;
-      padding:9px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid #d9d0c1;
       font-size:14px;
-      color:var(--slate-900);
-      background:#fff;
+      color:var(--ink-900);
+      background:#fffdfa;
     }
     .search-input:focus{
-      outline:3px solid rgba(37,99,235,0.15);
-      border-color:#93c5fd;
+      outline:none;
+      border-color:#9cb7a5;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
 
     .top-summary-grid .kpi{
-      background:#fff;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
-      padding:12px 14px;
-      box-shadow:0 6px 16px rgba(15,23,42,0.05);
+      background:#fffefc;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 18px 19px;
+      box-shadow:var(--shadow);
+      min-height:122px;
     }
     .top-summary-grid .kpi .label{
-      font-size:13px;
-      color:var(--slate-500);
-      margin-bottom:6px;
+      font-size:12px;
+      color:var(--ink-500);
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-weight:700;
     }
     .top-summary-grid .kpi .value{
-      font-size:21px;
+      font-size:29px;
       font-weight:800;
+      line-height:1.12;
     }
     .kpi.sales .value{ color:var(--ok); }
-    .kpi.sales-return .value{ color:#0f766e; }
+    .kpi.sales-return .value{ color:#2c6f64; }
     .kpi.purchase .value{ color:var(--warn); }
-    .kpi.purchase-return .value{ color:#7c2d12; }
-    .kpi.in .value{ color:#1d4ed8; }
+    .kpi.purchase-return .value{ color:#7e4c18; }
+    .kpi.in .value{ color:var(--ok); }
     .kpi.out .value{ color:var(--out); }
     .kpi.expense .value{ color:var(--out); }
-    .kpi.transfer .value{ color:#4338ca; }
+    .kpi.transfer .value{ color:#5b6287; }
+    .kpi.sales{ background:linear-gradient(180deg,#fffefc 0%, #f4f8f4 100%); }
+    .kpi.sales-return{ background:linear-gradient(180deg,#fffefc 0%, #f2f7f5 100%); }
+    .kpi.purchase{ background:linear-gradient(180deg,#fffefc 0%, #faf4e9 100%); }
+    .kpi.purchase-return{ background:linear-gradient(180deg,#fffefc 0%, #fbf3ea 100%); }
+    .kpi.in{ background:linear-gradient(180deg,#fffefc 0%, #eef7f0 100%); border-color:#c9e2d0; }
+    .kpi.out{ background:linear-gradient(180deg,#fffefc 0%, #fff2f1 100%); border-color:#e8c8c8; }
+    .kpi.expense{ background:linear-gradient(180deg,#fffefc 0%, #fff2f1 100%); border-color:#e8c8c8; }
+    .kpi.transfer{ background:linear-gradient(180deg,#fffefc 0%, #f7f3ed 100%); }
     .kpi.net{
-      background:linear-gradient(180deg,#111827,#0f172a);
-      border-color:#111827;
-      box-shadow:0 10px 20px rgba(15,23,42,0.22);
+      background:linear-gradient(180deg,#1f5134,#173c27);
+      border-color:#173c27;
+      box-shadow:0 16px 30px rgba(31,81,52,.24);
     }
-    .kpi.net .label{ color:#9ca3af; }
+    .kpi.net .label{ color:#d4e2d8; }
     .kpi.net .value{ color:#fff; }
 
     .money-in{
       color:var(--ok);
       font-weight:800;
       background:var(--ok-soft);
-      border-radius:8px;
-      padding:2px 7px;
+      border-radius:10px;
+      padding:4px 8px;
     }
     .money-out{
       color:var(--out);
       font-weight:800;
       background:var(--out-soft);
-      border-radius:8px;
-      padding:2px 7px;
+      border-radius:10px;
+      padding:4px 8px;
     }
     .section-label{
-      font-size:13px;
+      font-size:12px;
       font-weight:800;
-      letter-spacing:.08em;
+      letter-spacing:.1em;
       text-transform:uppercase;
-      color:var(--slate-500);
+      color:var(--ink-500);
       margin:0 0 8px;
     }
     .summary-group{
-      margin-bottom:18px;
+      margin-bottom:22px;
     }
 
     .mini-box{
-      margin-top:12px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:12px;
+      margin-top:14px;
+      border-top:1px dashed #ddd2c2;
+      padding-top:14px;
       display:flex;
       gap:18px;
       flex-wrap:wrap;
@@ -232,22 +352,23 @@
       border-collapse:collapse;
     }
     .mini-table td{
-      padding:6px 8px;
-      border-bottom:1px solid #f1f5f9;
+      padding:7px 8px;
+      border-bottom:1px solid var(--line-soft);
       font-size:14px;
     }
     .mini-right{ text-align:right; white-space:nowrap; }
 
     .net-strip{
       margin-top:14px;
-      background:linear-gradient(180deg,#0f172a,#111827);
+      background:linear-gradient(180deg,#1f5134,#173c27);
       color:#fff;
-      border-radius:14px;
-      padding:14px 16px;
+      border-radius:18px;
+      padding:16px 18px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:10px;
+      box-shadow:0 16px 30px rgba(31,81,52,.24);
     }
     .net-strip small{ opacity:.75; font-size:13px; }
     .net-strip strong{ font-size:18px; }
@@ -258,9 +379,11 @@
 
     @media (max-width: 640px) {
       .day-summary-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
-      .day-title { font-size: 26px !important; }
+      .day-title { font-size: 28px !important; }
       .day-sub { font-size: 14px !important; }
       .day-btn { width: 100%; min-width: unset; }
+      .day-filter-col{ min-width:100% !important; }
+      .day-apply{ width:100%; }
       .day-summary-page .tbl { min-width: 820px !important; }
       .day-summary-page .mini-table { min-width: 100% !important; }
       .day-summary-page .mini-right { text-align: left !important; white-space: normal !important; }
@@ -275,7 +398,7 @@
     <div>
       <h1 class="day-title">Day Summary</h1>
       <p class="day-sub">
-        View posted sales, returns, purchases, expenses, payments, and transfers for a single day.
+        Overview of today’s business activity and cash movement.
       </p>
     </div>
     <div>
@@ -283,40 +406,45 @@
     </div>
   </div>
 
-  <div class="ds-card">
-    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Select date</div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
-      Choose a date to see all activity for that day, then click <strong>Apply</strong>.
+  <div class="ds-card day-filter-card">
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px;color:var(--ink-900);letter-spacing:-.01em;">Selected date</div>
+    <p style="font-size:15px;color:var(--ink-700);margin-bottom:14px;line-height:1.6;">
+      Choose a date to view the business snapshot for that day, then click <strong>Apply</strong>.
     </p>
 
-    <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-      <div style="min-width:220px;">
-        <label for="date" style="display:block;font-size:14px;margin-bottom:4px;">Date</label>
+    <form method="get" class="day-filter-grid">
+      <div class="day-filter-col">
+        <label for="date" class="day-filter-label">Date</label>
         <input
           type="date"
           id="date"
           name="date"
           value="{{ selected_date|date:'Y-m-d' }}"
-          style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d1d5db;font-size:16px;height:44px;"
+          class="day-input"
         >
       </div>
 
       <div>
-        <button type="submit" class="btn btn-primary" style="display:inline-flex;align-items:center;justify-content:center;padding:9px 18px;border-radius:10px;font-size:14px;font-weight:700;border:1px solid #1d4ed8;background:#2563eb;color:#ffffff;cursor:pointer;white-space:nowrap;">
+        <button type="submit" class="day-apply">
           Apply
         </button>
       </div>
 
-      <div style="margin-left:auto;min-width:260px;">
-        <label for="daySearch" style="display:block;font-size:14px;margin-bottom:4px;">Quick Search (all sections)</label>
+      <div class="day-filter-col" style="margin-left:auto;min-width:280px;">
+        <label for="daySearch" class="day-filter-label">Quick Search (all sections)</label>
         <input id="daySearch" type="text" class="search-input" placeholder="Search invoice, party, product, account...">
       </div>
     </form>
   </div>
 
   <div class="summary-group">
-    <div class="section-label">Commercial Activity</div>
-    <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+    <div class="snapshot-shell">
+      <div class="snapshot-head">
+        <div class="snapshot-eyebrow">Daily Snapshot</div>
+        <h2 class="snapshot-title">Commercial Activity (Invoice-Based)</h2>
+        <p class="snapshot-sub">Based on posted sales and purchase documents.</p>
+      </div>
+      <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px;margin-bottom:0;">
       <div class="kpi sales">
         <div class="label">Total Sales</div>
         <div class="value">{{ total_sales|floatformat:2 }}</div>
@@ -333,15 +461,18 @@
         <div class="label">Purchase Returns</div>
         <div class="value">{{ total_purchase_returns|floatformat:2 }}</div>
       </div>
+      </div>
     </div>
   </div>
 
   <div class="summary-group">
-    <div class="section-label">Cash Movement</div>
-    <div style="margin:-10px 0 14px;font-size:13px;color:#6b7280;">
-      This section shows customer/supplier payment records only. Daily expenses are shown separately.
-    </div>
-    <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+    <div class="snapshot-shell">
+      <div class="snapshot-head">
+        <div class="snapshot-eyebrow">Actual Cash</div>
+        <h2 class="snapshot-title">Cash Movement (Payments Only)</h2>
+        <p class="snapshot-sub">Based on recorded payment entries. Daily expenses are shown separately.</p>
+      </div>
+      <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:14px;margin-bottom:0;">
       <div class="kpi in">
         <div class="label">Payments In</div>
         <div class="value">{{ total_payments_in|floatformat:2 }}</div>
@@ -354,12 +485,18 @@
         <div class="label">Net Payment Flow</div>
         <div class="value">{{ net_cash_flow|floatformat:2 }}</div>
       </div>
+      </div>
     </div>
   </div>
 
   <div class="summary-group">
-    <div class="section-label">Other Day Activity</div>
-    <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px;margin-bottom:22px;">
+    <div class="snapshot-shell">
+      <div class="snapshot-head">
+        <div class="snapshot-eyebrow">Supporting Activity</div>
+        <h2 class="snapshot-title">Other Day Activity</h2>
+        <p class="snapshot-sub">Additional recorded activity that affects the day but is separate from invoice totals and payment flows.</p>
+      </div>
+      <div class="top-summary-grid" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:14px;margin-bottom:0;">
       <div class="kpi expense">
         <div class="label">Daily Expenses</div>
         <div class="value">{{ total_expenses|floatformat:2 }}</div>
@@ -367,6 +504,7 @@
       <div class="kpi transfer">
         <div class="label">Cash/Bank Transfers</div>
         <div class="value">{{ total_transfers|floatformat:2 }}</div>
+      </div>
       </div>
     </div>
   </div>

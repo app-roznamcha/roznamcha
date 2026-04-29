@@ -6,47 +6,60 @@
   <style>
     .adj-page{
       max-width:1120px;
-      margin:34px auto 64px;
-      padding:0 18px;
-      --line:#e2e8f0;
-      --ink-900:#0f172a;
-      --ink-700:#334155;
-      --ink-500:#64748b;
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
-      --surface:#ffffff;
+      margin:38px auto 72px;
+      padding:0 20px;
+      --bg:#f8f5ef;
+      --surface:#fffdf9;
+      --surface-strong:#ffffff;
+      --line:#e7dfd1;
+      --line-soft:#efe7da;
+      --ink-900:#1d3528;
+      --ink-700:#405548;
+      --ink-500:#6d7c72;
+      --accent:#1f5134;
+      --accent-dark:#173c27;
+      --accent-soft:#edf4ee;
+      --warn:#9a6a16;
+      --warn-soft:#fdf5e7;
+      --danger:#8a2e2e;
+      --danger-soft:#fff4f1;
+      --info:#3a6b89;
+      --info-soft:#eef6fb;
+      --shadow:0 16px 36px rgba(29, 53, 40, .08);
+      color:var(--ink-900);
     }
 
     .adj-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:12px;
+      gap:18px;
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:18px 20px;
+      border-radius:22px;
+      padding:24px 26px;
       background:
-        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
-        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
-        var(--surface);
-      box-shadow:0 10px 24px rgba(15,23,42,.07);
+        radial-gradient(760px 260px at -16% -90%, rgba(205, 223, 209, .7) 0%, transparent 58%),
+        radial-gradient(640px 240px at 115% -80%, rgba(243, 231, 212, .78) 0%, transparent 54%),
+        linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:var(--shadow);
     }
 
     .adj-title{
-      margin:0 0 6px;
-      font-size:31px;
+      margin:0 0 8px;
+      font-size:34px;
       font-weight:800;
       color:var(--ink-900);
       letter-spacing:-.02em;
+      line-height:1.08;
     }
 
     .adj-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
-      line-height:1.55;
+      color:var(--ink-700);
+      line-height:1.65;
       max-width:760px;
     }
 
@@ -62,57 +75,59 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 16px;
-      min-width:140px;
-      border-radius:12px;
+      padding:11px 18px;
+      min-width:146px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid #cbd5e1;
-      background:#f8fafc;
-      color:#111827;
+      border:1px solid #d9d0c1;
+      background:rgba(255,255,255,.82);
+      color:var(--ink-900);
       white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
       cursor:pointer;
+      box-shadow:0 8px 18px rgba(29, 53, 40, .05);
     }
 
     .adj-btn:hover{
       transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
+      border-color:#c8bca6;
+      background:#fff;
+      box-shadow:0 10px 20px rgba(29, 53, 40, .08);
     }
 
     .adj-btn-primary{
-      border-color:var(--primary-dark);
-      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      border-color:var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#fff;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
     }
     .adj-btn-soft{
-      background:#fff;
-      color:#334155;
-      border-color:#dbe3ee;
-      box-shadow:0 1px 2px rgba(15,23,42,.04);
+      background:#fffdfa;
+      color:var(--ink-700);
+      border-color:#ded3c2;
+      box-shadow:0 6px 14px rgba(29, 53, 40, .04);
     }
 
     .adj-card{
-      background:#ffffff;
-      border-radius:16px;
-      border:1px solid #d1d5db;
-      padding:18px 16px 18px;
-      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      background:var(--surface-strong);
+      border-radius:20px;
+      border:1px solid var(--line);
+      padding:22px 20px 22px;
+      box-shadow:var(--shadow);
     }
 
     .adj-card + .adj-card{
       margin-top:22px;
     }
     .adj-card-form{
-      border-color:#cfd9e6;
-      box-shadow:0 10px 24px rgba(15,23,42,.065);
+      border-color:var(--line);
     }
     .adj-card-history{
       margin-top:26px;
-      border-color:#e2e8f0;
-      background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+      border-color:var(--line);
+      background:linear-gradient(180deg,#fffdf9 0%, #faf6ee 100%);
     }
     .adj-card-head{
       margin-bottom:16px;
@@ -127,8 +142,8 @@
     .adj-card-subtitle{
       margin:0;
       font-size:14px;
-      color:#64748b;
-      line-height:1.5;
+      color:var(--ink-700);
+      line-height:1.6;
       max-width:760px;
     }
 
@@ -144,21 +159,22 @@
     }
     .adj-field-primary label{
       font-weight:700;
-      color:#0f172a;
+      color:var(--ink-900);
     }
     .adj-field-secondary label{
-      color:#475569;
+      color:var(--ink-700);
     }
     .adj-field-primary label,
     .adj-field-secondary label{
       display:block;
-      font-size:15px;
-      margin-bottom:6px;
+      font-size:13px;
+      margin-bottom:7px;
       line-height:1.2;
+      letter-spacing:.01em;
     }
     .adj-field-secondary input,
     .adj-field-secondary select{
-      background:#fbfcfe !important;
+      background:#fffdfa !important;
     }
     .adj-span-2{
       grid-column:1 / -1;
@@ -174,43 +190,46 @@
 
     .adj-page input,
     .adj-page select{
-      border:1px solid #cbd5e1 !important;
-      border-radius:10px !important;
-      padding:10px 12px !important;
+      border:1px solid #d9d0c1 !important;
+      border-radius:13px !important;
+      padding:11px 13px !important;
       font-size:14px !important;
-      background:#fff !important;
-      transition:border-color .14s ease, box-shadow .14s ease;
+      background:#fffdfa !important;
+      color:var(--ink-900) !important;
+      min-height:46px;
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
     }
 
     .adj-page input:focus,
     .adj-page select:focus{
       outline:none;
-      border-color:#93c5fd !important;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#9cb7a5 !important;
+      background:#fff !important;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
 
     .adj-help{
       margin-top:6px;
       font-size:13px;
-      color:#6b7280;
+      color:var(--ink-500);
     }
     .adj-note{
-      margin-top:14px;
-      padding:10px 12px;
-      border:1px solid #e2e8f0;
-      border-radius:12px;
-      background:#f8fafc;
+      margin-top:16px;
+      padding:12px 14px;
+      border:1px solid var(--line-soft);
+      border-radius:15px;
+      background:#f8f3eb;
       font-size:12.5px;
-      color:#64748b;
+      color:var(--ink-700);
       line-height:1.5;
     }
     .adj-preview{
-      margin-top:10px;
-      padding:12px 14px;
-      border-radius:14px;
-      background:linear-gradient(180deg,#eff6ff 0%, #f8fbff 100%);
-      border:1px solid #cfe0fb;
-      color:#0f172a;
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:linear-gradient(180deg,#eef6fb 0%, #f7fbfd 100%);
+      border:1px solid #cfe0eb;
+      color:var(--ink-900);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.92);
     }
     .adj-preview-label{
@@ -219,14 +238,14 @@
       text-transform:uppercase;
       letter-spacing:.08em;
       font-weight:800;
-      color:#64748b;
+      color:var(--ink-500);
       margin-bottom:4px;
     }
     .adj-preview-line{
       font-size:14px;
       font-weight:700;
       line-height:1.45;
-      color:#0f172a;
+      color:var(--ink-900);
     }
     @media (max-width: 980px){
       .adj-party-grid{
@@ -257,13 +276,13 @@
     }
 
     .adj-chip{
-      border:1px solid #dbeafe;
-      background:#eff6ff;
-      color:#1d4ed8;
+      border:1px solid #d9d0c1;
+      background:#fffdfa;
+      color:var(--ink-700);
       border-radius:999px;
       font-size:12px;
       font-weight:700;
-      padding:4px 10px;
+      padding:5px 11px;
       cursor:pointer;
       opacity:.9;
     }
@@ -286,30 +305,30 @@
     .adj-search label{
       display:block;
       font-size:13px;
-      color:#475569;
-      margin-bottom:4px;
-      font-weight:600;
+      color:var(--ink-700);
+      margin-bottom:7px;
+      font-weight:700;
     }
 
     .adj-search input{
       width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid #d9d0c1;
       font-size:14px;
     }
 
     .adj-search input:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#9cb7a5;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
 
     .adj-table-wrap{
-      margin-top:12px;
+      margin-top:14px;
       overflow-x:auto;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
+      border:1px solid var(--line);
+      border-radius:16px;
       background:#fff;
     }
 
@@ -321,41 +340,71 @@
 
     .adj-table th,
     .adj-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:10px 12px;
+      border-bottom:1px solid var(--line-soft);
+      padding:12px 13px;
       font-size:14px;
       vertical-align:middle;
     }
 
     .adj-table th{
-      background:#f8fafc;
+      background:#f3ede2;
       text-align:left;
       font-weight:700;
-      color:#334155;
+      color:var(--ink-700);
       text-transform:uppercase;
-      letter-spacing:.05em;
+      letter-spacing:.08em;
       font-size:12px;
       position:sticky;
       top:0;
       z-index:1;
-      padding-top:11px;
-      padding-bottom:11px;
+      padding-top:12px;
+      padding-bottom:12px;
     }
 
-    .adj-table tbody tr:nth-child(even){ background:#fcfdff; }
-    .adj-table tbody tr:hover{ background:#f8fbff; }
+    .adj-table tbody tr:nth-child(even){ background:#fdfbf7; }
+    .adj-table tbody tr:hover{ background:#f5efe4; }
     .adj-table tbody tr.is-hidden{ display:none; }
 
     .adj-count{
       font-size:13px;
-      color:#64748b;
+      color:var(--ink-500);
       font-weight:700;
     }
 
+    .adj-direction-legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .adj-direction-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid;
+    }
+    .adj-direction-pill.in{
+      background:var(--profit-soft);
+      color:var(--profit);
+      border-color:#c9e2d0;
+    }
+    .adj-direction-pill.out{
+      background:var(--loss-soft);
+      color:var(--danger);
+      border-color:#e8c8c8;
+    }
+    .adj-section-sep{
+      margin-top:26px;
+    }
+
     @media (max-width:640px){
-      .adj-page{padding:0 14px;margin:22px auto 52px;}
-      .adj-hero{padding:16px;}
-      .adj-title{font-size:25px;}
+      .adj-page{padding:0 14px;margin:24px auto 54px;}
+      .adj-hero{padding:18px;}
+      .adj-title{font-size:28px;}
       .adj-btn{width:100%;}
       .adj-search{min-width:100%;max-width:100%;}
     }
@@ -382,8 +431,8 @@
   </div>
 
   {% if error %}
-    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
-                font-size:15px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+    <div style="margin-bottom:16px;padding:13px 14px;border-radius:14px;
+                font-size:15px;background:#fff4f1;color:#8a2e2e;border:1px solid #e8c8c8;box-shadow:0 10px 24px rgba(138,46,46,.05);">
       {{ error }}
     </div>
   {% endif %}
@@ -392,18 +441,18 @@
     <div style="margin-bottom:16px;">
       {% for message in messages %}
         {% if "success" in message.tags %}
-          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:15px;
-                      background:#dcfce7;color:#166534;border:1px solid #bbf7d0;">
+          <div style="margin-bottom:10px;padding:13px 14px;border-radius:14px;font-size:15px;
+                      background:#edf7ef;color:#1f6a3d;border:1px solid #c9e2d0;box-shadow:0 10px 24px rgba(31,106,61,.05);">
             {{ message }}
           </div>
         {% elif "error" in message.tags %}
-          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:15px;
-                      background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+          <div style="margin-bottom:10px;padding:13px 14px;border-radius:14px;font-size:15px;
+                      background:#fff4f1;color:#8a2e2e;border:1px solid #e8c8c8;box-shadow:0 10px 24px rgba(138,46,46,.05);">
             {{ message }}
           </div>
         {% else %}
-          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:15px;
-                      background:#f3f4f6;color:#111827;border:1px solid #e5e7eb;">
+          <div style="margin-bottom:10px;padding:13px 14px;border-radius:14px;font-size:15px;
+                      background:#f8f3eb;color:#1d3528;border:1px solid #e7dfd1;box-shadow:0 10px 24px rgba(29,53,40,.04);">
             {{ message }}
           </div>
         {% endif %}
@@ -558,7 +607,7 @@
   </div>
 
   {# ===================== STOCK ADJUSTMENT CARD ===================== #}
-  <div class="adj-card adj-card-form">
+  <div class="adj-card adj-card-form adj-section-sep">
 
     <div class="adj-card-head">
       <h2 class="adj-card-title" data-i18n="stock_adj">Stock Correction</h2>
@@ -600,6 +649,10 @@
             <option value="DOWN" selected data-i18n="down_damage">DOWN (Damage / Expiry / Loss)</option>
             <option value="UP" data-i18n="up_correction">UP (Extra / Found / Correction)</option>
           </select>
+          <div class="adj-direction-legend" aria-hidden="true">
+            <span class="adj-direction-pill in">UP = Stock increases</span>
+            <span class="adj-direction-pill out">DOWN = Stock decreases</span>
+          </div>
         </div>
 
         <div class="adj-field-secondary">
