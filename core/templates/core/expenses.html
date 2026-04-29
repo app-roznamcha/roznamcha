@@ -9,47 +9,57 @@
   <style>
     .expenses-page{
       max-width:1200px;
-      margin:34px auto 64px;
-      padding:0 18px;
-      --line:#e2e8f0;
-      --ink-900:#0f172a;
-      --ink-700:#334155;
-      --ink-500:#64748b;
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
-      --surface:#ffffff;
+      margin:38px auto 72px;
+      padding:0 20px;
+      --bg:#f8f5ef;
+      --surface:#fffdf9;
+      --surface-strong:#ffffff;
+      --line:#e7dfd1;
+      --line-soft:#efe7da;
+      --ink-900:#1d3528;
+      --ink-700:#405548;
+      --ink-500:#6d7c72;
+      --accent:#1f5134;
+      --accent-dark:#173c27;
+      --accent-soft:#edf4ee;
+      --danger:#8a2e2e;
+      --danger-soft:#fff3f1;
+      --info-soft:#eef6fb;
+      --shadow:0 16px 36px rgba(29, 53, 40, .08);
+      color:var(--ink-900);
     }
 
     .exp-header{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:12px;
+      gap:18px;
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:18px 20px;
+      border-radius:22px;
+      padding:24px 26px;
       background:
-        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
-        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
-        var(--surface);
-      box-shadow:0 10px 24px rgba(15,23,42,.07);
+        radial-gradient(760px 260px at -16% -90%, rgba(205, 223, 209, .7) 0%, transparent 58%),
+        radial-gradient(640px 240px at 115% -80%, rgba(243, 231, 212, .78) 0%, transparent 54%),
+        linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:var(--shadow);
     }
 
     .exp-title{
-      margin:0 0 4px;
-      font-size:31px;
+      margin:0 0 8px;
+      font-size:34px;
       font-weight:800;
       color:var(--ink-900);
       letter-spacing:-.02em;
+      line-height:1.08;
     }
 
     .exp-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
-      line-height:1.55;
+      color:var(--ink-700);
+      line-height:1.65;
       max-width:740px;
     }
 
@@ -65,90 +75,105 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:150px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid #cbd5e1;
-      background:#f8fafc;
-      color:#111827;
+      border:1px solid #d9d0c1;
+      background:rgba(255,255,255,.82);
+      color:var(--ink-900);
       white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
       cursor:pointer;
+      box-shadow:0 8px 18px rgba(29, 53, 40, .05);
     }
 
     .exp-btn:hover{
       transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
+      border-color:#c8bca6;
+      background:#fff;
+      box-shadow:0 10px 20px rgba(29, 53, 40, .08);
     }
 
     .exp-btn-primary{
-      border-color:var(--primary-dark);
-      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      border-color:var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#fff;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
     }
 
     .exp-card{
-      background:#ffffff;
-      border-radius:16px;
-      border:1px solid #d1d5db;
-      padding:16px 18px 18px;
-      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      background:var(--surface-strong);
+      border-radius:20px;
+      border:1px solid var(--line);
+      padding:22px 24px 24px;
+      box-shadow:var(--shadow);
       margin-bottom:14px;
     }
 
     .exp-card-title{
-      font-size:18px;
+      font-size:20px;
       font-weight:800;
-      margin:0 0 6px;
-      color:#0f172a;
+      margin:0 0 10px;
+      color:var(--ink-900);
+      letter-spacing:-.01em;
     }
 
     .exp-form-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:12px;
+      gap:14px 16px;
       align-items:end;
     }
 
     .exp-field label{
       display:block;
-      font-size:14px;
-      margin-bottom:4px;
-      color:#334155;
-      font-weight:600;
+      font-size:13px;
+      margin-bottom:7px;
+      color:var(--ink-700);
+      font-weight:700;
+      letter-spacing:.01em;
     }
 
     .exp-field input,
     .exp-field select{
       width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid #d9d0c1;
       font-size:14px;
-      background:#fff;
-      transition:border-color .14s ease, box-shadow .14s ease;
+      background:#fffdfa;
+      color:var(--ink-900);
+      min-height:46px;
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
     }
 
     .exp-field input:focus,
     .exp-field select:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#9cb7a5;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
     .exp-field-amount input{
-      min-height:46px;
-      font-size:16px;
+      min-height:50px;
+      font-size:18px;
       font-weight:700;
-      border-color:#94a3b8;
+      border-color:#cdbb97;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+      text-align:right;
     }
     .exp-field-amount input:focus{
-      border-color:#60a5fa;
-      box-shadow:0 0 0 3px rgba(37,99,235,.16);
+      border-color:#9cb7a5;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
+    }
+    .exp-field-help{
+      margin-top:7px;
+      font-size:12.5px;
+      color:var(--ink-500);
+      line-height:1.5;
     }
     .exp-actions-row{
       grid-column:1 / -1;
@@ -162,9 +187,9 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      border:1px solid #dbeafe;
-      background:#eff6ff;
-      color:#1d4ed8;
+      border:1px solid #cfe0eb;
+      background:var(--info-soft);
+      color:#3a6b89;
       padding:7px 11px;
       border-radius:999px;
       font-size:13px;
@@ -179,13 +204,13 @@
     }
 
     .exp-chip{
-      border:1px solid #dbeafe;
-      background:#eff6ff;
-      color:#1d4ed8;
+      border:1px solid #d9d0c1;
+      background:#fffdfa;
+      color:var(--ink-700);
       border-radius:999px;
       font-size:12px;
       font-weight:700;
-      padding:4px 10px;
+      padding:5px 11px;
       cursor:pointer;
     }
 
@@ -219,20 +244,20 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      border:1px solid #e2e8f0;
-      background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
-      color:#0f172a;
+      border:1px solid var(--line);
+      background:#f8f3eb;
+      color:var(--ink-900);
       padding:7px 11px;
       border-radius:999px;
       font-size:13px;
       font-weight:700;
-      box-shadow:0 1px 2px rgba(15,23,42,.04);
+      box-shadow:0 1px 2px rgba(29,53,40,.04);
     }
 
     .exp-stat-chip.total{
-      border-color:#bfdbfe;
-      background:#eff6ff;
-      color:#1d4ed8;
+      border-color:#cfe0eb;
+      background:var(--info-soft);
+      color:#3a6b89;
     }
 
     .exp-toolbar{
@@ -253,24 +278,25 @@
     .exp-search label{
       display:block;
       font-size:13px;
-      color:#475569;
-      margin-bottom:4px;
-      font-weight:600;
+      color:var(--ink-700);
+      margin-bottom:7px;
+      font-weight:700;
     }
 
     .exp-search input{
       width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid #d9d0c1;
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
+      color:var(--ink-900);
     }
 
     .exp-search input:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#9cb7a5;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
     .exp-search-row{
       display:flex;
@@ -287,8 +313,8 @@
     .exp-table-wrap{
       width:100%;
       overflow-x:auto;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
+      border:1px solid var(--line);
+      border-radius:16px;
       background:#fff;
     }
 
@@ -300,19 +326,19 @@
 
     .exp-table th,
     .exp-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:10px 12px;
+      border-bottom:1px solid var(--line-soft);
+      padding:12px 13px;
       font-size:14px;
       vertical-align:middle;
     }
 
     .exp-table th{
-      background:#f8fafc;
+      background:#f3ede2;
       text-align:left;
       font-weight:700;
-      color:#334155;
+      color:var(--ink-700);
       text-transform:uppercase;
-      letter-spacing:.05em;
+      letter-spacing:.08em;
       font-size:12px;
       position:sticky;
       top:0;
@@ -321,8 +347,9 @@
       padding-bottom:11px;
     }
 
-    .exp-table tbody tr:nth-child(even){ background:#fcfdff; }
-    .exp-table tbody tr:hover{ background:#f8fbff; }
+    .exp-table td{ color:var(--ink-900); }
+    .exp-table tbody tr:nth-child(even){ background:#fdfbf7; }
+    .exp-table tbody tr:hover{ background:#f5efe4; }
     .exp-table tbody tr.is-hidden{ display:none; }
 
     .right{text-align:right;}
@@ -333,7 +360,7 @@
       align-items:center;
       justify-content:center;
       min-width:58px;
-      padding:4px 8px;
+      padding:5px 10px;
       border-radius:999px;
       font-size:12px;
       font-weight:700;
@@ -341,23 +368,32 @@
     }
 
     .posted-yes{
-      color:#166534;
-      background:#ecfdf3;
-      border-color:#bbf7d0;
+      color:#1f6a3d;
+      background:var(--accent-soft);
+      border-color:#c9e2d0;
     }
 
     .posted-no{
-      color:#9a3412;
-      background:#fff7ed;
-      border-color:#fed7aa;
+      color:#9a6a16;
+      background:#fdf5e7;
+      border-color:#ead6aa;
     }
 
     .ur{display:block;font-size:12px;color:#64748b;margin-top:2px;direction:rtl;text-align:right;}
+    .exp-empty{
+      padding:18px 16px;
+      border-radius:16px;
+      border:1px dashed #ddd2c2;
+      background:#f8f3eb;
+      color:var(--ink-500);
+      font-size:14px;
+      text-align:center;
+    }
 
     @media (max-width:640px){
-      .expenses-page{padding:0 14px !important;margin:22px auto 52px;}
-      .exp-header{padding:16px;}
-      .exp-title{font-size:25px;}
+      .expenses-page{padding:0 14px !important;margin:24px auto 54px;}
+      .exp-header{padding:18px;}
+      .exp-title{font-size:28px;}
       .exp-btn{width:100%;}
       .exp-filter-form .field,
       .exp-filter-form .field.small{min-width:100%;max-width:100%;}
@@ -371,10 +407,10 @@
   <div class="exp-header">
     <div>
       <h1 class="exp-title" data-i18n="expenses_title">
-        Daily Expenses
+        Expenses
       </h1>
       <p class="exp-sub" data-i18n="expenses_subtitle">
-        Record daily spending like wages, food, guests, fuel, etc.
+        Record and track your daily business expenses.
       </p>
     </div>
     <div class="exp-actions">
@@ -386,8 +422,8 @@
 
   {# ---------- Error ---------- #}
   {% if error %}
-    <div style="margin-bottom:16px;padding:10px 12px;border-radius:10px;
-                font-size:15px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;">
+    <div style="margin-bottom:16px;padding:13px 14px;border-radius:14px;
+                font-size:15px;background:var(--danger-soft);color:var(--danger);border:1px solid #e8c8c8;box-shadow:0 10px 24px rgba(138,46,46,.05);">
       {{ error }}
     </div>
   {% endif %}
@@ -436,9 +472,12 @@
 
       <div class="exp-field exp-field-amount">
         <label data-i18n="amount_label">
-          Amount (Rs)
+          Expense Amount
         </label>
         <input type="number" id="expenseAmountInput" name="amount" step="0.01" min="0" required>
+        <div class="exp-field-help" data-i18n="amount_helper">
+          Enter the amount paid for this expense.
+        </div>
       </div>
 
       <div class="exp-field" style="grid-column:1 / -1;">
@@ -558,7 +597,7 @@
           {% empty %}
             <tr>
               <td colspan="7" style="border-bottom:1px solid #e5e7eb;padding:10px 9px;font-size:15px;text-align:center;" data-i18n="no_expenses">
-                No expenses found.
+                No expenses recorded yet.
               </td>
             </tr>
           {% endfor %}
@@ -574,15 +613,16 @@
   window.ROZ_I18N = window.ROZ_I18N || { en: {}, ur: {} };
 
   Object.assign(window.ROZ_I18N.en, {
-    expenses_title: "Daily Expenses",
-    expenses_subtitle: "Record daily spending like wages, food, guests, fuel, etc.",
+    expenses_title: "Expenses",
+    expenses_subtitle: "Record and track your daily business expenses.",
     back_dashboard: "← Dashboard",
 
     record_expense: "Record Expense",
     date_label: "Date",
     paid_from_label: "Paid From (Cash/Bank)",
     expense_head_label: "Expense Head",
-    amount_label: "Amount (Rs)",
+    amount_label: "Expense Amount",
+    amount_helper: "Enter the amount paid for this expense.",
     notes_label: "Notes (optional)",
     select_account_opt: "-- Select Account --",
     select_head_opt: "-- Select Head --",
@@ -616,19 +656,20 @@
 
     yes: "Yes",
     no: "No",
-    no_expenses: "No expenses found.",
+    no_expenses: "No expenses recorded yet.",
   });
 
   Object.assign(window.ROZ_I18N.ur, {
-    expenses_title: "روزانہ اخراجات",
-    expenses_subtitle: "روزانہ اخراجات درج کریں جیسے مزدوری، کھانا، مہمان، ایندھن وغیرہ۔",
+    expenses_title: "اخراجات",
+    expenses_subtitle: "اپنے روزانہ کاروباری اخراجات درج کریں اور ٹریک کریں۔",
     back_dashboard: "← ڈیش بورڈ",
 
     record_expense: "اخراجات درج کریں",
     date_label: "تاریخ",
     paid_from_label: "ادائیگی کس اکاؤنٹ سے (کیش/بینک)",
     expense_head_label: "اخراجات کی مد",
-    amount_label: "رقم (روپے)",
+    amount_label: "اخراجات کی رقم",
+    amount_helper: "اس خرچے کے لیے ادا کی گئی رقم درج کریں۔",
     notes_label: "تفصیل (اختیاری)",
     select_account_opt: "-- اکاؤنٹ منتخب کریں --",
     select_head_opt: "-- مد منتخب کریں --",
@@ -662,7 +703,7 @@
 
     yes: "ہاں",
     no: "نہیں",
-    no_expenses: "کوئی اخراجات نہیں ملے۔",
+    no_expenses: "ابھی تک کوئی اخراجات درج نہیں ہوئے۔",
   });
 
   if (window.applyLang) window.applyLang(localStorage.getItem("roz_lang") || "en");

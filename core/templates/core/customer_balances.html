@@ -3,66 +3,79 @@
 {% block title %}Customer Balances{% endblock %}
 
 {% block content %}
-<div class="page customer-balances-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page customer-balances-page" style="max-width:1140px;margin:40px auto 68px;padding:0 18px;">
   <style>
     .customer-balances-page{
-      --slate-50:#f8fafc;
-      --slate-100:#f1f5f9;
-      --slate-200:#e2e8f0;
-      --slate-300:#cbd5e1;
-      --slate-500:#64748b;
-      --slate-700:#334155;
-      --slate-900:#0f172a;
-      --brand:#2563eb;
-      --brand-dark:#1d4ed8;
-      --dr:#b91c1c;
-      --dr-soft:#fee2e2;
-      --cr:#047857;
-      --cr-soft:#d1fae5;
+      --bg:#f8f5ef;
+      --surface:#fffdf9;
+      --surface-strong:#ffffff;
+      --line:#e7dfd1;
+      --line-soft:#efe7da;
+      --ink-900:#1d3528;
+      --ink-700:#405548;
+      --ink-500:#6d7c72;
+      --accent:#1f5134;
+      --accent-dark:#173c27;
+      --accent-soft:#edf4ee;
+      --dr:#1f6a3d;
+      --dr-soft:#edf7ef;
+      --cr:#9a6a16;
+      --cr-soft:#fdf5e7;
+      --net:#3a6b89;
+      --net-soft:#eef6fb;
+      --danger:#8a2e2e;
+      --danger-soft:#fff3f1;
+      --shadow:0 16px 36px rgba(29, 53, 40, .08);
+      color:var(--ink-900);
     }
 
     .cb-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:14px;
-      padding:18px 20px;
-      border-radius:20px;
-      border:1px solid var(--slate-200);
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+      gap:18px;
+      padding:24px 26px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(760px 260px at -16% -90%, rgba(205, 223, 209, .7) 0%, transparent 58%),
+        radial-gradient(640px 240px at 115% -80%, rgba(243, 231, 212, .78) 0%, transparent 54%),
+        linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:var(--shadow);
     }
     .cb-title{
-      margin:0 0 4px;
-      font-size:32px;
+      margin:0 0 8px;
+      font-size:35px;
       font-weight:800;
       letter-spacing:-0.02em;
-      color:var(--slate-900);
+      color:var(--ink-900);
+      line-height:1.08;
     }
     .cb-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
-      line-height:1.55;
+      color:var(--ink-700);
+      line-height:1.65;
       max-width:720px;
     }
     .cb-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 18px;
+      padding:11px 18px;
       min-width:170px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#fff;
       white-space:nowrap;
       transition:transform .12s ease, box-shadow .12s ease;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
     }
     .cb-btn:hover{
       transform:translateY(-1px);
@@ -70,115 +83,131 @@
     }
 
     .cb-card{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--slate-200);
-      padding:18px 20px 20px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      background:var(--surface-strong);
+      border-radius:20px;
+      border:1px solid var(--line);
+      padding:22px 24px 24px;
+      box-shadow:var(--shadow);
       margin-bottom:20px;
     }
     .cb-kpis{
       display:grid;
       grid-template-columns:repeat(4,minmax(0,1fr));
       gap:14px;
-      margin-bottom:20px;
+      margin-bottom:22px;
     }
     .cb-kpi{
-      background:#fff;
-      border:1px solid var(--slate-200);
-      border-radius:16px;
-      padding:16px 18px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      background:#fffefc;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 18px 19px;
+      box-shadow:var(--shadow);
+      min-height:126px;
     }
     .cb-kpi-label{
-      font-size:13px;
-      color:var(--slate-500);
+      font-size:12px;
+      color:var(--ink-500);
       margin-bottom:8px;
       font-weight:700;
       text-transform:uppercase;
-      letter-spacing:.04em;
+      letter-spacing:.08em;
     }
     .cb-kpi-value{
-      font-size:26px;
+      font-size:29px;
       font-weight:800;
-      color:var(--slate-900);
+      color:var(--ink-900);
       line-height:1.15;
     }
     .cb-kpi-sub{
       font-size:13px;
-      color:var(--slate-500);
+      color:var(--ink-500);
       margin-top:8px;
+      line-height:1.5;
     }
+    .cb-kpi.receivable{ background:linear-gradient(180deg,#fffefc 0%, #eef7f0 100%); border-color:#c9e2d0; }
+    .cb-kpi.receivable .cb-kpi-value{ color:var(--dr); }
+    .cb-kpi.advance{ background:linear-gradient(180deg,#fffefc 0%, #fdf5e7 100%); border-color:#ead6aa; }
+    .cb-kpi.advance .cb-kpi-value{ color:var(--cr); }
+    .cb-kpi.net{ background:linear-gradient(180deg,#fffefc 0%, #eef6fb 100%); border-color:#cfe0eb; }
+    .cb-kpi.net .cb-kpi-value{ color:var(--net); }
+    .cb-kpi.count{ background:linear-gradient(180deg,#fffefc 0%, #f8f3eb 100%); }
     .cb-card-head{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:10px;
+      margin-bottom:14px;
       gap:10px;
       flex-wrap:wrap;
     }
     .cb-card-title{
-      font-size:18px;
-      font-weight:700;
-      color:var(--slate-900);
+      font-size:20px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.01em;
     }
     .cb-card-sub{
       font-size:13px;
-      color:var(--slate-500);
+      color:var(--ink-500);
+      line-height:1.55;
     }
 
     .cb-filter{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
+      gap:14px 16px;
       align-items:flex-end;
     }
     .cb-filter label{
       display:block;
-      font-size:14px;
-      color:#4b5563;
-      margin-bottom:4px;
+      font-size:13px;
+      color:var(--ink-700);
+      margin-bottom:7px;
+      font-weight:700;
+      letter-spacing:.01em;
     }
     .cb-filter input,
     .cb-filter select{
       width:100%;
-      padding:9px 10px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid #d9d0c1;
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
+      color:var(--ink-900);
     }
     .cb-filter input:focus,
     .cb-filter select:focus{
-      outline:3px solid rgba(37,99,235,0.15);
-      border-color:#93c5fd;
+      outline:none;
+      border-color:#9cb7a5;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
 
     .cb-apply{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:9px 18px;
-      border-radius:10px;
+      padding:11px 18px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#ffffff;
       cursor:pointer;
       white-space:nowrap;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .18);
     }
 
     .pill{
       display:inline-flex;
       align-items:center;
       gap:6px;
-      padding:3px 10px;
+      padding:6px 11px;
       border-radius:999px;
       font-size:12px;
-      border:1px solid var(--slate-200);
-      background:#ffffff;
-      color:#111827;
+      border:1px solid var(--line);
+      background:#f8f3eb;
+      color:var(--ink-900);
       white-space:nowrap;
       font-weight:700;
     }
@@ -194,27 +223,31 @@
       border-collapse:collapse;
       width:100%;
       min-width:760px;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
+      border:1px solid var(--line);
+      border-radius:16px;
       overflow:hidden;
     }
     .tbl th, .tbl td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
+      border-bottom:1px solid var(--line-soft);
+      padding:12px 13px;
       font-size:14px;
       vertical-align:middle;
     }
     .tbl th{
       text-align:left;
-      font-weight:600;
-      background:#f9fafb;
-      color:var(--slate-700);
+      font-weight:700;
+      background:#f3ede2;
+      color:var(--ink-700);
       position:sticky;
       top:0;
       z-index:1;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-size:12px;
     }
-    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
-    .tbl tbody tr:hover{ background:#f8fbff; }
+    .tbl td{ color:var(--ink-900); }
+    .tbl tbody tr:nth-child(even){ background:#fdfbf7; }
+    .tbl tbody tr:hover{ background:#f5efe4; }
     .right{text-align:right}
     .center{text-align:center}
 
@@ -222,21 +255,48 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:56px;
-      padding:2px 8px;
+      min-width:118px;
+      padding:5px 11px;
       border-radius:999px;
       font-size:12px;
       font-weight:800;
-      border:1px solid var(--slate-200);
+      border:1px solid var(--line);
       background:#fff;
-      color:var(--slate-700);
+      color:var(--ink-700);
     }
-    .bal-pill.dr{ border-color:#fca5a5; color:var(--dr); background:var(--dr-soft); }
-    .bal-pill.cr{ border-color:#86efac; color:var(--cr); background:var(--cr-soft); }
+    .bal-pill.dr{ border-color:#c9e2d0; color:var(--dr); background:var(--dr-soft); }
+    .bal-pill.cr{ border-color:#ead6aa; color:var(--cr); background:var(--cr-soft); }
+    .statement-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      text-decoration:none;
+      color:var(--ink-700);
+      border:1px solid #d9d0c1;
+      background:#fffdfa;
+      box-shadow:0 6px 14px rgba(29, 53, 40, .04);
+    }
+    .statement-link:hover{
+      background:#fff;
+      border-color:#c8bca6;
+    }
+    .cb-empty{
+      padding:18px 16px;
+      border-radius:16px;
+      border:1px dashed #ddd2c2;
+      background:#f8f3eb;
+      color:var(--ink-500);
+      font-size:14px;
+      text-align:center;
+    }
 
     @media (max-width: 640px) {
       .customer-balances-page { padding: 0 14px !important; margin: 24px auto 50px !important; }
-      .cb-title { font-size: 26px !important; }
+      .cb-title { font-size: 28px !important; }
       .cb-sub { font-size: 14px !important; }
       .cb-btn { width:100%; min-width:unset; }
       .cb-kpis { grid-template-columns:1fr !important; }
@@ -247,7 +307,7 @@
   <div class="cb-hero">
     <div>
       <h1 class="cb-title">Customer Balances</h1>
-      <p class="cb-sub">See each customer's opening position and closing ledger balance as of the selected date, using the same statement logic as the party ledger.</p>
+      <p class="cb-sub">View outstanding receivables and customer account positions.</p>
     </div>
     <div>
       <a href="{% url 'dashboard' %}" class="cb-btn">← Back to Dashboard</a>
@@ -255,8 +315,8 @@
   </div>
 
   <div class="cb-card">
-    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">As-of date</div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px;color:var(--ink-900);letter-spacing:-.01em;">As-of date</div>
+    <p style="font-size:15px;color:var(--ink-700);margin-bottom:14px;line-height:1.6;">
       Choose a cut-off date to calculate balances up to that day, then click <strong>Apply</strong>.
     </p>
 
@@ -301,22 +361,22 @@
   </div>
 
   <div class="cb-kpis">
-    <div class="cb-kpi">
+    <div class="cb-kpi receivable">
       <div class="cb-kpi-label">Total Receivable</div>
       <div class="cb-kpi-value">PKR {{ total_receivable|floatformat:2 }}</div>
-      <div class="cb-kpi-sub">Debit-side customer balances</div>
+      <div class="cb-kpi-sub">Receivable (DR) balances</div>
     </div>
-    <div class="cb-kpi">
+    <div class="cb-kpi advance">
       <div class="cb-kpi-label">Customer Advances</div>
       <div class="cb-kpi-value">PKR {{ total_advances|floatformat:2 }}</div>
-      <div class="cb-kpi-sub">Credit-side customer balances</div>
+      <div class="cb-kpi-sub">Advance (CR) balances</div>
     </div>
-    <div class="cb-kpi">
+    <div class="cb-kpi net">
       <div class="cb-kpi-label">Net Customer Position</div>
       <div class="cb-kpi-value">{{ net_position_side }} PKR {{ net_position_abs|floatformat:2 }}</div>
       <div class="cb-kpi-sub">Net balance across visible customers</div>
     </div>
-    <div class="cb-kpi">
+    <div class="cb-kpi count">
       <div class="cb-kpi-label">Customers with Due</div>
       <div class="cb-kpi-value">{{ customers_with_due_count }}</div>
       <div class="cb-kpi-sub">Customers currently in debit balance</div>
@@ -340,7 +400,7 @@
         </div>
       </div>
     {% else %}
-      <div style="padding:14px 16px;border-radius:12px;border:1px dashed #cbd5e1;background:#f8fafc;color:#64748b;font-size:14px;">
+      <div class="cb-empty">
         No due customer balances for this date.
       </div>
     {% endif %}
@@ -378,10 +438,10 @@
               </td>
               <td class="right">{{ row.net_abs|floatformat:2 }}</td>
               <td class="center">
-                <span class="bal-pill {% if row.net_type == 'DR' %}dr{% else %}cr{% endif %}">{{ row.net_type }}</span>
+                <span class="bal-pill {% if row.net_type == 'DR' %}dr{% else %}cr{% endif %}">{% if row.net_type == 'DR' %}Receivable (DR){% else %}Advance (CR){% endif %}</span>
               </td>
               <td class="center">
-                <a href="{% url 'party_statement' row.party.id %}?to={{ as_of|date:'Y-m-d' }}" style="color:#2563eb;text-decoration:none;font-weight:600;">
+                <a href="{% url 'party_statement' row.party.id %}?to={{ as_of|date:'Y-m-d' }}" class="statement-link">
                   View
                 </a>
               </td>
@@ -389,7 +449,7 @@
           {% empty %}
             <tr>
               <td colspan="6" style="border-bottom:1px solid #e5e7eb;padding:7px 9px;font-size:14px;text-align:center;">
-                No customers found.
+                No customer balances available.
               </td>
             </tr>
           {% endfor %}
