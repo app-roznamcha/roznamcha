@@ -10,15 +10,20 @@
       width:100%;
       margin:34px 0 64px;
       padding:0 16px;
-      --ink-900:#0f172a;
+      --ink-900:#172033;
       --ink-700:#334155;
-      --ink-500:#64748b;
-      --line:#dbe3ee;
-      --line-soft:#e5e7eb;
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
+      --ink-500:#6b7280;
+      --line:#e5dccd;
+      --line-soft:#efe7db;
+      --primary:#1f5a45;
+      --primary-dark:#163f31;
       --surface:#ffffff;
-      --surface-soft:#f8fafc;
+      --surface-soft:#fffdfa;
+      --surface-cream:#f8f5ef;
+      --dr:#166534;
+      --dr-soft:#e7f4eb;
+      --cr:#9a6700;
+      --cr-soft:#fdf3d6;
     }
 
     .al-hero{
@@ -29,27 +34,28 @@
       flex-wrap:wrap;
       gap:12px;
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:20px 22px;
+      border-radius:24px;
+      padding:24px 26px;
       background:
-        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
-        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        radial-gradient(900px 260px at -20% -120%, #f1e6d2 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #e4efe8 0%, transparent 56%),
         var(--surface);
-      box-shadow:0 12px 28px rgba(15,23,42,.08);
+      box-shadow:0 18px 34px rgba(23,32,51,.07);
     }
 
     .al-title{
       margin:0 0 4px;
-      font-size:31px;
+      font-size:38px;
       font-weight:800;
       color:var(--ink-900);
       letter-spacing:-.02em;
+      line-height:1.05;
     }
 
     .al-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
+      color:#5f6675;
       line-height:1.55;
       max-width:800px;
     }
@@ -58,24 +64,25 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:150px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid #cfd9e6;
-      background:linear-gradient(180deg,#ffffff,#f8fafc);
-      color:#111827;
+      border:1px solid rgba(31,90,69,.16);
+      background:#fffdfa;
+      color:var(--primary-dark);
       transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
       cursor:pointer;
       white-space:nowrap;
+      box-shadow:0 8px 18px rgba(23,32,51,.05);
     }
 
     .al-btn:hover{
       transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
+      border-color:#88a092;
+      box-shadow:0 12px 24px rgba(23,32,51,.08);
     }
 
     .al-btn-primary{
@@ -86,10 +93,10 @@
 
     .al-card{
       background:#ffffff;
-      border-radius:16px;
+      border-radius:20px;
       border:1px solid var(--line);
-      padding:18px 20px 20px;
-      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      padding:22px 24px 24px;
+      box-shadow:0 14px 28px rgba(23,32,51,.06);
       margin-bottom:18px;
       position:relative;
       overflow:hidden;
@@ -102,28 +109,102 @@
       left:0;
       right:0;
       height:3px;
-      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
-      opacity:.75;
+      background:linear-gradient(90deg,#1f5a45,#7d9f8d,#d7b574);
+      opacity:.82;
     }
 
     .al-card-title{
       margin:0;
-      font-size:18px;
+      font-size:22px;
       font-weight:800;
       color:var(--ink-900);
+      letter-spacing:-.01em;
     }
 
     .al-card-sub{
-      margin:4px 0 12px;
-      font-size:13px;
-      color:#64748b;
+      margin:6px 0 16px;
+      font-size:14px;
+      color:#6b7280;
       line-height:1.45;
+    }
+
+    .al-summary-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .al-summary-card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 15px;
+      background:linear-gradient(180deg,#fffdfa 0%,#f8f5ef 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+    }
+
+    .al-summary-label{
+      font-size:12px;
+      color:var(--ink-500);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    .al-summary-value{
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      line-height:1.2;
+    }
+
+    .al-summary-value.dr{ color:var(--dr); }
+    .al-summary-value.cr{ color:var(--cr); }
+
+    .al-summary-hint{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--ink-500);
+      line-height:1.4;
+    }
+
+    .al-side-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-bottom:8px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      border:1px solid transparent;
+    }
+
+    .al-side-badge.dr{
+      background:var(--dr-soft);
+      color:var(--dr);
+      border-color:rgba(22,101,52,.12);
+    }
+
+    .al-side-badge.cr{
+      background:var(--cr-soft);
+      color:var(--cr);
+      border-color:rgba(154,103,0,.14);
+    }
+
+    .al-side-badge.neutral{
+      background:#f3f4f6;
+      color:#4b5563;
+      border-color:#e5e7eb;
     }
 
     .al-filter{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
+      gap:14px;
       align-items:flex-end;
     }
 
@@ -136,30 +217,33 @@
 
     .al-filter label{
       display:block;
-      font-size:14px;
+      font-size:13px;
       font-weight:700;
-      margin-bottom:5px;
-      color:var(--ink-700);
+      margin-bottom:7px;
+      color:#5f6675;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .al-filter select,
     .al-filter input[type="date"]{
       width:100%;
-      min-height:42px;
-      border:1px solid #cbd5e1;
-      border-radius:10px;
-      padding:9px 11px;
+      min-height:48px;
+      border:1px solid #d9cfbf;
+      border-radius:14px;
+      padding:12px 13px;
       font-size:14px;
       color:#0f172a;
       background:var(--surface-soft);
       transition:border-color .14s ease, box-shadow .14s ease;
+      box-shadow:inset 0 1px 2px rgba(23,32,51,.03);
     }
 
     .al-filter select:focus,
     .al-filter input[type="date"]:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
       background:#fff;
     }
 
@@ -191,7 +275,7 @@
 
     .al-kpis{
       display:flex;
-      gap:8px;
+      gap:10px;
       flex-wrap:wrap;
       align-items:center;
     }
@@ -200,10 +284,10 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      border:1px solid #e2e8f0;
-      background:#f8fafc;
+      border:1px solid #e6dccd;
+      background:#fff9f0;
       color:#0f172a;
-      padding:6px 10px;
+      padding:7px 11px;
       border-radius:999px;
       font-size:13px;
       font-weight:700;
@@ -227,33 +311,37 @@
     .al-search label{
       display:block;
       font-size:13px;
-      color:#475569;
-      margin-bottom:4px;
-      font-weight:600;
+      color:#5f6675;
+      margin-bottom:7px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .al-search input{
       width:100%;
-      min-height:40px;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
+      min-height:46px;
+      padding:11px 13px;
+      border-radius:14px;
+      border:1px solid #d9cfbf;
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
+      color:var(--ink-900);
     }
 
     .al-search input:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
     }
 
     .al-table-wrap{
       width:100%;
       overflow-x:auto;
       border:1px solid var(--line-soft);
-      border-radius:12px;
-      background:#fff;
+      border-radius:18px;
+      background:#fffdfa;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
     }
 
     .al-table{
@@ -264,16 +352,16 @@
 
     .al-table th,
     .al-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:10px 10px;
+      border-bottom:1px solid #ece3d6;
+      padding:13px 12px;
       font-size:14px;
       vertical-align:middle;
     }
 
     .al-table th{
-      background:#f8fafc;
+      background:linear-gradient(180deg,#f6f0e6 0%,#f1e9dc 100%);
       text-align:left;
-      font-weight:700;
+      font-weight:800;
       color:#334155;
       text-transform:uppercase;
       letter-spacing:.05em;
@@ -284,17 +372,34 @@
       white-space:nowrap;
     }
 
-    .al-table tbody tr:nth-child(even){ background:#fbfdff; }
-    .al-table tbody tr:hover{ background:#f8fbff; }
+    .al-table tbody tr:nth-child(even){ background:#fffcf7; }
+    .al-table tbody tr:hover{ background:#f7f1e8; }
     .al-table tbody tr.is-hidden{ display:none; }
 
     .right{text-align:right;}
     .type-cell,.counter-cell{color:#334155;white-space:nowrap;}
-    .date-cell{white-space:nowrap;}
-    .debit{color:#166534;white-space:nowrap;}
-    .credit{color:#dc2626;white-space:nowrap;}
-    .balance-cell{white-space:nowrap;}
+    .date-cell{white-space:nowrap;color:#445063;font-weight:600;}
+    .desc-cell{color:#1f2937;line-height:1.5;font-weight:600;}
+    .debit{color:var(--dr);white-space:nowrap;font-weight:800;}
+    .credit{color:var(--cr);white-space:nowrap;font-weight:800;}
+    .balance-cell{white-space:nowrap;font-weight:800;color:var(--ink-900);}
     .balance-label{color:#64748b;font-size:12px;margin-left:6px;}
+    .al-note{
+      margin:12px 0 0;
+      padding:12px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg,#fffdfa,#f8f5ef);
+      border:1px solid var(--line);
+      color:#5f6675;
+      font-size:14px;
+      line-height:1.5;
+    }
+    .empty-state{
+      text-align:center;
+      padding:24px 12px !important;
+      color:#6b7280;
+      font-size:15px;
+    }
 
     @media (max-width:640px){
       .account-ledger-page{ padding:0 14px; margin:22px 0 52px; }
@@ -302,6 +407,7 @@
       .al-title{ font-size:25px; }
       .al-sub{ font-size:14px; }
       .al-btn{ width:100%; min-width:0; }
+      .al-summary-grid{ grid-template-columns:1fr; }
       .al-filter .field, .al-filter .field.account, .al-filter .field.small{
         min-width:100%;
         max-width:100%;
@@ -315,7 +421,7 @@
     <div>
       <h1 class="al-title">Account Ledger</h1>
       <p class="al-sub">
-        View detailed debit/credit movements and running balance for a single account.
+        View transactions, cash/bank movements, and running balance for this account.
       </p>
     </div>
     <div>
@@ -367,13 +473,64 @@
   {% if selected_account %}
     <div class="al-card">
       <div class="al-head">
-        <h2 class="al-card-title">{{ selected_account.code }} – {{ selected_account.name }}</h2>
+        <div>
+          <h2 class="al-card-title">{{ selected_account.code }} – {{ selected_account.name }}</h2>
+          <p class="al-card-sub" style="margin-bottom:0;">
+            Account Type:
+            <strong>{% if selected_account.is_cash_or_bank %}Cash / Bank{% else %}Other Account{% endif %}</strong>
+          </p>
+        </div>
         <div class="al-kpis">
-          <span class="al-chip">Opening: <strong>{{ opening_balance|floatformat:2 }}</strong></span>
-          <span class="al-chip">Closing: <strong>{{ closing_balance|floatformat:2 }}</strong></span>
           <span class="al-chip">Rows: <span id="visible-row-count">{{ rows|length }}</span>/<span id="server-row-count">{{ rows|length }}</span></span>
         </div>
       </div>
+
+      <div class="al-summary-grid">
+        <div class="al-summary-card">
+          <div class="al-summary-label">Opening Balance</div>
+          {% if opening_balance > 0 %}
+            <div class="al-side-badge dr">DR · Positive balance</div>
+            <div class="al-summary-value dr">{{ opening_balance|floatformat:2 }}</div>
+          {% elif opening_balance < 0 %}
+            <div class="al-side-badge cr">CR · Negative / overdraft / liability</div>
+            <div class="al-summary-value cr">{{ opening_balance|floatformat:2 }}</div>
+          {% else %}
+            <div class="al-side-badge neutral">Balanced</div>
+            <div class="al-summary-value">0.00</div>
+          {% endif %}
+        </div>
+        <div class="al-summary-card">
+          <div class="al-summary-label">Account Type</div>
+          <div class="al-summary-value" style="font-size:20px;">
+            {% if selected_account.is_cash_or_bank %}Cash / Bank{% else %}Other{% endif %}
+          </div>
+          <div class="al-summary-hint">Selected account classification for this ledger view.</div>
+        </div>
+        <div class="al-summary-card">
+          <div class="al-summary-label">Closing Balance</div>
+          {% if closing_balance > 0 %}
+            <div class="al-side-badge dr">DR · Positive balance</div>
+            <div class="al-summary-value dr">{{ closing_balance|floatformat:2 }}</div>
+          {% elif closing_balance < 0 %}
+            <div class="al-side-badge cr">CR · Negative / overdraft / liability</div>
+            <div class="al-summary-value cr">{{ closing_balance|floatformat:2 }}</div>
+          {% else %}
+            <div class="al-side-badge neutral">Balanced</div>
+            <div class="al-summary-value">0.00</div>
+          {% endif %}
+        </div>
+        <div class="al-summary-card">
+          <div class="al-summary-label">Visible Rows</div>
+          <div class="al-summary-value">{{ rows|length }}</div>
+          <div class="al-summary-hint">Entries in the current date-filtered ledger selection.</div>
+        </div>
+      </div>
+
+      {% if selected_account.is_cash_or_bank %}
+        <div class="al-note">
+          This ledger reflects actual cash/bank movement based on recorded transactions.
+        </div>
+      {% endif %}
 
       <div class="al-toolbar">
         <div></div>
@@ -403,7 +560,7 @@
                   <td class="date-cell">{{ r.date|date:"d M Y" }}</td>
                   <td class="type-cell">{{ r.type|default:"Journal" }}</td>
                   <td class="counter-cell">{{ r.counter|default:"—" }}</td>
-                  <td>{{ r.description }}</td>
+                  <td class="desc-cell">{{ r.description }}</td>
                   <td class="right debit">{% if r.debit and r.debit != 0 %}↑ {{ r.debit|floatformat:2 }}{% else %}—{% endif %}</td>
                   <td class="right credit">{% if r.credit and r.credit != 0 %}↓ {{ r.credit|floatformat:2 }}{% else %}—{% endif %}</td>
                   <td class="right balance-cell">
@@ -414,8 +571,8 @@
               {% endfor %}
             {% else %}
               <tr>
-                <td colspan="7" style="padding:12px 10px;font-size:14px;text-align:center;color:#6b7280;">
-                  No transactions for this period.
+                <td colspan="7" class="empty-state">
+                  No transactions found for the selected period.
                 </td>
               </tr>
             {% endif %}

@@ -15,20 +15,21 @@
       max-width:760px;
       margin:26px auto 72px;
       padding:0 16px;
-      --ink-900:#0f172a;
+      --ink-900:#172033;
       --ink-700:#334155;
-      --ink-500:#64748b;
-      --line:#dde6ef;
-      --line-strong:#c8d4e3;
-      --primary:#0f766e;
-      --primary-dark:#115e59;
+      --ink-500:#6b7280;
+      --line:#e5dccd;
+      --line-strong:#d9cfbf;
+      --primary:#1f5a45;
+      --primary-dark:#163f31;
       --surface:#ffffff;
-      --surface-soft:#f7fafc;
-      --surface-muted:#f1f5f9;
-      --green-soft:#ecfdf5;
-      --green-line:#bbf7d0;
-      --orange-soft:#fff7ed;
-      --orange-line:#fed7aa;
+      --surface-soft:#fffdfa;
+      --surface-muted:#f8f5ef;
+      --green-soft:#e7f4eb;
+      --green-line:#b9dfc2;
+      --orange-soft:#fdf3d6;
+      --orange-line:#ecd08f;
+      --hero-cream:#f3ede3;
     }
 
     .party-hero{
@@ -36,27 +37,28 @@
       grid-template-columns:1fr auto;
       gap:14px;
       margin-bottom:16px;
-      padding:18px 20px;
-      border-radius:20px;
+      padding:24px 26px;
+      border-radius:24px;
       border:1px solid var(--line);
       background:
-        radial-gradient(700px 240px at -10% -130%, #d1fae5 0%, transparent 60%),
-        radial-gradient(520px 220px at 110% -120%, #e0f2fe 0%, transparent 56%),
+        radial-gradient(700px 240px at -10% -130%, #e4efe8 0%, transparent 60%),
+        radial-gradient(520px 220px at 110% -120%, #f0e2cf 0%, transparent 56%),
         var(--surface);
-      box-shadow:0 14px 30px rgba(15,23,42,.07);
+      box-shadow:0 18px 34px rgba(23,32,51,.07);
     }
 
     .party-title{
       margin:0 0 6px;
-      font-size:30px;
+      font-size:38px;
       font-weight:800;
       letter-spacing:-.02em;
       color:var(--ink-900);
+      line-height:1.05;
     }
 
     .party-subtitle{
       margin:0;
-      color:#475569;
+      color:#5f6675;
       font-size:15px;
       line-height:1.55;
       max-width:540px;
@@ -67,24 +69,25 @@
       align-items:center;
       justify-content:center;
       gap:8px;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:170px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
       border:1px solid var(--line-strong);
-      background:linear-gradient(180deg,#ffffff,#f8fafc);
-      color:#111827;
+      background:#fffdfa;
+      color:var(--primary-dark);
       transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
       cursor:pointer;
       white-space:nowrap;
+      box-shadow:0 8px 18px rgba(23,32,51,.05);
     }
 
     .party-btn:hover{
       transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
+      border-color:#88a092;
+      box-shadow:0 12px 24px rgba(23,32,51,.08);
     }
 
     .party-btn-primary{
@@ -98,10 +101,10 @@
 
     .party-card{
       background:var(--surface);
-      border-radius:20px;
+      border-radius:22px;
       border:1px solid var(--line);
-      box-shadow:0 10px 22px rgba(15,23,42,.06);
-      padding:18px 18px 20px;
+      box-shadow:0 14px 28px rgba(23,32,51,.06);
+      padding:22px 22px 24px;
       position:relative;
       overflow:hidden;
     }
@@ -113,15 +116,15 @@
       left:0;
       right:0;
       height:3px;
-      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
-      opacity:.75;
+      background:linear-gradient(90deg,#1f5a45,#7d9f8d,#d7b574);
+      opacity:.82;
     }
 
     .party-alerts{ margin-bottom:14px; }
 
     .party-alert{
-      padding:10px 12px;
-      border-radius:10px;
+      padding:14px 16px;
+      border-radius:14px;
       font-size:14px;
       margin-bottom:8px;
       border:1px solid;
@@ -148,7 +151,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      margin:4px 0 2px;
+      margin:6px 0 4px;
       font-size:13px;
       font-weight:800;
       letter-spacing:.08em;
@@ -169,20 +172,51 @@
       flex:0 0 auto;
     }
 
+    .party-section-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg,#fffdfa 0%,#f8f5ef 100%);
+      padding:16px 16px 18px;
+      display:grid;
+      gap:14px;
+    }
+
+    .party-section-head{
+      display:grid;
+      gap:4px;
+    }
+
+    .party-section-title{
+      margin:0;
+      font-size:20px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.01em;
+    }
+
+    .party-section-sub{
+      margin:0;
+      font-size:14px;
+      color:var(--ink-500);
+      line-height:1.5;
+    }
+
     .party-field label{
       display:flex;
       align-items:center;
       gap:9px;
-      font-size:14px;
+      font-size:13px;
       font-weight:700;
       margin-bottom:7px;
-      color:var(--ink-700);
+      color:#5f6675;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .party-field input,
     .party-field textarea{
       width:100%;
-      border:1px solid #cbd5e1;
+      border:1px solid #d9cfbf;
       border-radius:14px;
       min-height:50px;
       padding:12px 13px;
@@ -192,6 +226,7 @@
       transition:border-color .14s ease, box-shadow .14s ease;
       -webkit-appearance:none;
       appearance:none;
+      box-shadow:inset 0 1px 2px rgba(23,32,51,.03);
     }
 
     .party-field textarea{
@@ -207,8 +242,8 @@
     .party-field input:focus,
     .party-field textarea:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
       background:#fff;
     }
 
@@ -216,13 +251,14 @@
       margin-top:6px;
       font-size:13px;
       color:var(--ink-500);
+      line-height:1.5;
     }
 
     .party-secondary-block{
       border:1px solid var(--line);
-      border-radius:16px;
-      background:linear-gradient(180deg,#fcfdff,#f8fafc);
-      padding:14px 15px 15px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#fffdfa,#f8f5ef);
+      padding:16px;
       display:grid;
       gap:14px;
     }
@@ -234,11 +270,11 @@
     }
 
     .party-balance-card{
-      padding:14px;
+      padding:18px;
       border:1px solid var(--line);
       border-radius:18px;
       background:
-        radial-gradient(420px 180px at 0% 0%, rgba(15,118,110,.07), transparent 55%),
+        radial-gradient(420px 180px at 0% 0%, rgba(31,90,69,.07), transparent 55%),
         var(--surface);
     }
 
@@ -251,16 +287,26 @@
 
     .party-balance-title{
       margin:0;
-      font-size:18px;
+      font-size:22px;
       font-weight:800;
       color:var(--ink-900);
     }
 
     .party-balance-sub{
       margin:4px 0 0;
-      font-size:13px;
+      font-size:14px;
       line-height:1.5;
       color:var(--ink-500);
+    }
+
+    .party-balance-amount{
+      display:grid;
+      gap:6px;
+      margin:6px 0 4px;
+    }
+
+    .party-balance-amount .party-helper{
+      margin-top:0;
     }
 
     .party-balance-choices{
@@ -285,7 +331,7 @@
       min-height:84px;
       border-radius:16px;
       border:1px solid var(--line);
-      padding:11px 12px 10px;
+      padding:12px 13px 11px;
       background:var(--surface-soft);
       display:flex;
       flex-direction:column;
@@ -319,19 +365,19 @@
       font-style:normal;
       font-size:14px;
       background:#fff;
-      border:1px solid rgba(148,163,184,.35);
+      border:1px solid rgba(148,163,184,.25);
     }
 
     .party-choice.receivable input:checked + .party-choice-card{
-      border-color:#22c55e;
+      border-color:#5c9a6e;
       background:var(--green-soft);
-      box-shadow:0 0 0 3px rgba(34,197,94,.12);
+      box-shadow:0 0 0 4px rgba(22,101,52,.10);
     }
 
     .party-choice.advance input:checked + .party-choice-card{
-      border-color:#f59e0b;
+      border-color:#d5ab54;
       background:var(--orange-soft);
-      box-shadow:0 0 0 3px rgba(245,158,11,.12);
+      box-shadow:0 0 0 4px rgba(154,103,0,.10);
     }
 
     .party-submit-note{
@@ -365,10 +411,16 @@
         {% if is_edit %}
           Edit {{ party_type_label }}
         {% else %}
-          Create {{ party_type_label }}
+          New {{ party_type_label }}
         {% endif %}
       </h1>
-      
+      <p class="party-subtitle">
+        {% if party_type == "CUSTOMER" %}
+          Add a new customer to track sales, payments, and balances.
+        {% else %}
+          Add a supplier to track purchases, payments, and outstanding balances.
+        {% endif %}
+      </p>
     </div>
 
     <div>
@@ -410,36 +462,46 @@
       {% csrf_token %}
 
       <div class="party-form-grid">
-        
+        <div class="party-section-card">
+          <div class="party-section-head">
+            <div class="party-section-label"><span class="party-icon">👤</span> Basic Information</div>
+            <h2 class="party-section-title">{{ party_type_label }} Details</h2>
+            <p class="party-section-sub">Enter the main identity and contact details for this {{ party_type_label|lower }}.</p>
+          </div>
 
-        <div class="party-field">
-          <label for="name">
-            <span class="party-icon">👤</span>
-            {{ party_type_label }} Name <span class="req">*</span>
-          </label>
-          <input type="text"
-                 id="name"
-                 name="name"
-                 value="{% if request.POST.name %}{{ request.POST.name }}{% else %}{{ party.name|default_if_none:'' }}{% endif %}"
-                 placeholder="{% if party_type == 'CUSTOMER' %}e.g. Ahmed Traders or John Stores{% else %}e.g. Ahmed Traders or Noor Supplies{% endif %}"
-                 required>
-        </div>
+          <div class="party-field">
+            <label for="name">
+              <span class="party-icon">👤</span>
+              {{ party_type_label }} Name <span class="req">*</span>
+            </label>
+            <input type="text"
+                   id="name"
+                   name="name"
+                   value="{% if request.POST.name %}{{ request.POST.name }}{% else %}{{ party.name|default_if_none:'' }}{% endif %}"
+                   placeholder="{% if party_type == 'CUSTOMER' %}e.g. Ahmed Traders or John Stores{% else %}e.g. Ahmed Traders or Noor Supplies{% endif %}"
+                   required>
+          </div>
 
-        <div class="party-field">
-          <label for="phone">
-            <span class="party-icon">☎</span>
-            Phone Number
-          </label>
-          <input type="tel"
-                 id="phone"
-                 name="phone"
-                 inputmode="tel"
-                 value="{% if request.POST.phone %}{{ request.POST.phone }}{% else %}{{ party.phone|default_if_none:'' }}{% endif %}"
-                 placeholder="e.g. 03001234567">
+          <div class="party-field">
+            <label for="phone">
+              <span class="party-icon">☎</span>
+              Phone Number
+            </label>
+            <input type="tel"
+                   id="phone"
+                   name="phone"
+                   inputmode="tel"
+                   value="{% if request.POST.phone %}{{ request.POST.phone }}{% else %}{{ party.phone|default_if_none:'' }}{% endif %}"
+                   placeholder="e.g. 03001234567">
+          </div>
         </div>
 
         <div class="party-secondary-block">
-          
+          <div class="party-section-head">
+            <div class="party-section-label"><span class="party-icon">⌂</span> Business Details</div>
+            <h2 class="party-section-title">Location Details</h2>
+            <p class="party-section-sub">Add city and address information to identify this {{ party_type_label|lower }} quickly.</p>
+          </div>
 
           <div class="party-field">
             <label for="city">
@@ -456,7 +518,7 @@
           <div class="party-field">
             <label for="address">
               <span class="party-icon">📝</span>
-              Address
+              Address (optional)
             </label>
             <textarea id="address"
                       name="address"
@@ -477,15 +539,40 @@
             </div>
           </div>
 
-          <div class="party-field">
+          <div class="party-balance-amount">
+            <div class="party-field">
+              <label for="opening_balance">
+                <span class="party-icon">₨</span>
+                Opening Balance
+              </label>
+              <input type="number"
+                     step="0.01"
+                     min="0"
+                     id="opening_balance"
+                     name="opening_balance"
+                     inputmode="decimal"
+                     value="{% if request.method == 'POST' %}{{ request.POST.opening_balance|default_if_none:'' }}{% elif party %}{{ party.opening_balance|default_if_none:'0' }}{% else %}0{% endif %}"
+                     placeholder="e.g. 5000">
+            </div>
+            <div class="party-helper">Leave the amount as 0 if there is no previous balance.</div>
+          </div>
+
+          <div class="party-section-label" style="margin-top:4px;">
+            <span class="party-icon">⇄</span> Balance Type
+          </div>
+
+          <div class="party-helper" style="margin-top:-2px;margin-bottom:2px;">
+            {% if party_type == "CUSTOMER" %}
+              DR means the customer already owes you money. CR means the customer has advance balance with you.
+            {% else %}
+              CR means you owe this supplier money. DR means the supplier has advance with you.
+            {% endif %}
+          </div>
+
+          <div class="party-field" style="display:none;">
             <input type="number"
-                   step="0.01"
-                   min="0"
-                   id="opening_balance"
-                   name="opening_balance"
-                   inputmode="decimal"
-                   value="{% if request.method == 'POST' %}{{ request.POST.opening_balance|default_if_none:'' }}{% elif party %}{{ party.opening_balance|default_if_none:'0' }}{% else %}0{% endif %}"
-                   placeholder="e.g. 5000">
+                   aria-hidden="true"
+                   tabindex="-1">
           </div>
 
           <div class="party-balance-choices">
@@ -494,8 +581,8 @@
                      {% if request.POST.opening_side == "CR" %}{% else %}checked{% endif %}>
               <span class="party-choice-card">
                 <em>↙</em>
-                <strong>{% if party_type == "CUSTOMER" %}Customer will pay me{% else %}I paid supplier in advance{% endif %}</strong>
-                <span>{% if party_type == "CUSTOMER" %}Use this when this customer already owes you money.{% else %}Use this when you already paid the supplier and want to record that balance.{% endif %}</span>
+                <strong>{% if party_type == "CUSTOMER" %}DR (Debit){% else %}DR (Debit){% endif %}</strong>
+                <span>{% if party_type == "CUSTOMER" %}Customer already owes you money{% else %}Supplier has advance with you{% endif %}</span>
               </span>
             </label>
 
@@ -504,14 +591,18 @@
                      {% if request.POST.opening_side == "CR" %}checked{% endif %}>
               <span class="party-choice-card">
                 <em>↗</em>
-                <strong>{% if party_type == "CUSTOMER" %}I will pay customer{% else %}I need to pay supplier{% endif %}</strong>
-                <span>{% if party_type == "CUSTOMER" %}Use this when you already owe money or advance to this customer.{% else %}Use this when there is still money you need to pay to the supplier.{% endif %}</span>
+                <strong>{% if party_type == "CUSTOMER" %}CR (Credit){% else %}CR (Credit){% endif %}</strong>
+                <span>{% if party_type == "CUSTOMER" %}Customer has advance balance with you{% else %}You owe this supplier money{% endif %}</span>
               </span>
             </label>
           </div>
 
           <div class="party-submit-note">
-            Leave the amount as 0 if there is no previous balance.
+            {% if party_type == "CUSTOMER" %}
+              Customer balances will update automatically when you record sales, payments, and returns.
+            {% else %}
+              Supplier balances update automatically when you record purchases, payments, and returns.
+            {% endif %}
           </div>
         </div>
       {% endif %} 
@@ -524,7 +615,7 @@
           {% if is_edit %}
             Save Changes
           {% else %}
-            Create {{ party_type_label }}
+            Save {{ party_type_label }}
           {% endif %}
         </button>
       </div>

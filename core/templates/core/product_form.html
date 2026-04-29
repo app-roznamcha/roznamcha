@@ -8,15 +8,16 @@
       max-width:860px;
       margin:34px auto 64px;
       padding:0 18px;
-      --ink-900:#0f172a;
+      --ink-900:#172033;
       --ink-700:#334155;
-      --ink-500:#64748b;
-      --line:#dbe3ee;
-      --line-strong:#cfd9e6;
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
+      --ink-500:#6b7280;
+      --line:#e5dccd;
+      --line-strong:#d9cfbf;
+      --primary:#1f5a45;
+      --primary-dark:#163f31;
       --surface:#ffffff;
-      --surface-soft:#f8fafc;
+      --surface-soft:#fffdfa;
+      --surface-cream:#f8f5ef;
     }
 
     .pf-hero{
@@ -27,27 +28,28 @@
       flex-wrap:wrap;
       gap:12px;
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:20px 22px;
+      border-radius:24px;
+      padding:24px 26px;
       background:
-        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
-        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        radial-gradient(900px 260px at -20% -120%, #f1e6d2 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #e4efe8 0%, transparent 56%),
         var(--surface);
-      box-shadow:0 12px 28px rgba(15,23,42,.08);
+      box-shadow:0 18px 34px rgba(23,32,51,.07);
     }
 
     .pf-title{
       margin:0 0 4px;
-      font-size:31px;
+      font-size:38px;
       font-weight:800;
       color:var(--ink-900);
       letter-spacing:-.02em;
+      line-height:1.05;
     }
 
     .pf-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
+      color:#5f6675;
       line-height:1.55;
       max-width:620px;
     }
@@ -57,24 +59,25 @@
       align-items:center;
       justify-content:center;
       gap:8px;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:170px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
       border:1px solid var(--line-strong);
-      background:linear-gradient(180deg,#ffffff,#f8fafc);
-      color:#111827;
+      background:#fffdfa;
+      color:var(--primary-dark);
       transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
       cursor:pointer;
       white-space:nowrap;
+      box-shadow:0 8px 18px rgba(23,32,51,.05);
     }
 
     .pf-btn:hover{
       transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
+      border-color:#88a092;
+      box-shadow:0 12px 24px rgba(23,32,51,.08);
     }
 
     .pf-btn-primary{
@@ -85,10 +88,10 @@
 
     .pf-card{
       background:#ffffff;
-      border-radius:16px;
+      border-radius:20px;
       border:1px solid var(--line);
-      padding:18px 20px 20px;
-      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      padding:22px 24px 24px;
+      box-shadow:0 14px 28px rgba(23,32,51,.06);
       margin-bottom:18px;
       position:relative;
       overflow:hidden;
@@ -101,35 +104,38 @@
       left:0;
       right:0;
       height:3px;
-      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
-      opacity:.75;
+      background:linear-gradient(90deg,#1f5a45,#7d9f8d,#d7b574);
+      opacity:.82;
     }
 
     .pf-card-title{
       margin:0;
-      font-size:18px;
+      font-size:22px;
       font-weight:800;
       color:var(--ink-900);
+      letter-spacing:-.01em;
     }
 
     .pf-card-sub{
-      margin:4px 0 10px;
-      font-size:13px;
-      color:#64748b;
+      margin:6px 0 14px;
+      font-size:14px;
+      color:#6b7280;
       line-height:1.45;
     }
 
     .pf-grid{
       display:grid;
-      gap:12px;
+      gap:14px;
     }
 
     .pf-field label{
       display:block;
-      font-size:14px;
+      font-size:13px;
       font-weight:700;
-      margin-bottom:5px;
-      color:var(--ink-700);
+      margin-bottom:7px;
+      color:#5f6675;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .pf-hint{
@@ -142,14 +148,15 @@
     .pf-field input,
     .pf-field select{
       width:100%;
-      min-height:42px;
-      border:1px solid #cbd5e1;
-      border-radius:10px;
-      padding:9px 11px;
+      min-height:48px;
+      border:1px solid #d9cfbf;
+      border-radius:14px;
+      padding:12px 13px;
       font-size:14px;
       color:#0f172a;
       background:var(--surface-soft);
       transition:border-color .14s ease, box-shadow .14s ease;
+      box-shadow:inset 0 1px 2px rgba(23,32,51,.03);
     }
 
     .pf-field input::placeholder{
@@ -159,19 +166,26 @@
     .pf-field input:focus,
     .pf-field select:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
       background:#fff;
+    }
+
+    .price-input{
+      text-align:right;
+      font-variant-numeric:tabular-nums;
+      font-weight:700;
     }
 
     .pf-error{
       margin-bottom:16px;
-      padding:10px 12px;
-      border-radius:10px;
+      padding:14px 16px;
+      border-radius:14px;
       font-size:14px;
-      background:#fee2e2;
-      color:#b91c1c;
-      border:1px solid #fecaca;
+      background:#fde8e8;
+      color:#9f1d1d;
+      border:1px solid #f2b8b5;
+      box-shadow:0 10px 20px rgba(159,29,29,.06);
     }
 
     .pf-inline-check{
@@ -196,14 +210,14 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      border:1px solid #e2e8f0;
-      background:linear-gradient(180deg,#ffffff,#f8fafc);
+      border:1px solid #e6dccd;
+      background:linear-gradient(180deg,#fffdfa,#f8f5ef);
       color:#0f172a;
       border-radius:14px;
       padding:8px 12px;
       font-size:13px;
       font-weight:700;
-      box-shadow:0 6px 14px rgba(15,23,42,.05);
+      box-shadow:0 6px 14px rgba(23,32,51,.05);
     }
 
     .pf-actions{
@@ -217,8 +231,8 @@
 
     .pf-details{
       border:1px solid var(--line);
-      border-radius:14px;
-      background:linear-gradient(180deg,#fcfdff,#f8fafc);
+      border-radius:18px;
+      background:linear-gradient(180deg,#fffdfa,#f8f5ef);
       overflow:hidden;
     }
 
@@ -229,7 +243,7 @@
       justify-content:space-between;
       gap:12px;
       cursor:pointer;
-      padding:14px 15px;
+      padding:16px 16px;
       font-size:14px;
       font-weight:700;
       color:#0f172a;
@@ -252,8 +266,8 @@
       align-items:center;
       justify-content:center;
       border-radius:10px;
-      background:#e2e8f0;
-      color:#334155;
+      background:#e5efe8;
+      color:var(--primary-dark);
       font-size:15px;
       flex:0 0 auto;
     }
@@ -291,10 +305,10 @@
   <div class="pf-hero">
     <div>
       <h1 class="pf-title">
-        {% if product %}Edit Product{% else %}Create Product{% endif %}
+        {% if product %}Edit Product{% else %}New Product{% endif %}
       </h1>
       <p class="pf-sub">
-        Add the main product details first. Packing is optional and can be added only when needed.
+        Define product details, pricing, and stock behavior.
       </p>
     </div>
     <div>
@@ -318,7 +332,7 @@
     {# ---------- Basic Details Card ---------- #}
     <div class="pf-card">
       <h2 class="pf-card-title">Basic Details</h2>
-      <p class="pf-card-sub">Set the product name, short code, and base unit used in sales, purchases, and stock.</p>
+      <p class="pf-card-sub">Set the product name, code, and base unit used in sales, purchases, and stock.</p>
 
       <div class="pf-grid">
         <div class="pf-field">
@@ -364,8 +378,8 @@
 
     {# ---------- Prices Card ---------- #}
     <div class="pf-card">
-      <h2 class="pf-card-title">Prices</h2>
-      <p class="pf-card-sub">Set per-unit prices. Pack preview updates automatically when packing is used.</p>
+      <h2 class="pf-card-title">Pricing</h2>
+      <p class="pf-card-sub">Set per-unit cost and selling prices. Pack preview updates automatically when packing is used.</p>
 
       <div class="pf-grid">
         <div class="pf-field">
@@ -376,9 +390,11 @@
                  step="0.01"
                  inputmode="decimal"
                  id="purchaseUnitPriceInput"
+                 class="price-input"
                  name="purchase_price_per_unit"
                  value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}"
                  placeholder="e.g. 1200">
+          <div class="pf-hint">Cost price per base unit.</div>
         </div>
 
         <div class="pf-field">
@@ -389,9 +405,11 @@
                  step="0.01"
                  inputmode="decimal"
                  id="saleUnitPriceInput"
+                 class="price-input"
                  name="sale_price_per_unit"
                  value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}"
                  placeholder="e.g. 1350">
+          <div class="pf-hint">Selling price per base unit.</div>
         </div>
 
         

@@ -9,15 +9,22 @@
       max-width:980px;
       margin:34px auto 64px;
       padding:0 16px;
-      --ink-900:#0f172a;
+      --ink-900:#172033;
       --ink-700:#334155;
-      --ink-500:#64748b;
-      --line:#dbe3ee;
-      --line-soft:#e5e7eb;
-      --primary:#2563eb;
-      --primary-dark:#1d4ed8;
+      --ink-500:#6b7280;
+      --line:#e5dccd;
+      --line-soft:#efe7db;
+      --primary:#1f5a45;
+      --primary-dark:#163f31;
       --surface:#ffffff;
-      --surface-soft:#f8fafc;
+      --surface-soft:#fffdfa;
+      --surface-cream:#f8f5ef;
+      --good:#166534;
+      --good-soft:#e7f4eb;
+      --bank:#1d4ed8;
+      --bank-soft:#e8efff;
+      --warn:#9a6700;
+      --warn-soft:#fdf3d6;
     }
 
     .ua-hero{
@@ -28,27 +35,28 @@
       flex-wrap:wrap;
       gap:12px;
       border:1px solid var(--line);
-      border-radius:18px;
-      padding:20px 22px;
+      border-radius:24px;
+      padding:24px 26px;
       background:
-        radial-gradient(900px 260px at -20% -120%, #dbeafe 0%, transparent 58%),
-        radial-gradient(700px 220px at 120% -110%, #dcfce7 0%, transparent 56%),
+        radial-gradient(900px 260px at -20% -120%, #f1e6d2 0%, transparent 58%),
+        radial-gradient(700px 220px at 120% -110%, #e4efe8 0%, transparent 56%),
         var(--surface);
-      box-shadow:0 12px 28px rgba(15,23,42,.08);
+      box-shadow:0 18px 34px rgba(23,32,51,.07);
     }
 
     .ua-title{
       margin:0 0 4px;
-      font-size:31px;
+      font-size:38px;
       font-weight:800;
       color:var(--ink-900);
       letter-spacing:-.02em;
+      line-height:1.05;
     }
 
     .ua-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
+      color:#5f6675;
       line-height:1.55;
       max-width:740px;
     }
@@ -57,24 +65,25 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:150px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid #cfd9e6;
-      background:linear-gradient(180deg,#ffffff,#f8fafc);
-      color:#111827;
+      border:1px solid rgba(31,90,69,.16);
+      background:#fffdfa;
+      color:var(--primary-dark);
       transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
       cursor:pointer;
       white-space:nowrap;
+      box-shadow:0 8px 18px rgba(23,32,51,.05);
     }
 
     .ua-btn:hover{
       transform:translateY(-1px);
-      border-color:#94a3b8;
-      box-shadow:0 8px 16px rgba(15,23,42,.08);
+      border-color:#88a092;
+      box-shadow:0 12px 24px rgba(23,32,51,.08);
     }
 
     .ua-btn-primary{
@@ -85,10 +94,10 @@
 
     .ua-card{
       background:#ffffff;
-      border-radius:16px;
+      border-radius:20px;
       border:1px solid var(--line);
-      padding:18px 20px 20px;
-      box-shadow:0 10px 22px rgba(15,23,42,.06);
+      padding:22px 24px 24px;
+      box-shadow:0 14px 28px rgba(23,32,51,.06);
       margin-bottom:18px;
       position:relative;
       overflow:hidden;
@@ -101,28 +110,29 @@
       left:0;
       right:0;
       height:3px;
-      background:linear-gradient(90deg,#2563eb,#0ea5e9,#22c55e);
-      opacity:.75;
+      background:linear-gradient(90deg,#1f5a45,#7d9f8d,#d7b574);
+      opacity:.82;
     }
 
     .ua-card-title{
       margin:0;
-      font-size:18px;
+      font-size:22px;
       font-weight:800;
       color:var(--ink-900);
+      letter-spacing:-.01em;
     }
 
     .ua-card-sub{
-      margin:4px 0 12px;
-      font-size:13px;
-      color:#64748b;
+      margin:6px 0 16px;
+      font-size:14px;
+      color:#6b7280;
       line-height:1.45;
     }
 
     .ua-alert{
       margin-bottom:14px;
-      padding:10px 12px;
-      border-radius:10px;
+      padding:14px 16px;
+      border-radius:14px;
       font-size:14px;
       border:1px solid;
     }
@@ -152,23 +162,26 @@
 
     .ua-field label{
       display:block;
-      font-size:14px;
+      font-size:13px;
       font-weight:700;
-      margin-bottom:6px;
-      color:var(--ink-700);
+      margin-bottom:7px;
+      color:#5f6675;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .ua-field input,
     .ua-field select{
       width:100%;
       min-height:46px;
-      border:1px solid #cbd5e1;
-      border-radius:12px;
-      padding:10px 12px;
+      border:1px solid #d9cfbf;
+      border-radius:14px;
+      padding:11px 13px;
       font-size:15px;
       color:#0f172a;
       background:var(--surface-soft);
       transition:border-color .14s ease, box-shadow .14s ease;
+      box-shadow:inset 0 1px 2px rgba(23,32,51,.03);
     }
 
     .ua-field input::placeholder{
@@ -178,8 +191,8 @@
     .ua-field input:focus,
     .ua-field select:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
       background:#fff;
     }
 
@@ -213,13 +226,61 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      border:1px solid #e2e8f0;
-      background:#f8fafc;
+      border:1px solid #e6dccd;
+      background:#fff9f0;
       color:#0f172a;
-      border-radius:12px;
+      border-radius:14px;
       padding:8px 12px;
       font-size:13px;
       font-weight:700;
+    }
+
+    .ua-helper-note{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fffdfa,#f8f5ef);
+      color:#5f6675;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .ua-balance-note{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fffdfa 0%,#f8f5ef 100%);
+      display:grid;
+      gap:10px;
+    }
+
+    .ua-balance-choice{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .ua-balance-chip{
+      border-radius:14px;
+      padding:11px 12px;
+      border:1px solid transparent;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:700;
+    }
+
+    .ua-balance-chip.dr{
+      background:var(--good-soft);
+      color:var(--good);
+      border-color:rgba(22,101,52,.12);
+    }
+
+    .ua-balance-chip.cr{
+      background:var(--warn-soft);
+      color:var(--warn);
+      border-color:rgba(154,103,0,.14);
     }
 
     .ua-table-head{
@@ -240,25 +301,27 @@
     .ua-search label{
       display:block;
       font-size:13px;
-      color:#475569;
-      margin-bottom:4px;
-      font-weight:600;
+      color:#5f6675;
+      margin-bottom:7px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .ua-search input{
       width:100%;
-      min-height:40px;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #cbd5e1;
+      min-height:46px;
+      padding:11px 13px;
+      border-radius:14px;
+      border:1px solid #d9cfbf;
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
     }
 
     .ua-search input:focus{
       outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(37,99,235,.14);
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
     }
 
     .ua-stats{
@@ -273,8 +336,9 @@
       width:100%;
       overflow-x:auto;
       border:1px solid var(--line-soft);
-      border-radius:12px;
-      background:#fff;
+      border-radius:18px;
+      background:#fffdfa;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
     }
 
     .ua-table{
@@ -285,16 +349,16 @@
 
     .ua-table th,
     .ua-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:10px 10px;
+      border-bottom:1px solid #ece3d6;
+      padding:13px 12px;
       font-size:14px;
       vertical-align:middle;
     }
 
     .ua-table th{
-      background:#f8fafc;
+      background:linear-gradient(180deg,#f6f0e6 0%,#f1e9dc 100%);
       text-align:left;
-      font-weight:700;
+      font-weight:800;
       color:#334155;
       text-transform:uppercase;
       letter-spacing:.05em;
@@ -304,11 +368,53 @@
       z-index:1;
     }
 
-    .ua-table tbody tr:nth-child(even){ background:#fbfdff; }
-    .ua-table tbody tr:hover{ background:#f8fbff; }
+    .ua-table tbody tr:nth-child(even){ background:#fffcf7; }
+    .ua-table tbody tr:hover{ background:#f7f1e8; }
     .ua-table tbody tr.is-hidden{ display:none; }
 
     .center{text-align:center;}
+    .right{text-align:right;}
+    .ua-code{color:#7b7280;font-size:13px;font-weight:600;}
+    .ua-name{font-weight:800;color:var(--ink-900);}
+    .ua-type-badge,
+    .ua-status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:72px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid transparent;
+    }
+
+    .ua-type-badge.cash{
+      color:var(--good);
+      background:var(--good-soft);
+      border-color:rgba(22,101,52,.12);
+    }
+
+    .ua-type-badge.bank{
+      color:var(--bank);
+      background:var(--bank-soft);
+      border-color:rgba(29,78,216,.12);
+    }
+
+    .ua-balance{
+      text-align:right;
+      font-variant-numeric:tabular-nums;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .ua-balance-sub{
+      display:block;
+      margin-top:4px;
+      font-size:12px;
+      color:var(--ink-500);
+      font-weight:600;
+    }
 
     .ua-pill{
       display:inline-flex;
@@ -329,24 +435,37 @@
     }
 
     .ua-pill.no{
-      color:#b91c1c;
-      background:#fee2e2;
-      border-color:#fecaca;
+      color:#6b7280;
+      background:#f3f4f6;
+      border-color:#e5e7eb;
     }
 
     .ua-delete{
-      border:none;
-      background:none;
-      color:#b91c1c;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid #f2c6c2;
+      background:#fff1f1;
+      color:#b42318;
       font-size:13px;
       cursor:pointer;
-      padding:0;
       font-weight:700;
-      text-decoration:underline;
+      text-decoration:none;
+      box-shadow:0 6px 14px rgba(180,35,24,.05);
+    }
+
+    .ua-empty{
+      text-align:center;
+      padding:24px 12px !important;
+      font-size:15px;
+      color:#6b7280;
     }
 
     @media (max-width:840px){
       .ua-col-code, .ua-col-opening, .ua-col-side{ grid-column:span 12; }
+      .ua-balance-choice{ grid-template-columns:1fr; }
     }
 
     @media (max-width:640px){
@@ -362,10 +481,12 @@
   {# ---------- Top Bar ---------- #}
   <div class="ua-hero">
     <div>
-      <h1 class="ua-title">🏦 Bank &amp; Cash Accounts</h1>
+      <h1 class="ua-title">Cash &amp; Bank Accounts</h1>
+      <p class="ua-sub">Manage accounts used for payments, receipts, and transfers.</p>
     </div>
-    <div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <a href="{% url 'dashboard' %}" class="ua-btn">← Dashboard</a>
+      <a href="#account-form" class="ua-btn ua-btn-primary">Add Account</a>
     </div>
   </div>
 
@@ -378,10 +499,10 @@
   {% endif %}
 
   {# ---------- Add / Update Card ---------- #}
-  <div class="ua-card">
+  <div class="ua-card" id="account-form">
     <h2 class="ua-card-title">Add / Update Account</h2>
     <p class="ua-card-sub">
-      Add a bank, wallet, or cash account that can be used in payment screens.
+      Create cash or bank accounts used across receipts, payments, and transfers.
     </p>
 
     <form method="post">
@@ -408,6 +529,19 @@
         </div>
       </div>
 
+      <div class="ua-balance-note">
+        <div class="ua-hint" style="margin-top:0;font-size:13px;">
+          Opening balance is recorded as starting money available in this account. The current setup uses a debit-style opening balance.
+        </div>
+        <div class="ua-balance-choice">
+          <div class="ua-balance-chip dr">DR: Money available in this account</div>
+          <div class="ua-balance-chip cr">CR: Overdraft / negative balance</div>
+        </div>
+      </div>
+
+      <div class="ua-helper-note">
+        These accounts are used to record all receipts, payments, and transfers.
+      </div>
 
       <div style="margin-top:14px;">
         <button type="submit" class="ua-btn ua-btn-primary">💾 Save Account</button>
@@ -448,14 +582,18 @@
         <tbody>
         {% for acc in accounts %}
           <tr class="account-row">
-            <td>{{ acc.code }}</td>
-            <td style="font-weight:700;color:#0f172a;">{{ acc.name }}</td>
-            <td>{{ acc.get_account_type_display }}</td>
+            <td class="ua-code">{{ acc.code }}</td>
+            <td class="ua-name">{{ acc.name }}</td>
+            <td>
+              <span class="ua-type-badge cash">
+                Cash / Bank
+              </span>
+            </td>
             <td class="center">
               {% if acc.allow_for_payments %}
-                <span class="ua-pill yes">Yes</span>
+                <span class="ua-pill yes">Active</span>
               {% else %}
-                <span class="ua-pill no">No</span>
+                <span class="ua-pill no">Inactive</span>
               {% endif %}
             </td>
             <td class="center">
@@ -473,8 +611,8 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="5" style="padding:12px 10px;font-size:14px;color:#6b7280;">
-              No bank/cash accounts defined yet.
+            <td colspan="5" class="ua-empty">
+              No accounts created yet. Add a cash or bank account to start recording transactions.
             </td>
           </tr>
         {% endfor %}
