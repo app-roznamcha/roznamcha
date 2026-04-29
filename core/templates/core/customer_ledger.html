@@ -6,19 +6,21 @@
 <div class="page customer-ledger-page" style="max-width:1100px;margin:40px auto 60px;padding:0 26px;">
   <style>
     .customer-ledger-page{
-      --slate-50:#f8fafc;
-      --slate-100:#f1f5f9;
-      --slate-200:#e2e8f0;
-      --slate-300:#cbd5e1;
-      --slate-500:#64748b;
+      --cream-50:#fbf8f2;
+      --cream-100:#f6f0e6;
+      --cream-200:#ece2d3;
+      --cream-300:#ded1bc;
+      --slate-500:#6b7280;
       --slate-700:#334155;
-      --slate-900:#0f172a;
-      --brand:#2563eb;
-      --brand-dark:#1d4ed8;
-      --dr:#b91c1c;
-      --dr-soft:#fee2e2;
-      --cr:#047857;
-      --cr-soft:#d1fae5;
+      --slate-900:#172033;
+      --brand:#1f5a45;
+      --brand-dark:#163f31;
+      --brand-soft:#e5efe8;
+      --dr:#166534;
+      --dr-soft:#e7f4eb;
+      --cr:#9a6700;
+      --cr-soft:#fdf3d6;
+      color:var(--slate-900);
     }
 
     .cl-hero{
@@ -28,23 +30,24 @@
       margin-bottom:18px;
       flex-wrap:wrap;
       gap:14px;
-      padding:18px 20px;
-      border-radius:20px;
-      border:1px solid var(--slate-200);
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+      padding:24px 26px;
+      border-radius:24px;
+      border:1px solid var(--cream-200);
+      background:linear-gradient(135deg,#fcfaf5 0%,#f3ede3 100%);
+      box-shadow:0 18px 34px rgba(23,32,51,0.07);
     }
     .cl-title{
       margin:0 0 4px;
-      font-size:32px;
+      font-size:38px;
       font-weight:800;
       letter-spacing:-0.02em;
       color:var(--slate-900);
+      line-height:1.05;
     }
     .cl-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
+      color:#5f6675;
       line-height:1.55;
       max-width:700px;
     }
@@ -52,102 +55,161 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:9px 16px;
+      padding:11px 18px;
       min-width:150px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
-      color:#fff;
+      border:1px solid rgba(22,63,49,0.18);
+      background:#fffdfa;
+      color:var(--brand-dark);
+      box-shadow:0 8px 18px rgba(23,32,51,0.05);
       white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
     .cl-btn:hover{
       transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.12);
+      box-shadow:0 12px 24px rgba(23,32,51,.08);
+      background:#ffffff;
     }
 
     .cl-card{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--slate-200);
-      padding:18px 20px 20px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      background:rgba(255,255,255,0.96);
+      border-radius:20px;
+      border:1px solid rgba(222,209,188,0.95);
+      padding:22px 24px 24px;
+      box-shadow:0 14px 28px rgba(23,32,51,0.06);
       margin-bottom:18px;
+    }
+
+    .cl-section-title{
+      margin:0 0 6px;
+      font-size:21px;
+      font-weight:800;
+      color:var(--slate-900);
+      letter-spacing:-0.01em;
+    }
+    .cl-section-sub{
+      margin:0 0 16px;
+      color:#6b7280;
+      font-size:14px;
+      line-height:1.55;
+      max-width:720px;
     }
 
     .cl-filter{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
+      gap:14px;
       align-items:flex-end;
     }
     .cl-filter .stack{min-width:180px;}
     .cl-filter label{
       display:block;
-      font-size:14px;
-      margin-bottom:4px;
-      color:#4b5563;
+      font-size:13px;
+      margin-bottom:7px;
+      color:#5f6675;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.05em;
     }
     .cl-filter select,
     .cl-filter input{
       width:100%;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid #d9cfbf;
       font-size:14px;
-      background:#fff;
-      height:44px;
+      background:#fffdfa;
+      height:48px;
+      color:var(--slate-900);
+      box-shadow:inset 0 1px 2px rgba(23,32,51,0.03);
     }
     .cl-filter select:focus,
-    .cl-filter input:focus{
-      outline:3px solid rgba(37,99,235,0.15);
-      border-color:#93c5fd;
+    .cl-filter input:focus,
+    .search-input:focus,
+    .type-filter:focus{
+      outline:none;
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,0.12);
+      background:#ffffff;
     }
 
     .cl-apply{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 18px;
-      border-radius:10px;
+      padding:12px 18px;
+      border-radius:14px;
       font-size:14px;
-      font-weight:700;
+      font-weight:800;
       border:1px solid var(--brand-dark);
       background:linear-gradient(180deg,var(--brand),var(--brand-dark));
-      color:#ffffff;
+      color:#fff;
       cursor:pointer;
       white-space:nowrap;
-      height:44px;
+      height:48px;
+      box-shadow:0 12px 24px rgba(22,63,49,0.16);
     }
 
     .meta-grid{
       display:grid;
       grid-template-columns:repeat(4, minmax(0,1fr));
-      gap:10px;
-      margin-top:4px;
+      gap:14px;
+      margin-top:14px;
     }
     .meta-pill{
-      border:1px solid var(--slate-200);
-      border-radius:12px;
-      padding:10px 12px;
-      background:#fff;
+      border:1px solid rgba(222,209,188,0.9);
+      border-radius:16px;
+      padding:14px 15px;
+      background:linear-gradient(180deg,#fffdfa 0%,#fff9f0 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.8);
     }
     .meta-label{
       font-size:12px;
       color:var(--slate-500);
-      margin-bottom:2px;
+      margin-bottom:6px;
       font-weight:700;
       text-transform:uppercase;
       letter-spacing:.06em;
     }
     .meta-value{
-      font-size:14px;
+      font-size:18px;
       font-weight:800;
       color:var(--slate-900);
       line-height:1.4;
+    }
+    .meta-value.balance-dr{ color:var(--dr); }
+    .meta-value.balance-cr{ color:var(--cr); }
+    .meta-value.balance-zero{ color:var(--slate-700); }
+    .balance-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-bottom:8px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      border:1px solid transparent;
+    }
+    .balance-badge.dr{
+      background:var(--dr-soft);
+      color:var(--dr);
+      border-color:rgba(22,101,52,0.12);
+    }
+    .balance-badge.cr{
+      background:var(--cr-soft);
+      color:var(--cr);
+      border-color:rgba(154,103,0,0.14);
+    }
+    .balance-badge.zero{
+      background:#f3f4f6;
+      color:#4b5563;
+      border-color:#e5e7eb;
     }
 
     .cl-toolbar{
@@ -156,76 +218,100 @@
       align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      margin-bottom:10px;
+      margin-bottom:14px;
     }
     .search-input,
     .type-filter{
-      padding:9px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      padding:11px 13px;
+      border-radius:14px;
+      border:1px solid #d9cfbf;
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
+      color:var(--slate-900);
     }
     .search-input{ width:300px; max-width:100%; }
     .type-filter{ min-width:170px; }
 
-    .ledger-wrap{ width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .ledger-wrap{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      border:1px solid rgba(222,209,188,0.95);
+      border-radius:18px;
+      background:#fffdfa;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.8);
+    }
     .ledger-table{
       border-collapse:collapse;
       width:100%;
       min-width:760px;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
-      overflow:hidden;
     }
     .ledger-table th,
     .ledger-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 9px;
+      border-bottom:1px solid #ebe3d8;
+      padding:12px 14px;
       font-size:14px;
       vertical-align:middle;
     }
     .ledger-table th{
       text-align:left;
-      font-weight:700;
+      font-weight:800;
       color:var(--slate-700);
-      background:#f9fafb;
+      background:linear-gradient(180deg,#f6f0e6 0%,#f1e9dc 100%);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
       position:sticky;
       top:0;
       z-index:1;
     }
-    .ledger-table tbody tr:nth-child(even){ background:#fcfdff; }
-    .ledger-table tbody tr:hover{ background:#f8fbff; }
+    .ledger-table tbody tr:nth-child(even){ background:#fffcf7; }
+    .ledger-table tbody tr:hover{ background:#f7f1e8; }
     .right{ text-align:right; white-space:nowrap; }
+    .date-cell{ color:#445063; font-weight:600; }
+    .desc-cell{ color:#1f2937; line-height:1.5; }
+    .balance-cell{
+      font-weight:800;
+      color:var(--slate-900);
+    }
 
     .amt-dr{
       color:var(--dr);
       font-weight:800;
       background:var(--dr-soft);
-      border-radius:8px;
-      padding:2px 7px;
+      border-radius:999px;
+      padding:4px 10px;
     }
     .amt-cr{
       color:var(--cr);
       font-weight:800;
       background:var(--cr-soft);
-      border-radius:8px;
-      padding:2px 7px;
+      border-radius:999px;
+      padding:4px 10px;
     }
 
     .print-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:8px 14px;
-      border-radius:10px;
+      padding:10px 15px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
-      border:1px solid var(--slate-300);
-      background:#f8fafc;
-      color:#111827;
+      border:1px solid rgba(222,209,188,0.95);
+      background:#fffdfa;
+      color:#243042;
       cursor:pointer;
       white-space:nowrap;
+      box-shadow:0 8px 18px rgba(23,32,51,0.05);
+    }
+    .empty-card{
+      background:linear-gradient(180deg,#fffdfa 0%,#faf5eb 100%);
+      border-style:dashed;
+      color:#6b7280;
+      text-align:center;
+      font-size:15px;
+      line-height:1.6;
     }
 
     @media (max-width: 900px) {
@@ -249,14 +335,16 @@
 
     @media print {
       .no-print { display:none !important; }
-      .cl-card { box-shadow:none; border-color:#d1d5db; }
+      .cl-card,
+      .cl-hero,
+      .ledger-wrap { box-shadow:none; border-color:#d1d5db; }
     }
   </style>
 
   <div class="cl-hero">
     <div>
       <h1 class="cl-title">Customer Ledger</h1>
-      <p class="cl-sub">View detailed statement of a single customer with running balance.</p>
+      <p class="cl-sub">Review customer transactions, payments, returns, and running balance.</p>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <a href="{% url 'dashboard' %}" class="cl-btn">← Dashboard</a>
@@ -264,8 +352,8 @@
   </div>
 
   <div class="cl-card no-print">
-    <div style="font-size:18px;font-weight:700;margin-bottom:8px;">Filter</div>
-    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">Select a customer and optional date range, then click <strong>Apply</strong>.</p>
+    <h2 class="cl-section-title">Filter Ledger</h2>
+    <p class="cl-section-sub">Select a customer and optional date range, then click <strong>Apply</strong> to review the statement.</p>
 
     <form method="get" class="cl-filter">
       <div class="stack" style="min-width:260px;flex:1;">
@@ -299,7 +387,10 @@
   {% if selected_customer %}
     <div class="cl-card">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
-        <div style="font-size:16px;font-weight:700;">{{ selected_customer.name }}</div>
+        <div>
+          <div class="cl-section-title" style="margin-bottom:4px;">{{ selected_customer.name }}</div>
+          <div style="font-size:14px;color:#6b7280;">Customer summary and current statement position.</div>
+        </div>
         <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
       </div>
 
@@ -320,23 +411,27 @@
         </div>
         <div class="meta-pill">
           <div class="meta-label">Opening Balance</div>
-          <div class="meta-value">
-            {% if opening_balance and opening_balance != 0 %}
-              {{ opening_side }} {{ opening_balance|floatformat:2 }}
-            {% else %}
-              0.00
-            {% endif %}
-          </div>
+          {% if opening_balance and opening_balance != 0 %}
+            <div class="balance-badge {% if opening_side == 'DR' %}dr{% else %}cr{% endif %}">
+              {% if opening_side == 'DR' %}Receivable (DR){% else %}Advance (CR){% endif %}
+            </div>
+            <div class="meta-value {% if opening_side == 'DR' %}balance-dr{% else %}balance-cr{% endif %}">{{ opening_balance|floatformat:2 }}</div>
+          {% else %}
+            <div class="balance-badge zero">Balanced</div>
+            <div class="meta-value balance-zero">0.00</div>
+          {% endif %}
         </div>
         <div class="meta-pill">
           <div class="meta-label">Closing Balance</div>
-          <div class="meta-value">
-            {% if closing_balance and closing_balance != 0 %}
-              {{ closing_side }} {{ closing_balance|floatformat:2 }}
-            {% else %}
-              0.00
-            {% endif %}
-          </div>
+          {% if closing_balance and closing_balance != 0 %}
+            <div class="balance-badge {% if closing_side == 'DR' %}dr{% else %}cr{% endif %}">
+              {% if closing_side == 'DR' %}Receivable (DR){% else %}Advance (CR){% endif %}
+            </div>
+            <div class="meta-value {% if closing_side == 'DR' %}balance-dr{% else %}balance-cr{% endif %}">{{ closing_balance|floatformat:2 }}</div>
+          {% else %}
+            <div class="balance-badge zero">Balanced</div>
+            <div class="meta-value balance-zero">0.00</div>
+          {% endif %}
         </div>
         <div class="meta-pill">
           <div class="meta-label">Rows</div>
@@ -347,7 +442,10 @@
 
     <div class="cl-card">
       <div class="cl-toolbar no-print">
-        <div style="font-size:18px;font-weight:700;color:#0f172a;">Ledger Entries</div>
+        <div>
+          <div class="cl-section-title" style="margin-bottom:2px;font-size:20px;">Ledger Entries</div>
+          <div style="font-size:13px;color:#6b7280;">Audit-friendly statement view with debit, credit, and running balance.</div>
+        </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <input id="ledgerSearch" type="text" class="search-input" placeholder="Quick search in description...">
           <select id="entryTypeFilter" class="type-filter">
@@ -374,7 +472,7 @@
             {% if rows %}
               {% for r in rows %}
                 <tr class="ledger-row" data-debit="{{ r.debit|default:0 }}" data-credit="{{ r.credit|default:0 }}">
-                  <td style="white-space:nowrap;">{{ r.date|date:"d M Y" }}</td>
+                  <td class="date-cell" style="white-space:nowrap;">{{ r.date|date:"d M Y" }}</td>
                   <td class="desc-cell">{{ r.description }}</td>
                   <td class="right">
                     {% if r.debit and r.debit != 0 %}
@@ -390,7 +488,7 @@
                       {{ r.credit|floatformat:2 }}
                     {% endif %}
                   </td>
-                  <td class="right">
+                  <td class="right balance-cell">
                     {% if r.balance and r.balance != 0 %}
                       {{ r.balance_side }} {{ r.balance|floatformat:2 }}
                     {% else %}
@@ -411,7 +509,7 @@
       </div>
     </div>
   {% else %}
-    <div class="cl-card" style="background:#f9fafb;border-style:dashed;color:#6b7280;">
+    <div class="cl-card empty-card">
       Please select a customer above and click <strong>Apply</strong> to view the ledger.
     </div>
   {% endif %}
