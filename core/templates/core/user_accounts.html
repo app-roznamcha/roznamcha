@@ -246,43 +246,6 @@
       line-height:1.5;
     }
 
-    .ua-balance-note{
-      margin-top:10px;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,#fffdfa 0%,#f8f5ef 100%);
-      display:grid;
-      gap:10px;
-    }
-
-    .ua-balance-choice{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
-    }
-
-    .ua-balance-chip{
-      border-radius:14px;
-      padding:11px 12px;
-      border:1px solid transparent;
-      font-size:13px;
-      line-height:1.45;
-      font-weight:700;
-    }
-
-    .ua-balance-chip.dr{
-      background:var(--good-soft);
-      color:var(--good);
-      border-color:rgba(22,101,52,.12);
-    }
-
-    .ua-balance-chip.cr{
-      background:var(--warn-soft);
-      color:var(--warn);
-      border-color:rgba(154,103,0,.14);
-    }
-
     .ua-table-head{
       display:flex;
       justify-content:space-between;
@@ -465,7 +428,6 @@
 
     @media (max-width:840px){
       .ua-col-code, .ua-col-opening, .ua-col-side{ grid-column:span 12; }
-      .ua-balance-choice{ grid-template-columns:1fr; }
     }
 
     @media (max-width:640px){
@@ -525,17 +487,7 @@
         <div class="ua-field ua-col-opening">
           <label for="opening_amount">Opening Balance (optional)</label>
           <input type="number" step="0.01" name="opening_amount" id="opening_amount" placeholder="e.g. 50000.00">
-          <div class="ua-hint">Leave blank if this is a new account with no starting balance.</div>
-        </div>
-      </div>
-
-      <div class="ua-balance-note">
-        <div class="ua-hint" style="margin-top:0;font-size:13px;">
-          Opening balance is recorded as starting money available in this account. The current setup uses a debit-style opening balance.
-        </div>
-        <div class="ua-balance-choice">
-          <div class="ua-balance-chip dr">DR: Money available in this account</div>
-          <div class="ua-balance-chip cr">CR: Overdraft / negative balance</div>
+          <div class="ua-hint">Enter the starting amount available in this cash/bank account. Leave blank or 0 if there is no opening balance.</div>
         </div>
       </div>
 
@@ -575,7 +527,8 @@
             <th style="width:13%;">Code</th>
             <th>Name</th>
             <th style="width:15%;">Type</th>
-            <th class="center" style="width:18%;">Payment Screens</th>
+            <th class="right" style="width:20%;">Balance</th>
+            <th class="center" style="width:18%;">Status</th>
             <th class="center" style="width:12%;">Remove</th>
           </tr>
         </thead>
@@ -585,9 +538,13 @@
             <td class="ua-code">{{ acc.code }}</td>
             <td class="ua-name">{{ acc.name }}</td>
             <td>
-              <span class="ua-type-badge cash">
-                Cash / Bank
+              <span class="ua-type-badge {% if acc.code == '1000' %}cash{% else %}bank{% endif %}">
+                {% if acc.code == '1000' %}Cash{% else %}Bank{% endif %}
               </span>
+            </td>
+            <td class="ua-balance">
+              {{ acc.current_balance|default:"—" }}
+              <span class="ua-balance-sub">Live balance based on transactions</span>
             </td>
             <td class="center">
               {% if acc.allow_for_payments %}
@@ -611,7 +568,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="5" class="ua-empty">
+            <td colspan="6" class="ua-empty">
               No accounts created yet. Add a cash or bank account to start recording transactions.
             </td>
           </tr>
