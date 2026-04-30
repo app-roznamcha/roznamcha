@@ -426,6 +426,30 @@
 
       {% block content %}{% endblock %}
     </div>
+    <style>
+      /* Global primary button hover fix for Roznamcha transaction workflows */
+      .sale-btn-primary:hover,
+      .pn-btn-primary:hover {
+        background: linear-gradient(180deg, var(--primary-dark), #134e3a);
+        color: #ffffff;
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(23,32,51,.10);
+      }
+
+      .rn-btn-primary:hover,
+      .np-btn-primary:hover,
+      .pl-btn-primary:hover,
+      .exp-btn-primary:hover,
+      .tf-btn-primary:hover,
+      .adj-btn-primary:hover {
+        background: linear-gradient(180deg, var(--accent-dark), #123522);
+        color: #ffffff;
+        border-color: var(--accent-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(23,32,51,.10);
+      }
+    </style>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function () {
