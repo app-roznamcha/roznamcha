@@ -12,8 +12,16 @@ class PublicCanonicalHostMiddleware(MiddlewareMixin):
 
     Safe behavior:
     - Redirect only GET/HEAD requests from www.public-host to bare public-host.
+    - Redirect public requests from Render hostnames to the canonical public host.
     - Leave non-idempotent methods untouched to avoid cross-host POST surprises.
     """
+
+    SAFE_PATH_PREFIXES = (
+        "/internal/",
+        "/static/",
+        "/media/",
+        "/admin/",
+    )
 
     def process_request(self, request):
         public_host = (getattr(settings, "PUBLIC_BASE_DOMAIN", "") or "").strip().lower()
@@ -26,6 +34,10 @@ class PublicCanonicalHostMiddleware(MiddlewareMixin):
         current_host_only = current_host.split(":")[0].lower()
         public_host_only = public_host.split(":")[0].lower()
         www_host_only = f"www.{base_domain}"
+        path = request.path or "/"
+
+        if any(path.startswith(prefix) for prefix in self.SAFE_PATH_PREFIXES):
+            return None
 
         # Canonical strategy: bare public host wins over www host.
         if (
@@ -35,6 +47,15 @@ class PublicCanonicalHostMiddleware(MiddlewareMixin):
             and current_host.lower() != public_host
         ):
             target = f"{request.scheme}://{public_host}{request.get_full_path()}"
+            return redirect(target, permanent=True)
+
+        # Render hostnames should never be user-facing in production.
+        if (
+            request.method in ("GET", "HEAD")
+            and current_host_only.endswith(".onrender.com")
+            and current_host_only != public_host_only
+        ):
+            target = f"https://{public_host}{request.get_full_path()}"
             return redirect(target, permanent=True)
 
         return None
