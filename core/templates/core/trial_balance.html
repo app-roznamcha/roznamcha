@@ -3,143 +3,208 @@
 {% block title %}Account Movement Report{% endblock %}
 
 {% block content %}
-<div class="page trial-balance-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page trial-balance-page">
   <style>
     .trial-balance-page{
-      --slate-50:#f8fafc;
-      --slate-100:#f1f5f9;
-      --slate-200:#e2e8f0;
-      --slate-300:#cbd5e1;
-      --slate-500:#64748b;
-      --slate-700:#334155;
-      --slate-900:#0f172a;
-      --brand:#2563eb;
-      --brand-dark:#1d4ed8;
-      --ok:#047857;
-      --ok-soft:#d1fae5;
-      --warn:#b91c1c;
-      --warn-soft:#fee2e2;
+      max-width:1120px;
+      margin:40px auto 68px;
+      padding:0 18px;
+      --bg:#f8f5ef;
+      --surface:#fffdfa;
+      --surface-strong:#ffffff;
+      --surface-soft:#f6f1e7;
+      --surface-soft-2:#f1eadf;
+      --line:#e5dccd;
+      --line-soft:#efe7da;
+      --ink-900:#1d3528;
+      --ink-700:#405548;
+      --ink-500:#6d7c72;
+      --accent:#1f5134;
+      --accent-dark:#173c27;
+      --accent-soft:#edf4ee;
+      --debit:#1d3528;
+      --debit-soft:#f7f2e9;
+      --credit:#9a6a16;
+      --credit-soft:#fdf5e7;
+      --warn:#b45309;
+      --warn-soft:#fff7ed;
+      --shadow:0 16px 36px rgba(29, 53, 40, .08);
+      color:var(--ink-900);
     }
 
     .tb-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:14px;
-      padding:18px 20px;
-      border-radius:20px;
-      border:1px solid var(--slate-200);
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+      gap:18px;
+      padding:24px 26px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(760px 260px at -16% -90%, rgba(205, 223, 209, .7) 0%, transparent 58%),
+        radial-gradient(640px 240px at 115% -80%, rgba(243, 231, 212, .78) 0%, transparent 54%),
+        linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:var(--shadow);
     }
     .tb-title{
       margin:0 0 4px;
-      font-size:31px;
+      font-size:34px;
       font-weight:800;
       letter-spacing:-0.02em;
-      color:var(--slate-900);
+      color:var(--ink-900);
+      line-height:1.08;
     }
     .tb-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
-      line-height:1.55;
+      color:var(--ink-700);
+      line-height:1.65;
       max-width:700px;
+    }
+    .tb-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
     .tb-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:150px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#fff;
       white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
     }
     .tb-btn:hover{
       transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.12);
+      border-color:var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent-dark), #123522);
+      box-shadow:0 10px 22px rgba(23,32,51,.10);
     }
 
     .tb-card{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--slate-200);
-      padding:18px 20px 20px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
-      margin-bottom:20px;
+      background:var(--surface-strong);
+      border-radius:20px;
+      border:1px solid var(--line);
+      padding:22px 24px 24px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+    .tb-card.filter-card{
+      background:linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+    }
+    .tb-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .tb-card-title{
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+    .tb-card-sub{
+      font-size:14px;
+      color:var(--ink-500);
+      line-height:1.6;
+      max-width:620px;
     }
 
     .tb-filter{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
+      gap:14px 16px;
       align-items:flex-end;
     }
     .tb-filter .col{min-width:220px;}
     .tb-filter label{
-      display:block;
-      font-size:14px;
-      margin-bottom:4px;
-      color:#4b5563;
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:0;
+      color:var(--ink-700);
+      letter-spacing:.01em;
     }
     .tb-filter input,
     .tb-filter select{
       width:100%;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid var(--line);
       font-size:14px;
-      background:#fff;
-      height:44px;
+      background:#fffdfa;
+      color:var(--ink-900);
+      height:46px;
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
     }
     .tb-filter input:focus,
     .tb-filter select:focus{
-      outline:3px solid rgba(37,99,235,0.15);
-      border-color:#93c5fd;
+      outline:none;
+      border-color:#9cb7a5;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
     .tb-apply{
       display:inline-flex;
       align-items:center;
       justify-content:center;
       padding:10px 18px;
-      border-radius:10px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#ffffff;
       cursor:pointer;
       white-space:nowrap;
       min-width:130px;
-      height:44px;
+      height:46px;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .tb-apply:hover{
+      transform:translateY(-1px);
+      border-color:var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent-dark), #123522);
+      box-shadow:0 10px 22px rgba(23,32,51,.10);
     }
 
     .tb-head{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:10px;
+      margin-bottom:14px;
       flex-wrap:wrap;
       gap:10px;
     }
     .tb-head-title{
-      font-size:18px;
-      font-weight:700;
-      color:var(--slate-900);
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
     }
     .tb-head-sub{
-      font-size:13px;
-      color:var(--slate-500);
+      font-size:14px;
+      color:var(--ink-500);
       max-width:560px;
+      line-height:1.6;
     }
 
     .tb-tools{
@@ -150,86 +215,161 @@
     }
     .search-input,
     .side-filter{
-      padding:9px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      min-height:46px;
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid var(--line);
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
+      color:var(--ink-900);
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
     }
     .search-input{ width:290px; max-width:100%; }
     .side-filter{ min-width:170px; }
+    .search-input:focus,
+    .side-filter:focus{
+      outline:none;
+      border-color:#9cb7a5;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
+    }
 
     .pill{
       display:inline-flex;
       align-items:center;
       gap:6px;
-      padding:3px 10px;
+      padding:5px 10px;
       border-radius:999px;
       font-size:12px;
-      border:1px solid var(--slate-200);
+      border:1px solid var(--line);
       background:#ffffff;
-      color:#111827;
+      color:var(--ink-900);
       white-space:nowrap;
       font-weight:700;
     }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .summary-card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 15px;
+      background:linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    .summary-card.warn{
+      background:linear-gradient(180deg,#fff9f0 0%, #fff2dd 100%);
+      border-color:#f3d3a5;
+    }
+    .summary-label{
+      display:block;
+      margin-bottom:6px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      color:var(--ink-500);
+    }
+    .summary-value{
+      display:block;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+      line-height:1.35;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1;
+    }
 
-    .tbl-wrap{ width:100%; overflow-x:auto; }
+    .tbl-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fffefb;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.92);
+    }
     .tbl{
       border-collapse:collapse;
       width:100%;
       min-width:820px;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
-      overflow:hidden;
     }
     .tbl th, .tbl td{
-      border-bottom:1px solid #e5e7eb;
-      padding:8px 10px;
+      border-bottom:1px solid var(--line-soft);
+      padding:12px 12px;
       font-size:14px;
       vertical-align:middle;
     }
     .tbl th{
       text-align:left;
-      font-weight:700;
-      color:var(--slate-700);
-      background:#f9fafb;
+      font-weight:800;
+      color:var(--ink-700);
+      background:linear-gradient(180deg,#f3ede2 0%, #efe6d8 100%);
       position:sticky;
       top:0;
       z-index:1;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-size:12px;
     }
-    .tbl tbody tr:nth-child(even){ background:#fcfdff; }
-    .tbl tbody tr:hover{ background:#f8fbff; }
+    .tbl td{
+      color:var(--ink-900);
+    }
+    .tbl tbody tr:nth-child(even){ background:#fdfbf7; }
+    .tbl tbody tr:hover{ background:#f5efe4; }
+    .tbl tbody tr:last-child td{ border-bottom:none; }
     .right{ text-align:right; }
+    .code-cell{
+      color:var(--ink-500);
+      font-weight:700;
+    }
+    .name-cell{
+      color:var(--ink-900);
+      font-weight:800;
+    }
 
     .amt-dr{
-      color:var(--ok);
+      color:var(--debit);
       font-weight:800;
-      background:var(--ok-soft);
+      background:var(--debit-soft);
       border-radius:8px;
-      padding:2px 7px;
+      padding:3px 7px;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1;
     }
     .amt-cr{
-      color:var(--warn);
+      color:var(--credit);
       font-weight:800;
-      background:var(--warn-soft);
+      background:var(--credit-soft);
       border-radius:8px;
-      padding:2px 7px;
+      padding:3px 7px;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1;
     }
 
+    .tbl tfoot th{
+      border-top:2px solid var(--line);
+      padding:10px 12px;
+      background:linear-gradient(180deg,#f7f2e9 0%, #f1eadf 100%);
+      color:var(--ink-900);
+      font-weight:800;
+    }
     .totals-strip{
-      margin-top:12px;
+      margin-top:14px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--slate-200);
-      background:#f8fafc;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
       font-size:14px;
     }
-    .totals-strip .eq{ font-weight:800; color:#0f172a; }
+    .totals-strip .eq{ font-weight:800; color:var(--ink-900); }
     .balance-pill{
       display:inline-flex;
       align-items:center;
@@ -237,33 +377,53 @@
       padding:8px 12px;
       border-radius:999px;
       font-weight:800;
-      border:1px solid var(--slate-200);
+      border:1px solid var(--line);
       background:#fff;
+      color:var(--ink-900);
     }
     .balance-pill .dot{
       width:10px;
       height:10px;
       border-radius:999px;
-      background:var(--ok);
-      box-shadow:0 0 0 4px rgba(4,120,87,0.12);
+      background:var(--accent);
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
     .balance-pill.bad{
       color:var(--warn);
-      background:#fff7ed;
-      border-color:#fdba74;
+      background:var(--warn-soft);
+      border-color:#f3d3a5;
     }
     .balance-pill.bad .dot{
-      background:#d97706;
+      background:var(--warn);
       box-shadow:0 0 0 4px rgba(217,119,6,0.14);
     }
     .tb-clarify{
       margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid var(--slate-200);
-      background:var(--slate-50);
-      color:#475569;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fffdfa;
+      color:var(--ink-700);
       font-size:14px;
+      line-height:1.6;
+    }
+    .tb-empty{
+      padding:32px 18px;
+      text-align:center;
+      color:var(--ink-500);
+      background:linear-gradient(180deg,#fffdf9 0%, #faf6ee 100%);
+    }
+    .tb-empty-title{
+      display:block;
+      margin-bottom:6px;
+      font-size:16px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+    .tb-empty-copy{
+      display:block;
+      font-size:14px;
+      line-height:1.6;
     }
 
     @media (max-width: 640px) {
@@ -275,6 +435,7 @@
       .tb-filter .col{ min-width:100% !important; }
       .search-input,
       .side-filter{ width:100%; }
+      .summary-grid{ grid-template-columns:1fr; }
     }
 
     @media print {
@@ -288,15 +449,17 @@
       <h1 class="tb-title">Account Movement Report</h1>
       <p class="tb-sub">This report shows net debit and credit movement for each account during the selected period.</p>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="tb-actions">
       <a href="{% url 'dashboard' %}" class="tb-btn">← Dashboard</a>
-      <button type="button" class="tb-btn no-print" style="background:#0f172a;border-color:#0f172a;" onclick="window.print()">🖨️ Print</button>
+      <button type="button" class="tb-btn no-print" onclick="window.print()">🖨️ Print</button>
     </div>
   </div>
 
-  <div class="tb-card no-print">
-    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Filter by date</div>
-    <p style="font-size:15px;color:#475569;margin-bottom:12px;">Select a date range to view net account movement for that period.</p>
+  <div class="tb-card filter-card no-print">
+    <div class="tb-card-head">
+      <div class="tb-card-title">Filters</div>
+      <div class="tb-card-sub">Select a date range to view account-wise movement.</div>
+    </div>
 
     <form method="get" class="tb-filter">
       <div class="col">
@@ -349,6 +512,21 @@
       </div>
     </div>
 
+    <div class="summary-grid">
+      <div class="summary-card">
+        <span class="summary-label">Total Debit</span>
+        <span class="summary-value">{{ total_debits|floatformat:2 }}</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-label">Total Credit</span>
+        <span class="summary-value">{{ total_credits|floatformat:2 }}</span>
+      </div>
+      <div class="summary-card {% if not is_balanced %}warn{% endif %}">
+        <span class="summary-label">Difference</span>
+        <span class="summary-value">{{ difference|floatformat:2 }}</span>
+      </div>
+    </div>
+
     <div class="tbl-wrap">
       <table class="tbl">
         <thead>
@@ -379,7 +557,9 @@
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="4" style="padding:10px 9px;font-size:15px;color:#6b7280;">No journal entries for this period.</td>
+              <td colspan="4" class="tb-empty">
+                <span class="tb-empty-title">No account activity found for the selected period.</span>
+              </td>
             </tr>
           {% endif %}
         </tbody>
@@ -398,6 +578,9 @@
         <span class="dot" aria-hidden="true"></span>
         <span>Balance Check: {{ balance_status }}</span>
       </span>
+      {% if not is_balanced %}
+      <span class="eq">⚠ Report not balanced for selected period</span>
+      {% endif %}
       <span>Debit Total: <strong>{{ total_debits|floatformat:2 }}</strong></span>
       <span>Credit Total: <strong>{{ total_credits|floatformat:2 }}</strong></span>
       <span class="eq">Difference: <strong>{{ difference|floatformat:2 }}</strong></span>

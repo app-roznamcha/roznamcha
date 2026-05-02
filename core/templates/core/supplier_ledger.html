@@ -3,108 +3,160 @@
 {% block title %}Supplier Ledger{% endblock %}
 
 {% block content %}
-<div class="page supplier-ledger-page" style="max-width:1100px;margin:40px auto 60px;padding:0 16px;">
+<div class="page supplier-ledger-page">
   <style>
     .supplier-ledger-page{
-      --slate-50:#f8fafc;
-      --slate-100:#f1f5f9;
-      --slate-200:#e2e8f0;
-      --slate-300:#cbd5e1;
-      --slate-500:#64748b;
-      --slate-700:#334155;
-      --slate-900:#0f172a;
-      --brand:#2563eb;
-      --brand-dark:#1d4ed8;
-      --dr:#b91c1c;
-      --dr-soft:#fee2e2;
-      --cr:#047857;
-      --cr-soft:#d1fae5;
+      max-width:1120px;
+      margin:40px auto 68px;
+      padding:0 18px;
+      --bg:#f8f5ef;
+      --surface:#fffdfa;
+      --surface-strong:#ffffff;
+      --surface-soft:#f6f1e7;
+      --surface-soft-2:#f1eadf;
+      --line:#e5dccd;
+      --line-soft:#efe7da;
+      --ink-900:#1d3528;
+      --ink-700:#405548;
+      --ink-500:#6d7c72;
+      --accent:#1f5134;
+      --accent-dark:#173c27;
+      --accent-soft:#edf4ee;
+      --debit:#1d3528;
+      --debit-soft:#f7f2e9;
+      --credit:#9a6a16;
+      --credit-soft:#fdf5e7;
+      --shadow:0 16px 36px rgba(29, 53, 40, .08);
+      color:var(--ink-900);
     }
 
     .sl-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:20px;
       flex-wrap:wrap;
-      gap:14px;
-      padding:18px 20px;
-      border-radius:20px;
-      border:1px solid var(--slate-200);
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 24px rgba(15,23,42,0.07);
+      gap:18px;
+      padding:24px 26px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:
+        radial-gradient(760px 260px at -16% -90%, rgba(205, 223, 209, .7) 0%, transparent 58%),
+        radial-gradient(640px 240px at 115% -80%, rgba(243, 231, 212, .78) 0%, transparent 54%),
+        linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:var(--shadow);
     }
     .sl-title{
       margin:0 0 4px;
-      font-size:31px;
+      font-size:34px;
       font-weight:800;
       letter-spacing:-0.02em;
-      color:var(--slate-900);
+      color:var(--ink-900);
+      line-height:1.08;
     }
     .sl-sub{
       margin:0;
       font-size:15px;
-      color:#475569;
-      line-height:1.55;
+      color:var(--ink-700);
+      line-height:1.65;
       max-width:700px;
+    }
+    .sl-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
     .sl-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:10px 16px;
+      padding:11px 18px;
       min-width:150px;
-      border-radius:12px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
       text-decoration:none;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#fff;
       white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
     }
     .sl-btn:hover{
       transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.12);
+      border-color:var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent-dark), #123522);
+      box-shadow:0 10px 22px rgba(23,32,51,.10);
     }
 
     .sl-card{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--slate-200);
-      padding:18px 20px 20px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.06);
+      background:var(--surface-strong);
+      border-radius:20px;
+      border:1px solid var(--line);
+      padding:22px 24px 24px;
+      box-shadow:var(--shadow);
       margin-bottom:18px;
+    }
+    .sl-card.filter-card{
+      background:linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+    }
+    .sl-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .sl-card-title{
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+    }
+    .sl-card-sub{
+      font-size:14px;
+      color:var(--ink-500);
+      line-height:1.6;
+      max-width:620px;
     }
 
     .sl-filter{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
+      gap:14px 16px;
       align-items:flex-end;
     }
     .sl-filter .stack{min-width:180px;}
     .sl-filter label{
-      display:block;
-      font-size:14px;
-      margin-bottom:4px;
-      color:#4b5563;
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      font-size:13px;
+      color:var(--ink-700);
+      font-weight:700;
+      letter-spacing:.01em;
     }
     .sl-filter select,
     .sl-filter input{
       width:100%;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid var(--line);
       font-size:14px;
-      background:#fff;
-      height:44px;
+      background:#fffdfa;
+      color:var(--ink-900);
+      height:46px;
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
     }
     .sl-filter select:focus,
     .sl-filter input:focus{
-      outline:3px solid rgba(37,99,235,0.15);
-      border-color:#93c5fd;
+      outline:none;
+      border-color:#9cb7a5;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
     }
 
     .sl-apply{
@@ -112,43 +164,52 @@
       align-items:center;
       justify-content:center;
       padding:10px 18px;
-      border-radius:10px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
-      border:1px solid var(--brand-dark);
-      background:linear-gradient(180deg,var(--brand),var(--brand-dark));
+      border:1px solid var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
       color:#ffffff;
       cursor:pointer;
       white-space:nowrap;
-      height:44px;
+      height:46px;
       min-width:130px;
+      box-shadow:0 14px 28px rgba(31, 81, 52, .2);
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .sl-apply:hover{
+      transform:translateY(-1px);
+      border-color:var(--accent-dark);
+      background:linear-gradient(180deg,var(--accent-dark), #123522);
+      box-shadow:0 10px 22px rgba(23,32,51,.10);
     }
 
     .meta-grid{
       display:grid;
       grid-template-columns:repeat(4, minmax(0,1fr));
-      gap:10px;
+      gap:12px;
       margin-top:4px;
     }
     .meta-pill{
-      border:1px solid var(--slate-200);
-      border-radius:12px;
-      padding:10px 12px;
-      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 15px;
+      background:linear-gradient(180deg,#fffdf9 0%, #f7f2e9 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
     }
     .meta-label{
-      font-size:12px;
-      color:var(--slate-500);
-      margin-bottom:2px;
-      font-weight:700;
+      font-size:11px;
+      color:var(--ink-500);
+      margin-bottom:6px;
+      font-weight:800;
       text-transform:uppercase;
-      letter-spacing:.06em;
+      letter-spacing:.10em;
     }
     .meta-value{
-      font-size:14px;
+      font-size:18px;
       font-weight:800;
-      color:var(--slate-900);
-      line-height:1.4;
+      color:var(--ink-900);
+      line-height:1.35;
     }
 
     .sl-toolbar{
@@ -157,76 +218,144 @@
       align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      margin-bottom:10px;
+      margin-bottom:14px;
+    }
+    .sl-toolbar-title{
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
     }
     .search-input,
     .type-filter{
-      padding:9px 12px;
-      border-radius:10px;
-      border:1px solid var(--slate-300);
+      min-height:46px;
+      padding:11px 13px;
+      border-radius:13px;
+      border:1px solid var(--line);
       font-size:14px;
-      background:#fff;
+      background:#fffdfa;
+      color:var(--ink-900);
+      transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
     }
     .search-input{ width:300px; max-width:100%; }
     .type-filter{ min-width:170px; }
+    .search-input:focus,
+    .type-filter:focus{
+      outline:none;
+      border-color:#9cb7a5;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(31,81,52,.12);
+    }
 
-    .ledger-wrap{ width:100%; overflow-x:auto; }
+    .ledger-wrap{
+      width:100%;
+      overflow-x:auto;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fffefb;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.92);
+    }
     .ledger-table{
       border-collapse:collapse;
       width:100%;
       min-width:860px;
-      border:1px solid var(--slate-200);
-      border-radius:14px;
-      overflow:hidden;
     }
     .ledger-table th,
     .ledger-table td{
-      border-bottom:1px solid #e5e7eb;
-      padding:7px 9px;
+      border-bottom:1px solid var(--line-soft);
+      padding:12px 12px;
       font-size:14px;
       vertical-align:middle;
     }
     .ledger-table th{
       text-align:left;
-      font-weight:700;
-      color:var(--slate-700);
-      background:#f9fafb;
+      font-weight:800;
+      color:var(--ink-700);
+      background:linear-gradient(180deg,#f3ede2 0%, #efe6d8 100%);
       position:sticky;
       top:0;
       z-index:1;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-size:12px;
     }
-    .ledger-table tbody tr:nth-child(even){ background:#fcfdff; }
-    .ledger-table tbody tr:hover{ background:#f8fbff; }
+    .ledger-table td{
+      color:var(--ink-900);
+    }
+    .ledger-table tbody tr:nth-child(even){ background:#fdfbf7; }
+    .ledger-table tbody tr:hover{ background:#f5efe4; }
+    .ledger-table tbody tr:last-child td{ border-bottom:none; }
     .right{ text-align:right; }
+    .desc-cell{
+      color:var(--ink-900);
+      font-weight:600;
+    }
+    .balance-cell{
+      font-weight:800;
+      font-size:15px;
+      color:var(--ink-900);
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1;
+    }
 
     .amt-dr{
-      color:var(--dr);
+      color:var(--debit);
       font-weight:800;
-      background:var(--dr-soft);
+      background:var(--debit-soft);
       border-radius:8px;
-      padding:2px 7px;
+      padding:3px 7px;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1;
     }
     .amt-cr{
-      color:var(--cr);
+      color:var(--credit);
       font-weight:800;
-      background:var(--cr-soft);
+      background:var(--credit-soft);
       border-radius:8px;
-      padding:2px 7px;
+      padding:3px 7px;
+      font-variant-numeric:tabular-nums;
+      font-feature-settings:"tnum" 1;
     }
 
     .print-btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:8px 14px;
-      border-radius:10px;
+      padding:10px 14px;
+      border-radius:14px;
       font-size:14px;
       font-weight:700;
-      border:1px solid var(--slate-300);
-      background:#f8fafc;
-      color:#111827;
+      border:1px solid var(--line);
+      background:#fffdfa;
+      color:var(--ink-700);
       cursor:pointer;
       white-space:nowrap;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .print-btn:hover{
+      transform:translateY(-1px);
+      border-color:#c8bca6;
+      background:#fff;
+      color:var(--ink-900);
+      box-shadow:0 8px 18px rgba(29, 53, 40, .06);
+    }
+    .empty-state{
+      padding:32px 18px;
+      color:var(--ink-500);
+      text-align:center;
+      background:linear-gradient(180deg,#fffdf9 0%, #faf6ee 100%);
+    }
+    .empty-state-title{
+      display:block;
+      margin-bottom:6px;
+      font-size:16px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+    .empty-state-copy{
+      display:block;
+      font-size:14px;
+      line-height:1.6;
     }
 
     @media (max-width: 900px) {
@@ -256,16 +385,18 @@
   <div class="sl-hero">
     <div>
       <h1 class="sl-title">Supplier Ledger</h1>
-      <p class="sl-sub">View detailed statement of a single supplier with running balance.</p>
+      <p class="sl-sub">View all transactions, payments, and balance movements for this supplier.</p>
     </div>
-    <div>
+    <div class="sl-actions">
       <a href="{% url 'dashboard' %}" class="sl-btn">← Dashboard</a>
     </div>
   </div>
 
-  <div class="sl-card no-print">
-    <div style="font-size:18px;font-weight:700;margin-bottom:8px;">Filter</div>
-    <p style="font-size:14px;color:#6b7280;margin-bottom:12px;">Select a supplier and optional date range, then click <strong>Apply</strong>.</p>
+  <div class="sl-card filter-card no-print">
+    <div class="sl-card-head">
+      <div class="sl-card-title">Filters</div>
+      <div class="sl-card-sub">Select a supplier and optional date range, then click <strong>Apply</strong>.</div>
+    </div>
 
     <form method="get" class="sl-filter">
       <div class="stack" style="min-width:260px;">
@@ -298,8 +429,8 @@
 
   {% if selected_supplier %}
     <div class="sl-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
-        <div style="font-size:16px;font-weight:700;">{{ selected_supplier.name }}</div>
+      <div class="sl-card-head">
+        <div class="sl-card-title">{{ selected_supplier.name }}</div>
         <button type="button" class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
       </div>
 
@@ -347,7 +478,7 @@
 
     <div class="sl-card">
       <div class="sl-toolbar no-print">
-        <div style="font-size:18px;font-weight:700;color:#0f172a;">Ledger Entries</div>
+        <div class="sl-toolbar-title">Ledger Entries</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <input id="ledgerSearch" type="text" class="search-input" placeholder="Quick search in description...">
           <select id="entryTypeFilter" class="type-filter">
@@ -390,7 +521,7 @@
                       {{ r.credit|floatformat:2 }}
                     {% endif %}
                   </td>
-                  <td class="right">
+                  <td class="right balance-cell">
                     {% if r.balance and r.balance != 0 %}
                       {{ r.balance_side }} {{ r.balance|floatformat:2 }}
                     {% else %}
@@ -401,8 +532,9 @@
               {% endfor %}
             {% else %}
               <tr>
-                <td colspan="5" style="padding:10px 9px;color:#6b7280;text-align:center;">
-                  No transactions found for this supplier in the selected period.
+                <td colspan="5" class="empty-state">
+                  <span class="empty-state-title">No transactions found for this supplier.</span>
+                  <span class="empty-state-copy">Select a supplier and date range to view ledger activity.</span>
                 </td>
               </tr>
             {% endif %}
@@ -411,8 +543,9 @@
       </div>
     </div>
   {% else %}
-    <div class="sl-card" style="background:#f9fafb;border-style:dashed;color:#6b7280;">
-      Please select a supplier above and click <strong>Apply</strong> to view the ledger.
+    <div class="sl-card empty-state">
+      <span class="empty-state-title">No transactions found for this supplier.</span>
+      <span class="empty-state-copy">Select a supplier and date range to view ledger activity.</span>
     </div>
   {% endif %}
 
