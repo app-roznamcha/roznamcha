@@ -2002,6 +2002,7 @@ class CompanyProfile(TimeStampedModel):
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
     slug = models.SlugField(max_length=50, unique=True, blank=True)
+    business_setup_dismissed = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # Source for slug:

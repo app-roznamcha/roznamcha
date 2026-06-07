@@ -397,9 +397,35 @@
       color:var(--dash-green-dark);
   }
 
+  .setup-dismiss-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 14px;
+      border-radius:12px;
+      font-size:13px;
+      font-weight:700;
+      color:var(--dash-muted-strong);
+      background:#fff;
+      border:1px solid var(--dash-line);
+      cursor:pointer;
+      transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+
+  .setup-dismiss-btn:hover{
+      transform:translateY(-1px);
+      border-color:var(--dash-line-strong);
+      box-shadow:0 8px 16px rgba(19,33,26,.06);
+  }
+
+  .setup-dismiss-form{
+      margin:0;
+  }
+
   @media (max-width: 640px){
     .setup-checklist{ grid-template-columns:1fr; }
     .setup-btn{ width:100%; }
+    .setup-dismiss-btn{ width:100%; }
   }
 
   /* Top mini-cards */
@@ -1116,6 +1142,7 @@ html[dir="rtl"] .dashboard-section{
 
     {# ---- Business setup progress (Owner/Superadmin only) ---- #}
     {% if not is_staff and setup_progress %}
+    {% if not setup_progress.all_done or not business_setup_dismissed %}
     <section class="setup-section" aria-label="Business setup progress">
       <div class="setup-header">
         <div>
@@ -1141,11 +1168,18 @@ html[dir="rtl"] .dashboard-section{
       <div class="setup-footer">
         {% if setup_progress.all_done %}
           <p class="setup-complete">🎉 Business setup completed.</p>
+          {% if not business_setup_dismissed %}
+          <form method="post" action="{% url 'dismiss_business_setup' %}" class="setup-dismiss-form">
+            {% csrf_token %}
+            <button type="submit" class="setup-dismiss-btn">Hide Setup Guide</button>
+          </form>
+          {% endif %}
         {% else %}
           <a href="{{ setup_progress.next_url }}" class="setup-btn">Continue Setup</a>
         {% endif %}
       </div>
     </section>
+    {% endif %}
     {% endif %}
 
     {# ---- Top financial metric cards (Owner/Superadmin only) ---- #}

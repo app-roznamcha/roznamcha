@@ -69,6 +69,11 @@ urlpatterns = [
     # App (authenticated)
     # =========================
     path("dashboard/", views.dashboard, name="dashboard"),
+    path(
+        "dashboard/dismiss-setup/",
+        staff_blocked(views.dismiss_business_setup),
+        name="dismiss_business_setup",
+    ),
 
     # Super Admin (global)
     path("superadmin/", views.superadmin_dashboard, name="superadmin_dashboard"),

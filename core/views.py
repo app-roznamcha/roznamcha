@@ -842,8 +842,23 @@ def dashboard(request):
 
     if not is_staff:
         context["setup_progress"] = _business_setup_progress(owner)
+        context["business_setup_dismissed"] = bool(
+            getattr(company, "business_setup_dismissed", False)
+        ) if company else False
 
     return render(request, "core/dashboard.html", context)
+
+
+@require_POST
+def dismiss_business_setup(request):
+    owner = getattr(request, "owner", None) or get_company_owner(request.user)
+    company = getattr(request, "tenant", None) or CompanyProfile.objects.filter(
+        owner=owner
+    ).order_by("-id").first()
+    if company and not company.business_setup_dismissed:
+        company.business_setup_dismissed = True
+        company.save(update_fields=["business_setup_dismissed"])
+    return redirect("dashboard")
 
 
 # --------------------------
