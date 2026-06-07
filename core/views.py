@@ -52,6 +52,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.safestring import mark_safe
 from django.utils.dateparse import parse_date
 from django.utils.text import slugify
 from django.views.decorators.http import require_GET, require_POST
@@ -563,6 +564,110 @@ def get_operational_profit(owner, date_from, date_to):
     }
 
 
+def _business_setup_progress(owner):
+    steps = [
+        {
+            "label": "Add Supplier",
+            "done": Party.objects.filter(owner=owner, party_type="SUPPLIER").exists(),
+            "url_name": "supplier_create",
+        },
+        {
+            "label": "Add Product",
+            "done": Product.objects.filter(owner=owner).exists(),
+            "url_name": "product_create",
+        },
+        {
+            "label": "Add Customer",
+            "done": Party.objects.filter(owner=owner, party_type="CUSTOMER").exists(),
+            "url_name": "customer_create",
+        },
+        {
+            "label": "Record Purchase",
+            "done": PurchaseInvoice.objects.filter(owner=owner).exists(),
+            "url_name": "purchase_new",
+        },
+        {
+            "label": "Record Sale",
+            "done": SalesInvoice.objects.filter(owner=owner).exists(),
+            "url_name": "sales_new",
+        },
+    ]
+    completed_count = sum(1 for step in steps if step["done"])
+    total_count = len(steps)
+    next_url = None
+    for step in steps:
+        if not step["done"]:
+            next_url = reverse(step["url_name"])
+            break
+    return {
+        "steps": steps,
+        "completed_count": completed_count,
+        "total_count": total_count,
+        "all_done": completed_count == total_count,
+        "next_url": next_url,
+        "progress_percent": int((completed_count / total_count) * 100) if total_count else 0,
+    }
+
+
+_SETUP_GUIDANCE = {
+    "supplier": (
+        "✅ Supplier added successfully.",
+        "Next step: Add your first product.",
+        "Add Product",
+        "product_create",
+    ),
+    "product": (
+        "✅ Product added successfully.",
+        "Next step: Add your first customer.",
+        "Add Customer",
+        "customer_create",
+    ),
+    "customer": (
+        "✅ Customer added successfully.",
+        "Next step: Record your first purchase.",
+        "Record Purchase",
+        "purchase_new",
+    ),
+    "purchase": (
+        "✅ Purchase recorded successfully.",
+        "Next step: Record your first sale.",
+        "Record Sale",
+        "sales_new",
+    ),
+    "sale": (
+        "🎉 Congratulations!",
+        "Your business setup is complete.",
+        "Go To Dashboard",
+        "dashboard",
+    ),
+}
+
+
+def _add_setup_guidance_message(request, step_key):
+    title, subtitle, btn_label, url_name = _SETUP_GUIDANCE[step_key]
+    url = reverse(url_name)
+    html = mark_safe(
+        f'<div class="onboarding-msg">'
+        f'<div class="onboarding-msg-title">{title}</div>'
+        f'<div class="onboarding-msg-sub">{subtitle}</div>'
+        f'<a class="onboarding-msg-btn" href="{url}">{btn_label}</a>'
+        f'</div>'
+    )
+    messages.add_message(request, messages.SUCCESS, html, extra_tags="onboarding")
+
+
+def _maybe_add_setup_guidance_after_create(request, owner, step_key, was_first, was_in_setup_before):
+    if not was_first or not was_in_setup_before:
+        return
+    if step_key == "sale":
+        if _business_setup_progress(owner)["all_done"]:
+            _add_setup_guidance_message(request, "sale")
+        return
+    if _business_setup_progress(owner)["all_done"]:
+        return
+    _add_setup_guidance_message(request, step_key)
+
+
 @login_required
 @owner_required
 def dashboard(request):
@@ -735,6 +840,9 @@ def dashboard(request):
         "month_profit": month_profit,
     }
 
+    if not is_staff:
+        context["setup_progress"] = _business_setup_progress(owner)
+
     return render(request, "core/dashboard.html", context)
 
 
@@ -813,6 +921,9 @@ def customer_create(request):
                 "party_type_label": "Customer",
             })
 
+        was_in_setup = not _business_setup_progress(owner)["all_done"]
+        was_first = not Party.objects.filter(owner=owner, party_type="CUSTOMER").exists()
+
         opening_balance = _parse_opening_balance(opening_balance_raw)
         opening_is_debit = (opening_side != "CR")
 
@@ -832,6 +943,9 @@ def customer_create(request):
         if opening_balance > 0:
             create_opening_entry_for_party(request, party, opening_balance, opening_side)
 
+        _maybe_add_setup_guidance_after_create(
+            request, owner, "customer", was_first, was_in_setup
+        )
         return redirect("customer_list")
 
     return render(request, "core/party_form.html", {
@@ -867,6 +981,9 @@ def supplier_create(request):
                 "party_type_label": "Supplier",
             })
 
+        was_in_setup = not _business_setup_progress(owner)["all_done"]
+        was_first = not Party.objects.filter(owner=owner, party_type="SUPPLIER").exists()
+
         opening_balance = _parse_opening_balance(opening_balance_raw)
         opening_is_debit = (opening_side != "CR")
 
@@ -886,6 +1003,9 @@ def supplier_create(request):
         if opening_balance > 0:
             create_opening_entry_for_party(request, party, opening_balance, opening_side)
 
+        _maybe_add_setup_guidance_after_create(
+            request, owner, "supplier", was_first, was_in_setup
+        )
         return redirect("supplier_list")
 
     return render(request, "core/party_form.html", {
@@ -1117,6 +1237,8 @@ def product_create(request):
             if Product.objects.filter(owner=owner, code=code).exists():
                 error = "A product with this code already exists for your company."
             else:
+                was_in_setup = not _business_setup_progress(owner)["all_done"]
+                was_first = not Product.objects.filter(owner=owner).exists()
                 kwargs = {
                     "owner": owner,
                     "code": code,
@@ -1131,6 +1253,9 @@ def product_create(request):
                 kwargs = set_tenant_on_create_kwargs(request, kwargs, Product)
                 try:
                     Product.objects.create(**kwargs)
+                    _maybe_add_setup_guidance_after_create(
+                        request, owner, "product", was_first, was_in_setup
+                    )
                     return redirect("product_list")
                 except IntegrityError:
                     error = "A product with this code already exists for your company."
@@ -1591,8 +1716,11 @@ def sales_new(request):
                             error = "For partial payment, amount must be > 0 and < invoice total."
 
         if not error:
+            owner = request.owner
+            was_in_setup = not _business_setup_progress(owner)["all_done"]
+            was_first = not SalesInvoice.objects.filter(owner=owner).exists()
             # ✅ Generate invoice number only after all validations succeed
-            invoice_number = str(get_next_sequence(request.owner, "sales_invoice"))
+            invoice_number = str(get_next_sequence(owner, "sales_invoice"))
 
             inv_kwargs = {
                 "customer": customer,
@@ -1606,7 +1734,7 @@ def sales_new(request):
             }
 
             invoice = SalesInvoice.objects.create(
-                owner=request.owner,
+                owner=owner,
                 **inv_kwargs,
             )
 
@@ -1621,10 +1749,13 @@ def sales_new(request):
                 }
 
                 SalesInvoiceItem.objects.create(
-                    owner=request.owner,
+                    owner=owner,
                     **item_kwargs,
                 )
 
+            _maybe_add_setup_guidance_after_create(
+                request, owner, "sale", was_first, was_in_setup
+            )
             return redirect("sales_list")
 
     context = {
@@ -1885,8 +2016,11 @@ def purchase_new(request):
                     error = f"Invoice number '{invoice_number}' already exists. Please use a different invoice number."
 
             if not error:
+                owner = request.owner
+                was_in_setup = not _business_setup_progress(owner)["all_done"]
+                was_first = not PurchaseInvoice.objects.filter(owner=owner).exists()
                 invoice = PurchaseInvoice.objects.create(
-                    owner=request.owner,
+                    owner=owner,
                     **inv_kwargs,
                 )
 
@@ -1901,10 +2035,13 @@ def purchase_new(request):
                     }
 
                     PurchaseInvoiceItem.objects.create(
-                        owner=request.owner,
+                        owner=owner,
                         **item_kwargs,
                     )
 
+                _maybe_add_setup_guidance_after_create(
+                    request, owner, "purchase", was_first, was_in_setup
+                )
                 return redirect("purchase_list")
 
     context = {

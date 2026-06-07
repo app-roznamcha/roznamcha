@@ -253,6 +253,155 @@
       font-weight:800;
   }
 
+  /* Business setup progress */
+  .setup-section{
+      margin: 0 0 16px;
+      padding: 18px 18px 20px;
+      border: 1px solid rgba(29, 92, 66, 0.14);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(200,157,74,.10), transparent 34%),
+        linear-gradient(180deg, rgba(255,253,249,.98) 0%, rgba(234,243,238,.72) 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.92), 0 18px 34px rgba(19, 33, 26, 0.06);
+  }
+
+  .setup-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+  }
+
+  .setup-title{
+      margin:0;
+      font-size:22px;
+      font-weight:800;
+      color:var(--dash-text);
+      line-height:1.15;
+      letter-spacing:-0.01em;
+  }
+
+  .setup-subtitle{
+      margin:4px 0 0;
+      font-size:13px;
+      color:var(--dash-muted);
+      font-weight:600;
+      line-height:1.4;
+  }
+
+  .setup-progress-meta{
+      font-size:12px;
+      font-weight:800;
+      color:var(--dash-green-dark);
+      background:var(--dash-green-soft);
+      border:1px solid rgba(29,92,66,.14);
+      border-radius:999px;
+      padding:6px 12px;
+      white-space:nowrap;
+  }
+
+  .setup-progress-track{
+      height:8px;
+      border-radius:999px;
+      background:rgba(19,33,26,.08);
+      overflow:hidden;
+      margin-bottom:14px;
+  }
+
+  .setup-progress-fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--dash-green), #3d8a67);
+      transition:width .2s ease;
+  }
+
+  .setup-checklist{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:8px 14px;
+  }
+
+  .setup-checklist li{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      font-weight:700;
+      color:var(--dash-muted-strong);
+      line-height:1.3;
+  }
+
+  .setup-checklist li.is-done{
+      color:var(--dash-text);
+  }
+
+  .setup-check-icon{
+      width:22px;
+      height:22px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:8px;
+      border:1px solid rgba(19,33,26,.10);
+      background:#fff;
+      font-size:13px;
+      flex:0 0 auto;
+  }
+
+  .setup-checklist li.is-done .setup-check-icon{
+      background:var(--dash-green-soft);
+      border-color:rgba(29,92,66,.18);
+      color:var(--dash-green-dark);
+  }
+
+  .setup-footer{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+  }
+
+  .setup-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:11px 18px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      text-decoration:none;
+      border:1px solid var(--dash-green-dark);
+      background:linear-gradient(180deg, var(--dash-green), var(--dash-green-dark));
+      color:#fff;
+      box-shadow:0 10px 22px rgba(21,63,46,.18);
+      transition:transform .12s ease, box-shadow .12s ease;
+  }
+
+  .setup-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 26px rgba(21,63,46,.22);
+      color:#fff;
+  }
+
+  .setup-complete{
+      margin:0;
+      font-size:14px;
+      font-weight:800;
+      color:var(--dash-green-dark);
+  }
+
+  @media (max-width: 640px){
+    .setup-checklist{ grid-template-columns:1fr; }
+    .setup-btn{ width:100%; }
+  }
+
   /* Top mini-cards */
   .dashboard-cards {
         display: grid;
@@ -964,6 +1113,40 @@ html[dir="rtl"] .dashboard-section{
     </div>
 
 
+
+    {# ---- Business setup progress (Owner/Superadmin only) ---- #}
+    {% if not is_staff and setup_progress %}
+    <section class="setup-section" aria-label="Business setup progress">
+      <div class="setup-header">
+        <div>
+          <h2 class="setup-title">🚀 Business Setup</h2>
+          <p class="setup-subtitle">Complete these steps to start managing your business.</p>
+        </div>
+        <span class="setup-progress-meta">{{ setup_progress.completed_count }} / {{ setup_progress.total_count }} complete</span>
+      </div>
+
+      <div class="setup-progress-track" aria-hidden="true">
+        <div class="setup-progress-fill" style="width: {{ setup_progress.progress_percent }}%;"></div>
+      </div>
+
+      <ul class="setup-checklist">
+        {% for step in setup_progress.steps %}
+        <li class="{% if step.done %}is-done{% endif %}">
+          <span class="setup-check-icon" aria-hidden="true">{% if step.done %}✓{% else %}☐{% endif %}</span>
+          <span>{{ step.label }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <div class="setup-footer">
+        {% if setup_progress.all_done %}
+          <p class="setup-complete">🎉 Business setup completed.</p>
+        {% else %}
+          <a href="{{ setup_progress.next_url }}" class="setup-btn">Continue Setup</a>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
 
     {# ---- Top financial metric cards (Owner/Superadmin only) ---- #}
     {% if not is_staff %}

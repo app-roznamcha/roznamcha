@@ -295,6 +295,49 @@
         color:#065f46;
         border-color:#10b981;
       }
+      .msg-onboarding{
+        padding:16px 18px;
+        border-radius:16px;
+        background:linear-gradient(180deg,#ecfdf5 0%,#dff7ec 100%);
+        border-color:#6ee7b7;
+        box-shadow:0 10px 22px rgba(6,95,70,.08);
+      }
+      .onboarding-msg{
+        display:grid;
+        gap:8px;
+      }
+      .onboarding-msg-title{
+        font-size:15px;
+        font-weight:800;
+        color:#065f46;
+        line-height:1.35;
+      }
+      .onboarding-msg-sub{
+        font-size:14px;
+        font-weight:600;
+        color:#047857;
+        line-height:1.4;
+      }
+      .onboarding-msg-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:fit-content;
+        margin-top:4px;
+        padding:10px 16px;
+        border-radius:12px;
+        font-size:14px;
+        font-weight:800;
+        text-decoration:none;
+        color:#fff;
+        background:linear-gradient(180deg,#1d5c42,#153f2e);
+        border:1px solid #153f2e;
+        box-shadow:0 8px 18px rgba(21,63,46,.18);
+      }
+      .onboarding-msg-btn:hover{
+        color:#fff;
+        transform:translateY(-1px);
+      }
       .msg-error{
         background:#fef2f2;
         color:#991b1b;
@@ -423,10 +466,11 @@
        <div class="msg-wrap">
          {% for message in messages %}
            <div class="msg
-             {% if message.tags == 'success' %} msg-success
-             {% elif message.tags == 'error' %} msg-error
-             {% elif message.tags == 'warning' %} msg-warning
+             {% if 'success' in message.tags %} msg-success
+             {% elif 'error' in message.tags %} msg-error
+             {% elif 'warning' in message.tags %} msg-warning
              {% endif %}
+             {% if 'onboarding' in message.tags %} msg-onboarding{% endif %}
            ">
              {{ message }}
            </div>

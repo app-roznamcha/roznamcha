@@ -1,12 +1,12 @@
 {% extends "core/base.html" %}
-{% block title %}{% if product %}Edit Product{% else %}New Product{% endif %}{% endblock %}
+{% block title %}{% if product %}Edit Product{% else %}Add Product{% endif %}{% endblock %}
 
 {% block content %}
 <div class="product-form-page">
   <style>
     .product-form-page{
       max-width:860px;
-      margin:34px auto 64px;
+      margin:22px auto 56px;
       padding:0 18px;
       --ink-900:#172033;
       --ink-700:#334155;
@@ -20,16 +20,27 @@
       --surface-cream:#f8f5ef;
     }
 
+    .pf-top-hint{
+      margin:0 0 12px;
+      padding:10px 14px;
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.45;
+      color:var(--ink-700);
+      background:var(--surface-cream);
+      border:1px solid var(--line);
+    }
+
     .pf-hero{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:18px;
+      margin-bottom:12px;
       flex-wrap:wrap;
       gap:12px;
       border:1px solid var(--line);
       border-radius:24px;
-      padding:24px 26px;
+      padding:20px 22px;
       background:
         radial-gradient(900px 260px at -20% -120%, #f1e6d2 0%, transparent 58%),
         radial-gradient(700px 220px at 120% -110%, #e4efe8 0%, transparent 56%),
@@ -90,9 +101,9 @@
       background:#ffffff;
       border-radius:20px;
       border:1px solid var(--line);
-      padding:22px 24px 24px;
+      padding:18px 20px 20px;
       box-shadow:0 14px 28px rgba(23,32,51,.06);
-      margin-bottom:18px;
+      margin-bottom:14px;
       position:relative;
       overflow:hidden;
     }
@@ -116,16 +127,9 @@
       letter-spacing:-.01em;
     }
 
-    .pf-card-sub{
-      margin:6px 0 14px;
-      font-size:14px;
-      color:#6b7280;
-      line-height:1.45;
-    }
-
     .pf-grid{
       display:grid;
-      gap:14px;
+      gap:12px;
     }
 
     .pf-field label{
@@ -305,10 +309,14 @@
   <div class="pf-hero">
     <div>
       <h1 class="pf-title">
-        {% if product %}Edit Product{% else %}New Product{% endif %}
+        {% if product %}Edit Product{% else %}Add Product{% endif %}
       </h1>
       <p class="pf-sub">
-        Define product details, pricing, and stock behavior.
+        {% if product %}
+          Update product details and prices.
+        {% else %}
+          Add an item you buy or sell.
+        {% endif %}
       </p>
     </div>
     <div>
@@ -318,6 +326,10 @@
       </a>
     </div>
   </div>
+
+  {% if not product %}
+  <p class="pf-top-hint">Fill only the required fields first. You can update details later.</p>
+  {% endif %}
 
   {# ---------- Error Message (if any) ---------- #}
   {% if error %}
@@ -329,10 +341,9 @@
   <form method="post">
     {% csrf_token %}
 
-    {# ---------- Basic Details Card ---------- #}
+    {# ---------- Product Info Card ---------- #}
     <div class="pf-card">
-      <h2 class="pf-card-title">Basic Details</h2>
-      <p class="pf-card-sub">Set the product name, code, and base unit used in sales, purchases, and stock.</p>
+      <h2 class="pf-card-title">Product Info</h2>
 
       <div class="pf-grid">
         <div class="pf-field">
@@ -342,9 +353,8 @@
           <input type="text"
                  name="name"
                  value="{{ product.name|default_if_none:'' }}"
-                 placeholder="e.g. Cement Bag, Pepsi Bottle, Rice 25kg"
+                 placeholder="e.g. Urea Bag"
                  required>
-          <div class="pf-hint">Use the name customers and staff will recognize quickly.</div>
         </div>
 
         <div class="pf-field">
@@ -354,9 +364,8 @@
           <input type="text"
                  name="code"
                  value="{{ product.code|default_if_none:'' }}"
-                 placeholder="e.g. CEMENT50, PEPSI1L, RICE25"
+                 placeholder="e.g. UREA50"
                  required>
-          <div class="pf-hint">Short code for search and reports.</div>
         </div>
 
         <div class="pf-field">
@@ -366,25 +375,23 @@
           <select name="unit">
             {% for value,label in UNIT_CHOICES %}
             <option value="{{ value }}"
-              {% if product and product.unit == value %}selected{% endif %}>
+              {% if product and product.unit == value %}selected{% elif not product and value == "BAG" %}selected{% endif %}>
               {{ label }}
             </option>
             {% endfor %}
           </select>
-          <div class="pf-hint">Base unit: piece, kg, bottle, bag.</div>
         </div>
       </div>
     </div>
 
     {# ---------- Prices Card ---------- #}
     <div class="pf-card">
-      <h2 class="pf-card-title">Pricing</h2>
-      <p class="pf-card-sub">Set per-unit cost and selling prices. Pack preview updates automatically when packing is used.</p>
+      <h2 class="pf-card-title">Prices</h2>
 
       <div class="pf-grid">
         <div class="pf-field">
           <label>
-            Purchase Price per Unit
+            Purchase Price Per Unit
           </label>
           <input type="number"
                  step="0.01"
@@ -393,13 +400,12 @@
                  class="price-input"
                  name="purchase_price_per_unit"
                  value="{% if product %}{{ product.purchase_price_per_unit }}{% else %}0{% endif %}"
-                 placeholder="e.g. 1200">
-          <div class="pf-hint">Cost price per base unit.</div>
+                 placeholder="0">
         </div>
 
         <div class="pf-field">
           <label>
-            Sale Price per Unit
+            Sale Price Per Unit
           </label>
           <input type="number"
                  step="0.01"
@@ -408,8 +414,7 @@
                  class="price-input"
                  name="sale_price_per_unit"
                  value="{% if product %}{{ product.sale_price_per_unit }}{% else %}0{% endif %}"
-                 placeholder="e.g. 1350">
-          <div class="pf-hint">Selling price per base unit.</div>
+                 placeholder="0">
         </div>
 
         
@@ -418,10 +423,7 @@
           <summary>
             <div class="pf-details-copy">
               <span class="pf-toggle-badge">+</span>
-              <div>
-                <div>Use packing</div>
-                <div class="pf-details-hint">Example: 12 bottles = 1 carton.</div>
-              </div>
+              <div>Use packing</div>
             </div>
             <span class="pf-details-chevron">⌄</span>
           </summary>
@@ -440,7 +442,6 @@
                         </option>
                       {% endfor %}
                 </select>
-                <div class="pf-hint">Choose carton, bag, box, bottle, or another outer pack.</div>
               </div>
 
               <div class="pf-field">
@@ -454,7 +455,6 @@
                        id="piecesPerPackInput"
                        name="pieces_per_pack"
                        value="{% if request.POST.pieces_per_pack %}{{ request.POST.pieces_per_pack }}{% elif product %}{{ product.pieces_per_pack }}{% else %}1{% endif %}">
-                <div class="pf-hint">How many base units are inside one pack.</div>
               </div>
             </div>
           </div>
