@@ -142,13 +142,13 @@
     .grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:12px;
+      gap:14px;
     }
 
     .field{
       display:flex;
       flex-direction:column;
-      gap:7px;
+      gap:8px;
     }
 
     label{
@@ -180,13 +180,6 @@
       border-color:#7ba08f;
       box-shadow:0 0 0 4px rgba(31,90,69,.12);
       background:#fff;
-    }
-
-    .help{
-      font-size:12px;
-      color:var(--ink-500);
-      line-height:1.45;
-      margin-top:0;
     }
 
     .pw-wrap{ position:relative; }
@@ -306,36 +299,33 @@
         <div class="grid">
           <div class="field">
             <label>Username <span class="req">*</span></label>
-            <input class="input" name="username" required autocomplete="username" placeholder="e.g., ahmed_ali">
-            <div class="help">Used for login. Keep it simple and memorable.</div>
+            <input class="input" name="username" required autocomplete="username" placeholder="Username">
           </div>
 
           <div class="field">
             <label>Full Name</label>
-            <input class="input" name="full_name" autocomplete="name" placeholder="e.g., Ahmed Ali">
+            <input class="input" name="full_name" autocomplete="name" placeholder="Full Name">
           </div>
 
           <div class="field">
             <label>Password <span class="req">*</span></label>
             <div class="pw-wrap">
-              <input id="pw1" class="input" name="password" type="password" required autocomplete="new-password" placeholder="Minimum 8 characters">
+              <input id="pw1" class="input" name="password" type="password" required autocomplete="new-password" placeholder="Password">
               <button class="pw-btn" type="button" data-toggle="pw1">Show</button>
             </div>
-            <div class="help">Tip: Use at least 8 characters with a mix of letters & numbers.</div>
           </div>
 
           <div class="field">
             <label>Confirm Password <span class="req">*</span></label>
             <div class="pw-wrap">
-              <input id="pw2" class="input" name="password2" type="password" required autocomplete="new-password" placeholder="Re-type your password">
+              <input id="pw2" class="input" name="password2" type="password" required autocomplete="new-password" placeholder="Confirm Password">
               <button class="pw-btn" type="button" data-toggle="pw2">Show</button>
             </div>
-            <div class="help">Must match the password exactly.</div>
           </div>
 
           <div class="field" style="grid-column:1/-1;">
             <label>Email <span class="req">*</span></label>
-            <input class="input" name="email" type="email" required autocomplete="email" placeholder="e.g., ahmed@gmail.com">
+            <input class="input" name="email" type="email" required autocomplete="email" placeholder="Email Address">
           </div>
         </div>
 
@@ -344,12 +334,12 @@
         <div class="grid">
           <div class="field">
             <label>Company Name <span class="req">*</span></label>
-            <input class="input" name="company_name" required placeholder="e.g., Standard Zarai Traders">
+            <input class="input" name="company_name" required placeholder="Company Name">
           </div>
 
           <div class="field">
             <label>Phone</label>
-            <input class="input" name="phone" autocomplete="tel" placeholder="e.g., 0349 5952363">
+            <input class="input" name="phone" autocomplete="tel" placeholder="Phone Number">
           </div>
         </div>
 
