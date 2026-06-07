@@ -8,7 +8,7 @@ import logging
 import json
 import hashlib
 import hmac
-from collections import OrderedDict, defaultdict
+from collections import Counter, OrderedDict, defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from functools import wraps
@@ -81,6 +81,7 @@ from .models import (
     SalesReturn,
     SalesReturnItem,
     StockAdjustment,
+    OwnerSequence,
     SubscriptionTransaction,
     UserProfile,
     get_company_owner,
@@ -428,6 +429,22 @@ def _wipe_tenant_data(owner):
     Account.objects.filter(owner=owner).delete()
 
     # CompanyProfile is NOT deleted here (keep tenant identity)
+
+
+def _hard_purge_owner_data(owner):
+    """
+    Delete all business and staff data for an owner before removing the owner user.
+    Superadmin hard purge only.
+    """
+    _wipe_tenant_data(owner)
+    SubscriptionTransaction.objects.filter(owner=owner).delete()
+    OwnerSequence.objects.filter(owner=owner).delete()
+
+    staff_user_ids = list(
+        UserProfile.objects.filter(role="STAFF", owner=owner).values_list("user_id", flat=True)
+    )
+    if staff_user_ids:
+        get_user_model().objects.filter(id__in=staff_user_ids).delete()
 
 
 def get_operational_profit(owner, date_from, date_to):
@@ -7289,8 +7306,26 @@ def superadmin_hard_purge_owner(request, owner_id):
         messages.error(request, f"Confirmation failed. Type exactly: {expected}")
         return redirect("superadmin_owner_detail", owner_id=owner_id)
 
-    # HARD PURGE: delete company data safely by deleting owner (cascades)
-    owner.delete()
+    try:
+        with transaction.atomic():
+            _hard_purge_owner_data(owner)
+            owner.delete()
+    except ProtectedError as exc:
+        counts = Counter(type(obj).__name__ for obj in exc.protected_objects)
+        summary = ", ".join(f"{name} ({count})" for name, count in sorted(counts.items()))
+        logger.exception(
+            "Hard purge blocked for owner_id=%s (%s): protected %s",
+            owner_id,
+            getattr(owner, "username", owner_id),
+            summary,
+        )
+        messages.error(
+            request,
+            "Owner could not be purged because protected records still exist: "
+            f"{summary}",
+        )
+        return redirect("superadmin_owner_detail", owner_id=owner_id)
+
     messages.success(request, "Company hard purged successfully.")
     return redirect("superadmin_dashboard")
 
