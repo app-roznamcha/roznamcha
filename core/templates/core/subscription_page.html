@@ -1,105 +1,536 @@
 {% extends "core/base.html" %}
+{% load static %}
 {% block content %}
 
-<div class="container" style="max-width:900px;margin:30px auto 60px;padding:0 16px;">
-  <h2 style="margin:0 0 10px;font-size:28px;font-weight:800;">Subscription</h2>
+<div class="subscription-page">
+  <style>
+    .subscription-page{
+      max-width:920px;
+      margin:28px auto 64px;
+      padding:0 16px;
+      --ink-900:#172033;
+      --ink-700:#334155;
+      --ink-500:#6b7280;
+      --line:#e5dccd;
+      --line-strong:#d9cfbf;
+      --primary:#1f5a45;
+      --primary-dark:#163f31;
+      --surface:#ffffff;
+      --surface-soft:#fffdfa;
+      --surface-muted:#f8f5ef;
+      --accent-gold:#c89d4a;
+    }
 
-  <div style="margin:15px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;">
-    <p><strong>Status:</strong> {{ status|default:"-" }}</p>
-    <p><strong>Trial Started:</strong> {{ trial_started_at|date:"d M Y, h:i A" }}</p>
+    .sub-hero{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:14px;
+      padding:20px 22px;
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:
+        radial-gradient(700px 240px at -10% -130%, #e4efe8 0%, transparent 60%),
+        radial-gradient(520px 220px at 110% -120%, #f0e2cf 0%, transparent 56%),
+        var(--surface-soft);
+      box-shadow:0 18px 34px rgba(23,32,51,.07);
+    }
 
-    {% if expires_at %}
-      <p><strong>Expires At:</strong> {{ expires_at|date:"d M Y, h:i A" }}</p>
-      <p><strong>Days Left:</strong> {{ days_left }}</p>
-    {% else %}
-      <p><strong>Expires At:</strong> (not set)</p>
-    {% endif %}
+    .sub-logo{
+      height:56px;
+      width:auto;
+      object-fit:contain;
+      border-radius:14px;
+      border:1px solid rgba(23,32,51,.08);
+      background:#fff;
+      padding:4px;
+      flex:0 0 auto;
+    }
+
+    .sub-title{
+      margin:0 0 4px;
+      font-size:30px;
+      font-weight:800;
+      color:var(--ink-900);
+      letter-spacing:-.02em;
+      line-height:1.1;
+    }
+
+    .sub-subtitle{
+      margin:0;
+      font-size:14px;
+      color:var(--ink-500);
+      font-weight:600;
+      line-height:1.45;
+    }
+
+    .sub-card{
+      position:relative;
+      overflow:hidden;
+      background:var(--surface-soft);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:20px 22px 22px;
+      box-shadow:0 14px 28px rgba(23,32,51,.06);
+      margin-bottom:14px;
+    }
+
+    .sub-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg,var(--primary),#7d9f8d,var(--accent-gold));
+      opacity:.85;
+    }
+
+    .sub-card-title{
+      margin:0 0 14px;
+      font-size:20px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .sub-status-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px 18px;
+    }
+
+    .sub-status-item{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .sub-status-label{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--ink-500);
+    }
+
+    .sub-status-value{
+      font-size:15px;
+      font-weight:700;
+      color:var(--ink-900);
+      line-height:1.35;
+    }
+
+    .sub-days-left{
+      font-size:28px;
+      font-weight:800;
+      color:var(--primary-dark);
+      line-height:1;
+      letter-spacing:-.02em;
+    }
+
+    .sub-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      border:1px solid;
+      width:fit-content;
+    }
+
+    .sub-badge-active{
+      color:#065f46;
+      background:#ecfdf5;
+      border-color:#6ee7b7;
+    }
+
+    .sub-badge-trial{
+      color:#92400e;
+      background:#fffbeb;
+      border-color:#fcd34d;
+    }
+
+    .sub-badge-expired{
+      color:#991b1b;
+      background:#fef2f2;
+      border-color:#fecaca;
+    }
+
+    .sub-section-head{
+      margin-bottom:14px;
+    }
+
+    .sub-section-head h3{
+      margin:0 0 4px;
+      font-size:22px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .sub-section-head p{
+      margin:0;
+      font-size:14px;
+      color:var(--ink-500);
+      font-weight:600;
+      line-height:1.45;
+    }
+
+    .sub-pay-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:14px;
+    }
+
+    .sub-pay-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-height:100%;
+    }
+
+    .sub-pay-card.online{
+      border-color:rgba(31,90,69,.22);
+      background:linear-gradient(180deg,#fffdfa 0%,#f3faf6 100%);
+      box-shadow:0 10px 22px rgba(21,63,46,.08);
+    }
+
+    .sub-pay-card.manual{
+      background:linear-gradient(180deg,#fffdfa 0%,#f8f5ef 100%);
+    }
+
+    .sub-pay-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .sub-pay-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .sub-pay-badge{
+      display:inline-flex;
+      padding:4px 9px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      border:1px solid;
+      white-space:nowrap;
+    }
+
+    .sub-pay-badge-instant{
+      color:var(--primary-dark);
+      background:#e7f4eb;
+      border-color:#b9dfc2;
+    }
+
+    .sub-pay-badge-manual{
+      color:var(--ink-700);
+      background:var(--surface-muted);
+      border-color:var(--line);
+    }
+
+    .sub-pay-desc{
+      margin:0;
+      font-size:14px;
+      color:var(--ink-500);
+      line-height:1.5;
+      font-weight:600;
+    }
+
+    .sub-field label{
+      display:block;
+      margin-bottom:7px;
+      font-size:13px;
+      font-weight:700;
+      color:var(--ink-700);
+    }
+
+    .sub-field select{
+      width:100%;
+      min-height:48px;
+      padding:12px 13px;
+      border:1px solid var(--line-strong);
+      border-radius:14px;
+      background:var(--surface-soft);
+      font-size:14px;
+      color:var(--ink-900);
+      transition:border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .sub-field select:focus{
+      outline:none;
+      border-color:#7ba08f;
+      box-shadow:0 0 0 4px rgba(31,90,69,.12);
+      background:#fff;
+    }
+
+    .sub-plan-note{
+      font-size:13px;
+      line-height:1.55;
+      color:var(--ink-500);
+      font-weight:600;
+    }
+
+    .sub-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      min-height:50px;
+      padding:12px 16px;
+      border-radius:14px;
+      font-size:15px;
+      font-weight:800;
+      text-decoration:none;
+      border:1px solid var(--line-strong);
+      background:var(--surface-soft);
+      color:var(--primary-dark);
+      cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+
+    .sub-btn-primary{
+      border-color:var(--primary-dark);
+      background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+      color:#fff;
+      box-shadow:0 10px 22px rgba(21,63,46,.18);
+    }
+
+    .sub-btn-primary:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 26px rgba(21,63,46,.22);
+    }
+
+    .sub-btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .sub-status-box{
+      display:none;
+      margin-top:12px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface-muted);
+      color:var(--ink-700);
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .sub-manual-steps{
+      display:grid;
+      gap:10px;
+    }
+
+    .sub-manual-step{
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+    }
+
+    .sub-manual-step strong{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:var(--ink-500);
+      margin-bottom:4px;
+    }
+
+    .sub-manual-step span{
+      font-size:14px;
+      color:var(--ink-700);
+      font-weight:600;
+      line-height:1.45;
+    }
+
+    .sub-ref{
+      margin-top:8px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:2px dashed var(--line-strong);
+      background:#fff;
+      color:var(--ink-900);
+      font-weight:900;
+      font-size:20px;
+      letter-spacing:.05em;
+      text-align:center;
+    }
+
+    .sub-phone{
+      margin-top:4px;
+      font-size:20px;
+      font-weight:800;
+      color:var(--ink-900);
+    }
+
+    .sub-back{
+      margin-top:14px;
+    }
+
+    @media (max-width: 760px){
+      .sub-pay-grid{ grid-template-columns:1fr; }
+      .sub-status-grid{ grid-template-columns:1fr; }
+      .sub-hero{ padding:16px; }
+      .sub-title{ font-size:24px; }
+    }
+  </style>
+
+  <div class="sub-hero">
+    <img class="sub-logo" src="{% static 'core/branding/roznamcha.png' %}" alt="Roznamcha">
+    <div>
+      <h1 class="sub-title">Subscription</h1>
+      <p class="sub-subtitle">View your plan status and renew your subscription.</p>
+    </div>
   </div>
 
-  <div style="padding:18px 18px 8px;border:1px solid #e5e7eb;border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);box-shadow:0 10px 24px rgba(15,23,42,.05);">
-    <h3 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#111827;">Choose how you want to pay</h3>
-    <p style="margin:0 0 18px;color:#6b7280;line-height:1.55;">
-      Pick the payment method that works best for you.
-    </p>
+  <div class="sub-card">
+    <h2 class="sub-card-title">Subscription Status</h2>
+    <div class="sub-status-grid">
+      <div class="sub-status-item">
+        <span class="sub-status-label">Status</span>
+        <span class="sub-status-value">
+          {% if is_active %}
+            <span class="sub-badge sub-badge-active">Active</span>
+          {% elif is_trial %}
+            <span class="sub-badge sub-badge-trial">Trial</span>
+          {% elif is_expired %}
+            <span class="sub-badge sub-badge-expired">Expired</span>
+          {% else %}
+            <span class="sub-badge">{{ status|default:"-" }}</span>
+          {% endif %}
+        </span>
+      </div>
 
-    <div style="padding:18px;border:1px solid #dbeafe;border-radius:18px;background:#ffffff;box-shadow:0 8px 18px rgba(37,99,235,.06);">
-      <h4 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#1d4ed8;">Pay Online (Instant Activation)</h4>
-      <p style="margin:0 0 16px;color:#4b5563;line-height:1.55;">
-        Secure online payment. Your subscription activates instantly.
-      </p>
+      <div class="sub-status-item">
+        <span class="sub-status-label">Days Left</span>
+        <span class="sub-status-value">
+          {% if days_left != None %}
+            <span class="sub-days-left">{{ days_left }}</span>
+          {% else %}
+            —
+          {% endif %}
+        </span>
+      </div>
 
-      <form id="subscription-checkout-form" method="post" action="{% url 'subscription_checkout_start' %}">
-        {% csrf_token %}
+      <div class="sub-status-item">
+        <span class="sub-status-label">Expires</span>
+        <span class="sub-status-value">
+          {% if expires_at %}
+            {{ expires_at|date:"d M Y, h:i A" }}
+          {% else %}
+            Not set
+          {% endif %}
+        </span>
+      </div>
 
-        <label style="display:block;margin-top:4px;margin-bottom:8px;font-weight:700;color:#111827;">Select Plan</label>
-        <select name="plan" required style="width:100%;max-width:360px;padding:12px 14px;border:1px solid #d1d5db;border-radius:12px;background:#fff;">
-          <option value="">-- Select --</option>
-          <option value="MONTHLY">Monthly — Rs 1,000 / month</option>
-          <option value="YEARLY">Yearly — Rs 9,000 / year (Save 25%)</option>
-        </select>
+      <div class="sub-status-item">
+        <span class="sub-status-label">Trial Started</span>
+        <span class="sub-status-value">
+          {% if trial_started_at %}
+            {{ trial_started_at|date:"d M Y, h:i A" }}
+          {% else %}
+            —
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
 
-        <div style="margin-top:12px;max-width:520px;font-size:14px;line-height:1.65;color:#4b5563;">
-          <div><strong style="color:#111827;">Monthly:</strong> Rs 1,000 per month</div>
-          <div><strong style="color:#111827;">Yearly:</strong> Rs 9,000 per year <span style="color:#059669;font-weight:700;">(25% discount compared to monthly)</span></div>
-        </div>
-
-        <div style="margin-top:18px;">
-          <button id="subscription-checkout-submit" type="submit" style="width:100%;max-width:360px;padding:14px 18px;border-radius:14px;border:1px solid #2563eb;background:#2563eb;color:#fff;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 12px 24px rgba(37,99,235,.18);">
-            Continue to Safepay Checkout
-          </button>
-        </div>
-      </form>
-
-      <div id="subscription-checkout-status" style="display:none;margin-top:16px;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;color:#374151;"></div>
+  <div class="sub-card">
+    <div class="sub-section-head">
+      <h3>Choose Payment Method</h3>
+      <p>Select a payment option to continue your subscription.</p>
     </div>
 
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0 18px;">
-      <div style="flex:1;height:1px;background:#e5e7eb;"></div>
-      <div style="font-size:13px;font-weight:800;letter-spacing:.08em;color:#94a3b8;">OR</div>
-      <div style="flex:1;height:1px;background:#e5e7eb;"></div>
-    </div>
-
-    <div style="padding:18px;border:1px solid #e5e7eb;border-radius:18px;background:#ffffff;box-shadow:0 8px 18px rgba(15,23,42,.05);">
-      <h4 style="margin:0 0 12px;font-size:20px;font-weight:800;color:#111827;">Pay via Easypaisa / JazzCash</h4>
-
-      <div style="display:grid;gap:14px;">
-        <div style="padding:14px;border:1px solid #eef2f7;border-radius:14px;background:#f8fafc;">
-          <div style="font-size:13px;font-weight:800;letter-spacing:.04em;color:#64748b;text-transform:uppercase;">Step 1</div>
-          <div style="margin-top:6px;font-size:15px;color:#334155;">Send payment using JazzCash or Easypaisa:</div>
-          <div style="margin-top:8px;font-size:22px;font-weight:800;color:#111827;">03330552363</div>
-          <div style="margin-top:6px;font-size:13px;color:#6b7280;">This number works for both JazzCash and Easypaisa.</div>
+    <div class="sub-pay-grid">
+      <div class="sub-pay-card online">
+        <div class="sub-pay-head">
+          <h4 class="sub-pay-title">Pay Online</h4>
+          <span class="sub-pay-badge sub-pay-badge-instant">Instant Activation</span>
         </div>
+        <p class="sub-pay-desc">Pay securely online. Your subscription is activated automatically.</p>
 
-        <div style="padding:14px;border:1px solid #eef2f7;border-radius:14px;background:#f8fafc;">
-          <div style="font-size:13px;font-weight:800;letter-spacing:.04em;color:#64748b;text-transform:uppercase;">Step 2</div>
-          <div style="margin-top:6px;font-size:15px;color:#334155;">Send screenshot on WhatsApp:</div>
-          <div style="margin-top:8px;font-size:22px;font-weight:800;color:#111827;">03330552363</div>
-          <div style="margin-top:6px;font-size:13px;color:#6b7280;">This is the same number on WhatsApp.</div>
-        </div>
+        <form id="subscription-checkout-form" method="post" action="{% url 'subscription_checkout_start' %}">
+          {% csrf_token %}
 
-        <div style="padding:14px;border:1px solid #eef2f7;border-radius:14px;background:#f8fafc;">
-          <div style="font-size:13px;font-weight:800;letter-spacing:.04em;color:#64748b;text-transform:uppercase;">Step 3</div>
-          <div style="margin-top:6px;font-size:15px;color:#334155;">Include this reference code in your message:</div>
-          <div style="margin-top:12px;display:flex;justify-content:center;">
-            <div style="min-width:260px;padding:16px 18px;border-radius:14px;border:2px dashed #94a3b8;background:#ffffff;color:#0f172a;font-weight:900;font-size:22px;letter-spacing:.06em;text-align:center;">
-              {{ manual_payment_ref }}
-            </div>
+          <div class="sub-field">
+            <label for="subscription-plan">Select Plan</label>
+            <select id="subscription-plan" name="plan" required>
+              <option value="">-- Select --</option>
+              <option value="MONTHLY">Monthly — Rs 1,000 / month</option>
+              <option value="YEARLY">Yearly — Rs 9,000 / year (Save 25%)</option>
+            </select>
           </div>
-          <div style="margin-top:8px;font-size:13px;color:#6b7280;text-align:center;">Reference code (for support) · Tap to copy</div>
-        </div>
 
-        <div style="padding:14px;border:1px solid #eef2f7;border-radius:14px;background:#f8fafc;">
-          <div style="font-size:13px;font-weight:800;letter-spacing:.04em;color:#64748b;text-transform:uppercase;">Step 4</div>
-          <div style="margin-top:6px;font-size:15px;color:#334155;">We will activate your subscription within <strong style="color:#111827;">2–6 hours</strong>.</div>
+          <p class="sub-plan-note">
+            Monthly: Rs 1,000 · Yearly: Rs 9,000 (25% off)
+          </p>
+
+          <button id="subscription-checkout-submit" class="sub-btn sub-btn-primary" type="submit">
+            Pay Online
+          </button>
+        </form>
+
+        <div id="subscription-checkout-status" class="sub-status-box"></div>
+      </div>
+
+      <div class="sub-pay-card manual">
+        <div class="sub-pay-head">
+          <h4 class="sub-pay-title">JazzCash / Easypaisa</h4>
+          <span class="sub-pay-badge sub-pay-badge-manual">Manual Verification</span>
+        </div>
+        <p class="sub-pay-desc">Send payment and upload screenshot for approval.</p>
+
+        <div class="sub-manual-steps">
+          <div class="sub-manual-step">
+            <strong>Step 1 — Send Payment</strong>
+            <span>Pay via JazzCash or Easypaisa:</span>
+            <div class="sub-phone">03330552363</div>
+          </div>
+
+          <div class="sub-manual-step">
+            <strong>Step 2 — Send Screenshot</strong>
+            <span>Share payment screenshot on WhatsApp:</span>
+            <div class="sub-phone">03330552363</div>
+          </div>
+
+          <div class="sub-manual-step">
+            <strong>Step 3 — Reference Code</strong>
+            <span>Include this code in your message:</span>
+            <div class="sub-ref">{{ manual_payment_ref }}</div>
+          </div>
+
+          <div class="sub-manual-step">
+            <strong>Step 4 — Activation</strong>
+            <span>Subscription is activated within 2–6 hours.</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div style="margin-top: 20px;">
-    <a href="{% url 'dashboard' %}" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;color:#111827;font-weight:700;text-decoration:none;">
-      ← Back to Dashboard
-    </a>
+  <div class="sub-back">
+    <a href="{% url 'dashboard' %}" class="sub-btn" style="width:auto;min-width:200px;">← Back to Dashboard</a>
   </div>
 </div>
 
